@@ -8,10 +8,14 @@ N_true <- 50
 set_f <- function(gamma, C, K, beta){ 
   function(x, E_h) x * exp( gamma*(1-x/K)*((x-C)/K)) - x*E_h*beta
 }
+alan_f <- function(r, alpha, K, beta){ 
+  function(x, E_h) r*x^alpha/(1+x^alpha/K) - x*E_h*beta
+}
 
-# Initialize f.  Allee threshold 20, carrying capacity 100, .1 efficacy 
+
+# Initialize f.  timescale, Allee threshold, carrying capacity, efficacy 
 # (e.g. effort = 1/beta means catch all the stock)
-f <- set_f(1, 5, 100, .1)
+f <- set_f(1, 20, 100, 1)
 
 
 
@@ -38,6 +42,7 @@ Pi <- function(E_h, E_s, t){
 # Increased sampling effort reduces the the variance 
   P_0 <- function(x) dlnorm(x, mean=log(N_true), sd=1/E_s)
 
+# integral over N
   iterate_t <- function(t){ # in case t is a vector
     int <- function(N) E_h*N*F(N,t,E_h)*P_0(N)
     sum(sapply(0:200, int))
@@ -55,8 +60,8 @@ Pi <- function(E_h, E_s, t){
 }
 
 
-r <- .5 # discounting (interest) rate
-T <- 40 # time horizon
+r <- 1 # discounting (interest) rate
+T <- 20 # time horizon
 
 # target function which we optimize
 target <- function(pars){
