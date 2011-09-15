@@ -1,5 +1,8 @@
 # training_prob2.R
 
+
+N_true <- 50
+
 # population growth function: Discrete time Ricker with Allee effect
 # Returns the function f as a closure
 set_f <- function(gamma, C, K, beta){ 
@@ -8,7 +11,7 @@ set_f <- function(gamma, C, K, beta){
 
 # Initialize f.  Allee threshold 20, carrying capacity 100, .1 efficacy 
 # (e.g. effort = 1/beta means catch all the stock)
-f <- set_f(1, 20, 100, .1)
+f <- set_f(1, 5, 100, .1)
 
 
 
@@ -26,9 +29,6 @@ F <- function(N,t, E_h){
   sapply(t, iterate_t)
 }
 
-t <-1:20
-plot(t, F(50,t,1))
-
 
 info_cost <- 1
 
@@ -36,7 +36,7 @@ info_cost <- 1
 Pi <- function(E_h, E_s, t){
 # Define the initial probability distribution of population density
 # Increased sampling effort reduces the the variance 
-  P_0 <- function(x) dlnorm(x, mean=log(60), sd=1/E_s)
+  P_0 <- function(x) dlnorm(x, mean=log(N_true), sd=1/E_s)
 
   iterate_t <- function(t){ # in case t is a vector
     int <- function(N) E_h*N*F(N,t,E_h)*P_0(N)
@@ -55,8 +55,8 @@ Pi <- function(E_h, E_s, t){
 }
 
 
-r <- 1 # discounting (interest) rate
-T <- 20 # time horizon
+r <- .5 # discounting (interest) rate
+T <- 40 # time horizon
 
 # target function which we optimize
 target <- function(pars){
@@ -80,9 +80,19 @@ gridsearch <- function(E_s, E_h){
 
 
 
-pars <- c(E_h=5, E_s=5)
+pars <- c(E_h=.5, E_s=.5)
 o <- optim(pars, target)
 
 #optimal solution is:
 o$par
+
+par(mfrow=c(1,2)) # space for two side-by-side plots
+## what does the optimal strategy do to the fish population?
+plot(1:T, F(N_true,t,o$par["E_h"]), main="Optimial fish stock over time")
+## What does the optimal starting information look like:
+P_0 <- function(x) dlnorm(x, mean=log(N_true), sd=1/o$par["E_s"])
+curve(P_0, 0, 120, main="Optimal Sampling")
+## enough to place most of the weight above the allee threshold 
+
+
 
