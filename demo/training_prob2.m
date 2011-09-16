@@ -74,6 +74,8 @@ end
 
 target(.01, .01, pars)
 
+%% This is the same target function I was passing to the optim routine (Nelder-Mead).  fminsearch function will do this in Matlab, but it might be worth exploring doing something more intelligent and enforcing the boundary condition at T.  Add and edit at will!
+
 
 
 
