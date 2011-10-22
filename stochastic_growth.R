@@ -10,9 +10,11 @@
 #   (2) Continuous state space and discrete time
 #   (3) Income shock takes on two discrete states
 #
+#   \max_u
+#
 # Assumptions are:
 #   (1) Utility function: U(c) = c^(1-g)/(1-g)
-#   (2) discount rate = 10%
+#   (2) discount rate, b = 10% 
 #   (3) Consumption function: c = F(K) = (1/a)*K^a.  AKA the law of motion
 #
 # Based on code written by George Hall, July 2001
