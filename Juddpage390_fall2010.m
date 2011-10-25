@@ -6,6 +6,72 @@
 % ARE 254 Dynamic Optimization Fall 2009 Updated Fall 2010
 % Prof. J. Sanchirico
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%% Function definitions
+function [Res1 R1 R2]=RESID1(c,R,gam,rho1,W,A0,AF,n,a,b,xn,Time,T,dT)
+ 
+co=zeros(1,length(c));
+A=zeros(1,length(c));
+ 
+co =  T*c(1,:)'; 
+A =  T*c(2,:)';
+cdot= dT*c(1,:)'; 
+Adot= dT*c(2,:)';
+ 
+R1= cdot - (1/gam)*co*(rho1-R);
+R2= Adot - (R*A+(.5+(Time'./10)-4*(Time'/50).^2)-co); % Allowing Wage to
+%vary
+%R2= Adot - R*A - W + co; %fixed wage
+
+%% hmm??
+Res1 = [A0-c(2,:)*((-1).^[1:length(c)])' R1' R2' AF-sum(c(2,:))];
+ 
+end
+
+function res = res1(ya,yb,R,gam,rho1,W,A0,AF)
+res = [ya(2) - A0
+       yb(2) - AF];
+end
+
+function dx = D1SD(t,x,R,gam,rho1,W,A0,AF)
+% commented code lets you calculate the solution with W varying
+% dx= [  (1/gam)*x(1)*(rho1-R)
+%         R*x(2)-x(1)+(.5+(t./10)-4*(t./50).^2)];
+   dx = [  (1/gam)*x(1)*(rho1-R)
+            R*x(2)-x(1)+W];
+end
+
+function T=Chebybasis(n,m,x)
+% Generate the T(x) Chebychev basis functions at the nodes
+ for i=1:m
+     for j=1:n
+         T(i,j)=cos((j-1)*acos(x(i))); 
+     end
+ end
+end
+
+function dT=Dchebybasis(n,m,x,T)
+% Generate the derivatives of the Cheby basis
+dT=zeros(m,n);
+ for i=1:length(x)
+     for j=1:n
+         dT(i,j)=(j-1)*sin((j-1)*acos(x(i)))/((1-x(i)^2)^.5);
+     end
+ end
+end
+
+
+
+
+
+
+
+
+
+
+
+
 function Juddpage390_fall2010
 clear all
 close all
@@ -81,6 +147,23 @@ subplot(212)
 plot(Tplot,As,'k')
 title('Assets Solution with W(t): Collocation')
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Solving the W(t)= W using the built-in matlab solver that uses
 % piecewise collocation methods (you can also solve W(t) varying by 
@@ -132,59 +215,6 @@ quiver(Ax,Cx,Axx,Cxx)
 axis([-5 10 0 5])
 
 end
-
-
-function [Res1 R1 R2]=RESID1(c,R,gam,rho1,W,A0,AF,n,a,b,xn,Time,T,dT)
- 
-co=zeros(1,length(c));
-A=zeros(1,length(c));
- 
-co =  T*c(1,:)'; 
-A =  T*c(2,:)';
-cdot= dT*c(1,:)'; 
-Adot= dT*c(2,:)';
- 
-R1= cdot - (1/gam)*co*(rho1-R);
-R2= Adot - (R*A+(.5+(Time'./10)-4*(Time'/50).^2)-co); % Allowing Wage to
-%vary
-%R2= Adot - R*A - W + co; %fixed wage
-
-Res1 = [A0-c(2,:)*((-1).^[1:length(c)])' R1' R2' AF-sum(c(2,:))];
- 
-end
-
-function res = res1(ya,yb,R,gam,rho1,W,A0,AF)
-res = [ya(2) - A0
-       yb(2) - AF];
-end
-
-function dx = D1SD(t,x,R,gam,rho1,W,A0,AF)
-% commented code lets you calculate the solution with W varying
-% dx= [  (1/gam)*x(1)*(rho1-R)
-%         R*x(2)-x(1)+(.5+(t./10)-4*(t./50).^2)];
-   dx = [  (1/gam)*x(1)*(rho1-R)
-            R*x(2)-x(1)+W];
-end
-
-function T=Chebybasis(n,m,x)
-% Generate the T(x) Chebychev basis functions at the nodes
- for i=1:m
-     for j=1:n
-         T(i,j)=cos((j-1)*acos(x(i))); 
-     end
- end
-end
-
-function dT=Dchebybasis(n,m,x,T)
-% Generate the derivatives of the Cheby basis
-dT=zeros(m,n);
- for i=1:length(x)
-     for j=1:n
-         dT(i,j)=(j-1)*sin((j-1)*acos(x(i)))/((1-x(i)^2)^.5);
-     end
- end
-end
-
 
 
 
