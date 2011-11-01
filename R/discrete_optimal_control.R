@@ -75,10 +75,10 @@ h_star <- function(t,x){
     func <- function(h) U(t, x, h) + beta*J(t+1, f(t,x,h))
 #    optimize(f=func, interval=c(0,1))[[1]]
     h <- seq(0,1,length=10)
-    i <- which.max( sapply(h, func) )
+    cost <- sapply(h, func)
+    i <- which.max(cost)
     if(is.na(h[i])){
-      print(paste("failed i=", i))
-      recover()
+      print(paste("failed i=", i, "length(cost) =", length(cost)))
       }
     h[i]
 }
