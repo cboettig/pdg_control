@@ -28,30 +28,30 @@ K <- 1
 C <- 0.2
 beta <- 0.9 # discounting rate (discrete)
 gamma <- -2
-T <- 5
+T <- 4
 
 # Discrete time state equation.  Ricker-style
 # \[ x_{t+1} = f(t, x_t, h_t) \] 
 f <- function(t, x, h){
-#  x - h
+  x - h
 #  r * x ^ alpha / (1 + x ^ alpha / K) - x * h ## B-H style
-  x * exp(alpha * (1 - x / K) * (x - C) / K ) - h * x
+#  x * exp(alpha * (1 - x / K) * (x - C) / K ) - h * x
 }
 
 
 
-#p <- 20
-#c <- 0.05
+p <- c(20,22,30,35)
+c <- 0.05
 # Define the utility function U
 U <- function(t, x, h){
-#   p*h - c*h^2 
-  h ^ (1+gamma) / (1 + gamma)
+   p[t]*h - c*h^2 
+#  h ^ (1+gamma) / (1 + gamma)
 }
 
 # and the boundary condition cost \Phi
 
 #phi <- function(x) p*x - c*x^2 # harvest what remains 
-phi <- function(x) 0
+phi <- function(x) 300
 
 J <- function(t,x){
   if(t < T)
@@ -60,16 +60,18 @@ J <- function(t,x){
     out <- phi(x)
   out
 }
-  
+ 
+#p h - c h^2 + beta* phi(x)
+
+## Wow, don't actually want to evaluate this so many times!
+## Should store values and look up!
+
 h_star <- function(t,x){
     func <- function(h) U(t, x, h) + beta*J(t+1, f(t,x,h))
 #    optimize(f=func, interval=c(0,1))[[1]]
-    h <- seq(0,1,length=20)
+    h <- seq(0,1000,length=500)
     cost <- sapply(h, func)
     i <- which.max(cost)
-    if(is.na(h[i])){
-      print(paste("failed i=", i, "length(cost) =", length(cost)))
-      }
     h[i]
 }
 
@@ -85,16 +87,17 @@ h_star <- function(t,x){
 ### Optimal Control Solution ##
 
 y <- numeric(T)
-y[1] <- K # x_0 constraint/initial condition
+y[1] <- 1000 # x_0 constraint/initial condition
 h <- numeric(T)
 for(t in 1:(T-1)){
   h[t] <- h_star(t, y[t])  
  y[t+1] = f(t,y[t], h[t])
 }
 
-png("optimal.png")
-plot(1:T, y, pch=19)
-points(1:T, h, pch=18, col="red")
-dev.off()
+#png("optimal.png")
+plot(1:T, y, pch=19, cex=1.5, ylim=c(0,1000) )
+points(1:T, h, pch=18, col="red", cex=2.5)
+legend("bottomleft", c("fish", "harvest"), pch=c(19,18), col=c("black", "red"))
+#dev.off()
 #
 
