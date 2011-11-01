@@ -4,20 +4,20 @@
 
 
 
-# \[ k_{t+1} = k_t + f(k_t) - h_t \]
-# F(x) = f(k) + k
+# \[ x_{t+1} = x_t + f(x_t) - h_t \]
+# F(x) = f(x) + x
 #
 # Discount rate \beta < 1
 # \[ \max_{h_t} \sum_{t=0}^{\infty} \beta^t U(h_t)  \]
-# s.t. \( k_{t+1} = F(k_t) -h_t \)
-# k_0 = k0
+# s.t. \( x_{t+1} = F(x_t) -h_t \)
+# x_0 = x0
 
 
 # First-order conditions are:
-#\[ U'(h_t) = \beta U'(h_{t+1}) F'(k_{t+1} ) \forall t \]
+#\[ U'(h_t) = \beta U'(h_{t+1}) F'(x_{t+1} ) \forall t \]
 
-# \[ V(k) = \max_h U(h) + \beta V(k_{t+1} ) \]
-# \[ V(k) = \max_h U(h) + \beta V( F(k) - h) \]
+# \[ V(x) = \max_h U(h) + \beta V(x_{t+1} ) \]
+# \[ V(x) = \max_h U(h) + \beta V( F(x) - h) \]
 
 
 
@@ -26,42 +26,32 @@ rm(list=ls()) # start clean
 alpha <- 1
 K <- 1
 C <- 0.2
-beta <- 0.95 # discounting rate (discrete)
+beta <- 0.9 # discounting rate (discrete)
 gamma <- -2
-T <- 10
+T <- 5
 
 # Discrete time state equation.  Ricker-style
 # \[ x_{t+1} = f(t, x_t, h_t) \] 
 f <- function(t, x, h){
-  if(is.na(h)) 
-    recover()
+#  x - h
 #  r * x ^ alpha / (1 + x ^ alpha / K) - x * h ## B-H style
   x * exp(alpha * (1 - x / K) * (x - C) / K ) - h * x
 }
 
 
 
-
+#p <- 20
+#c <- 0.05
 # Define the utility function U
 U <- function(t, x, h){
+#   p*h - c*h^2 
   h ^ (1+gamma) / (1 + gamma)
 }
 
 # and the boundary condition cost \Phi
-phi <- function(x) if(x > 0.2) 0 else 1e6
 
-Phi <- function(x) {
-  sapply(x, 
-    function(X){
-      if(is.na(X))
-        out <- Inf
-      else if(X > .2) 
-        out <- 0
-      else
-        out <- Inf
-      out
-    })
-}
+#phi <- function(x) p*x - c*x^2 # harvest what remains 
+phi <- function(x) 0
 
 J <- function(t,x){
   if(t < T)
@@ -74,7 +64,7 @@ J <- function(t,x){
 h_star <- function(t,x){
     func <- function(h) U(t, x, h) + beta*J(t+1, f(t,x,h))
 #    optimize(f=func, interval=c(0,1))[[1]]
-    h <- seq(0,1,length=10)
+    h <- seq(0,1,length=20)
     cost <- sapply(h, func)
     i <- which.max(cost)
     if(is.na(h[i])){
@@ -93,16 +83,18 @@ h_star <- function(t,x){
 #
 #
 ### Optimal Control Solution ##
-#
-#y <- numeric(T)
-#y[1] <- K # x_0 constraint/initial condition
-#h <- numeric(T)
-#for(t in 1:(T-1)){
-#  h[t] <- h_star(t, y[t])  
-# y[t+1] = f(t,x[t], h[t])
-#}
-#plot(1:T, y, pch=19)
-#points(1:T, h, pch=19, col="red")
-#
+
+y <- numeric(T)
+y[1] <- K # x_0 constraint/initial condition
+h <- numeric(T)
+for(t in 1:(T-1)){
+  h[t] <- h_star(t, y[t])  
+ y[t+1] = f(t,y[t], h[t])
+}
+
+png("optimal.png")
+plot(1:T, y, pch=19)
+points(1:T, h, pch=18, col="red")
+dev.off()
 #
 

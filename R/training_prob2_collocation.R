@@ -5,30 +5,6 @@
 # Libraries
 require(bvpSolve)
 
-#' State Equation(s): Fish population dynamics
-#' @param t is time 
-#' @param y is a vector of (x,h)', the fish pop and harvest level
-#' @param p parameters, c(alpha, K, C) 
-#' @return \dot x = f(x), population growth
-f <- function(t, y, p){
-  # Rename explicitly so equation is easier to read but still fast.
-  x <- y[1]
-  h <- y[2]
-  alpha <- pars[1]
-  K <- pars[2]
-  C <- pars[3]
-  x * alpha * ((K - x) / K) * ((x - C) / K) - h * x
-}
-#' Derivative with respect to state x
-df <- function(t, y, p){
-  x <- y[1]
-  h <- y[2]
-  alpha <- pars[1]
-  K <- pars[2]
-  C <- pars[3]
-  - alpha * ( C* K - 2 * x * K - 2 * x * C + 3 * x ^ 2) / K ^ 2 - h
-}
-
 ##################################################################
 # Solve the ODE system of fish dynamics at fixed harvest level   #
 ##################################################################
