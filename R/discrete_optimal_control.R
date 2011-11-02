@@ -61,15 +61,10 @@ J <- function(t,x){
   out
 }
  
-#p h - c h^2 + beta* phi(x)
-
-## Wow, don't actually want to evaluate this so many times!
-## Should store values and look up!
-
 h_star <- function(t,x){
     func <- function(h) U(t, x, h) + beta*J(t+1, f(t,x,h))
 #    optimize(f=func, interval=c(0,1))[[1]]
-    h <- seq(0,1000,length=500)
+    h <- seq(0,1000,length=100)
     cost <- sapply(h, func)
     i <- which.max(cost)
     h[i]
@@ -94,10 +89,10 @@ for(t in 1:(T-1)){
  y[t+1] = f(t,y[t], h[t])
 }
 
-#png("optimal.png")
+png("optimal.png")
 plot(1:T, y, pch=19, cex=1.5, ylim=c(0,1000) )
 points(1:T, h, pch=18, col="red", cex=2.5)
 legend("bottomleft", c("fish", "harvest"), pch=c(19,18), col=c("black", "red"))
-#dev.off()
+dev.off()
 #
 
