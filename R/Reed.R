@@ -45,13 +45,18 @@ SubBevHolt <- function(x1, A, B, h){
 # Show the population growth function f(x)
 #curve(SubBevHolt(x,A,B,0), 0, 2*K)
 
-n_vec <- seq(0, 2*K, length=gridsize)  # population size
-d <- n_vec[2] - n_vec[1]               # grid spacing
-H_vec <- n_vec                         # vector of havest levels
 
-# Set up the grid
+##### Set up the grid ############
 n_vec <- seq(0, 2*K, length=gridsize)  # population size
-H_vec <- n_vec                         # vector of havest levels
+
+# in principle H can be defined on a seperate grid,
+# but as it is harvest (not effort) makes sense to define it
+# as any value the population n, itslef can assume:
+
+H_vec <- c(n_vec,2*K+.01)        # vector of havest levels
+HL <- length(H_vec) 
+
+
 
 #' Caculate the Transition matrix 
 #' @details For each harvest level, generate a transition
@@ -60,7 +65,7 @@ H_vec <- n_vec                         # vector of havest levels
 SDP_Mat <- lapply(H_vec, function(h){
   SDP_matrix <- matrix(0, nrow=gridsize, ncol=gridsize)
   # Cycle over x values
-  for(i in 1:gridsize){
+  for(i in 1:gridsize){ ## VECTORIZE ME
     ## Calculate the 
     x1 <- n_vec[i]
     x2_expected <- SubBevHolt(x1, A, B, h)
@@ -82,31 +87,30 @@ SDP_Mat <- lapply(H_vec, function(h){
 OptTime = 25
 D <- matrix(NA, nrow=gridsize, ncol=OptTime)
 V <- rep(0,gridsize) # initialize, "No scrap value" (leave no fish)
-V <- rep(.1,gridsize) # initialize, 
 
 # loop through time  
 for(time in 1:OptTime){
-
   # try all potential havest rates
-  V1 <- sapply(1:gridsize, function(i){
+  V1 <- sapply(1:HL, function(i){
 
     # havest cannot exceed population size
     min_hn <- sapply(n_vec, function(n) min(H_vec[i], n))
 
     # Transition matrix times V gives dist in next time
     # then (add) harvested amount times discount
+    # NOTE: where's the cost function?
     SDP_Mat[[i]] %*% V + min_hn * exp(-delta * (OptTime-time))
   })
 
   # find havest, h that gives the maximum value 
   out <- sapply(1:gridsize, function(j){
-    value <- max(V1[j,], na.rm = T) 
-    index <- which.max(V1[j,])
+    value <- max(V1[j,], na.rm = T)   ## SHOULD THIS BE V1[,j] ??
+    index <- which.max(V1[j,])        ## SHOULD THIS BE V1[,j] ??
     c(value, index)
   })
 
-  V <- out[1,]                  # The new value-to-go
-  D[,OptTime-time+1] <- out[2,] # The index positions
+  V <- out[1,]                        # The new value-to-go
+  D[,OptTime-time+1] <- out[2,]       # The index positions
 }
 
 
@@ -149,5 +153,9 @@ ForwardSimulate <- function(x0, A, B, D, sigma, n, H){
 out <- ForwardSimulate(K/2, A, B, D, sigma, n_vec, H_vec)
 
 require(ggplot2)
-qplot(time, fishstock, data=out)
+## as area plot
+# data <- melt(data, id="time")
+# ggplot(data, aes(year, value, fill=variable)) + geom_area()
+## as stacked lines
+ggplot(out) + geom_line(aes(time, fishstock)) + geom_line(aes(time, unharvested), col=I("green"))
 
