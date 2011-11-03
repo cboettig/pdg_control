@@ -19,16 +19,16 @@
 
 rm(list=ls())   # Start wtih clean workspace 
 
-############## Parameters ################
+########## Parameters ################
 delta <- 0.1      # economic discounting rate
 sigma <- 0.4      # Noise process
-gridsize <- 100   # gridsize (discretized population)
+gridsize <- 5   # gridsize (discretized population)
 A <- 2            # Beverton-Holt/f(x) pars
 B <- 4            # Beverton-Holt/f(x) pars
 K <- (A-1)/B      # Unharvested deterministic equilib population
 
 
-
+########## Havest function ################ 
 #' Harvested Beverton Holt growth model
 #' @param x fish population currently
 #' @param A growth rate 
@@ -46,7 +46,7 @@ SubBevHolt <- function(x1, A, B, h){
 #curve(SubBevHolt(x,A,B,0), 0, 2*K)
 
 
-##### Set up the grid ############
+########## Set up the grid ############
 n_vec <- seq(0, 2*K, length=gridsize)  # population size
 
 # in principle H can be defined on a seperate grid,
@@ -81,9 +81,9 @@ SDP_Mat <- lapply(H_vec, function(h){
   SDP_matrix
 })
 
-##########################################################
-# Identify the dynamic optimum using backward iteration  #
-##########################################################
+#########################################################
+# Identify the dynamic optimum using backward iteration #
+#########################################################
 OptTime = 25
 D <- matrix(NA, nrow=gridsize, ncol=OptTime)
 V <- rep(0,gridsize) # initialize, "No scrap value" (leave no fish)
@@ -102,13 +102,14 @@ for(time in 1:OptTime){
     SDP_Mat[[i]] %*% V + min_hn * exp(-delta * (OptTime-time))
   })
 
-  # find havest, h that gives the maximum value 
+  # find havest, h that gives the maximum value
   out <- sapply(1:gridsize, function(j){
-    value <- max(V1[j,], na.rm = T)   ## SHOULD THIS BE V1[,j] ??
-    index <- which.max(V1[j,])        ## SHOULD THIS BE V1[,j] ??
-    c(value, index)
+    value <- max(V1[j,], na.rm = T)   # each column is a diff h, max over these
+    index <- which.max(V1[j,])        # record index so we can recover the h's 
+    c(value, index)                   # returns both values 
   })
 
+  # V{t+1} = max_h V{t} at each possible state value, x
   V <- out[1,]                        # The new value-to-go
   D[,OptTime-time+1] <- out[2,]       # The index positions
 }
