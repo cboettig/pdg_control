@@ -35,12 +35,18 @@ K <- (A-1)/B      # Unharvested deterministic equilib population
 #' @param B half-maximum
 #' @param h havest
 #' @returns population next year
+#' @details Applies Beverton-Holt dynamics to the *post-harvest* population,
+#'  x-h, not the year's current (pre-havest) stock level, x.  See Reed 1979.  
 SubBevHolt <- function(x1, A, B, h){
   sapply(x1, function(x){ # accept vector-valued x
     x_minus_h <- max(0, x-h)
     max(0, A*x_minus_h/(1+B*x_minus_h))
   })
 }
+
+
+
+
 
 # Show the population growth function f(x)
 #curve(SubBevHolt(x,A,B,0), 0, 2*K)
