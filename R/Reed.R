@@ -7,13 +7,13 @@
 #   Reed, W.J., 1979. Optimal Escapement Levels in Stochastic
 #   and Deterministic Harvesting Models. Journal of Environmental 
 #   Economics and Management. 6: 350-363.
-#
-#
 # 
 # 
 # Fish population dynamics:
 # X_{t+1} = Z_n f(X_n) 
 # f(x) = 
+# 
+# 
 
 
 require(ggplot2) # nicer plotting package
@@ -151,6 +151,17 @@ ForwardSimulate <- function(f, pars, x_grid, h_grid, sigma, x0, D){
 
 
 
+
+#############################################################################
+#                                                                           #
+#  These are probably the functions you want to modify to specify a         #
+#  particular problem.  The above functions are somewhat general and        #
+#  used to implement the SDP solution on the system defined below.          #
+#                                                                           #
+#############################################################################
+
+
+
 ########## Define our population dynamics / state equation  ################ 
 #' Harvested Beverton Holt growth model
 #' @param x fish population that reproduces (usually x-h)
@@ -168,33 +179,39 @@ BevHolt <- function(x, p){
 
 
 
-profit <- function(h){
-  h
-}
-
-########## Define all Parameters ##################################
+# Define all parameters 
 delta <- 0.1      # economic discounting rate
 OptTime <- 25     # stopping time
-sigma <- 0.4      # Noise process
+sigma <- 0.2      # Noise process
 gridsize <- 5     # gridsize (discretized population)
 pars <- c(2,4)    # Beverton-Holt/f(x) pars, A, B
-K <- (pars[1]-1)/pars[2]   # Unharvested deterministic equilib population
+K <- (pars[1]-1)/pars[2]   # Unharvested deterministic equib pop
 
-########## Set up the grid #######################################
+
+# define a profit function, price minus cost
+profit <- function(h){
+  p <- 1
+  c <- 0.001 # higher extraction costs result in less fishing 
+  # sapply: support for vector-valued h
+  sapply(h, function(h) max(0,p*h - c/h))
+}
+
+# Set up the grid 
 x_grid <- seq(0, 2*K, length=gridsize)  # population size
-h_grid <- x_grid  # vector of havest levels, use same resolution as fish stock
+h_grid <- x_grid  # vector of havest levels, use same res as stock
 
-######### Calculate the transition matrix ########################
+# Calculate the transition matrix 
 SDP_Mat <- determine_SDP_matrix(BevHolt, pars, x_grid, h_grid, sigma)
 
-######### Find the optimum by dynamic programming ###############
+# Find the optimum by dynamic programming 
 opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, 0, profit, delta)
 
-######### Simulate the optimal routine on a stochastic realization of growth dynamics ####
+# Simulate the optimal routine on a stoch realization of growth dynamics
 out <- ForwardSimulate(BevHolt, pars, x_grid, h_grid, sigma, K/2, opt$D)
 
-## Plot the results ##
-ggplot(out) + geom_line(aes(time, fishstock)) + geom_line(aes(time, unharvested), col=I("green"))
+# Plot the results 
+ggplot(out) + geom_line(aes(time, fishstock)) + 
+  geom_line(aes(time, unharvested), col=I("green"))
 
 
 
