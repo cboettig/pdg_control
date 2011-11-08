@@ -66,8 +66,14 @@ delta <- 0.1      # economic discounting rate
 OptTime <- 25     # stopping time
 sigma <- 0.2      # Noise process
 gridsize <- 100   # gridsize (discretized population)
-pars <- c(2,4)    # Beverton-Holt/f(x) pars, A, B
-K <- (pars[1]-1)/pars[2]   # Unharvested deterministic equib pop
+
+# Chose the state equation / population dynamics function
+f <- RickerAllee
+pars <- c(1, 100, 30)
+K <- 100
+
+#pars <- c(2,4)    # Beverton-Holt/f(x) pars, A, B
+#K <- (pars[1]-1)/pars[2]   # Unharvested deterministic equib pop
 
 # define a profit function, price minus cost
 profit <- function(h){
@@ -77,8 +83,6 @@ profit <- function(h){
   sapply(h, function(h) max(0,p*h - c/h))
 }
 
-# Chose the state equation / population dynamics function
-f <- BevHolt
 
 
 # Set up the grid 
@@ -102,11 +106,11 @@ dat <- melt(dat2, id="year")
 
 
 # Assemble the plot
-ggplot(dat,aes(year, value)) + geom_line(aes(group=variable), col="gray") 
-  + geom_line(aes(year, rowMeans(out))) # Mean path 
-  + geom_smooth()
+p <- ggplot(dat,aes(year, value)) + 
+  geom_line(aes(group=variable), col="gray") + 
+  geom_line(aes(year, rowMeans(out)))  # Mean path 
 
-ggsave("replicates.png")
+ggsave("ricker.png")
 
 
 ## Plot the results of a single run, against unharvested version  
@@ -116,11 +120,8 @@ ggsave("replicates.png")
 #ReedThreshold <- n[ sum(D[,1]==1) ]
 
 # check out the deterministic dynamics
-pars <- c(1,2,100)
-x <- numeric(OptTime)
-x[1] <- 50
-for(t in 1:(OptTime-1))
-  x[t+1] <- AlleeModel(x[t],pars)
-
-
+#x <- numeric(OptTime)
+#x[1] <- 50
+#for(t in 1:(OptTime-1))
+#  x[t+1] <- f(x[t],pars)
 
