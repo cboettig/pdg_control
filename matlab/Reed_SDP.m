@@ -24,7 +24,6 @@ function [D,SDP_Mat,xt_h] = Reed_SDP(DISCRETISE,SIM)
     DISCRETISE = 100; 
     SIM = 1;
 %  end
-
   pars = [2,4]; % Beverton-Holt parameters
   K = (pars(1)-1)/pars(2); % K is the equilib w/o stochasticity & harvest
   delta = 0.1;  % The economic discount rate
@@ -49,15 +48,16 @@ function [D,SDP_Mat,xt_h] = Reed_SDP(DISCRETISE,SIM)
     x2 = max(0,pars(1)*x1/(1+pars(2)*x1));
   end 
 
-  SDP_Mat = determine_SDP_matrix(f, pars, n_vec, HVec, dev);
+  fhandle = @f; 
+  SDP_Mat = determine_SDP_matrix(fhandle, pars, n_vec, HVec, dev);
   [V, D] = find_dp_optim(SDP_Mat, n_vec, HVec, OptTime, xT, profit, delta) 
-  [xt_h,xt,x_ph] = ForwardSimulate(K/2,A,B,D,dev,n_vec,HVec);
+  [xt_h,xt,x_ph] = ForwardSimulate(x0,pars,D,dev,n,H)
   draw_plots(Hvec, n_vec, V1, D, xt_h, xt, x_ph)
 end
 
 
 
-function SDP_Mat = determine_SDP_matrix(f, pars, n_vec, HVec, dev)
+function SDP_Mat = determine_SDP_matrix(fhandle, pars, n_vec, HVec, dev)
 % CREATE TRANSITION MATRICES CORRESPONDING TO ALTERNATE ACTIONS               
   L_H = length(HVec);   % number of havest states 
   S = length(n_vec);    % number of states
@@ -67,7 +67,7 @@ function SDP_Mat = determine_SDP_matrix(f, pars, n_vec, HVec, dev)
       h = HVec(q); % Harvest option being considered in this round of the loop
       for i = 1:S                  % Cycle through state-space -- VECTORIZE ME 
           x1 = n_vec(i);                % Pop is in state i, with abundance x1
-          x2_exp = f(x1-h,pars);                     % expected next abundance
+          x2_exp = fhandle(x1-h,pars);  % expected next abundance
           if x2_exp == 0; 
             SDP_Mat(i,1,q) = 1; 
           else 
@@ -148,6 +148,7 @@ function draw_plots(Hvec, n_vec, V1, D, xt_h, xt, x_ph)
   ylabel('Population','fontsize',16), axis tight
   L=legend('Reed''s S','N(t) without harvest','N(t)','Post-harvest population',2); set(L,'fontsize',12)
 end
+
 
 
 
