@@ -98,8 +98,10 @@ find_dp_optim <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, r
   }
 
   # Reed derives a constant escapement policy saying to fish the pop down to:
-  ReedThreshold <- x_grid[ sum(D[,1]==1) ]
-
+  ReedThreshold <- x_grid[ sum(D[,1]==1) ] # easy way
+  # calculation is harder for general f, need to start at top
+  # finds the largest population for which you shouldn't harvest: 
+  ReedThreshold <- x_grid[ max(which(D[,1] == 1)) ]
   list(D=D, V=V, S=ReedThreshold)
 }
 

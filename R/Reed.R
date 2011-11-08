@@ -27,12 +27,12 @@ sigma <- 0.2      # Noise process
 gridsize <- 100   # gridsize (discretized population)
 
 # Chose the state equation / population dynamics function
-f <- BevHolt
-pars <- c(2,4)    # Beverton-Holt/f(x) pars, A, B
-K <- (pars[1]-1)/pars[2]   # Unharvested deterministic equib pop
-#RickerAllee
-#pars <- c(1, 100, 0)
-#K <- 100
+#f <- BevHolt
+#pars <- c(2,4)    # Beverton-Holt/f(x) pars, A, B
+#K <- (pars[1]-1)/pars[2]   # Unharvested deterministic equib pop
+f <- RickerAllee
+pars <- c(1, 100, 0)
+K <- 100
 
 # define a profit function, price minus cost
 profit <- function(h){
@@ -60,11 +60,6 @@ p0 <- ggplot(dat, aes(time, value, color=variable)) + geom_line() +  geom_abline
 #  geom_line(data=subset(dat, variable=="harvest"), 
 #  aes(time, value+opt$S), col="black")
 
-ggsave("samplerun.png")
-
-
-
-
 #######################################################################
 # Now we'll simulate this process many times under this optimal havest#
 #######################################################################
@@ -86,10 +81,8 @@ p1 <- ggplot(optimal_havest, aes(year, value)) +
   geom_line(aes(group = variable), col = "gray") + 
   geom_line(aes(year, rowMeans(fished)))  + # Mean path
   geom_abline(intercept=opt$S, slope=0)
-# modify plot appearance
 p1 <- p1 + opts(title=sprintf("Optimally Havested, %d populations crash",
   optimal_crashed))
-ggsave("fished.png")
 
 # reformatting for the unhavested dynamics
 unfished <- sapply(sims, function(x) x$unharvested)
@@ -97,14 +90,17 @@ unharvested <- melt(data.frame(year=1:OptTime, unfished), id="year")
 
 # without fishing, how many populations have crashed
 crashed <- sum(unfished[OptTime-1,]<pars[3])
-
 p2 <- ggplot(unharvested,aes(year, value)) + 
   geom_line(aes(group=variable), col="gray") + 
   geom_line(aes(year, rowMeans(unfished)))  # Mean path
-
 p2 <- p2 + opts(title=sprintf("Unfished dynamics, %d populations crash",
   crashed))
-ggsave("unfished.png")
+
+
+
+#ggsave("samplerun.png", plot=p0)
+#ggsave("fished.png", plot=p1)
+#ggsave("unfished.png", plot=p2)
 
 
 
