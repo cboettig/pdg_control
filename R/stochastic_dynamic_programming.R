@@ -71,7 +71,7 @@ find_dp_optim <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta){
   D <- matrix(NA, nrow=gridsize, ncol=OptTime)
   V <- rep(0,gridsize) # initialize BC, 
   # give a fixed reward for having value larger than xT at the end. 
-  V[ which(x_grid >= xT) ] <- 10 # "Scrap Value" for x(T) >= xT
+  V[ x_grid >= xT ] <- 10 # "Scrap Value" for x(T) >= xT
   # loop through time  
   for(time in 1:OptTime){
     # try all potential havest rates

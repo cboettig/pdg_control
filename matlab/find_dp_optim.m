@@ -4,7 +4,8 @@ function [V1, D] = find_dp_optim(SDP_Mat, n_vec, HVec, OptTime, xT, profit, delt
 
 L_H = length(HVec);   % number of havest states 
   S = length(n_vec);    % number of states
-  V = ones(S,1) * xT;    % Scrap value 
+  V = zeros(S,1);       %  No scrap value
+  V(n_vec >= xT) = 10;   % a non-zero reward for having >= xT fish at the end
   V1 = zeros(S,S);        % initial allocation
   D = zeros(S, OptTime);  % initial allocation
   for Timestep = 1:OptTime
