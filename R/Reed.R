@@ -55,7 +55,7 @@ SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma)
 opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, 30, profit, delta)
 
 ## Plot the results of a single run, against unharvested version  
-out <- ForwardSimulate(f, pars, x_grid, h_grid, sigma, K, opt$D)
+out <- ForwardSimulate(f, pars, x_grid, h_grid, sigma, K/2, opt$D)
 dat <- melt(out, id="time")
 ggplot(dat, aes(time, value, color=variable)) + geom_line()
 ggsave("samplerun.png")
@@ -68,7 +68,7 @@ ggsave("samplerun.png")
 #######################################################################
 sims <- lapply(1:100, function(i){
 # simulate the optimal routine on a stoch realization of growth dynamics
-    sim <- ForwardSimulate(f, pars, x_grid, h_grid, sigma, K/2, opt$D)
+    sim <- ForwardSimulate(f, pars, x_grid, h_grid, sigma, K, opt$D)
     list(fishstock=sim$fishstock, unharvested=sim$unharvested)
 })
 
