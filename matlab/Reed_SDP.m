@@ -20,10 +20,10 @@ function [D,SDP_Mat,xt_h] = Reed_SDP(DISCRETISE,SIM)
 %           SDP_Mat     - The markovian state transition matrix
 %           xt_h        - The population level through time
 % 
-  if nargin < 2
+%  if nargin < 2
     DISCRETISE = 100; 
     SIM = 1;
-  end
+%  end
 
   pars = [2,4]; % Beverton-Holt parameters
   K = (pars(1)-1)/pars(2); % K is the equilib w/o stochasticity & harvest
@@ -39,14 +39,14 @@ function [D,SDP_Mat,xt_h] = Reed_SDP(DISCRETISE,SIM)
   p = 1; % price of fish
   c = 0.0001; % cost of fishing
 
-  function profit(h) 
-    p*h - c/h;
+  function out = profit(h) 
+    out = p*h - c/h;
   end
 
   % f is the Beverton-Holt function
   function x2 = f(x1,pars)
-    x1_minus_h = max(0,x1-h);
-    x2 = max(0,pars(1)*x/(1+pars(2)*x1));
+    x1 = max(0,x1);
+    x2 = max(0,pars(1)*x1/(1+pars(2)*x1));
   end 
 
   SDP_Mat = determine_SDP_matrix(f, pars, n_vec, HVec, dev);
@@ -57,7 +57,7 @@ end
 
 
 
-function determine_SDP_matrix(f, pars, n_vec, HVec, dev)
+function SDP_Mat = determine_SDP_matrix(f, pars, n_vec, HVec, dev)
 % CREATE TRANSITION MATRICES CORRESPONDING TO ALTERNATE ACTIONS               
   L_H = length(HVec);   % number of havest states 
   S = length(n_vec);    % number of states
