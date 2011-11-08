@@ -63,7 +63,7 @@ determine_SDP_matrix <- function(f, p, x_grid, h_grid, sigma){
 #'  V is a matrix of x_grid by x_grid, which is used to store the value 
 #'  function at each point along the grid at each point in time.  
 #'  The returned V gives the value matrix at the first (last) time.  
-find_dp_optim <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta){
+find_dp_optim <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward=10){
   gridsize <- length(x_grid)
   HL <- length(h_grid)
 
@@ -71,7 +71,7 @@ find_dp_optim <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta){
   D <- matrix(NA, nrow=gridsize, ncol=OptTime)
   V <- rep(0,gridsize) # initialize BC, 
   # give a fixed reward for having value larger than xT at the end. 
-  V[ x_grid >= xT ] <- 10 # "Scrap Value" for x(T) >= xT
+  V[ x_grid >= xT ] <- reward # "Scrap Value" for x(T) >= xT
   # loop through time  
   for(time in 1:OptTime){
     # try all potential havest rates
@@ -96,7 +96,11 @@ find_dp_optim <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta){
     V <- out[1,]                        # The new value-to-go
     D[,OptTime-time+1] <- out[2,]       # The index positions
   }
-  list(D=D, V=V)
+
+  # Reed derives a constant escapement policy saying to fish the pop down to:
+  ReedThreshold <- x_grid[ sum(D[,1]==1) ]
+
+  list(D=D, V=V, S=ReedThreshold)
 }
 
 

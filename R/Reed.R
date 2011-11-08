@@ -12,11 +12,6 @@
 # Fish population dynamics:
 # X_{t+1} = Z_n f(X_n) 
 # 
-
-#pars <- c(2,4)    # Beverton-Holt/f(x) pars, A, B
-#K <- (pars[1]-1)/pars[2]   # Unharvested deterministic equib pop
-
-
 rm(list=ls())   # Start wtih clean workspace 
 require(ggplot2) # nicer plotting package
 
@@ -32,9 +27,12 @@ sigma <- 0.2      # Noise process
 gridsize <- 100   # gridsize (discretized population)
 
 # Chose the state equation / population dynamics function
-f <- RickerAllee
-pars <- c(1, 100, 30)
-K <- 100
+f <- BevHolt
+pars <- c(2,4)    # Beverton-Holt/f(x) pars, A, B
+K <- (pars[1]-1)/pars[2]   # Unharvested deterministic equib pop
+#RickerAllee
+#pars <- c(1, 100, 0)
+#K <- 100
 
 # define a profit function, price minus cost
 profit <- function(h){
@@ -45,19 +43,23 @@ profit <- function(h){
 }
 
 # Set up the grid 
-x_grid <- seq(0, 2*K-2, length=gridsize)  # population size
+x_grid <- seq(0, 2*K, length=gridsize)  # population size
 h_grid <- x_grid  # vector of havest levels, use same res as stock
 
 # Calculate the transition matrix 
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma)
 
 # Find the optimum by dynamic programming 
-opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, 30, profit, delta)
+opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, 0, profit, delta)
 
-## Plot the results of a single run, against unharvested version  
+
+## Example plot the results of a single run, against unharvested version  
 out <- ForwardSimulate(f, pars, x_grid, h_grid, sigma, K/2, opt$D)
 dat <- melt(out, id="time")
-ggplot(dat, aes(time, value, color=variable)) + geom_line()
+p0 <- ggplot(dat, aes(time, value, color=variable)) + geom_line() +  geom_abline(intercept=opt$S, slope=0, col="black") #+
+#  geom_line(data=subset(dat, variable=="harvest"), 
+#  aes(time, value+opt$S), col="black")
+
 ggsave("samplerun.png")
 
 
@@ -82,7 +84,8 @@ optimal_crashed <- sum(fished[OptTime-1,]<pars[3])
 # Assemble the plot
 p1 <- ggplot(optimal_havest, aes(year, value)) + 
   geom_line(aes(group = variable), col = "gray") + 
-  geom_line(aes(year, rowMeans(fished)))  # Mean path
+  geom_line(aes(year, rowMeans(fished)))  + # Mean path
+  geom_abline(intercept=opt$S, slope=0)
 # modify plot appearance
 p1 <- p1 + opts(title=sprintf("Optimally Havested, %d populations crash",
   optimal_crashed))
@@ -109,7 +112,6 @@ ggsave("unfished.png")
 
 
 
-#ReedThreshold <- n[ sum(D[,1]==1) ]
 
 # check out the deterministic dynamics
 #x <- numeric(OptTime)
