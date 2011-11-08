@@ -96,21 +96,47 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, 0, profit, delta)
 
 
 
-out <- sapply(1:100, function(i)
+sims <- lapply(1:100, function(i){
 # simulate the optimal routine on a stoch realization of growth dynamics
-    ForwardSimulate(f, pars, x_grid, h_grid, sigma, K/2, opt$D)$fishstock
-)
+    sim <- ForwardSimulate(f, pars, x_grid, h_grid, sigma, K/2, opt$D)
+    list(fishstock=sim$fishstock, unharvested=sim$unharvested)
+})
 
-dat2 <- data.frame(year = 1:OptTime,out)
-dat <- melt(dat2, id="year")
+# some reformatting
+fished <- sapply(sims, function(x) x$fishstock)
+dat <- data.frame(year = 1:OptTime,out)
+optimal_havest <- melt(dat, id="year")
 
+# After optimal fishing, how many populations have crashed 
+optimal_crashed <- sum(fished[OptTime-1,]<pars[3])
 
 # Assemble the plot
-p <- ggplot(dat,aes(year, value)) + 
-  geom_line(aes(group=variable), col="gray") + 
-  geom_line(aes(year, rowMeans(out)))  # Mean path 
+p1 <- ggplot(optimal_havest, aes(year, value)) + 
+  geom_line(aes(group = variable), col = "gray") + 
+  geom_line(aes(year, rowMeans(fished)))  # Mean path
+# modify plot appearance
+p1 <- p1 + opts(title=sprintf("Optimally Havested, %d populations crash",
+  optimal_crashed))
+ggsave("fished.png")
 
-ggsave("ricker.png")
+# reformatting for the unhavested dynamics
+unfished <- sapply(sims, function(x) x$unharvested)
+unharvested <- melt(data.frame(year=1:OptTime, free), id="year")
+
+# without fishing, how many populations have crashed
+crashed <- sum(unfished[OptTime-1,]<pars[3])
+
+p2 <- ggplot(unharvested,aes(year, value)) + 
+  geom_line(aes(group=variable), col="gray") + 
+  geom_line(aes(year, rowMeans(unfished)))  # Mean path
+
+p2 <- p2 + opts(title=sprintf("Unfished dynamics, %d populations crash",
+  crashed))
+ggsave("unfished.png")
+
+
+
+
 
 
 ## Plot the results of a single run, against unharvested version  
