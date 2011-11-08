@@ -39,7 +39,7 @@ function [D,SDP_Mat,xt_h] = Reed_SDP(DISCRETISE,SIM)
     % Define a Profit function
     p = 1; % price of fish
     c = 0.0001; % cost of fishing
-    out = p*h - c/h;
+    out = p * h - c ./ h;
   end
 
   % f is the Beverton-Holt function
@@ -49,10 +49,11 @@ function [D,SDP_Mat,xt_h] = Reed_SDP(DISCRETISE,SIM)
   end 
 
   fhandle = @f; 
+  profit_handle = @profit;
   SDP_Mat = determine_SDP_matrix(fhandle, pars, n_vec, HVec, dev);
-  [V, D] = find_dp_optim(SDP_Mat, n_vec, HVec, OptTime, 0, profit, delta); 
-  [xt_h,xt,x_ph] = ForwardSimulate(K/2,pars,D,dev,n,H);
-  draw_plots(Hvec, n_vec, V1, D, xt_h, xt, x_ph);
+  [V, D] = find_dp_optim(SDP_Mat, n_vec, HVec, OptTime, 0, profit_handle, delta); 
+  [xt_h,xt,x_ph] = ForwardSimulate(K/2,pars,D,dev,n_vec,HVec);
+  draw_plots(HVec, n_vec, V1, D, xt_h, xt, x_ph, OptTime);
 end
 
 
@@ -95,7 +96,9 @@ function [V, D] = find_dp_optim(SDP_Mat, n_vec, HVec, OptTime, xT, profit, delta
   for Timestep = 1:OptTime
       for i = 1:L_H % Try out all the potential harvest rates  -- VECTORIZE ME
         % Consider the ongoing reward
-        V1(:,i) = SDP_Mat(:,:,i)*V + profit(min(HVec(i),n_vec')) * exp(-delta*(OptTime-Timestep)); 
+        sale = profit(min(HVec(i), n_vec'));
+        sale = min(HVec(i), n_vec');
+        V1(:,i) = SDP_Mat(:,:,i)*V + sale * exp(-delta*(OptTime-Timestep)); 
       end
       [V,D(:,OptTime-Timestep+1)] = max(V1,[],2); % Choose the optimal harvest
   end
@@ -122,7 +125,7 @@ end
 
 
 
-function draw_plots(Hvec, n_vec, V1, D, xt_h, xt, x_ph)
+function out = draw_plots(HVec, n_vec, V1, D, xt_h, xt, x_ph, OptTime)
   figure(1), clf % PLOTTING FUNCTIONS
   subplot(2,2,1), hold on, set(gca,'fontsize',14)
   P=pcolor(HVec,n_vec,V1); set(P,'edgecolor','none'), colorbar, ylim([0 75])
@@ -138,7 +141,7 @@ function draw_plots(Hvec, n_vec, V1, D, xt_h, xt, x_ph)
   ylabel('Population','fontsize',14), axis tight
   subplot(2,2,[3,4]), hold on, set(gca,'fontsize',14)
 
-  ReedThreshold = n(sum(D(:,1)==1));
+  ReedThreshold = n_vec(sum(D(:,1)==1));
   plot([0 OptTime],[ReedThreshold ReedThreshold],'r:')
   MixX = [1:length(xt); 1:length(xt)]; MixX = MixX(1:end-1);
   Mix = [xt;xt_h]; Mix = Mix(1:end-1); plot(MixX,Mix,'g--','linewidth',2)
@@ -147,6 +150,7 @@ function draw_plots(Hvec, n_vec, V1, D, xt_h, xt, x_ph)
   xlabel('Management timeline (years)','fontsize',16)
   ylabel('Population','fontsize',16), axis tight
   L=legend('Reed''s S','N(t) without harvest','N(t)','Post-harvest population',2); set(L,'fontsize',12)
+  out = 0;
 end
 
 
