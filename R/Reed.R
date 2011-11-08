@@ -104,8 +104,7 @@ sims <- lapply(1:100, function(i){
 
 # some reformatting
 fished <- sapply(sims, function(x) x$fishstock)
-dat <- data.frame(year = 1:OptTime,out)
-optimal_havest <- melt(dat, id="year")
+optimal_havest <- melt(data.frame(year = 1:OptTime,fished), id="year")
 
 # After optimal fishing, how many populations have crashed 
 optimal_crashed <- sum(fished[OptTime-1,]<pars[3])
@@ -121,7 +120,7 @@ ggsave("fished.png")
 
 # reformatting for the unhavested dynamics
 unfished <- sapply(sims, function(x) x$unharvested)
-unharvested <- melt(data.frame(year=1:OptTime, free), id="year")
+unharvested <- melt(data.frame(year=1:OptTime, unfished), id="year")
 
 # without fishing, how many populations have crashed
 crashed <- sum(unfished[OptTime-1,]<pars[3])
