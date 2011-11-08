@@ -9,8 +9,15 @@ function SDP_Mat = determine_SDP_matrix(fhandle, pars, n_vec, HVec, dev)
 %  n_vec    - the grid for the population dynamics
 %  HVec     - the grid for harvest levels
 %  dev      - sd of noise term
+%
 % Output
 %  SDP_Mat  - the stochastic transition matrix
+%
+% Description: 
+%   Create the stochastic transition matrices 
+%   for transitions from any state (on grid, n_vec), to any 
+%   other state, for each value in havest grid, HVec
+
   L_H = length(HVec);   % number of havest states 
   S = length(n_vec);    % number of states
   SDP_Mat = zeros(S,S,L_H); % initialize transition matrix
