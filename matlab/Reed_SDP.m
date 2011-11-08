@@ -34,11 +34,11 @@ function [D,SDP_Mat,xt_h] = Reed_SDP(DISCRETISE,SIM)
   n_vec = linspace(0,2*K,DISCRETISE); % Vector of state-spaces
   HVec = n_vec; 
  
-  % Define a Profit function
-  p = 1; % price of fish
-  c = 0.0001; % cost of fishing
 
   function out = profit(h) 
+    % Define a Profit function
+    p = 1; % price of fish
+    c = 0.0001; % cost of fishing
     out = p*h - c/h;
   end
 
@@ -50,9 +50,9 @@ function [D,SDP_Mat,xt_h] = Reed_SDP(DISCRETISE,SIM)
 
   fhandle = @f; 
   SDP_Mat = determine_SDP_matrix(fhandle, pars, n_vec, HVec, dev);
-  [V, D] = find_dp_optim(SDP_Mat, n_vec, HVec, OptTime, xT, profit, delta) 
-  [xt_h,xt,x_ph] = ForwardSimulate(x0,pars,D,dev,n,H)
-  draw_plots(Hvec, n_vec, V1, D, xt_h, xt, x_ph)
+  [V, D] = find_dp_optim(SDP_Mat, n_vec, HVec, OptTime, 0, profit, delta); 
+  [xt_h,xt,x_ph] = ForwardSimulate(K/2,pars,D,dev,n,H);
+  draw_plots(Hvec, n_vec, V1, D, xt_h, xt, x_ph);
 end
 
 
