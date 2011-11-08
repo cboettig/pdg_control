@@ -28,7 +28,7 @@ source("stochastic_dynamic_programming.R")
 # Define all parameters 
 delta <- 0.1      # economic discounting rate
 OptTime <- 25     # stopping time
-sigma <- 0.002      # Noise process
+sigma <- 0.2      # Noise process
 gridsize <- 100   # gridsize (discretized population)
 
 # Chose the state equation / population dynamics function
@@ -58,6 +58,9 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, 30, profit, delta)
 out <- ForwardSimulate(f, pars, x_grid, h_grid, sigma, K/2, opt$D)
 dat <- melt(out, id="time")
 ggplot(dat, aes(time, value, color=variable)) + geom_line()
+ggsave("samplerun.png")
+
+
 
 
 #######################################################################
