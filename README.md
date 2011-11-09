@@ -33,6 +33,7 @@ What's here so far?
 
 Progress & what need's doing
 ============================
-Information about progress milestones and what's up next can be followed through the Issues Tracker, see: https://github.com/cboettig/pdg_control/issues?sort=created&direction=desc&state=open
-More details about the project are avialble in my research lab notebook here: http://www.carlboettiger.info/archives/tag/PDG-Control
+Information about progress milestones and what's up next can be followed through the [Issues Tracker](https://github.com/cboettig/pdg_control/issues?sort=created&direction=desc&state=open)
+
+More details about the project are avialble in my research [lab notebook](http://www.carlboettiger.info/archives/tag/PDG-Control)
 
