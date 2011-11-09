@@ -1,34 +1,29 @@
-Directions for running code in R
-===============================
+Pretty Darn Good Control: Applied Optimal Control Tools & Examples 
+==================================================================
+
+This repository contains a collection of scripts and functions being
+actively used and developing in research in optimal control as 
+part of a NIMBioS working group, PDG Control.  
 
 
-Install R 
----------
+Installation for R
+------------------
 
-See http://www.r-project.org
-
-Install the required package
-----------------------------
-
+Install R.  See http://www.r-project.org
+Install required packages:
 Launch R and do:
 
 ```R 
-install.packages("bvpSolve") 
+install.packages(c("bvpSolve", "ggplot2")) 
 ```
 
-Load functions defning the BVP system
+Matlab installation
 -------------------------------------
-
-Paste the contents of training_prob2_collocation.R into your R terminal
-OR
-save it as a file in your R working directory and do 
-```R
-source("training_prob2_collocation.R")
-```
-
-Run the example
-----------------
-Now paste the code in from run_collocation.R (changing parameters as you see fit).  
+Collaborators work in Matlab, and some scripts here are written in matlab.
+I've tried to ensure that my adapted matlab scripts will run in the open-source
+clone "octave," which can be freely installed on most platforms.  
 
 
+What's here so far?
+------------------
 
