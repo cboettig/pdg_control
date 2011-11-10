@@ -91,28 +91,56 @@ sims <- lapply(1:100, function(i){
     ForwardSimulate(f, pars, x_grid, h_grid, sigma, x0, opt$D)
 })
 dat <- melt(sims, id="time")
-p1 <- ggplot(dat) + 
-  geom_line(aes(time, value, group = L1), 
-            data = subset(dat, variable == "fishstock"), col = "gray") + 
-  geom_line(aes(time, cast(dat, time ~ variable, mean)$fishstock))  + # Mean path
-  geom_abline(intercept=opt$S, slope = 0) +
-  geom_line(aes(time, value, group = L1), 
-            data=subset(dat, variable=="harvest"), col="lightgreen") +
-  geom_abline(intercept=e_star, slope=0, col="green", lty=2) 
+
+# some stats, geom-smooth should do this?
+m <- cast(dat, time ~ variable, mean) # mean population
+err <- cast(dat, time ~ variable, sd) # sd population
+m_f <- m$fishstock
+err_f <- err$fishstock 
+m_h <- m$harvest
+err_h <- err$harvest 
+
+p1 <- ggplot(dat) +
+      # Replicate harvested dynamics
+      geom_line(aes(time, value, group = L1), data = 
+                subset(dat, variable == "fishstock"), alpha = 0.4) + 
+      ## Mean & SD for population
+      geom_ribbon(aes(x = time, ymin = m_f - err_f, ymax = m_f + err_f),
+                  fill = "darkblue", alpha = 0.7)  +
+      geom_line(aes(time, m_f), col = "lightblue")  +
+#      geom_abline(intercept=opt$S, slope = 0) + # Reed's S: optimal escapement 
+      geom_abline(intercept=xT, slope = 0, lty=2) + # Allee threshold
+      ## And the same for harvest levels
+      geom_line(aes(time, value, group = L1), 
+            data = subset(dat, variable == "harvest"),  alpha=.2, col = "darkgreen") +
+      geom_ribbon(aes(x = time, ymin = m_h - err_h, ymax = m_h + err_h),
+                  fill = "darkgreen", alpha = 0.4)  +
+      geom_line(aes(time, m_h), col = "lightgreen")  +
+      geom_abline(intercept = e_star, slope = 0, col = "lightgreen", lwd=1,lty=2) 
+
+optimal_crashed = subset(dat, variable == "fishstock" & 
+                         time == OptTime-1 & value < xT)
+p1 <- p1 + opts(title=sprintf("Optimal Harvest dynamics, %d populations crash",
+  dim(optimal_crashed)[1]))
+print(p1)
+
+## make the crashed trajectories stand out?
+#p1 <- p1 + geom_line(aes(time, value, group = L1), 
+#          data = subset(dat, variable == "harvest" & 
+#          (L1 %in% optimal_crashed$L1)),  col = "darkgreen", alpha = 0.5) +
+#     geom_line(aes(time, value, group = L1), 
+#          data = subset(dat, variable == "fishstock" &
+#          (L1 %in% optimal_crashed$L1)),  col = "darkblue", alpha = 0.5) 
 
 
-optimal_crashed = subset(dat, variable =="fishstock" & time == OptTime-1 & value < xT)
 crashed = subset(dat, variable =="unharvested" & time == OptTime-1 & value < xT)
-
 p2 <- ggplot(dat) + 
   geom_line(aes(time, value, group = L1), 
-            data = subset(dat, variable == "unharvested"), col = "gray") + 
+            data = subset(dat, variable == "unharvested"), alpha=.2) + 
   geom_line(aes(time, cast(dat, time ~ variable, mean)$unharvested)) 
 
-p1 <- p1 + opts(title=sprintf("Optimal Harvest dynamics, %d populations crash",
-  length(optimal_crashed)))
 p2 <- p2 + opts(title=sprintf("Unfished dynamics, %d populations crash",
-  length(crashed)))
+  dim(crashed)[1]))
 
 
 
