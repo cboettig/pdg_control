@@ -26,7 +26,7 @@ determine_SDP_matrix <- function(f, p, x_grid, h_grid, sigma){
     for(i in 1:gridsize){ ## VECTORIZE ME
       ## Calculate the 
       x1 <- x_grid[i]
-      x2_expected <- f(x1-h, pars)
+      x2_expected <- f(x1, h, pars)
       ## If expected 0, go to 0 with probabilty 1
       if( x2_expected == 0) 
         SDP_matrix[i,1] <- 1  
@@ -137,9 +137,9 @@ ForwardSimulate <- function(f, pars, x_grid, h_grid, sigma, x0, D){
     St <- which.min(abs(n - x_h[t])) # Current state
     h[t] <- h_grid[D[St,t+1]]      # Optimal harvest for state
     z <- rnorm(1,1,sigma)
-    x_h[t+1] <- z*f(x_h[t]-h[t], pars) # with havest
-    x[t+1]   <- z*f(x[t], pars) # havest-free dynamics
-#    x[t+1]   <- z*f(x_h[t], pars) # no havest on year t
+    x_h[t+1] <- z*f(x_h[t],h[t], pars) # with havest
+    x[t+1]   <- z*f(x[t], 0, pars) # havest-free dynamics
+#    x[t+1]   <- z*f(x_h[t], 0, pars) # no havest on year t
   }
   data.frame(time=1:OptTime, fishstock=x_h, harvest=h, unharvested=x) 
 }
@@ -159,7 +159,8 @@ ForwardSimulate <- function(f, pars, x_grid, h_grid, sigma, x0, D){
 #' @param p parameters of the growth function, c(A, B), where
 #'  A is the maximum growth rate and B the half-maximum in Beverton-Holt.  
 #' @returns population next year
-BevHolt <- function(x, p){
+BevHolt <- function(x, h, p){
+  x <- max(0, x - h)
   A <- p[1] 
   B <- p[2] 
   sapply(x, function(x){ # use sapply so fn accepts vector-valued x
@@ -172,16 +173,18 @@ BevHolt <- function(x, p){
 #' @param x the current population level
 #' @param p vector of parameters c(r, alpha, K) 
 #' @returns the population level in the next timestep
-#' @details A Beverton-Holt style model with Allee effect
-#' try with pars = c(1,2,100)
-AlleeModel <- function(x, p){
-   p[1] * x ^ p[2] / (1 + x ^ p[2] / p[3]) 
+#' @details A Beverton-Holt style model with Allee effect.
+#'   note that as written, h is fishing EFFORT, not harvest
+#' try with pars = c(1,2,6), h=.01
+Myer <- function(x, h, p){
+   max(0, p[1] * x ^ p[2] / (1 + x ^ p[2] / p[3])  - h * x)
 }
 
 #' @param x the current population level
 #' @param p a vector of parameters c(r, K, C) 
 #' @returns the population level in the next timestep
-RickerAllee <- function(x, p){
+RickerAllee <- function(x, h, p){
+    x <- max(0,x-h)
     x * exp(p[1] * (1 - x / p[2]) * (x - p[3]) / p[2] ) 
 }
 
