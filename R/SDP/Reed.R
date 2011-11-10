@@ -91,7 +91,7 @@ sims <- lapply(1:100, function(i){
     ForwardSimulate(f, pars, x_grid, h_grid, sigma, x0, opt$D)
 })
 dat <- melt(sims, id="time")
-p <- ggplot(dat) + 
+p1 <- ggplot(dat) + 
   geom_line(aes(time, value, group = L1), 
             data = subset(dat, variable == "fishstock"), col = "gray") + 
   geom_line(aes(time, cast(dat, time ~ variable, mean)$fishstock))  + # Mean path
@@ -101,38 +101,14 @@ p <- ggplot(dat) +
   geom_abline(intercept=e_star, slope=0, col="green", lty=2) 
 
 
+optimal_crashed = subset(dat, variable =="fishstock" & time == OptTime-1 & value < xT)
+crashed = subset(dat, variable =="unharvested" & time == OptTime-1 & value < xT)
 
+p2 <- ggplot(dat) + 
+  geom_line(aes(time, value, group = L1), 
+            data = subset(dat, variable == "unharvested"), col = "gray") + 
+  geom_line(aes(time, cast(dat, time ~ variable, mean)$unharvested)) 
 
-sims <- lapply(1:100, function(i){
-# simulate the optimal routine on a stoch realization of growth dynamics
-    sim <- ForwardSimulate(f, pars, x_grid, h_grid, sigma, x0, opt$D)
-    list(fishstock=sim$fishstock, unharvested=sim$unharvested)
-})
-
-# some reformatting
-fished <- sapply(sims, function(x) x$fishstock)
-optimal_havest <- melt(data.frame(year = 1:OptTime,fished), id="year")
-
-# After optimal fishing, how many populations have crashed 
-optimal_crashed <- sum(fished[OptTime-1,]<=xT)
-
-# Assemble the plot
-p1 <- ggplot(optimal_havest, aes(year, value)) + 
-  geom_line(aes(group = variable), col = "gray") + 
-  geom_line(aes(year, rowMeans(fished)))  + # Mean path
-  geom_abline(intercept=opt$S, slope=0)
-p1 <- p1 + opts(title=sprintf("Optimally Havested, %d populations crash",
-  optimal_crashed))
-
-# reformatting for the unhavested dynamics
-unfished <- sapply(sims, function(x) x$unharvested)
-unharvested <- melt(data.frame(year=1:OptTime, unfished), id="year")
-
-# without fishing, how many populations have crashed
-crashed <- sum(unfished[OptTime-1,]<=xT)
-p2 <- ggplot(unharvested,aes(year, value)) + 
-  geom_line(aes(group=variable), col="gray") + 
-  geom_line(aes(year, rowMeans(unfished)))  # Mean path
 p2 <- p2 + opts(title=sprintf("Unfished dynamics, %d populations crash",
   crashed))
 
