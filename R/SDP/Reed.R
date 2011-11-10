@@ -109,8 +109,10 @@ p2 <- ggplot(dat) +
             data = subset(dat, variable == "unharvested"), col = "gray") + 
   geom_line(aes(time, cast(dat, time ~ variable, mean)$unharvested)) 
 
+p1 <- p1 + opts(title=sprintf("Optimal Harvest dynamics, %d populations crash",
+  length(optimal_crashed)))
 p2 <- p2 + opts(title=sprintf("Unfished dynamics, %d populations crash",
-  crashed))
+  length(crashed)))
 
 
 
