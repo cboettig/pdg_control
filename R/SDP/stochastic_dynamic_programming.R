@@ -76,13 +76,10 @@ find_dp_optim <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, r
   for(time in 1:OptTime){
     # try all potential havest rates
     V1 <- sapply(1:HL, function(i){
-
-      # havest cannot exceed population size
-      min_hn <- sapply(x_grid, function(n) min(h_grid[i], n))
-
       # Transition matrix times V gives dist in next time
+      SDP_Mat[[i]] %*% V + 
       # then (add) harvested amount times discount
-      SDP_Mat[[i]] %*% V + profit(min_hn) * exp(-delta * (OptTime-time))
+       profit(x_grid, h_grid[i]) * exp(-delta * (OptTime-time))
     })
 
     # find havest, h that gives the maximum value

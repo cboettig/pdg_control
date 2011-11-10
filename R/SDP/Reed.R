@@ -15,15 +15,15 @@
 rm(list=ls())   # Start wtih clean workspace 
 require(ggplot2) # nicer plotting package
 
-set.seed(1)
+#set.seed(1)
 # load my script defining the SDP functions:
 # determine_SDP_matrix, find_dp_optim, & ForwardSimulate
 source("stochastic_dynamic_programming.R")
 
 # Define all parameters 
 delta <- 0.1      # economic discounting rate
-OptTime <- 25     # stopping time
-sigma <- 0.2      # Noise process
+OptTime <- 50     # stopping time
+sigma <- 0.3      # Noise process
 gridsize <- 100   # gridsize (discretized population)
 
 # Chose the state equation / population dynamics function
@@ -39,13 +39,26 @@ xT <- p[1] * p[3] / 2 - sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2 # allee thresho
 e_star <- (p[1]*sqrt(p[3])-2)/2 ## Bifurcation point 
 
 
-# define a profit function, price minus cost
-profit <- function(h){
-  p <- 1     # higher profits mean more fishing. (scraps xT if too high!) 
-  c <- 0.001 # higher extraction costs result in less fishing 
-  # sapply: support for vector-valued h
-  sapply(h, function(h) max(0,p*h - c/h))
+#' define a profit function, price minus cost
+#' @param x is a the grid of state values (profit will evaluate at each of them)
+#' @param h is the current harvest level being considered by the algorithm
+#' @param p price of fish (Note, optimal will scrap xT if price is high enough!) 
+#' @param c fishing extraction costs (per unit effort)
+profit <- function(x_grid,h_i, p=1, c=.001){
+  ## Havest-based control; havest cannot exceed population size
+#  harvest <- sapply(x_grid, function(x_i) min(h_i, x_i))
+#  out <- sapply(harvest, function(x) max(0,p*x - c/x))
+
+  ## Effort-based control: 
+#  out <- sapply(x_grid, function(x) max(0,p*h_i*x - c*h_i))
+
+  # Another effort-based control cost-function (?)
+  harvest <- x_grid*h_i # cpue proportional to population size
+  out <- sapply(harvest, function(x) max(0,p*x - c/x))
+  out
 }
+
+set.seed(2)
 
 # Set up the grid 
 x_grid <- seq(0, 2*K, length=gridsize)  # population size
@@ -66,7 +79,7 @@ p0 <- ggplot(dat, aes(time, value, color=variable)) + geom_line() +
   geom_abline(intercept=opt$S, slope=0, col="black") + # Reed's S,
   geom_abline(intercept = xT, slope=0, col="darkred", lty=3) # unfished Allee 
 p0 <- p0 + geom_abline(intercept=e_star, slope=0, col="green", lty = 2)
-
+p0
 #  geom_line(data=subset(dat, variable=="harvest"), 
 #  aes(time, value+opt$S), col="black")
 
@@ -120,8 +133,8 @@ p2 <- p2 + opts(title=sprintf("Unfished dynamics, %d populations crash",
 
 
 # check out the deterministic dynamics
-#x <- numeric(OptTime)
-#x[1] <- K
-#for(t in 1:(OptTime-1))
-#  x[t+1] <- f(x[t],0,pars)
+x <- numeric(OptTime)
+x[1] <- K
+for(t in 1:(OptTime-1))
+  x[t+1] <- f(x[t],e_star+.01,pars)
 
