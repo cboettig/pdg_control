@@ -23,7 +23,7 @@ source("stochastic_dynamic_programming.R")
 # Define all parameters 
 delta <- 0.1      # economic discounting rate
 OptTime <- 50     # stopping time
-sigma <- 0.3      # Noise process
+sigma <- 0.2      # Noise process
 gridsize <- 100   # gridsize (discretized population)
 
 # Chose the state equation / population dynamics function
@@ -86,6 +86,23 @@ p0
 #######################################################################
 # Now we'll simulate this process many times under this optimal havest#
 #######################################################################
+sims <- lapply(1:100, function(i){
+# simulate the optimal routine on a stoch realization of growth dynamics
+    ForwardSimulate(f, pars, x_grid, h_grid, sigma, x0, opt$D)
+})
+dat <- melt(sims, id="time")
+p <- ggplot(dat) + 
+  geom_line(aes(time, value, group = L1), 
+            data = subset(dat, variable == "fishstock"), col = "gray") + 
+  geom_line(aes(time, cast(dat, time ~ variable, mean)$fishstock))  + # Mean path
+  geom_abline(intercept=opt$S, slope = 0) +
+  geom_line(aes(time, value, group = L1), 
+            data=subset(dat, variable=="harvest"), col="lightgreen") +
+  geom_abline(intercept=e_star, slope=0, col="green", lty=2) 
+
+
+
+
 sims <- lapply(1:100, function(i){
 # simulate the optimal routine on a stoch realization of growth dynamics
     sim <- ForwardSimulate(f, pars, x_grid, h_grid, sigma, x0, opt$D)
