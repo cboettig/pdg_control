@@ -50,7 +50,7 @@ profit <- function(h){
 # Set up the grid 
 x_grid <- seq(0, 2*K, length=gridsize)  # population size
 #h_grid <- x_grid  # vector of havest levels, use same res as stock
-h_grid <- seq(0, 2, length=gridsize) # Myers model based on harvesting effort 
+h_grid <- seq(0, 2, length=gridsize) # Myers model based on effort!
 
 # Calculate the transition matrix 
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma)
@@ -62,7 +62,9 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta)
 ## Example plot the results of a single run, against unharvested version  
 out <- ForwardSimulate(f, pars, x_grid, h_grid, sigma, x0, opt$D)
 dat <- melt(out, id="time")
-p0 <- ggplot(dat, aes(time, value, color=variable)) + geom_line() +  geom_abline(intercept=opt$S, slope=0, col="black") #+
+p0 <- ggplot(dat, aes(time, value, color=variable)) + geom_line() +  
+  geom_abline(intercept=opt$S, slope=0, col="black") + # Reed's S,
+  geom_abline(intercept = xT, slope=0, col="darkred", lty=3) # unfished Allee 
 p0 <- p0 + geom_abline(intercept=e_star, slope=0, col="green", lty = 2)
 
 #  geom_line(data=subset(dat, variable=="harvest"), 
