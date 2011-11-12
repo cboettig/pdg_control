@@ -156,13 +156,16 @@ ForwardSimulate <- function(f, pars, x_grid, h_grid, sigma, x0, D){
 #' @param p parameters of the growth function, c(A, B), where
 #'  A is the maximum growth rate and B the half-maximum in Beverton-Holt.  
 #' @returns population next year
+#' @details Harvesting takes place before reproduction in ths model.
+#'  The carrying capacity is K <- (pars[1]-1)/pars[2]
+#'  Try with pars <- c(2,4)
 BevHolt <- function(x, h, p){
   x <- max(0, x - h)
   A <- p[1] 
   B <- p[2] 
   sapply(x, function(x){ # use sapply so fn accepts vector-valued x
     x <- max(0, x)
-    max(0, A*x/(1+B*x))
+    max(0, A * x/(1 + B * x))
   })
 }
 
@@ -171,8 +174,14 @@ BevHolt <- function(x, h, p){
 #' @param p vector of parameters c(r, alpha, K) 
 #' @returns the population level in the next timestep
 #' @details A Beverton-Holt style model with Allee effect.
-#'   note that as written, h is fishing EFFORT, not harvest
-#' try with pars = c(1,2,6), h=.01
+#'   note that as written, h is fishing EFFORT, not harvest.
+#'   Effort above a certain value introduces a fold bifurcation. 
+#'   Unharvested carrying capacity is:
+#'   K <- p[1] * p[3] / 2 + sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2
+#'   The (unharvested) allee theshold is given by:
+#'   x = p[1] * p[3] / 2 - sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2 
+#'   Bifurcation pt is h = (p[1]*sqrt(p[3])-2)/2 
+#'   Try with pars = c(1,2,6), h=.01
 Myer <- function(x, h, p){
    max(0, p[1] * x ^ p[2] / (1 + x ^ p[2] / p[3])  - h * x)
 }
@@ -183,6 +192,12 @@ Myer <- function(x, h, p){
 RickerAllee <- function(x, h, p){
     x <- max(0,x-h)
     x * exp(p[1] * (1 - x / p[2]) * (x - p[3]) / p[2] ) 
+}
+
+
+Ricker <- function(x,h,p){
+  x <- max(0, x-h) 
+  max(0, x * exp(p[1] * (1 - x / p[2] )) )
 }
 
 
