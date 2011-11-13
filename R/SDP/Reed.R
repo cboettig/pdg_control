@@ -66,7 +66,7 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta)
 
 # What if parameter estimation is inaccurate? (No crashes w/o Allee)
 # if true A is 10% down, 80% crash.  B is 10% lower, 50% crash.     
-pars[1] <- pars[1]*.9
+pars[1] <- pars[1]*.95
 
 
 ## Example plot the results of a single run, against unharvested version  
