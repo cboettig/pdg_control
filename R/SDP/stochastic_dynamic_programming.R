@@ -63,7 +63,9 @@ determine_SDP_matrix <- function(f, p, x_grid, h_grid, sigma){
 #'  V is a matrix of x_grid by x_grid, which is used to store the value 
 #'  function at each point along the grid at each point in time.  
 #'  The returned V gives the value matrix at the first (last) time.  
-find_dp_optim <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward=10){
+find_dp_optim <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, 
+                          delta, reward=10){
+
   gridsize <- length(x_grid)
   HL <- length(h_grid)
 
@@ -114,9 +116,12 @@ find_dp_optim <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, r
 #' @param Xo initial stock size
 #' @param D the optimal solution indices on h_grid, 
 #'  given for each possible state at each timestep
+#' @param sigma_assess amount of uncertainty in the assessment of stock size
+#' @param sigma_harvest amount of noise in implementing quotas 
 #' @returns a data frame with the time, fishstock, harvested amount,
 #'  and what the stock would have been without that year's harvest.  
-ForwardSimulate <- function(f, pars, x_grid, h_grid, sigma, x0, D){
+ForwardSimulate <- function(f, pars, x_grid, h_grid, sigma, x0, D,
+                            sigma_assess=0, sigma_harvest=0){
   # shorthand names
   n <- x_grid
   h <- h_grid
@@ -131,12 +136,13 @@ ForwardSimulate <- function(f, pars, x_grid, h_grid, sigma, x0, D){
   x[1]   <- x0 
 
   for(t in 1:(OptTime-1)){
-    St <- which.min(abs(n - x_h[t])) # Current state
-    h[t] <- h_grid[D[St,t+1]]      # Optimal harvest for state
-    z <- rnorm(1,1,sigma)
-    x_h[t+1] <- z*f(x_h[t],h[t], pars) # with havest
-    x[t+1]   <- z*f(x[t], 0, pars) # havest-free dynamics
-#    x[t+1]   <- z*f(x_h[t], 0, pars) # no havest on year t
+    # Current state; can add noise to stock assessment, x_h[t] 
+    St <- which.min(abs(n - x_h[t] * rnorm(1, 1, sigma_assess))) 
+    # Set harvest level; can add noise to harvest level implementation
+    h[t] <- h_grid[D[St,t + 1]] * rnorm(1, 1, sigma_harvest) 
+    z <- rnorm(1,1,sigma)            # Noise in growth
+    x_h[t+1] <- z*f(x_h[t], h[t], pars) # with havest
+    x[t+1]   <- z * f(x[t], 0, pars) # havest-free dynamics
   }
   data.frame(time=1:OptTime, fishstock=x_h, harvest=h, unharvested=x) 
 }
@@ -152,7 +158,8 @@ ForwardSimulate <- function(f, pars, x_grid, h_grid, sigma, x0, D){
 
 ####### Define our population dynamics / state equation  #######
 #' Harvested Beverton Holt growth model
-#' @param x fish population that reproduces (usually x-h)
+#' @param x fish population 
+#' @param h havest level
 #' @param p parameters of the growth function, c(A, B), where
 #'  A is the maximum growth rate and B the half-maximum in Beverton-Holt.  
 #' @returns population next year
@@ -171,6 +178,7 @@ BevHolt <- function(x, h, p){
 
 #' Discrete-time model with an allee effect for alpha > 1
 #' @param x the current population level
+#' @param h harvest effort
 #' @param p vector of parameters c(r, alpha, K) 
 #' @returns the population level in the next timestep
 #' @details A Beverton-Holt style model with Allee effect.
@@ -186,7 +194,9 @@ Myer <- function(x, h, p){
    max(0, p[1] * x ^ p[2] / (1 + x ^ p[2] / p[3])  - h * x)
 }
 
+#' Ricker-like model with Allee effect (Allen)
 #' @param x the current population level
+#' @param h harvest level 
 #' @param p a vector of parameters c(r, K, C) 
 #' @returns the population level in the next timestep
 RickerAllee <- function(x, h, p){
@@ -199,5 +209,24 @@ Ricker <- function(x,h,p){
   x <- max(0, x-h) 
   max(0, x * exp(p[1] * (1 - x / p[2] )) )
 }
+
+#' corals
+
+#' Coral-Parrotfish model
+#' @param x vector of population levels: macroalgae, coral, parrotfish
+#' @param h harvesting effort on parrotfish
+#' @param p c(a, g, T, gamma, r, d, s, K)
+#'            1  2  3     4   5  6  7  8
+#' @details 
+coral <- function(x, h, p){
+ x_t1 <- p[1] * x[1] * x[2] + p[2] * x[3] * x[1] / (x[1] + p[3]) + p[4] * p[3] * x[1]
+ x_t2 <- (p[5] * p[3] - p[6] - p[1] * x[1]  ) * x[2] 
+ x_t3 <- p[7] * x[3] * (1 - x[3] / (p[8] * x[2])) - h * x[3]
+ c(x_t1, x_t2, x_t3)
+}
+
+
+
+
 
 
