@@ -23,17 +23,22 @@ source("stochastic_dynamic_programming.R")
 # Define all parameters 
 delta <- 0.1      # economic discounting rate
 OptTime <- 50     # stopping time
-sigma <- 0.2      # Noise process
+sigma <- 0.02      # Noise in population growth
 gridsize <- 100   # gridsize (discretized population)
+sigma_assess <- .3  # 
+sigma_harvest <- .0 # 
 
 # Chose the state equation / population dynamics function
-#f <- BevHolt pars <- c(2,4)  #K <- (pars[1]-1)/pars[2] #xT <- 0 #e_star <- 0
-# f <- RickerAllee # pars <- c(1, 100, 30) # K <- 100
+#f <- BevHolt 
+#pars <- c(2,4)  
+#K <- (pars[1]-1)/pars[2] 
+#xT <- 0 
+#e_star <- 0
+
 f <- Myer
 pars <- c(1, 2, 6) 
 p <- pars # shorthand 
 K <- p[1] * p[3] / 2 + sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2
-# Boundary value conditions
 xT <- p[1] * p[3] / 2 - sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2 # allee threshold
 e_star <- (p[1]*sqrt(p[3])-2)/2 ## Bifurcation point 
 x0 <- K
@@ -45,12 +50,9 @@ x0 <- K
 #' @param c fishing extraction costs (per unit effort)
 profit <- function(x_grid, h_i, p = 1, c = 0.001){
   ## Havest-based control; havest cannot exceed population size
-#  harvest <- sapply(x_grid, function(x_i) min(h_i, x_i)) # Harvest-based control
-  harvest <- x_grid * h_i # Effort-based control 
-  out <- sapply(harvest, function(x) max(0, p * x - c / x))
-
-  # Another effort-based control cost-function (?)
-  out
+  harvest <- sapply(x_grid, function(x_i) min(h_i, x_i)) # Harvest-based control
+#  harvest <- x_grid * h_i # Effort-based control 
+  sapply(harvest, function(x) max(0, p * x - c / x))
 }
 
 # Set up the grid 
@@ -58,19 +60,21 @@ x_grid <- seq(0, 2*K, length=gridsize)  # population size
 #h_grid <- x_grid  # vector of havest levels, use same res as stock
 h_grid <- seq(0, 2, length=gridsize) # Myers model based on effort!
 
+
+
 # Calculate the transition matrix 
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma)
 
 # Find the optimum by dynamic programming 
-opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward=1000)
+opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward=100)
 
 # What if parameter estimation is inaccurate? (No crashes w/o Allee)
-# if true A is 10% down, 80% crash.  B is 10% lower, 50% crash.     
-pars[1] <- pars[1]*.95
+#pars[1] <- pars[1]*.95
 
 
 ## Example plot the results of a single run, against unharvested version  
-out <- ForwardSimulate(f, pars, x_grid, h_grid, sigma, x0, opt$D)
+out <- ForwardSimulate(f, pars, x_grid, h_grid, sigma, x0, opt$D,
+                       sigma_assess, sigma_harvest)
 dat <- melt(out, id="time")
 p0 <- ggplot(dat, aes(time, value, color=variable)) + geom_line() +  
   geom_abline(intercept=opt$S, slope=0, col="black") + # Reed's S,
@@ -82,7 +86,8 @@ p0 <- p0 + geom_abline(intercept=e_star, slope=0, col="green", lty = 2) # tippt
 #######################################################################
 sims <- lapply(1:100, function(i){
 # simulate the optimal routine on a stoch realization of growth dynamics
-    ForwardSimulate(f, pars, x_grid, h_grid, sigma, x0, opt$D)
+    ForwardSimulate(f, pars, x_grid, h_grid, sigma, x0, opt$D, 
+                    sigma_assess, sigma_harvest)
 })
 dat <- melt(sims, id="time")
 
@@ -141,12 +146,6 @@ p2 <- p2 + opts(title=sprintf("Unfished dynamics, %d populations crash",
 #ggsave("samplerun.png", plot=p0)
 #ggsave("fished.png", plot=p1)
 #ggsave("unfished.png", plot=p2)
-
-
-
-
-
-
 
 
 # check out the deterministic dynamics

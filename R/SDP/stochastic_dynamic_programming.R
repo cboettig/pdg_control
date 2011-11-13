@@ -81,7 +81,7 @@ find_dp_optim <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit,
       # Transition matrix times V gives dist in next time
       SDP_Mat[[i]] %*% V + 
       # then (add) harvested amount times discount
-       profit(x_grid, h_grid[i]) * exp(-delta * (OptTime-time))
+       profit(x_grid, h_grid[i]) * exp(-delta * (OptTime - time))
     })
 
     # find havest, h that gives the maximum value
@@ -96,11 +96,11 @@ find_dp_optim <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit,
     D[,OptTime-time+1] <- out[2,]       # The index positions
   }
 
-  # Reed derives a constant escapement policy saying to fish the pop down to:
-  ReedThreshold <- x_grid[ sum(D[,1]==1) ] # easy way
+  # Reed derives a const escapement policy saying to fish the pop down to:
+  ReedThreshold <- x_grid[sum(D[,1]==1)] # easy way
   # calculation is harder for general f, need to start at top
   # finds the largest population for which you shouldn't harvest: 
-  ReedThreshold <- x_grid[ max(which(D[,1] == 1)) ]
+  ReedThreshold <- x_grid[max(which(D[,1] == 1))]
   list(D=D, V=V, S=ReedThreshold)
 }
 
@@ -121,7 +121,7 @@ find_dp_optim <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit,
 #' @returns a data frame with the time, fishstock, harvested amount,
 #'  and what the stock would have been without that year's harvest.  
 ForwardSimulate <- function(f, pars, x_grid, h_grid, sigma, x0, D,
-                            sigma_assess=0, sigma_harvest=0){
+                            sigma_assess = 0, sigma_harvest = 0){
   # shorthand names
   n <- x_grid
   h <- h_grid
