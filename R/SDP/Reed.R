@@ -23,7 +23,7 @@ source("stochastic_dynamic_programming.R")
 # Define all parameters 
 delta <- 0.1      # economic discounting rate
 OptTime <- 50     # stopping time
-sigma <- 0.02      # Noise in population growth
+sigma <- 0.2      # Noise in population growth
 gridsize <- 100   # gridsize (discretized population)
 sigma_assess <- .3  # 
 sigma_harvest <- .0 # 
