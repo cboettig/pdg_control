@@ -62,7 +62,7 @@ h_grid <- seq(0, 2, length=gridsize) # Myers model based on effort!
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma)
 
 # Find the optimum by dynamic programming 
-opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta)
+opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward=1000)
 
 # What if parameter estimation is inaccurate? (No crashes w/o Allee)
 # if true A is 10% down, 80% crash.  B is 10% lower, 50% crash.     
