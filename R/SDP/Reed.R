@@ -27,34 +27,29 @@ sigma <- 0.2      # Noise process
 gridsize <- 100   # gridsize (discretized population)
 
 # Chose the state equation / population dynamics function
-# f <- BevHolt #pars <- c(2,4) #K <- (pars[1]-1)/pars[2]
+#f <- BevHolt pars <- c(2,4)  #K <- (pars[1]-1)/pars[2] #xT <- 0 #e_star <- 0
 # f <- RickerAllee # pars <- c(1, 100, 30) # K <- 100
 f <- Myer
-pars <- c(1,2,6) 
+pars <- c(1, 2, 6) 
 p <- pars # shorthand 
 K <- p[1] * p[3] / 2 + sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2
 # Boundary value conditions
-x0 <- K
 xT <- p[1] * p[3] / 2 - sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2 # allee threshold
 e_star <- (p[1]*sqrt(p[3])-2)/2 ## Bifurcation point 
-
+x0 <- K
 
 #' define a profit function, price minus cost
 #' @param x is a the grid of state values (profit will evaluate at each of them)
 #' @param h is the current harvest level being considered by the algorithm
 #' @param p price of fish (Note, optimal will scrap xT if price is high enough!) 
 #' @param c fishing extraction costs (per unit effort)
-profit <- function(x_grid,h_i, p=1, c=.001){
+profit <- function(x_grid, h_i, p = 1, c = 0.001){
   ## Havest-based control; havest cannot exceed population size
-#  harvest <- sapply(x_grid, function(x_i) min(h_i, x_i))
-#  out <- sapply(harvest, function(x) max(0,p*x - c/x))
-
-  ## Effort-based control: 
-#  out <- sapply(x_grid, function(x) max(0,p*h_i*x - c*h_i))
+#  harvest <- sapply(x_grid, function(x_i) min(h_i, x_i)) # Harvest-based control
+  harvest <- x_grid * h_i # Effort-based control 
+  out <- sapply(harvest, function(x) max(0, p * x - c / x))
 
   # Another effort-based control cost-function (?)
-  harvest <- x_grid*h_i # cpue proportional to population size
-  out <- sapply(harvest, function(x) max(0,p*x - c/x))
   out
 }
 
@@ -69,9 +64,9 @@ SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma)
 # Find the optimum by dynamic programming 
 opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta)
 
-## What if we've assumed the wrong model?  
-## Estimate a logistic model from the data
-
+# What if parameter estimation is inaccurate? (No crashes w/o Allee)
+# if true A is 10% down, 80% crash.  B is 10% lower, 50% crash.     
+pars[1] <- pars[1]*.9
 
 
 ## Example plot the results of a single run, against unharvested version  
