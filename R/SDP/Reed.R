@@ -74,7 +74,7 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward
 
 ## Example plot the results of a single run, against unharvested version  
 out <- ForwardSimulate(f, pars, x_grid, h_grid, sigma, x0, opt$D,
-                       sigma_assess, sigma_harvest)
+                       sigma_assess, sigma_harvest, interval=4)
 dat <- melt(out, id="time")
 p0 <- ggplot(dat, aes(time, value, color=variable)) + geom_line() +  
   geom_abline(intercept=opt$S, slope=0, col="black") + # Reed's S,
@@ -87,7 +87,7 @@ p0 <- p0 + geom_abline(intercept=e_star, slope=0, col="green", lty = 2) # tippt
 sims <- lapply(1:100, function(i){
 # simulate the optimal routine on a stoch realization of growth dynamics
     ForwardSimulate(f, pars, x_grid, h_grid, sigma, x0, opt$D, 
-                    sigma_assess, sigma_harvest)
+                    sigma_assess, sigma_harvest, interval=4)
 })
 dat <- melt(sims, id="time")
 

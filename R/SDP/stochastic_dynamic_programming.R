@@ -118,10 +118,12 @@ find_dp_optim <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit,
 #'  given for each possible state at each timestep
 #' @param sigma_assess amount of uncertainty in the assessment of stock size
 #' @param sigma_harvest amount of noise in implementing quotas 
+#' @param interval is the years between updating the harvest quota
 #' @returns a data frame with the time, fishstock, harvested amount,
 #'  and what the stock would have been without that year's harvest.  
 ForwardSimulate <- function(f, pars, x_grid, h_grid, sigma, x0, D,
-                            sigma_assess = 0, sigma_harvest = 0){
+                            sigma_assess = 0, sigma_harvest = 0,
+                            interval = 1){
   # shorthand names
   n <- x_grid
   h <- h_grid
@@ -138,10 +140,16 @@ ForwardSimulate <- function(f, pars, x_grid, h_grid, sigma, x0, D,
   for(t in 1:(OptTime-1)){
     # Current state; can add noise to stock assessment, x_h[t] 
     St <- which.min(abs(n - x_h[t] * rnorm(1, 1, sigma_assess))) 
-    # Set harvest level; can add noise to harvest level implementation
-    h[t] <- h_grid[D[St,t + 1]] * rnorm(1, 1, sigma_harvest) 
+    # Set harvest quota on update years
+  # could update harvest quota annually based on projections, but assess stock only periodically.  Could update stock annually, but adjust quota periodically.  
+    if(t %% interval == 0){ 
+      h[t + 1] <- h_grid[D[St,t + 1]] 
+    } else {
+      h[t + 1] <- h[t]
+    }
+    h[t + 1] <- h[t + 1] * rnorm(1, 1, sigma_harvest) 
     z <- rnorm(1,1,sigma)            # Noise in growth
-    x_h[t+1] <- z*f(x_h[t], h[t], pars) # with havest
+    x_h[t+1] <- z*f(x_h[t], h[t + 1], pars) # with havest
     x[t+1]   <- z * f(x[t], 0, pars) # havest-free dynamics
   }
   data.frame(time=1:OptTime, fishstock=x_h, harvest=h, unharvested=x) 
