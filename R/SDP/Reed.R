@@ -9,7 +9,9 @@
 #   Economics and Management. 6: 350-363.
 #
 # Dependencies:
-#   my stochastic_dynamic_programming.R script   
+#   functions in scripts: 
+#     stochastic_dynamic_programming.R, 
+#     population_models.R
 #   Requires library: "ggplot2" (plotting)
 #   Recommends library: "snowfall" (for simulated transition matrix)
 #
@@ -25,12 +27,15 @@ require(ggplot2) # nicer plotting package
 # determine_SDP_matrix, find_dp_optim, & ForwardSimulate
 source("stochastic_dynamic_programming.R")
 
+# load the library of population models
+source("population_models.R")
+
 # Define all parameters 
 delta <- 0.1      # economic discounting rate
 OptTime <- 50     # stopping time
 sigma_g <- 0.2    # Noise in population growth
 gridsize <- 100   # gridsize (discretized population)
-sigma_m <- .2     # noise in stock assessment measurement
+sigma_m <- .0     # noise in stock assessment measurement
 sigma_i <- .0     # noise in implementation of the quota
 interval <- 1     # period of updating the stock assessment
 
@@ -42,16 +47,16 @@ pars <- c(2,4)            # parameters for the state equation
 K <- (pars[1]-1)/pars[2]  # Carrying capacity 
 xT <- 0                   # boundary conditions
 e_star <- 0               # model's bifurcation point (just for reference)
+ control = "harvest"         # control variable is total harvest, h = e * x
 
 ## An alternative state equation, with allee effect: (uncomment to select)
-## Effort-based, requires choosing a different h_grid and profit function!!
 #f <- Myer
 #pars <- c(1, 2, 6) 
 #p <- pars # shorthand 
 #K <- p[1] * p[3] / 2 + sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2
 #xT <- p[1] * p[3] / 2 - sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2 # allee threshold
 #e_star <- (p[1] * sqrt(p[3]) - 2) / 2 ## Bifurcation point 
-
+#control <- "effort"          # control variable is harvest effort, e = h / x
 
 x0 <- K # initial condition
 
@@ -60,27 +65,29 @@ x0 <- K # initial condition
 #' @param h is the current harvest level being considered by the algorithm
 #' @param p price of fish (Note, optimal will scrap xT if price is high enough!) 
 #' @param c fishing extraction costs (per unit effort)
-profit <- function(x_grid, h_i, p = 1, c = 0.001){
-  ## Havest-based control; havest cannot exceed population size
-  harvest <- sapply(x_grid, function(x_i) min(h_i, x_i)) # Harvest-based control
-#  harvest <- x_grid * h_i # Effort-based control 
+profit <- function(x_grid, h_i, p = 1, c = 0.001, type=control){
+  if(type=="harvest")
+    harvest <- sapply(x_grid, function(x_i) min(h_i, x_i)) # Harvest-based control
+  else if(type=="effort")
+    harvest <- x_grid * h_i # Effort-based control 
   sapply(harvest, function(x) max(0, p * x - c / x))
 }
 
 # Set up the discrete grids
 x_grid <- seq(0, 2 * K, length = gridsize)  # population size
-h_grid <- x_grid  # vector of havest levels, use same resolution as for stock
+#h_grid <- x_grid  # vector of havest levels, use same resolution as for stock
+h_grid <- seq(0, 2, length=gridsize) 
 
 
 #######################################################################
 # Calculate the transition matrix (with noise in growth only)         #
 #######################################################################
-#SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
+SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
 
 ## calculate the transition matrix by simulation 
-require(snowfall) # use parallelization since this can be slow
-sfInit(parallel=TRUE, cpu=4)
-SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, sigma_g, sigma_m, sigma_i, reps=99)
+#require(snowfall) # use parallelization since this can be slow
+#sfInit(parallel=TRUE, cpu=4)
+#SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, sigma_g, sigma_m, sigma_i, reps=99)
 
 
 #######################################################################

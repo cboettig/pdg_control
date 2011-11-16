@@ -1,3 +1,7 @@
+# file unit_tests.R
+# author Carl Boettiger <cboettig@gmail.com>
+# date 2011-11-16
+# license BSD
 # test the performance of SDP_by_simulation 
 
 source("stochastic_dynamic_programming.R")
