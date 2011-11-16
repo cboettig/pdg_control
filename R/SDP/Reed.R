@@ -37,19 +37,20 @@ interval <- 1     # period of updating the stock assessment
 
 
 # Chose the state equation / population dynamics function
-#f <- BevHolt              # Select the state equation
-#pars <- c(2,4)            # parameters for the state equation
-#K <- (pars[1]-1)/pars[2]  # Carrying capacity 
-#xT <- 0                   # boundary conditions
-#e_star <- 0               # model's bifurcation point (just for reference)
+f <- BevHolt              # Select the state equation
+pars <- c(2,4)            # parameters for the state equation
+K <- (pars[1]-1)/pars[2]  # Carrying capacity 
+xT <- 0                   # boundary conditions
+e_star <- 0               # model's bifurcation point (just for reference)
 
 ## An alternative state equation, with allee effect: (uncomment to select)
-f <- Myer
-pars <- c(1, 2, 6) 
-p <- pars # shorthand 
-K <- p[1] * p[3] / 2 + sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2
-xT <- p[1] * p[3] / 2 - sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2 # allee threshold
-e_star <- (p[1] * sqrt(p[3]) - 2) / 2 ## Bifurcation point 
+## Effort-based, requires choosing a different h_grid and profit function!!
+#f <- Myer
+#pars <- c(1, 2, 6) 
+#p <- pars # shorthand 
+#K <- p[1] * p[3] / 2 + sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2
+#xT <- p[1] * p[3] / 2 - sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2 # allee threshold
+#e_star <- (p[1] * sqrt(p[3]) - 2) / 2 ## Bifurcation point 
 
 
 x0 <- K # initial condition
