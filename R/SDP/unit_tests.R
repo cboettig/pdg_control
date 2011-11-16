@@ -25,7 +25,7 @@ SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
 
 require(snowfall)
 sfInit(parallel=TRUE, cpu=16)
-sim_SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, sigma_g, 0, 0)
+sim_SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, sigma_g, 0, 0, reps=99)
 
 x <- matrix(NA, length(x_grid), 10) 
 x[,1] <- 0
