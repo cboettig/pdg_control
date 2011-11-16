@@ -140,4 +140,6 @@ p1 <- p1 + opts(title = sprintf("Optimal Harvest dynamics, %d populations crash"
                                 dim(optimal_crashed)[1]))
 print(p1)
 
-
+## extra plots are avialable in plots.R, inculding unharvested dynamics,
+## plot of a single harvested replicate, and plot of the profit over time.  
+# source("plots.R")
