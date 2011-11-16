@@ -7,8 +7,13 @@
 #   Reed, W.J., 1979. Optimal Escapement Levels in Stochastic
 #   and Deterministic Harvesting Models. Journal of Environmental 
 #   Economics and Management. 6: 350-363.
-# 
-# 
+#
+# Dependencies:
+#   my stochastic_dynamic_programming.R script   
+#   Requires library: "ggplot2" (plotting)
+#   Recommends library: "snowfall" (for simulated transition matrix)
+#
+#
 # Fish population dynamics:
 # X_{t+1} = Z_n f(X_n) 
 
@@ -38,13 +43,13 @@ K <- (pars[1]-1)/pars[2]  # Carrying capacity
 xT <- 0                   # boundary conditions
 e_star <- 0               # model's bifurcation point (just for reference)
 
-## An alternative state equation, with allee effect:
+## An alternative state equation, with allee effect: (uncomment to select)
 #f <- Myer
 #pars <- c(1, 2, 6) 
 #p <- pars # shorthand 
 #K <- p[1] * p[3] / 2 + sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2
 #xT <- p[1] * p[3] / 2 - sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2 # allee threshold
-#e_star <- (p[1]*sqrt(p[3])-2)/2 ## Bifurcation point 
+#e_star <- (p[1] * sqrt(p[3]) - 2) / 2 ## Bifurcation point 
 
 
 x0 <- K # initial condition
@@ -62,14 +67,14 @@ profit <- function(x_grid, h_i, p = 1, c = 0.001){
 }
 
 # Set up the discrete grids
-x_grid <- seq(0, 2*K, length=gridsize)  # population size
+x_grid <- seq(0, 2 * K, length = gridsize)  # population size
 h_grid <- x_grid  # vector of havest levels, use same resolution as for stock
 
 
 #######################################################################
-# Calculate the transition matrix                                     #
+# Calculate the transition matrix (with noise in growth only)         #
 #######################################################################
-SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma)
+SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
 
 ## calculate the transition matrix by simulation 
 #require(snowfall) # use parallelization since this can be slow
@@ -84,7 +89,7 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward
 
 
 # What if parameter estimation is inaccurate? e.g.:
-#pars[1] <- pars[1]*.95
+#pars[1] <- pars[1] * 0.95
 
 
 #######################################################################
@@ -120,7 +125,7 @@ p1 <- ggplot(dat) +
                 subset(dat, variable == "fishstock"), alpha = 0.2) + 
       ## Mean & SD for population
       geom_ribbon(aes(x = time, ymin = m_f - err_f, ymax = m_f + err_f),
-                  fill = "darkblue", alpha = 0.7)  +
+                  fill = "darkblue", alpha = 0.4)  +
       geom_line(aes(time, m_f), col = "lightblue")  +
 #      geom_abline(intercept=opt$S, slope = 0) + # show Reed's S: optimal escapement 
       geom_abline(intercept=xT, slope = 0, lty=2) + # show Allee threshold
@@ -128,7 +133,7 @@ p1 <- ggplot(dat) +
 #      geom_line(aes(time, value, group = L1), 
 #            data = subset(dat, variable == "harvest"),  alpha=.2, col = "darkgreen") +
       geom_ribbon(aes(x = time, ymin = m_h - err_h, ymax = m_h + err_h),
-                  fill = "darkgreen", alpha = 0.2)  +
+                  fill = "darkgreen", alpha = 0.4)  +
       geom_line(aes(time, m_h), col = "lightgreen")  #+
 #     geom_abline(intercept = e_star, slope = 0, col = "lightgreen", lwd=1,lty=2) 
 
