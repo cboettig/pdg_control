@@ -17,16 +17,20 @@
 #' @param p the parameters of the growth function
 #' @param x_grid the discrete values allowed for the population size, x
 #' @param h_grid the discrete values of harvest levels to optimize over
-#' @param sigma the variance of the noise process
+#' @param sigma_g the variance of the population growth process
+#' @param sigma_m measurement uncertainty in the assessment of stock size
+#' @param sigma_i implementation uncertainty in implementing quotas 
 #' @returns the transition matrix at each value of h in the grid.  
-determine_SDP_matrix <- function(f, p, x_grid, h_grid, sigma){
+determine_SDP_matrix <- function(f, p, x_grid, h_grid, sigma_g, 
+                                 sigma_m, sigma_i){
+  gridsize <- length(x_grid)
   SDP_Mat <- lapply(h_grid, function(h){
     SDP_matrix <- matrix(0, nrow=gridsize, ncol=gridsize)
     # Cycle over x values
     for(i in 1:gridsize){ ## VECTORIZE ME
       ## Calculate the 
       x1 <- x_grid[i]
-      x2_expected <- f(x1, h, pars)
+      x2_expected <- f(x1, h, p)
       ## If expected 0, go to 0 with probabilty 1
       if( x2_expected == 0) 
         SDP_matrix[i,1] <- 1  
@@ -34,7 +38,7 @@ determine_SDP_matrix <- function(f, p, x_grid, h_grid, sigma){
         # relative probability of a transition to that state
         ProportionalChance <- x_grid / x2_expected
         # lognormal due to multiplicative Gaussian noise
-        Prob <- dlnorm(ProportionalChance, 0, sigma)
+        Prob <- dlnorm(ProportionalChance, 0, sigma_g)
         # Store normalized probabilities in row
         SDP_matrix[i,] <- Prob/sum(Prob)
       }
@@ -44,6 +48,33 @@ determine_SDP_matrix <- function(f, p, x_grid, h_grid, sigma){
   SDP_Mat
 }
 
+
+#' Determine the transtion matrix using stochastic simulation
+#' @param f the growth function of the escapement population (x-h)
+#'   should be a function of f(t, y, p), with parameters p
+#' @param p the parameters of the growth function
+#' @param x_grid the discrete values allowed for the population size, x
+#' @param h_grid the discrete values of harvest levels to optimize over
+#' @param sigma_g the variance of the population growth process
+#' @param sigma_m measurement uncertainty in the assessment of stock size
+#' @param sigma_i implementation uncertainty in implementing quotas 
+#' @returns the transition matrix at each value of h in the grid.  
+SDP_by_simulation <- function(f, p, x_grid, h_grid, sigma_g, sigma_m, sigma_i, reps = 999){
+  SDP_Mat <- lapply(h_grid, function(h){ # support parallelization of this
+    mat <- sapply(x_grid, function(x){
+      bw <- x_grid[2] - x_grid[1]
+      r <- range(x_grid)
+      z_g <- rnorm(reps, 1, sigma_g)
+      z_m <- rnorm(reps, 1, sigma_m)
+      z_i <- rnorm(reps, 1, sigma_i)
+      x_t1 <- sapply(z_i, function(z) f(x, z*h, p))
+      a <- bin(z_g * z_i * x_t1, binwidth=bw, range=c(r[1], r[2]-bw))$count
+      a / sum(a) 
+    })
+    mat
+  })
+  SDP_Mat
+}
 
 ########################################################################
 # A function to identify the dynamic optimum using backward iteration  #
@@ -58,22 +89,24 @@ determine_SDP_matrix <- function(f, p, x_grid, h_grid, sigma){
 #' @param c the cost/profit function, a function of harvested level
 #' @param delta the exponential discounting rate
 #' @returns list containing the matrices D and V.  D is an x_grid by OptTime
-#'  matrix with the indices of h_grid giving the optimal h at each value x as 
-#'  the columns, with a column for each time.  
+#'  matrix with the indices of h_grid giving the optimal h at each value x
+#'  as the columns, with a column for each time.  
 #'  V is a matrix of x_grid by x_grid, which is used to store the value 
 #'  function at each point along the grid at each point in time.  
 #'  The returned V gives the value matrix at the first (last) time.  
 find_dp_optim <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, 
                           delta, reward=10){
 
+ 
+  ## Initialize space for the matrices
   gridsize <- length(x_grid)
   HL <- length(h_grid)
-
-  ## Initialize space for the matrices
   D <- matrix(NA, nrow=gridsize, ncol=OptTime)
-  V <- rep(0,gridsize) # initialize BC, 
+  V <- rep(0,gridsize) # initialize BC,
+
   # give a fixed reward for having value larger than xT at the end. 
-  V[ x_grid >= xT ] <- reward # "Scrap Value" for x(T) >= xT
+  V[ x_grid >= xT ] <- reward # a "scrap value" for x(T) >= xT
+
   # loop through time  
   for(time in 1:OptTime){
     # try all potential havest rates
@@ -81,26 +114,27 @@ find_dp_optim <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit,
       # Transition matrix times V gives dist in next time
       SDP_Mat[[i]] %*% V + 
       # then (add) harvested amount times discount
-       profit(x_grid, h_grid[i]) * exp(-delta * (OptTime - time))
+       profit(x_grid, h_grid[i]) * (1 - delta) 
+## CHECKME I think discount is exp(-delta * (OptTime - time)) only in cts time
     })
 
     # find havest, h that gives the maximum value
     out <- sapply(1:gridsize, function(j){
-      value <- max(V1[j,], na.rm = T) # each column is a diff h, max over these
-      index <- which.max(V1[j,])      # record index so we can recover the h's 
-      c(value, index)                 # returns both values 
+      value <- max(V1[j,], na.rm = T) # each col is a diff h, max over these
+      index <- which.max(V1[j,])  # store index so we can recover h's 
+      c(value, index) # returns both profit value & index of optimal h.  
     })
 
-    # V{t+1} = max_h V{t} at each possible state value, x
+    # Sets V[t+1] = max_h V[t] at each possible state value, x
     V <- out[1,]                        # The new value-to-go
     D[,OptTime-time+1] <- out[2,]       # The index positions
   }
 
-  # Reed derives a const escapement policy saying to fish the pop down to:
-  ReedThreshold <- x_grid[sum(D[,1]==1)] # easy way
-  # calculation is harder for general f, need to start at top
-  # finds the largest population for which you shouldn't harvest: 
+  # Reed derives a const escapement policy saying to fish the pop down to
+  # the largest population for which you shouldn't harvest: 
   ReedThreshold <- x_grid[max(which(D[,1] == 1))]
+
+  # Format the output 
   list(D=D, V=V, S=ReedThreshold)
 }
 
@@ -112,46 +146,46 @@ find_dp_optim <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit,
 #' @param p the parameters of the growth function
 #' @param x_grid the discrete values allowed for the population size, x
 #' @param h_grid the discrete values of harvest levels to optimize over
-#' @param sigma the variance of the noise process
+#' @param sigma_g the variance of population growth process
 #' @param Xo initial stock size
 #' @param D the optimal solution indices on h_grid, 
 #'  given for each possible state at each timestep
-#' @param sigma_assess amount of uncertainty in the assessment of stock size
-#' @param sigma_harvest amount of noise in implementing quotas 
+#' @param sigma_m measurement uncertainty in the assessment of stock size
+#' @param sigma_i implementation uncertainty in implementing quotas 
 #' @param interval is the years between updating the harvest quota
 #' @returns a data frame with the time, fishstock, harvested amount,
 #'  and what the stock would have been without that year's harvest.  
-ForwardSimulate <- function(f, pars, x_grid, h_grid, sigma, x0, D,
-                            sigma_assess = 0, sigma_harvest = 0,
-                            interval = 1){
-  # shorthand names
-  n <- x_grid
-  h <- h_grid
-
+ForwardSimulate <- function(f, pars, x_grid, h_grid, sigma_g, x0, D,
+                            sigma_m = 0, sigma_i = 0, interval = 1){
   # initialize variables with initial conditions
-  OptTime <- dim(D)[2]
-  gridsize <- length(n)
+  OptTime <- dim(D)[2]    # Stopping time
+  gridsize <- length(n)   # size of the state-space grid
   x_h <- numeric(OptTime) # population dynamics with harvest
   x   <- numeric(OptTime) # What would happen with no havest
   h   <- numeric(OptTime) # optimal havest level
-  x_h[1] <- x0 
-  x[1]   <- x0 
+  x_h[1] <- x0  # initial values
+  x[1]   <- x0  # intial values
 
+  ## Simulate through time ##
   for(t in 1:(OptTime-1)){
-    # Current state; can add noise to stock assessment, x_h[t] 
-    St <- which.min(abs(n - x_h[t] * rnorm(1, 1, sigma_assess))) 
+    # Assess stock, with potential measurement error
+    m_t <- x_h[t] * rnorm(1, 1, sigma_m)
+    # Current state (is closest to which grid posititon) 
+    St <- which.min(abs(x_grid - m_t)) 
     # Set harvest quota on update years
-  # could update harvest quota annually based on projections, but assess stock only periodically.  Could update stock annually, but adjust quota periodically.  
-    if(t %% interval == 0){ 
-      h[t + 1] <- h_grid[D[St,t + 1]] 
-    } else {
-      h[t + 1] <- h[t]
-    }
-    h[t + 1] <- h[t + 1] * rnorm(1, 1, sigma_harvest) 
-    z <- rnorm(1,1,sigma)            # Noise in growth
-    x_h[t+1] <- z*f(x_h[t], h[t + 1], pars) # with havest
+    if(t %% interval == 0)
+      q_t <- h_grid[D[St, t + 1]] 
+    else 
+      q_t <- h[t]
+    # Implement harvest/(effort) based on quota with noise 
+    h[t + 1] <- q_t * rnorm(1, 1, sigma_i)
+    # Noise in growth 
+    z <- rnorm(1, 1, sigma_g)   
+    # population grows
+    x_h[t+1] <- z * f(x_h[t], h[t + 1], pars) # with havest
     x[t+1]   <- z * f(x[t], 0, pars) # havest-free dynamics
   }
+  # formats output 
   data.frame(time=1:OptTime, fishstock=x_h, harvest=h, unharvested=x) 
 }
 
@@ -198,6 +232,9 @@ BevHolt <- function(x, h, p){
 #'   x = p[1] * p[3] / 2 - sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2 
 #'   Bifurcation pt is h = (p[1]*sqrt(p[3])-2)/2 
 #'   Try with pars = c(1,2,6), h=.01
+#' 
+#'   Consider updating to be a function of x-h, instead?
+#' @export
 Myer <- function(x, h, p){
    max(0, p[1] * x ^ p[2] / (1 + x ^ p[2] / p[3])  - h * x)
 }
@@ -207,18 +244,24 @@ Myer <- function(x, h, p){
 #' @param h harvest level 
 #' @param p a vector of parameters c(r, K, C) 
 #' @returns the population level in the next timestep
+#' @export
 RickerAllee <- function(x, h, p){
     x <- max(0,x-h)
     x * exp(p[1] * (1 - x / p[2]) * (x - p[3]) / p[2] ) 
 }
 
 
+#' Basic Ricker model 
+#' @param x the current population level
+#' @param h harvest level 
+#' @param p a vector of parameters c(r, K) 
+#' @returns the population level in the next timestep
+#' @export
 Ricker <- function(x,h,p){
   x <- max(0, x-h) 
   max(0, x * exp(p[1] * (1 - x / p[2] )) )
 }
 
-#' corals
 
 #' Coral-Parrotfish model
 #' @param x vector of population levels: macroalgae, coral, parrotfish
@@ -226,6 +269,7 @@ Ricker <- function(x,h,p){
 #' @param p c(a, g, T, gamma, r, d, s, K)
 #'            1  2  3     4   5  6  7  8
 #' @details 
+#' @export
 coral <- function(x, h, p){
  x_t1 <- p[1] * x[1] * x[2] + p[2] * x[3] * x[1] / (x[1] + p[3]) + p[4] * p[3] * x[1]
  x_t2 <- (p[5] * p[3] - p[6] - p[1] * x[1]  ) * x[2] 
