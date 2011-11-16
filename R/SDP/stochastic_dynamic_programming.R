@@ -18,11 +18,11 @@
 #' @param x_grid the discrete values allowed for the population size, x
 #' @param h_grid the discrete values of harvest levels to optimize over
 #' @param sigma_g the variance of the population growth process
-#' @param sigma_m measurement uncertainty in the assessment of stock size
-#' @param sigma_i implementation uncertainty in implementing quotas 
-#' @returns the transition matrix at each value of h in the grid.  
-determine_SDP_matrix <- function(f, p, x_grid, h_grid, sigma_g, 
-                                 sigma_m, sigma_i){
+#' @returns the transition matrix at each value of h in the grid. 
+#' @details this analytical approach doesn't reliably support other 
+#'  sources of variation.  The quality of the analytic approximations 
+#'  (lognormal) can be tested.  
+determine_SDP_matrix <- function(f, p, x_grid, h_grid, sigma_g){
   gridsize <- length(x_grid)
   SDP_Mat <- lapply(h_grid, function(h){
     SDP_matrix <- matrix(0, nrow=gridsize, ncol=gridsize)
@@ -59,8 +59,14 @@ determine_SDP_matrix <- function(f, p, x_grid, h_grid, sigma_g,
 #' @param sigma_m measurement uncertainty in the assessment of stock size
 #' @param sigma_i implementation uncertainty in implementing quotas 
 #' @returns the transition matrix at each value of h in the grid.  
+#' @import snowfall
+#' @import ggplot2
+#' @export
 SDP_by_simulation <- function(f, p, x_grid, h_grid, sigma_g, sigma_m, sigma_i, reps = 999){
-  SDP_Mat <- lapply(h_grid, function(h){ # support parallelization of this
+  require(snowfall) # support parallelization of this
+  sfExportAll()
+  sfLibrary(ggplot2) # for the bin function 
+  SDP_Mat <- sfLapply(h_grid, function(h){ 
     mat <- sapply(x_grid, function(x){
       bw <- x_grid[2] - x_grid[1]
       r <- range(x_grid)
@@ -94,6 +100,7 @@ SDP_by_simulation <- function(f, p, x_grid, h_grid, sigma_g, sigma_m, sigma_i, r
 #'  V is a matrix of x_grid by x_grid, which is used to store the value 
 #'  function at each point along the grid at each point in time.  
 #'  The returned V gives the value matrix at the first (last) time.  
+#' @export
 find_dp_optim <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, 
                           delta, reward=10){
 
@@ -154,12 +161,12 @@ find_dp_optim <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit,
 #' @param sigma_i implementation uncertainty in implementing quotas 
 #' @param interval is the years between updating the harvest quota
 #' @returns a data frame with the time, fishstock, harvested amount,
-#'  and what the stock would have been without that year's harvest.  
+#'  and what the stock would have been without that year's harvest. 
+#' @export
 ForwardSimulate <- function(f, pars, x_grid, h_grid, sigma_g, x0, D,
                             sigma_m = 0, sigma_i = 0, interval = 1){
   # initialize variables with initial conditions
   OptTime <- dim(D)[2]    # Stopping time
-  gridsize <- length(n)   # size of the state-space grid
   x_h <- numeric(OptTime) # population dynamics with harvest
   x   <- numeric(OptTime) # What would happen with no havest
   h   <- numeric(OptTime) # optimal havest level

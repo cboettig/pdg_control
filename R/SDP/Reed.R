@@ -30,18 +30,18 @@ sigma_i <- .0 #
 interval <- 1
 
 # Chose the state equation / population dynamics function
-#f <- BevHolt 
-#pars <- c(2,4)  
-#K <- (pars[1]-1)/pars[2] 
-#xT <- 0 
-#e_star <- 0
+f <- BevHolt 
+pars <- c(2,4)  
+K <- (pars[1]-1)/pars[2] 
+xT <- 0 
+e_star <- 0
 
-f <- Myer
-pars <- c(1, 2, 6) 
-p <- pars # shorthand 
-K <- p[1] * p[3] / 2 + sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2
-xT <- p[1] * p[3] / 2 - sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2 # allee threshold
-e_star <- (p[1]*sqrt(p[3])-2)/2 ## Bifurcation point 
+#f <- Myer
+#pars <- c(1, 2, 6) 
+#p <- pars # shorthand 
+#K <- p[1] * p[3] / 2 + sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2
+#xT <- p[1] * p[3] / 2 - sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2 # allee threshold
+#e_star <- (p[1]*sqrt(p[3])-2)/2 ## Bifurcation point 
 x0 <- K
 
 #' define a profit function, price minus cost
@@ -51,18 +51,21 @@ x0 <- K
 #' @param c fishing extraction costs (per unit effort)
 profit <- function(x_grid, h_i, p = 1, c = 0.001){
   ## Havest-based control; havest cannot exceed population size
-#  harvest <- sapply(x_grid, function(x_i) min(h_i, x_i)) # Harvest-based control
-  harvest <- x_grid * h_i # Effort-based control 
+  harvest <- sapply(x_grid, function(x_i) min(h_i, x_i)) # Harvest-based control
+#  harvest <- x_grid * h_i # Effort-based control 
   sapply(harvest, function(x) max(0, p * x - c / x))
 }
 
 # Set up the grid 
 x_grid <- seq(0, 2*K, length=gridsize)  # population size
-#h_grid <- x_grid  # vector of havest levels, use same res as stock
-h_grid <- seq(0, 2, length=gridsize) # Myers model based on effort!
+h_grid <- x_grid  # vector of havest levels, use same res as stock
+#h_grid <- seq(0, 2, length=gridsize) # Myers model based on effort!
 
 # Calculate the transition matrix 
 #SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma)
+
+require(snowfall)
+sfInit(parallel=TRUE, cpu=4)
 SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, sigma_g, sigma_m, sigma_i)
 
 
