@@ -5,6 +5,7 @@
 # test the performance of SDP_by_simulation 
 
 source("stochastic_dynamic_programming.R")
+source("population_models.R")
 
 # Define all parameters 
 delta <- 0.1      # economic discounting rate
