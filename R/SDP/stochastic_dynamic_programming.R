@@ -38,7 +38,7 @@ determine_SDP_matrix <- function(f, p, x_grid, h_grid, sigma_g){
         # relative probability of a transition to that state
         ProportionalChance <- x_grid / x2_expected
         # lognormal due to multiplicative Gaussian noise
-        Prob <- dnorm(ProportionalChance, 0, sigma_g)
+        Prob <- dnorm(x_grid, x2_expected, sigma_g)
         # Store normalized probabilities in row
         SDP_matrix[i,] <- Prob/sum(Prob)
       }
