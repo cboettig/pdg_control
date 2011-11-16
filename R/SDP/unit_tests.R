@@ -24,7 +24,7 @@ h_grid <- x_grid  # vector of havest levels, use same res as stock
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
 
 require(snowfall)
-sfInit(parallel=TRUE, cpu=4)
+sfInit(parallel=TRUE, cpu=16)
 sim_SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, sigma_g, 0, 0)
 
 x <- matrix(NA, length(x_grid), 10) 
@@ -35,9 +35,19 @@ y <- x
 for(i in 1:9){
   x[,i+1] <- sim_SDP_Mat[[1]] %*% x[,i]
   y[,i+1] <- t(SDP_Mat[[1]]) %*% y[,i]
-  Sys.sleep(.5)
-  barplot(x[,i], col=rgb(0,0,1,.5))
-  barplot(y[,i], add=T, col=rgb(1,0,0,.5))
 }
 
+save(list=ls(), file = "unit_tests.rda")
+
+png("test1.png")
+  barplot(x[,2], col=rgb(0,0,1,.5))
+  barplot(y[,2], add=T, col=rgb(1,0,0,.5))
+dev.off()
+png("test2.png")
+  barplot(x[,5], col=rgb(0,0,1,.5))
+  barplot(y[,5], add=T, col=rgb(1,0,0,.5))
+dev.off()
+
+require(socialR)
+upload("test*.png", script="unit_tests.R", tag="PDG_Control")
 
