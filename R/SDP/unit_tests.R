@@ -33,7 +33,7 @@ x0 <- .2
 x[which.min(abs(x_grid - x0)),1] <- 100
 y <- x
 for(i in 1:9){
-  x[,i+1] <- sim_SDP_Mat[[1]] %*% x[,i]
+  x[,i+1] <- t(sim_SDP_Mat[[1]]) %*% x[,i]
   y[,i+1] <- t(SDP_Mat[[1]]) %*% y[,i]
 }
 

@@ -74,12 +74,12 @@ h_grid <- x_grid  # vector of havest levels, use same resolution as for stock
 #######################################################################
 # Calculate the transition matrix (with noise in growth only)         #
 #######################################################################
-SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
+#SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
 
 ## calculate the transition matrix by simulation 
-#require(snowfall) # use parallelization since this can be slow
-#sfInit(parallel=TRUE, cpu=4)
-#SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, sigma_g, sigma_m, sigma_i)
+require(snowfall) # use parallelization since this can be slow
+sfInit(parallel=TRUE, cpu=4)
+SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, sigma_g, sigma_m, sigma_i, reps=99)
 
 
 #######################################################################

@@ -77,7 +77,7 @@ SDP_by_simulation <- function(f, p, x_grid, h_grid, sigma_g, sigma_m, sigma_i, r
       a <- bin(z_g * z_i * x_t1, binwidth=bw, range=c(r[1], r[2]-bw))$count
       a / sum(a) 
     })
-    mat
+    t(mat)
   })
   SDP_Mat
 }
