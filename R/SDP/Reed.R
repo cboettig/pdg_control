@@ -1,6 +1,7 @@
 # file Reed.R
 # author Carl Boettiger, <cboettig@gmail.com>
 # date 2011-11-02
+# license BSD
 # modified from Reed_SDP.m, by Michael Bode.  
 # 
 # Implements a numerical version of the SDP described in:
