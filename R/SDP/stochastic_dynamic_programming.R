@@ -19,7 +19,7 @@
 # z_i is the implementation error in the harvest quota: h_t = z_i q_t
 
 # Normal random vars -- an unusual choice given the negative domain support
-z_g <- function() rnorm(1,1, sigma_g)
+#z_g <- function() rnorm(1,1, sigma_g)
 #z_m <- function() rnorm(1,1, sigma_m)
 #z_i <- function() rnorm(1,1, sigma_i)
 
@@ -84,6 +84,11 @@ determine_SDP_matrix <- function(f, p, x_grid, h_grid, sigma_g){
   SDP_Mat
 }
 
+
+#pdf_zg <- function(x, expected) dlnorm(x, log(expected)-sigma_g^2/2, sigma_g)
+#pdf_zm <- function(x) dlnorm(x, log(1)-sigma_m^2/2, sigma_m)
+#pdf_zi <- function(x,q) dlnorm(x, log(q)-sigma_i^2/2, sigma_i)
+#f(x,h,p) * pdf_zm(x)*pdf_zi(h) dx dh
 
 #' Determine the Stochastic Dynamic Programming matrix.
 #' @param f the growth function of the escapement population (x-h)
