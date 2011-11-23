@@ -35,9 +35,9 @@ require(ggplot2) # nicer plotting package
 delta <- 0.1      # economic discounting rate
 OptTime <- 50     # stopping time
 gridsize <- 100   # gridsize (discretized population)
-sigma_g <- 0.2    # Noise in population growth
-sigma_m <- 0     # noise in stock assessment measurement
-sigma_i <- 0     # noise in implementation of the quota
+sigma_g <- 0.    # Noise in population growth
+sigma_m <- 0.     # noise in stock assessment measurement
+sigma_i <- 0.2     # noise in implementation of the quota
 interval <- 1     # period of updating the stock assessment
 
 # load my script defining the SDP functions:
@@ -92,11 +92,11 @@ h_grid <- seq(0, 2, length=gridsize)
 #SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
 
 #SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
-#int_SDP_Mat <- integrate_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
+#SDP_Mat <- integrate_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
 ## calculate the transition matrix by simulation 
 require(snowfall) # use parallelization since this can be slow
-sfInit(parallel=TRUE, cpu=4)
-stoch_SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=999)
+#sfInit(parallel=TRUE, cpu=16)
+SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=999)
 
 
 #######################################################################
@@ -161,6 +161,11 @@ optimal_crashed = subset(dat, variable == "fishstock" &
 p1 <- p1 + opts(title = sprintf("Optimal Harvest dynamics, %d populations crash",
                                 dim(optimal_crashed)[1]))
 print(p1)
+
+
+ggsave("fished.png", plot=p1)
+require(socialR)
+upload("fished.png", script="Reed.R", tag="PDG_Control", comment=paste("sigma_g= ", sigma_g, "sigma_m =", sigma_m, "sigma_i= ", sigma_i))
 
 ## extra plots are avialable in plots.R, inculding unharvested dynamics,
 ## plot of a single harvested replicate, and plot of the profit over time.  
