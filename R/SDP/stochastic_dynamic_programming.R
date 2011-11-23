@@ -102,7 +102,7 @@ integrate_SDP_matrix  <- function(f, p, x_grid, h_grid, sigma_g){
         Prob <- numeric(gridsize)
         Prob[1] <- 1
       } else {
-        F <- function(x) dlnorm(x, log(1) - sigma_g ^ 2 / 2, sigma_g) * expected
+        F <- function(x) dlnorm(x, log(expected) - sigma_g ^ 2 / 2, sigma_g)
         bw <- (x_grid[2] - x_grid[1]) / 2 # we'll go from the midpoint
         Prob <- sapply(x_grid, function(x) integrate(F, x - bw, x + bw)[[1]] )
       }
@@ -110,6 +110,7 @@ integrate_SDP_matrix  <- function(f, p, x_grid, h_grid, sigma_g){
     })
   t(mat)
   })
+  SDP_Mat
 }
 
 #' Determine the transtion matrix using stochastic simulation

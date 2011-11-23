@@ -44,7 +44,7 @@ z <- x
 plt <- function(i){
   barplot(x[,i], col=rgb(0,0,1,.5))
   barplot(y[,i], add=T, col=rgb(1,0,0,.5))
-  barplot(z[,i], add=T, col=rgb(0,1,1,.7))
+  barplot(z[,i], add=T, col=rgb(1,1,0,.7))
 }
 
 
