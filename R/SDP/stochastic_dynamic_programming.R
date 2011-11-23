@@ -19,16 +19,21 @@
 # z_i is the implementation error in the harvest quota: h_t = z_i q_t
 
 # Normal random vars -- an unusual choice given the negative domain support
-z_g <- function(sigma_g) rnorm(1,1, sigma_g)
-z_m <- function(sigma_m) rnorm(1,1, sigma_m)
-z_i <- function(sigma_i) rnorm(1,1, sigma_i)
+z_g <- function() rnorm(1,1, sigma_g)
+#z_m <- function() rnorm(1,1, sigma_m)
+#z_i <- function() rnorm(1,1, sigma_i)
 
 # Log-normal distribution -- perhaps the most natural, at least for z_g
 # mean is 1 = exp(mu + sigma^2/2), then
-# exp(1) - sigma^2/2 = mu
+# log(1) - sigma^2/2 = mu
 z_g <- function() rlnorm(1,  log(1)-sigma_g^2/2, sigma_g) # mean 1
+#z_m <- function() rlnorm(1,  log(1)-sigma_m^2/2, sigma_m) # mean 1
+#z_i <- function() rlnorm(1,  log(1)-sigma_i^2/2, sigma_i) # mean 1
 
-
+# Uniform distribution
+#z_g <- function() runif(1, max(0,1-sigma_g), 1+sigma_g)
+#z_m <- function() runif(1, max(0,1-sigma_m), 1+sigma_m)
+#z_i <- function() runif(1, max(0,1-sigma_i), 1+sigma_i)
 
 
 # No noise
@@ -71,8 +76,6 @@ determine_SDP_matrix <- function(f, p, x_grid, h_grid, sigma_g){
         Prob <- dlnorm(ProportionalChance, 0, sigma_g)
         # Store normalized probabilities in row
         SDP_matrix[i,] <- Prob/sum(Prob)
-
-
 ## dnorm(x_i, mu, sigma)  x_i+1,  
       }
     }
@@ -81,6 +84,33 @@ determine_SDP_matrix <- function(f, p, x_grid, h_grid, sigma_g){
   SDP_Mat
 }
 
+
+#' Determine the Stochastic Dynamic Programming matrix.
+#' @param f the growth function of the escapement population (x-h)
+#'   should be a function of f(t, y, p), with parameters p
+#' @param p the parameters of the growth function
+#' @param x_grid the discrete values allowed for the population size, x
+#' @param h_grid the discrete values of harvest levels to optimize over
+#' @param sigma_g the variance of the population growth process
+#' @returns the transition matrix at each value of h in the grid. 
+integrate_SDP_matrix  <- function(f, p, x_grid, h_grid, sigma_g){
+  gridsize <- length(x_grid)
+  SDP_Mat <- lapply(h_grid, function(h){
+    mat <- sapply(x_grid, function(y){
+      expected <- f(y,h,p)
+      if(expected==0){
+        Prob <- numeric(gridsize)
+        Prob[1] <- 1
+      } else {
+        F <- function(x) dlnorm(x, log(1) - sigma_g ^ 2 / 2, sigma_g) * expected
+        bw <- (x_grid[2] - x_grid[1]) / 2 # we'll go from the midpoint
+        Prob <- sapply(x_grid, function(x) integrate(F, x - bw, x + bw)[[1]] )
+      }
+      Prob/sum(Prob)
+    })
+  t(mat)
+  })
+}
 
 #' Determine the transtion matrix using stochastic simulation
 #' @param f the growth function of the escapement population (x-h)
@@ -101,12 +131,15 @@ SDP_by_simulation <- function(f, p, x_grid, h_grid, z_g, z_m, z_i, reps = 999){
   require(snowfall) # support parallelization of this
   sfExportAll()
   sfLibrary(ggplot2) # for the bin function 
+
+  bw <- x_grid[2] - x_grid[1]
+  lower <-x_grid[1]
+  upper <- x_grid[length(x_grid)-1]
+
   SDP_Mat <- sfLapply(h_grid, function(h){ 
     mat <- sapply(x_grid, function(x){
-      bw <- x_grid[2] - x_grid[1]
-      r <- range(x_grid)
-      x_t1 <- sapply(z_m, function(z) f(x, z*h, p))
-      a <- bin(z_g * z_i * x_t1, binwidth=bw, range=c(r[1], r[2]-bw))$count
+      x_t1 <- replicate(reps, z_g() * z_i() * f(x, z_m() * h, p)) 
+      a <- bin( x_t1, binwidth=bw, range=c(lower, upper))$count
       a / sum(a) 
     })
     t(mat)

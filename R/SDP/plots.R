@@ -5,8 +5,8 @@
 
 
 ## Example plot the results of a single run, against unharvested version  
-out <- ForwardSimulate(f, pars, x_grid, h_grid, sigma_g, x0, opt$D,
-                       sigma_g, sigma_i, interval=1)
+out <- ForwardSimulate(f, pars, x_grid, h_grid, x0, opt$D,
+                       z_g, z_m, z_i, interval=1)
 dat <- melt(out, id="time")
 p0 <- ggplot(dat, aes(time, value, color=variable)) + geom_line() +  
   geom_abline(intercept=opt$S, slope=0, col="black") + # Reed's S,
