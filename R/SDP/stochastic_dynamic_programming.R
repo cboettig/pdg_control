@@ -73,7 +73,7 @@ determine_SDP_matrix <- function(f, p, x_grid, h_grid, sigma_g){
         # relative probability of a transition to that state
         ProportionalChance <- x_grid / x2_expected
         # lognormal due to multiplicative Gaussian noise
-        Prob <- dlnorm(ProportionalChance, 0, sigma_g)
+        Prob <- dlnorm(ProportionalChance, 0-sigma_g^2/2, sigma_g) #logmean of 0 is log(1)
         # Store normalized probabilities in row
         SDP_matrix[i,] <- Prob/sum(Prob)
 ## dnorm(x_i, mu, sigma)  x_i+1,  
@@ -93,10 +93,6 @@ determine_SDP_matrix <- function(f, p, x_grid, h_grid, sigma_g){
 #' @param h_grid the discrete values of harvest levels to optimize over
 #' @param sigma_g the variance of the population growth process
 #' @returns the transition matrix at each value of h in the grid. 
-
-
-
-
 integrate_SDP_matrix  <- function(f, p, x_grid, h_grid, sigma_g){
   gridsize <- length(x_grid)
   SDP_Mat <- lapply(h_grid, function(h){
@@ -106,7 +102,8 @@ integrate_SDP_matrix  <- function(f, p, x_grid, h_grid, sigma_g){
         Prob <- numeric(gridsize)
         Prob[1] <- 1
       } else {
-        F <- function(x) (expected * dlnorm(x, log(1) - sigma_g ^ 2 / 2, sigma_g))
+        # dividing x by the expected value is same as rescaling distribution to mean 1
+        F <- function(x) dlnorm(x/expected, log(1) - sigma_g ^ 2 / 2, sigma_g)
         bw <- (x_grid[2] - x_grid[1]) / 2 # we'll go from the midpoint
         Prob <- sapply(x_grid, function(x) integrate(F, x - bw, x + bw)[[1]] )
       }
@@ -116,6 +113,10 @@ integrate_SDP_matrix  <- function(f, p, x_grid, h_grid, sigma_g){
   })
   SDP_Mat
 }
+
+
+F <- function(x) dlnorm(x, log(expected) - sigma_g ^ 2 / 2, sigma_g)
+
 
 #' Determine the transtion matrix using stochastic simulation
 #' @param f the growth function of the escapement population (x-h)
