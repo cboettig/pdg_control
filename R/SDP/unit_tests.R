@@ -29,9 +29,9 @@ h_grid <- x_grid  # vector of havest levels, use same res as stock
 
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
 int_SDP_Mat <- integrate_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
-require(snowfall)
-sfInit(parallel=TRUE, cpu=4)
-sim_SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, sigma_g, 0, 0, reps=99)
+#require(snowfall)
+#sfInit(parallel=TRUE, cpu=4)
+#sim_SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, sigma_g, 0, 0, reps=99)
 
 
 x <- matrix(NA, length(x_grid), 10) 
@@ -42,14 +42,14 @@ y <- x
 z <- x
 
 plt <- function(i){
-  barplot(x[,i], col=rgb(0,0,1,.5))
-  barplot(y[,i], add=T, col=rgb(1,0,0,.5))
+#  barplot(x[,i], col=rgb(0,0,1,.5))
+  barplot(y[,i], col=rgb(1,0,0,.5))
   barplot(z[,i], add=T, col=rgb(1,1,0,.7))
 }
 
 
 for(i in 1:9){
-  x[,i+1] <- t(sim_SDP_Mat[[1]]) %*% x[,i]
+#  x[,i+1] <- t(sim_SDP_Mat[[1]]) %*% x[,i]
   y[,i+1] <- t(SDP_Mat[[1]]) %*% y[,i]
   z[,i+1] <- t(int_SDP_Mat[[1]]) %*% z[,i]
   Sys.sleep(.2)

@@ -93,6 +93,10 @@ determine_SDP_matrix <- function(f, p, x_grid, h_grid, sigma_g){
 #' @param h_grid the discrete values of harvest levels to optimize over
 #' @param sigma_g the variance of the population growth process
 #' @returns the transition matrix at each value of h in the grid. 
+
+
+
+
 integrate_SDP_matrix  <- function(f, p, x_grid, h_grid, sigma_g){
   gridsize <- length(x_grid)
   SDP_Mat <- lapply(h_grid, function(h){
@@ -102,7 +106,7 @@ integrate_SDP_matrix  <- function(f, p, x_grid, h_grid, sigma_g){
         Prob <- numeric(gridsize)
         Prob[1] <- 1
       } else {
-        F <- function(x) dlnorm(x, log(expected) - sigma_g ^ 2 / 2, sigma_g)
+        F <- function(x) (expected * dlnorm(x, log(1) - sigma_g ^ 2 / 2, sigma_g))
         bw <- (x_grid[2] - x_grid[1]) / 2 # we'll go from the midpoint
         Prob <- sapply(x_grid, function(x) integrate(F, x - bw, x + bw)[[1]] )
       }
