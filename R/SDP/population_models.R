@@ -33,6 +33,33 @@ BevHolt <- function(x, h, p){
   })
 }
 
+
+
+
+#' Beverton Holt growth model with fishing-effort based control
+#' @param x fish population 
+#' @param h fishing effort (harvest is effort times fish population)
+#' @param p parameters of the growth function, c(A, B), where
+#'  A is the maximum growth rate and B the half-maximum in Beverton-Holt.  
+#' @returns population next year
+#' @details Harvesting takes place before reproduction in ths model.
+#'  The carrying capacity is K <- (pars[1]-1)/pars[2]
+#'  Try with pars <- c(2,4)
+BevHolt_effort <- function(x, h, p){
+  S <- max(0, x - x*h) # Escapement from harvest
+  A <- p[1] 
+  B <- p[2] 
+  sapply(S, function(x){ # use sapply so fn accepts vector-valued x
+    x <- max(0, x)
+    max(0, A * x/(1 + B * x))
+  })
+}
+
+
+
+
+
+
 #' Discrete-time model with an allee effect for alpha > 1
 #' @param x the current population level
 #' @param h harvest effort
@@ -53,6 +80,26 @@ BevHolt <- function(x, h, p){
 Myer <- function(x, h, p){
    max(0, p[1] * x ^ p[2] / (1 + x ^ p[2] / p[3])  - h * x)
 }
+
+#' Discrete-time model with an allee effect for alpha > 1 with harvest control
+#' @param x the current population level
+#' @param h total harvest level
+#' @param p vector of parameters c(r, alpha, K) 
+#' @returns the population level in the next timestep
+#' @details A Beverton-Holt style model with Allee effect.
+#'   Unharvested carrying capacity is:
+#'   K <- p[1] * p[3] / 2 + sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2
+#'   The (unharvested) allee theshold is given by:
+#'   x = p[1] * p[3] / 2 - sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2 
+#' @export
+Myer_harvest <- function(x, h, p){
+   max(0, p[1] * x ^ p[2] / (1 + x ^ p[2] / p[3])  - h)
+}
+
+
+
+
+
 
 #' Ricker-like model with Allee effect (Allen)
 #' @param x the current population level

@@ -63,7 +63,7 @@ p <- pars # shorthand
 K <- p[1] * p[3] / 2 + sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2
 xT <- p[1] * p[3] / 2 - sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2 # allee threshold
 e_star <- (p[1] * sqrt(p[3]) - 2) / 2 ## Bifurcation point 
-control <- "effort"          # control variable is harvest effort, e = h / x
+control <- "effort"          # control variable is harvest effort, e = h / x (for price eqn)
 
 x0 <- K # initial condition
 

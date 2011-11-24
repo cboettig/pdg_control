@@ -32,8 +32,8 @@ function SDP_Mat = determine_SDP_matrix(fhandle, pars, n_vec, HVec, dev)
           else 
               % relative probability of a transition to that state
               PropChange = n_vec./x2_exp; 
-              % lognormal due to multiplicative Gaussian noise
-              Prob = lognpdf(PropChange,0,dev);
+              % Since the noise is lognormal. (an approximation of integral) 
+              Prob = lognpdf(PropChange,log(1) - dev^2/2, dev);
               % Store the normalised transition prob
               SDP_Mat(i,:,q) = Prob./sum(Prob); 
             end
