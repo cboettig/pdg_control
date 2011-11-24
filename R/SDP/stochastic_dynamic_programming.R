@@ -27,8 +27,8 @@
 # mean is 1 = exp(mu + sigma^2/2), then
 # log(1) - sigma^2/2 = mu
 z_g <- function() rlnorm(1,  log(1)-sigma_g^2/2, sigma_g) # mean 1
-#z_m <- function() rlnorm(1,  log(1)-sigma_m^2/2, sigma_m) # mean 1
-#z_i <- function() rlnorm(1,  log(1)-sigma_i^2/2, sigma_i) # mean 1
+z_m <- function() rlnorm(1,  log(1)-sigma_m^2/2, sigma_m) # mean 1
+z_i <- function() rlnorm(1,  log(1)-sigma_i^2/2, sigma_i) # mean 1
 
 # Uniform distribution
 #z_g <- function() runif(1, max(0,1-sigma_g), 1+sigma_g)
@@ -38,8 +38,8 @@ z_g <- function() rlnorm(1,  log(1)-sigma_g^2/2, sigma_g) # mean 1
 
 # No noise
 #z_g <- function() 1
-z_m <- function() 1
-z_i <- function() 1
+#z_m <- function() 1
+#z_i <- function() 1
 
 
 #########################################################################
@@ -114,9 +114,6 @@ integrate_SDP_matrix  <- function(f, p, x_grid, h_grid, sigma_g){
   })
   SDP_Mat
 }
-
-
-F <- function(x) dlnorm(x, log(expected) - sigma_g ^ 2 / 2, sigma_g)
 
 
 #' Determine the transtion matrix using stochastic simulation
@@ -239,18 +236,20 @@ find_dp_optim <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit,
 #' for the implementation uncertainty in quotas 
 #' @param interval is the years between updating the harvest quota
 #' @returns a data frame with the time, fishstock, harvested amount,
-#'  and what the stock would have been without that year's harvest. 
+#'  and what the escapement ("unharvested"). 
 #' @export
 ForwardSimulate <- function(f, pars, x_grid, h_grid, x0, D, z_g,
                             z_m, z_i, interval = 1){
   # initialize variables with initial conditions
   OptTime <- dim(D)[2]    # Stopping time
   x_h <- numeric(OptTime) # population dynamics with harvest
-  x   <- numeric(OptTime) # What would happen with no havest
-  h   <- numeric(OptTime) # optimal havest level
+  h <- numeric(OptTime) # optimal havest level
   x_h[1] <- x0  # initial values
-  x[1]   <- x0  # intial values
-
+  
+  s <- x_h # also track escapement
+  x <- x_h # What would happen with no havest
+  
+    
   ## Simulate through time ##
   for(t in 1:(OptTime-1)){
     # Assess stock, with potential measurement error
@@ -260,18 +259,19 @@ ForwardSimulate <- function(f, pars, x_grid, h_grid, x0, D, z_g,
     # Set harvest quota on update years
     if(t %% interval == 0)
       q_t <- h_grid[D[St, t + 1]] 
-    else 
-      q_t <- h[t]
+    else # quota remains the same if not an update yr
+      q_t <- h[t-1] 
     # Implement harvest/(effort) based on quota with noise 
-    h[t + 1] <- q_t * z_i()
+    h[t] <- q_t * z_i()
     # Noise in growth 
     z <- z_g() 
     # population grows
-    x_h[t+1] <- z * f(x_h[t], h[t + 1], pars) # with havest
+    x_h[t+1] <- z * f(x_h[t], h[t], pars) # with havest
+    s[t+1]   <- x_h[t] - q_t # anticipated escapement
     x[t+1]   <- z * f(x[t], 0, pars) # havest-free dynamics
   }
   # formats output 
-  data.frame(time=1:OptTime, fishstock=x_h, harvest=h, unharvested=x) 
+  data.frame(time=1:OptTime, fishstock=x_h, harvest=h, unharvested=x, escapement=s) 
 }
 
 

@@ -35,9 +35,9 @@ require(ggplot2) # nicer plotting package
 delta <- 0.1      # economic discounting rate
 OptTime <- 50     # stopping time
 gridsize <- 100   # gridsize (discretized population)
-sigma_g <- 0.2    # Noise in population growth
-sigma_m <- 0     # noise in stock assessment measurement
-sigma_i <- 0     # noise in implementation of the quota
+sigma_g <- 0.4    # Noise in population growth
+sigma_m <- 0.     # noise in stock assessment measurement
+sigma_i <- 0.     # noise in implementation of the quota
 interval <- 1     # period of updating the stock assessment
 
 # load my script defining the SDP functions:
@@ -49,23 +49,23 @@ source("population_models.R")
 
 
 ## Chose the state equation / population dynamics function
-#f <- BevHolt              # Select the state equation
-#pars <- c(2,4)            # parameters for the state equation
-#K <- (pars[1]-1)/pars[2]  # Carrying capacity 
-#xT <- 0                   # boundary conditions
-#e_star <- 0               # model's bifurcation point (just for reference)
-#control = "harvest"         # control variable is total harvest, h = e * x
+f <- BevHolt              # Select the state equation
+pars <- c(2,4)            # parameters for the state equation
+K <- (pars[1]-1)/pars[2]  # Carrying capacity 
+xT <- 0                   # boundary conditions
+e_star <- 0               # model's bifurcation point (just for reference)
+control = "harvest"         # control variable is total harvest, h = e * x
 
 ## An alternative state equation, with allee effect: (uncomment to select)
-f <- Myer
-pars <- c(1, 2, 6) 
-p <- pars # shorthand 
-K <- p[1] * p[3] / 2 + sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2
-xT <- p[1] * p[3] / 2 - sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2 # allee threshold
-e_star <- (p[1] * sqrt(p[3]) - 2) / 2 ## Bifurcation point 
-control <- "effort"          # control variable is harvest effort, e = h / x (for price eqn)
+#f <- Myer_harvest
+#pars <- c(1, 2, 6) 
+#p <- pars # shorthand 
+#K <- p[1] * p[3] / 2 + sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2
+#xT <- p[1] * p[3] / 2 - sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2 # allee threshold
+#e_star <- (p[1] * sqrt(p[3]) - 2) / 2 ## Bifurcation point 
+#control <- "harvest"          # control variable is harvest effort, e = h / x (for price eqn)
 
-x0 <- K # initial condition
+x0 <- K - sigma_g^2/2 # initial condition
 
 #' Define a profit function, price minus cost
 #' @param x is a the grid of state values (profit will evaluate at each of them)
@@ -82,27 +82,28 @@ profit <- function(x_grid, h_i, p = 1, c = 0.001, type=control){
 
 # Set up the discrete grids
 x_grid <- seq(0, 2 * K, length = gridsize)  # population size
-#h_grid <- x_grid  # vector of havest levels, use same resolution as for stock
-h_grid <- seq(0, 2, length=gridsize) 
+h_grid <- x_grid  # vector of havest levels, use same resolution as for stock
+#h_grid <- seq(0, 2, length=gridsize) 
 
 
 #######################################################################
 # Calculate the transition matrix (with noise in growth only)         #
 #######################################################################
-#SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
+## Fast & decent approximation (lognormal growth noise only)
+SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
+## Most accurateway: use integral (lognormal growth noise only)
+#SDP_Mat <- integrate_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
 
-#SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
-#int_SDP_Mat <- integrate_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
-## calculate the transition matrix by simulation 
-require(snowfall) # use parallelization since this can be slow
-sfInit(parallel=TRUE, cpu=4)
-stoch_SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=999)
+## calculate the transition matrix by simulation, generic
+#require(snowfall) # use parallelization since this can be slow
+#sfInit(parallel=TRUE, cpu=4)
+#SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=999)
 
 
 #######################################################################
 # Find the optimum by dynamic programming                             #
 #######################################################################
-opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward=100)
+opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward=10)
 
 
 # What if parameter estimation is inaccurate? e.g.:
@@ -129,39 +130,10 @@ dat <- melt(sims, id="time") # reshapes the data matrix to "long" form
 # some stats on the replicates, ((geom_smooth should do this?))
 m <- cast(dat, time ~ variable, mean) # mean population
 err <- cast(dat, time ~ variable, sd) # sd population
-m_f <- m$fishstock
-err_f <- err$fishstock 
-m_h <- m$harvest
-err_h <- err$harvest 
 
 
-## Creat the plot
-p1 <- ggplot(dat) +
-      # Replicate harvested dynamics
-      geom_line(aes(time, value, group = L1), data = 
-                subset(dat, variable == "fishstock"), alpha = 0.2) + 
-      ## Mean & SD for population
-      geom_ribbon(aes(x = time, ymin = m_f - err_f, ymax = m_f + err_f),
-                  fill = "darkblue", alpha = 0.4)  +
-      geom_line(aes(time, m_f), col = "lightblue")  +
-#      geom_abline(intercept=opt$S, slope = 0) + # show Reed's S: optimal escapement 
-      geom_abline(intercept=xT, slope = 0, lty=2) + # show Allee threshold
-      ## And the same for harvest-effort levels
-#      geom_line(aes(time, value, group = L1), 
-#            data = subset(dat, variable == "harvest"),  alpha=.2, col = "darkgreen") +
-      geom_ribbon(aes(x = time, ymin = m_h - err_h, ymax = m_h + err_h),
-                  fill = "darkgreen", alpha = 0.4)  +
-      geom_line(aes(time, m_h), col = "lightgreen")  #+
-#     geom_abline(intercept = e_star, slope = 0, col = "lightgreen", lwd=1,lty=2) 
 
-
-## Count how many crashed and add it in a plot title
-optimal_crashed = subset(dat, variable == "fishstock" & 
-                         time == OptTime-1 & value < xT)
-p1 <- p1 + opts(title = sprintf("Optimal Harvest dynamics, %d populations crash",
-                                dim(optimal_crashed)[1]))
-print(p1)
 
 ## extra plots are avialable in plots.R, inculding unharvested dynamics,
 ## plot of a single harvested replicate, and plot of the profit over time.  
-# source("plots.R")
+source("plots.R")

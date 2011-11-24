@@ -4,14 +4,44 @@
 # creates extra plots accompanying Reed.R
 
 
-## Example plot the results of a single run, against unharvested version  
-out <- ForwardSimulate(f, pars, x_grid, h_grid, x0, opt$D,
-                       z_g, z_m, z_i, interval=1)
-dat <- melt(out, id="time")
-p0 <- ggplot(dat, aes(time, value, color=variable)) + geom_line() +  
-  geom_abline(intercept=opt$S, slope=0, col="black") + # Reed's S,
-  geom_abline(intercept = xT, slope=0, col="darkred", lty=3) # unfished Allee 
-p0 <- p0 + geom_abline(intercept=e_star, slope=0, col="green", lty = 2) # tippt
+## Show dynamics of a single replicate 
+ex <- sample(1:100,1) # a random replicate
+p0 <- ggplot(dat) +
+      geom_line(aes(time, value, color=variable), 
+                data = subset(dat, L1 == ex)) + 
+      geom_abline(intercept=opt$S, slope = 0, col="darkred") + # show Reed's S: optimal escapement 
+      geom_abline(intercept=xT, slope = 0, lty=2) #+ # show Allee threshold
+print(p0)
+
+
+
+## Show the ensemble fishstock and harvest dynamics 
+p1 <- ggplot(dat) +
+      # Replicate harvested dynamics
+      geom_line(aes(time, value, group = L1), data = 
+                subset(dat, variable == "fishstock"), alpha = 0.2) + 
+      ## Mean & SD for population
+      geom_ribbon(aes(x = time, ymin = m$fishstock - err$fishstock,
+                      ymax = m$fishstock + err$fishstock),
+                  fill = "darkblue", alpha = 0.4)  +
+      geom_line(aes(time, m$fishstock), col = "lightblue")  +
+      geom_abline(intercept=opt$S, slope = 0) + # show Reed's S: optimal escapement 
+      geom_abline(intercept=xT, slope = 0, lty=2) + # show Allee threshold
+      ## And the same for harvest-effort levels
+      geom_line(aes(time, value, group = L1), 
+            data = subset(dat, variable == "harvest"),  alpha=.2, col = "darkgreen") +
+      geom_ribbon(aes(x = time, ymin = m$harvest - err$harvest, 
+                      ymax = m$harvest + err$harvest),
+                  fill = "darkgreen", alpha = 0.4)  +
+      geom_line(aes(time, m$harvest), col = "lightgreen")  #+
+#     geom_abline(intercept = e_star, slope = 0, col = "lightgreen", lwd=1,lty=2) # Bifur
+
+## Count how many crashed and add it in a plot title
+optimal_crashed = subset(dat, variable == "fishstock" & time == OptTime-1 & value < xT)
+p1 <- p1 + opts(title = sprintf("Optimal Harvest dynamics, %d populations crash",
+                                dim(optimal_crashed)[1]))
+#print(p1)
+
 
 
 ## Update the main p1 plot to 
@@ -24,35 +54,34 @@ p0 <- p0 + geom_abline(intercept=e_star, slope=0, col="green", lty = 2) # tippt
 #          (L1 %in% optimal_crashed$L1)),  col = "darkblue", alpha = 0.5) 
 
 
+
 crashed = subset(dat, variable =="unharvested" & time == OptTime-1 & value < xT)
 p2 <- ggplot(dat) + 
   geom_line(aes(time, value, group = L1), 
             data = subset(dat, variable == "unharvested"), alpha=.2) + 
-  geom_line(aes(time, cast(dat, time ~ variable, mean)$unharvested)) 
-
-p2 <- p2 + opts(title=sprintf("Unfished dynamics, %d populations crash",
-  dim(crashed)[1]))
+  geom_line(aes(time, cast(dat, time ~ variable, mean)$unharvested)) +
+  opts(title=sprintf("Unfished dynamics, %d populations crash", dim(crashed)[1]))
 
 
 ## Profits plot
-p3 <- ggplot(subset(dat, variable == "harvest"), aes(profit(x_grid,value))) + geom_histogram()
+p3 <- ggplot(subset(dat, variable == "harvest"), aes(time, profit(value,K), group=L1)) + 
+  geom_line(alpha=.2) + labs(x="Time (yrs)", y="Profit" )
+cash <- cast(subset(dat,variable=="harvest"), time ~ variable, profit, K) # profits for each rep, by timestep
+p3 <- p3+geom_line(aes(time,rowMeans(cash))) # average profit made as function of time
 
-# calculate end profits:
-d <- subset(dat, variable == "harvest") 
-income <- profit(x_grid,d$value)
 
+p4 <- qplot(colSums(cash), xlab="Total Profit", ylab=NULL) + # histogram of total profit made
+  geom_vline(xintercept=mean(colSums(cash))) + # expected total profit
+  opts(plot.margin=unit(rep(0,4), "lines")) + theme_gray(9) #appearnces
+subvp <- viewport(width=.3, height=.3, x=.8, y=.8)
 print(p3)
+print(p4, vp=subvp)
+base <- qplot(x, geom="density")
+
 
 
 #ggsave("samplerun.png", plot=p0)
 #ggsave("fished.png", plot=p1)
 #ggsave("unfished.png", plot=p2)
-
-
-# check out the deterministic dynamics
-x <- numeric(OptTime)
-x[1] <- K
-for(t in 1:(OptTime-1))
-  x[t+1] <- f(x[t],e_star+.01,pars)
 
 
