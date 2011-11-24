@@ -74,14 +74,14 @@ p4 <- qplot(colSums(cash), xlab="Total Profit", ylab=NULL) + # histogram of tota
   geom_vline(xintercept=mean(colSums(cash))) + # expected total profit
   opts(plot.margin=unit(rep(0,4), "lines")) + theme_gray(9) #appearnces
 subvp <- viewport(width=.3, height=.3, x=.8, y=.8)
+
+png("profit.png")
 print(p3)
 print(p4, vp=subvp)
-base <- qplot(x, geom="density")
+dev.off()
+ggsave("samplerun.png", plot=p0)
+ggsave("fished.png", plot=p1)
+ggsave("unfished.png", plot=p2)
 
-
-
-#ggsave("samplerun.png", plot=p0)
-#ggsave("fished.png", plot=p1)
-#ggsave("unfished.png", plot=p2)
-
-
+require(socialR)
+upload("profit.png samplerun.png fished.png unfished.png", script="Reed.R", tag="PDG_Control")
