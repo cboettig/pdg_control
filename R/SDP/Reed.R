@@ -49,12 +49,12 @@ source("population_models.R")
 
 
 ## Chose the state equation / population dynamics function
-#f <- BevHolt              # Select the state equation
-#pars <- c(2,4)            # parameters for the state equation
-#K <- (pars[1]-1)/pars[2]  # Carrying capacity 
-#xT <- 0                   # boundary conditions
-#e_star <- 0               # model's bifurcation point (just for reference)
-#control = "harvest"         # control variable is total harvest, h = e * x
+f <- BevHolt              # Select the state equation
+pars <- c(2,4)            # parameters for the state equation
+K <- (pars[1]-1)/pars[2]  # Carrying capacity 
+xT <- 0                   # boundary conditions
+e_star <- 0               # model's bifurcation point (just for reference)
+control = "harvest"         # control variable is total harvest, h = e * x
 
 ## An alternative state equation, with allee effect: (uncomment to select)
 f <- Myer_harvest

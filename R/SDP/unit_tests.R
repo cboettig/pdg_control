@@ -12,8 +12,8 @@ delta <- 0.1      # economic discounting rate
 OptTime <- 50     # stopping time
 sigma_g <- 0.2      # Noise in population growth
 gridsize <- 100   # gridsize (discretized population)
-sigma_m <- .0  # 
-sigma_i <- .0 # 
+sigma_m <- .2  # 
+sigma_i <- .2 # 
 interval <- 1
 
 # Chose the state equation / population dynamics function
@@ -27,11 +27,11 @@ e_star <- 0
 x_grid <- seq(0, 2*K, length=gridsize)  # population size
 h_grid <- x_grid  # vector of havest levels, use same res as stock
 
-SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
-int_SDP_Mat <- integrate_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
-#require(snowfall)
-#sfInit(parallel=TRUE, cpu=4)
-#sim_SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, sigma_g, 0, 0, reps=99)
+SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sqrt(sigma_g^2+sigma_m^2))
+int_SDP_Mat <- integrate_SDP_matrix(f, pars, x_grid, h_grid, sigma_g, sigma_m, sigma_i)
+require(snowfall)
+sfInit(parallel=TRUE, cpu=4)
+sim_SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, sigma_g, sigma_m, sigma_i, reps=999)
 
 
 x <- matrix(NA, length(x_grid), 10) 
@@ -42,14 +42,14 @@ y <- x
 z <- x
 
 plt <- function(i){
-#  barplot(x[,i], col=rgb(0,0,1,.5))
-  barplot(y[,i], col=rgb(1,0,0,.5))
+  barplot(x[,i], col=rgb(0,0,1,.5))
+  barplot(y[,i], add=T, col=rgb(1,0,0,.5))
   barplot(z[,i], add=T, col=rgb(0,0,1,.5))
 }
 
 
 for(i in 1:9){
-#  x[,i+1] <- t(sim_SDP_Mat[[1]]) %*% x[,i]
+  x[,i+1] <- t(sim_SDP_Mat[[1]]) %*% x[,i]
   y[,i+1] <- t(SDP_Mat[[1]]) %*% y[,i]
   z[,i+1] <- t(int_SDP_Mat[[1]]) %*% z[,i]
   Sys.sleep(.2)
@@ -59,6 +59,6 @@ for(i in 1:9){
 
 png("test1.png"); plt(2); dev.off()
 png("test2.png"); plt(5); dev.off()
-#require(socialR)
-#upload("test*.png", script="unit_tests.R", tag="PDG_Control")
+require(socialR)
+upload("test*.png", script="unit_tests.R", tag="PDG_Control")
 
