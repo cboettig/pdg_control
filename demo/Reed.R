@@ -15,20 +15,12 @@
 #   Economics and Management. 6: 350-363.
 #
 # 
-# Dependencies:
-#   functions in scripts: 
-#     stochastic_dynamic_programming.R, 
-#     population_models.R
-#   Requires library: "ggplot2" (plotting) Hmisc (plotting stats)
-#   Recommends library: "snowfall" (for simulated transition matrix)
-#
-#
 #           Fish population dynamics:
 #           X_{t+1} = Z_n f(X_n) 
 
 
 rm(list=ls())   # Start wtih clean workspace 
-require(pdg_control)
+require(PDGcontrol)
 
 ## consider defaults for these
 # Define all parameters 
@@ -38,7 +30,7 @@ gridsize <- 100   # gridsize (discretized population)
 sigma_g <- 0.2    # Noise in population growth
 sigma_m <- 0.2     # noise in stock assessment measurement
 sigma_i <- 0.2     # noise in implementation of the quota
-interval <- 1     # period of updating the stock assessment
+interval <- 2     # period of updating the stock assessment
 
 # load noise distributions  
 source("noise_dists.R")

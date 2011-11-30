@@ -12,13 +12,13 @@
 #' Define a profit function, price minus cost
 #' @param p price of fish (Note, optimal will scrap xT if price is high enough!) 
 #' @param c fishing extraction costs (per unit effort)
-#' @returns a function computing profit at effort intensity h_i over
+#' @return a function computing profit at effort intensity h_i over
 #' possible stock values x_grid, profit(x_grid, h_i)
 #' @export
 profit_effort <- function(p = 1, c = 0.001){
 #' @param x_grid is a the grid of state values (profit will evaluate at each of them)
 #' @param h_i is the current harvesting *effort* (effort*stocksize = catch) 
-#' @returns the profits of fishing at intensity h_i given the stock value equals x_i
+#' @return the profits of fishing at intensity h_i given the stock value equals x_i
 #' for each x_i in the grid.   
 #' @details Due to the symmetry, you can actually compute the profit over a range 
 #'  of harvest values, rather than a range of stock values, by simply swapping 
@@ -33,13 +33,13 @@ profit_effort <- function(p = 1, c = 0.001){
 #' Define a profit function, price minus cost
 #' @param p price of fish (Note, optimal will scrap xT if price is high enough!) 
 #' @param c fishing extraction costs (per unit effort)
-#' @returns a function computing profit at harvest intensity h_i over
+#' @return a function computing profit at harvest intensity h_i over
 #' possible stock values x_grid, profit(x_grid, h_i)
 #' @export
 profit_harvest  <- function(p = 1, c = 0.001){
 #' @param x_grid is a the grid of state values (profit will evaluate at each of them)
 #' @param h_i is total harvest level
-#' @returns the profits of harvesting at intensity h_i for each possible stock
+#' @return the profits of harvesting at intensity h_i for each possible stock
 #' size in x_grid.  
 #' @details Due to the symmetry, you can actually compute the profit over a range 
 #'  of harvest values, rather than a range of stock values, by simply swapping 
@@ -64,10 +64,11 @@ profit_harvest  <- function(p = 1, c = 0.001){
 #' @param x_grid the discrete values allowed for the population size, x
 #' @param h_grid the discrete values of harvest levels to optimize over
 #' @param sigma_g the variance of the population growth process
-#' @returns the transition matrix at each value of h in the grid. 
+#' @return the transition matrix at each value of h in the grid. 
 #' @details this analytical approach doesn't reliably support other 
 #'  sources of variation.  The quality of the analytic approximations 
-#'  (lognormal) can be tested.  
+#'  (lognormal) can be tested. 
+#' @export
 determine_SDP_matrix <- function(f, p, x_grid, h_grid, sigma_g){
   gridsize <- length(x_grid)
   SDP_Mat <- lapply(h_grid, function(h){
@@ -105,8 +106,9 @@ determine_SDP_matrix <- function(f, p, x_grid, h_grid, sigma_g){
 #' @param sigma_g the variance of the population growth process
 #' @param sigma_m noise in stock assessment (currently assumes lognormal)
 #' @param sigma_i noise in implementing the quota (lognormal)
-#' @returns the transition matrix at each value of h in the grid. 
+#' @return the transition matrix at each value of h in the grid. 
 #' @import cubature
+#' @export
 integrate_SDP_matrix  <- function(f, p, x_grid, h_grid, sigma_g, sigma_m, sigma_i){
   gridsize <- length(x_grid)
   SDP_Mat <- lapply(h_grid, function(h){
@@ -147,7 +149,7 @@ integrate_SDP_matrix  <- function(f, p, x_grid, h_grid, sigma_g, sigma_m, sigma_
 #' @param z_m a function determining the porbability distribution for
 #'  measurement uncertainty in the assessment of stock size (random variable)
 #' @param z_i function for implementation uncertainty in quotas 
-#' @returns the transition matrix at each value of h in the grid.  
+#' @return the transition matrix at each value of h in the grid.  
 #' @import snowfall
 #' @import ggplot2
 #' @export
@@ -188,7 +190,7 @@ SDP_by_simulation <- function(f, p, x_grid, h_grid, z_g, z_m, z_i, reps = 999){
 #' @param c the cost/profit function, a function of harvested level
 #' @param delta the exponential discounting rate
 #' @param interval the delay interval between updated assessment/quotas
-#' @returns list containing the matrices D and V.  D is an x_grid by OptTime
+#' @return list containing the matrices D and V.  D is an x_grid by OptTime
 #'  matrix with the indices of h_grid giving the optimal h at each value x
 #'  as the columns, with a column for each time.  
 #'  V is a matrix of x_grid by x_grid, which is used to store the value 
@@ -257,7 +259,7 @@ find_dp_optim <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit,
 #' @param z_i a function which returns a random number from a distribution 
 #' for the implementation uncertainty in quotas 
 #' @param interval is the years between updating the harvest quota
-#' @returns a data frame with the time, fishstock, harvested amount,
+#' @return a data frame with the time, fishstock, harvested amount,
 #'  and what the escapement ("unharvested"). 
 #' @export
 ForwardSimulate <- function(f, pars, x_grid, h_grid, x0, D, z_g,

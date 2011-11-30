@@ -1,7 +1,4 @@
-
-source("stochastic_dynamic_programming.R")
-
-source("population_models.R")
+require(PDGcontrol)
 
 # Define all parameters 
 delta <- 0.1      # economic discounting rate
