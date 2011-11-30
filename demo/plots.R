@@ -4,7 +4,18 @@
 # creates extra plots accompanying Reed.R
 
 # for stat plots
+require(ggplot2)
 require(Hmisc)
+
+
+## FIXME Once standardized, all these plots should become package fns
+
+## Reshape and summarize data ###
+dat <- melt(sims, id="time") # reshapes the data matrix to "long" form
+# some stats on the replicates, (stat_sumary can do this instead)
+m <- cast(dat, time ~ variable, mean) # mean population
+err <- cast(dat, time ~ variable, sd) # sd population
+
 
 ## Show dynamics of a single replicate 
 ex <- sample(1:100,1) # a random replicate
@@ -14,7 +25,6 @@ p0 <- ggplot(dat) +
       geom_abline(intercept=opt$S, slope = 0, col="darkred") + # show Reed's S: optimal escapement 
       geom_abline(intercept=xT, slope = 0, lty=2) #+ # show Allee threshold
 print(p0)
-
 
 
 ## Show the ensemble fishstock and harvest dynamics 

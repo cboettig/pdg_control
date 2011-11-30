@@ -19,18 +19,18 @@
 #   functions in scripts: 
 #     stochastic_dynamic_programming.R, 
 #     population_models.R
-#   Requires library: "ggplot2" (plotting)
+#   Requires library: "ggplot2" (plotting) Hmisc (plotting stats)
 #   Recommends library: "snowfall" (for simulated transition matrix)
 #
 #
-# Fish population dynamics:
-# X_{t+1} = Z_n f(X_n) 
+#           Fish population dynamics:
+#           X_{t+1} = Z_n f(X_n) 
 
 
 rm(list=ls())   # Start wtih clean workspace 
-require(ggplot2) # nicer plotting package
+require(pdg_control)
 
-
+## consider defaults for these
 # Define all parameters 
 delta <- 0.1      # economic discounting rate
 OptTime <- 50     # stopping time
@@ -40,21 +40,16 @@ sigma_m <- 0.2     # noise in stock assessment measurement
 sigma_i <- 0.2     # noise in implementation of the quota
 interval <- 1     # period of updating the stock assessment
 
-# load my script defining the SDP functions:
-# determine_SDP_matrix, find_dp_optim, & ForwardSimulate
-source("stochastic_dynamic_programming.R")
-
-# load the library of population models
-source("population_models.R")
-
+# load noise distributions  
+source("noise_dists.R")
 
 ## Chose the state equation / population dynamics function
-f <- BevHolt              # Select the state equation
-pars <- c(2,4)            # parameters for the state equation
-K <- (pars[1]-1)/pars[2]  # Carrying capacity 
-xT <- 0                   # boundary conditions
-e_star <- 0               # model's bifurcation point (just for reference)
-control = "harvest"         # control variable is total harvest, h = e * x
+#f <- BevHolt              # Select the state equation
+#pars <- c(2,4)            # parameters for the state equation
+#K <- (pars[1]-1)/pars[2]  # Carrying capacity 
+#xT <- 0                   # boundary conditions
+#e_star <- 0               # model's bifurcation point (just for reference)
+#control = "harvest"         # control variable is total harvest, h = e * x
 
 ## An alternative state equation, with allee effect: (uncomment to select)
 f <- Myer_harvest
@@ -65,20 +60,10 @@ xT <- p[1] * p[3] / 2 - sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2 # allee thresho
 e_star <- (p[1] * sqrt(p[3]) - 2) / 2 ## Bifurcation point 
 control <- "harvest"          # control variable is harvest effort, e = h / x (for price eqn)
 
-x0 <- K - sigma_g^2/2 # initial condition
+x0 <- K - sigma_g^2/2 # initial condition near equib size (note the stochastic deflation of mean)
 
-#' Define a profit function, price minus cost
-#' @param x is a the grid of state values (profit will evaluate at each of them)
-#' @param h is the current harvest level being considered by the algorithm
-#' @param p price of fish (Note, optimal will scrap xT if price is high enough!) 
-#' @param c fishing extraction costs (per unit effort)
-profit <- function(x_grid, h_i, p = 1, c = 0.001, type=control){
-  if(type=="harvest")
-    harvest <- sapply(x_grid, function(x_i) min(h_i, x_i)) # Harvest-based control
-  else if(type=="effort")
-    harvest <- x_grid * h_i # Effort-based control 
-  sapply(harvest, function(x) max(0, p * x - c / x))
-}
+# use a harvest-based profit function with default parameters
+profit <- profit_harvest()
 
 # Set up the discrete grids
 x_grid <- seq(0, 2 * K, length = gridsize)  # population size
@@ -90,15 +75,14 @@ h_grid <- x_grid  # vector of havest levels, use same resolution as for stock
 # Calculate the transition matrix (with noise in growth only)         #
 #######################################################################
 ## Fast & decent approximation (lognormal growth noise only)
-#SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
-## Most accurateway: use integral (lognormal growth noise only)
+SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
+## Most accurate way: use integral (lognormal growth noise only)
 #SDP_Mat <- integrate_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
 
 ## calculate the transition matrix by simulation, generic
-require(snowfall) # use parallelization since this can be slow
-sfInit(parallel=TRUE, cpu=4)
-SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=999)
-
+#require(snowfall) # use parallelization since this can be slow
+#sfInit(parallel=TRUE, cpu=4)
+#SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=999)
 
 #######################################################################
 # Find the optimum by dynamic programming                             #
@@ -120,20 +104,8 @@ sims <- lapply(1:100, function(i){
 })
 
 
+#######################################################################
+# Plot the results                                                    #
+#######################################################################
 
-
-########################################################################
-#  Summarize and plot data                                             #
-########################################################################
-dat <- melt(sims, id="time") # reshapes the data matrix to "long" form
-
-# some stats on the replicates, ((geom_smooth should do this?))
-m <- cast(dat, time ~ variable, mean) # mean population
-err <- cast(dat, time ~ variable, sd) # sd population
-
-
-
-
-## extra plots are avialable in plots.R, inculding unharvested dynamics,
-## plot of a single harvested replicate, and plot of the profit over time.  
 source("plots.R")

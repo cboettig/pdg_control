@@ -23,6 +23,7 @@
 #' @details Harvesting takes place before reproduction in ths model.
 #'  The carrying capacity is K <- (pars[1]-1)/pars[2]
 #'  Try with pars <- c(2,4)
+#' @export
 BevHolt <- function(x, h, p){
   x <- max(0, x - h)
   A <- p[1] 
@@ -45,6 +46,7 @@ BevHolt <- function(x, h, p){
 #' @details Harvesting takes place before reproduction in ths model.
 #'  The carrying capacity is K <- (pars[1]-1)/pars[2]
 #'  Try with pars <- c(2,4)
+#' @export
 BevHolt_effort <- function(x, h, p){
   S <- max(0, x - x*h) # Escapement from harvest
   A <- p[1] 
