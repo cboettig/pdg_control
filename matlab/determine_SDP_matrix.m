@@ -20,22 +20,22 @@ function SDP_Mat = determine_SDP_matrix(fhandle, pars, n_vec, HVec, dev)
 
   L_H = length(HVec);   % number of havest states 
   S = length(n_vec);    % number of states
-  SDP_Mat = zeros(S,S,L_H); % initialize transition matrix
+  SDP_Mat = zeros(S, S, L_H); % initialize transition matrix
   % Cycle through all the harvest options -- VECTORIZE_ME
   for q = 1:L_H 
       h = HVec(q); % Harvest option being considered in this round of the loop
       for i = 1:S                  % Cycle through state-space -- VECTORIZE ME 
           x1 = n_vec(i);                % Pop is in state i, with abundance x1
-          x2_exp = fhandle(x1-h,pars);  % expected next abundance
+          x2_exp = fhandle(x1 - h,pars);  % expected next abundance
           if x2_exp == 0; 
-            SDP_Mat(i,1,q) = 1; 
+            SDP_Mat(i, 1, q) = 1; 
           else 
               % relative probability of a transition to that state
-              PropChange = n_vec./x2_exp; 
+              PropChange = n_vec ./ x2_exp; 
               % Since the noise is lognormal. (an approximation of integral) 
-              Prob = lognpdf(PropChange,log(1) - dev^2/2, dev);
+              Prob = lognpdf(PropChange, log(1) - dev^2/2, dev);
               % Store the normalised transition prob
-              SDP_Mat(i,:,q) = Prob./sum(Prob); 
+              SDP_Mat(i,:,q) = Prob ./ sum(Prob); 
             end
       end
   end

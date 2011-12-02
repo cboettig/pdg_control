@@ -79,7 +79,7 @@ SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
 #######################################################################
 # Find the optimum by dynamic programming                             #
 #######################################################################
-opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward=10)
+opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward=10, interval)
 
 
 # What if parameter estimation is inaccurate? e.g.:
@@ -91,8 +91,7 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward
 #######################################################################
 sims <- lapply(1:100, function(i){
 # simulate the optimal routine on a stoch realization of growth dynamics
-  ForwardSimulate(f, pars, x_grid, h_grid, x0, opt$D, z_g,
-                  z_m, z_i, interval=1)
+  ForwardSimulate(f, pars, x_grid, h_grid, x0, opt$D, z_g, z_m, z_i, interval)
 })
 
 

@@ -282,7 +282,7 @@ ForwardSimulate <- function(f, pars, x_grid, h_grid, x0, D, z_g,
     St <- which.min(abs(x_grid - m_t)) 
     # Set harvest quota on update years
     if(t %% interval == 0)
-      q_t <- h_grid[D[St, (t + 1) / interval]] 
+      q_t <- h_grid[D[St, floor((t + 1) / interval)]] 
     else # quota remains the same if not an update yr
       q_t <- h[t-1] 
     # Implement harvest/(effort) based on quota with noise 
