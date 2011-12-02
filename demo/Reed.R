@@ -20,7 +20,7 @@
 
 
 rm(list=ls())   # Start wtih clean workspace 
-require(PDGcontrol)
+require(pdgControl)
 
 ## consider defaults for these
 # Define all parameters 

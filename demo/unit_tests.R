@@ -4,7 +4,7 @@
 # license BSD
 # test the performance of SDP_by_simulation 
 
-require(PDGcontrol)
+require(pdgControl)
 # Define all parameters 
 delta <- 0.1      # economic discounting rate
 OptTime <- 50     # stopping time
