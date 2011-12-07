@@ -9,3 +9,4 @@ Maintainer: Carl Boettiger, <cboettig@gmail.com>
 Collate:
     'population_models.R'
     'stochastic_dynamic_programming.R'
+    'plots.R'

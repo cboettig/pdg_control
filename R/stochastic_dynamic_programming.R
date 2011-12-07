@@ -330,8 +330,8 @@ optim_policy <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit,
   ## Initialize space for the matrices
   gridsize <- length(x_grid)
   HL <- length(h_grid)
-  D <- lapply(1:2, function(i) matrix(NA, nrow=gridsize, ncol=OptTime))
-  V <- sapply(1:2, function(i){ 
+  D <- lapply(1:HL, function(i) matrix(NA, nrow=gridsize, ncol=OptTime))
+  V <- sapply(1:HL, function(i){ 
     Vi <- rep(0,gridsize)  
     # give a fixed reward for having value larger than xT at the end. 
     Vi[x_grid >= xT] <- reward # a "scrap value" for x(T) >= xT
@@ -342,7 +342,7 @@ optim_policy <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit,
   # loop through time  
   for(time in 1:OptTime ){ 
   # loop over all possible values for last year's harvest level
-   for(h_prev in 1:2){
+   for(h_prev in 1:HL){
       # try all potential havest rates
       V1 <- sapply(1:HL, function(i){
         # Transition matrix times V gives dist in next time
@@ -350,7 +350,8 @@ optim_policy <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit,
         # then (add) harvested amount times discount
          profit(x_grid, h_grid[i]) * (1 - delta) - 
         # cost of changing the policy from the previous year
-         P*abs(h_grid[i] - h_grid[ h_prev])
+#         P * (h_grid[i] - h_grid[ h_prev])^2 * (1 - delta)
+         P * abs(h_grid[i] - h_grid[ h_prev]) * (1 - delta) #L1 cost
       })
       # find havest, h that gives the maximum value
       out <- sapply(1:gridsize, function(j){
@@ -389,12 +390,15 @@ optim_policy <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit,
 #' @param z_m a function which returns the measurement uncertainty in the 
 #'  assessment of stock size
 #' @param z_i a function which returns a random number from a distribution 
-#' for the implementation uncertainty in quotas 
+#' for the implementation uncertainty in quotas
+#' @param alt_D an option to compute harvest with an alternate 
+#' "optimal" solution as well, for comparison (indep of h_prev) 
 #' @return a data frame with the time, fishstock, harvested amount,
-#'  and what the escapement ("unharvested"). 
+#'  and what the escapement ("unharvested") is. Also the alternate
+#'  fishstock and harvest dynamics, if calculated
 #' @export
 simulate_optim <- function(f, pars, x_grid, h_grid, x0, D, z_g,
-                            z_m, z_i){
+                            z_m, z_i, alt_D = NULL){
   # initialize variables with initial conditions
   OptTime <- dim(D[[1]])[2]    # Stopping time
   x_h <- numeric(OptTime) # population dynamics with harvest
@@ -403,28 +407,47 @@ simulate_optim <- function(f, pars, x_grid, h_grid, x0, D, z_g,
   h_prev <- 1 # assume no harvesting happening at start (index of h_grid)
   s <- x_h # also track escapement
   x <- x_h # What would happen with no havest
+
+  # initialize alternative fishstock/harvest under alt_D management
+  x_alt <- x_h
+  h_alt <- h
     
   ## Simulate through time ##
   for(t in 1:(OptTime-1)){
+    # Draw the noise random variables
+    zg <- z_g() 
+    zm <- z_m()
+    zi <- z_i()
     # Assess stock, with potential measurement error
-    m_t <- x_h[t] * z_m()
+    m_t <- x_h[t] * zm
     # Current state (is closest to which grid posititon) 
     St <- which.min(abs(x_grid - m_t)) 
     # Set harvest quota on update years
     q_t <- h_grid[D[[h_prev]][St, (t + 1) ]] 
-    # Implement harvest/(effort) based on quota with noise 
-    h[t] <- q_t * z_i()
+    # Implement harvest/(effort) based on quota with noise
+    h[t] <- q_t * zi
     # Store last years quota
     h_prev <- which.min(abs(h_grid - q_t)) 
-    # Noise in growth 
-    z <- z_g() 
     # population grows
-    x_h[t+1] <- z * f(x_h[t], h[t], pars) # with havest
+    x_h[t+1] <- zg * f(x_h[t], h[t], pars) # with havest
     s[t+1]   <- x_h[t] - q_t # anticipated escapement
-    x[t+1]   <- z * f(x[t], 0, pars) # havest-free dynamics
-  }
+    x[t+1]   <- zg * f(x[t], 0, pars) # havest-free dynamics
+
+    ## Comparison solution
+    if(!is.null(alt_D)){
+      m_alt <- x_alt[t] * zm
+      # Current state (is closest to which grid posititon) 
+      St_alt <- which.min(abs(x_grid - m_alt)) 
+      # Set harvest quota 
+      h_alt[t] <- h_grid[alt_D[St_alt, (t + 1) ]] * zi
+      # population grows
+      x_alt[t+1] <- zg * f(x_alt[t], h_alt[t], pars) 
+    }
+}
   # formats output 
-  data.frame(time=1:OptTime, fishstock=x_h, harvest=h, unharvested=x, escapement=s) 
+  data.frame(time=1:OptTime, fishstock=x_h, harvest=h, 
+             unharvested=x, escapement=s, alternate=x_alt,
+             harvest_alt = h_alt) 
 }
 
 
