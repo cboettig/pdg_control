@@ -59,7 +59,6 @@ sims <- lapply(1:100, function(i)
 #identical(sims[[1]][[2]], sims[[1]][[6]])
 
 
-#p1 <- plot_replicates(sims)
 
 ## Reshape and summarize data ###
 dat <- melt(sims, id="time") # reshapes the data matrix to "long" form
@@ -72,4 +71,7 @@ p0 <- ggplot(example) +
 p0 <- p0 + geom_abline(intercept = reed$S, slope = 0, col = "darkred") 
 print(p0)
 
+
+
+p1 <- plot_replicates(sims)
 
