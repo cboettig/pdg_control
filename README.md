@@ -14,8 +14,20 @@ Install required packages:
 Launch R and do:
 
 ```R 
-install.packages(c("bvpSolve", "ggplot2")) 
+> install.packages("devtools")
+> require(devtools)
+> install_github("pdg_control", "cboettig")
 ```
+
+Then you should be able to run the R scripts in the /demo directory by 
+setting it as your "working directory" for R, and then sourcing in the 
+demo name, e.g. :
+
+```R 
+> source("policy_costs.R") 
+```
+
+
 
 Matlab installation
 -------------------------------------
