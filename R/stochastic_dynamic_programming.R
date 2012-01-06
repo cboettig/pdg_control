@@ -327,7 +327,9 @@ ForwardSimulate <- function(f, pars, x_grid, h_grid, x0, D, z_g,
 #' @import expm
 #' @export
 optim_policy <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, 
-                          delta, reward=0, P=0, penalty="L1"){
+                          delta, reward=0, P=0, 
+                          penalty=c("L1", "L2", "asymmetric", "fixed", "none")){
+  penalty <- match.arg(penalty)
   ## Initialize space for the matrices
   gridsize <- length(x_grid)
   HL <- length(h_grid)
@@ -347,13 +349,15 @@ optim_policy <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit,
       # try all potential havest rates
       V1 <- sapply(1:HL, function(i){
         # cost of changing the policy from the previous year
-        if(penalty="L2")
+        if(penalty=="L2")
           change_cost <- P * (h_grid[i] - h_grid[ h_prev])^2 
-        else if(penalty="L1")
+        else if(penalty=="L1")
           change_cost <- P * abs(h_grid[i] - h_grid[ h_prev]) 
-        else if(penalty="assymetric")
+        else if(penalty=="asymmetric")
           change_cost <- P * max(h_grid[h_prev]-h_grid[i], 0) 
-        else
+        else if(penalty=="fixed")
+          change_cost <- P
+        else 
           0
         # Transition matrix times V gives dist in next time
         SDP_Mat[[i]]  %*% V[, h_prev] + 
