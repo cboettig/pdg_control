@@ -45,11 +45,11 @@ SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
 
 ## solution with policy cost P: 
 opt <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, .25*K, 
-                    profit, delta, reward=100, P=9.3, penalty="L1")
+                    profit, delta, reward=0, P=.3, penalty="asym")
 
 # Calculate the Reed optimum (e.g. no cost to policy adjustment):
 reed <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, .25*K, 
-                      profit, delta, reward=100, interval=interval)
+                      profit, delta, reward=0, interval=interval)
 
 sims <- lapply(1:100, function(i)
   simulate_optim(f, pars, x_grid, h_grid, x0, opt$D, z_g, z_m, z_i, reed$D)
