@@ -42,8 +42,9 @@ x_grid <- seq(0, 2 * K, length = gridsize)  # population size
 h_grid <- x_grid  # vector of havest levels, use same resolution as for stock
 
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
+## with policy cost P: 
 opt <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, .25*K, profit, delta, reward=100, P=9.3)
-# Calculate the Reed optimum (e.g. no cost to policy adjustment)
+# Calculate the Reed optimum (e.g. no cost to policy adjustment):
 reed <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, .25*K, profit, delta, reward=100, interval=interval)
 
 sims <- lapply(1:100, function(i)

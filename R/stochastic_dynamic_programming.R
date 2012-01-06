@@ -317,6 +317,7 @@ ForwardSimulate <- function(f, pars, x_grid, h_grid, x0, D, z_g,
 #' @param reward the profit for finishing with >= Xt fish at the end 
 #' (i.e. enforces the boundary condition)
 #' @param P the cost of adjusting a policy, proportional to the amount of change
+#' @param penalty the kind of penalty applied: currently L1, L2, or assymetric
 #' @return list containing the matrices D and V.  D is an x_grid by OptTime
 #'  matrix with the indices of h_grid giving the optimal h at each value x
 #'  as the columns, with a column for each time.  
@@ -326,7 +327,7 @@ ForwardSimulate <- function(f, pars, x_grid, h_grid, x0, D, z_g,
 #' @import expm
 #' @export
 optim_policy <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, 
-                          delta, reward=0, P=0){
+                          delta, reward=0, P=0, penalty="L1"){
   ## Initialize space for the matrices
   gridsize <- length(x_grid)
   HL <- length(h_grid)
@@ -345,13 +346,19 @@ optim_policy <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit,
    for(h_prev in 1:HL){
       # try all potential havest rates
       V1 <- sapply(1:HL, function(i){
+        # cost of changing the policy from the previous year
+        if(penalty="L2")
+          change_cost <- P * (h_grid[i] - h_grid[ h_prev])^2 
+        else if(penalty="L1")
+          change_cost <- P * abs(h_grid[i] - h_grid[ h_prev]) 
+        else if(penalty="assymetric")
+          change_cost <- P * max(h_grid[h_prev]-h_grid[i], 0) 
+        else
+          0
         # Transition matrix times V gives dist in next time
         SDP_Mat[[i]]  %*% V[, h_prev] + 
-        # then (add) harvested amount times discount
-         profit(x_grid, h_grid[i]) * (1 - delta) - 
-        # cost of changing the policy from the previous year
-#         P * (h_grid[i] - h_grid[ h_prev])^2 * (1 - delta)
-         P * abs(h_grid[i] - h_grid[ h_prev]) * (1 - delta) #L1 cost
+        # then (add) harvested amount - policy cost times discount
+         (profit(x_grid, h_grid[i]) - change_cost ) * (1 - delta)
       })
       # find havest, h that gives the maximum value
       out <- sapply(1:gridsize, function(j){
