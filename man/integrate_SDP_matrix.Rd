@@ -1,0 +1,36 @@
+\name{integrate_SDP_matrix}
+\alias{integrate_SDP_matrix}
+\title{Determine the Stochastic Dynamic Programming matrix.}
+\usage{
+  integrate_SDP_matrix(f, p, x_grid, h_grid, sigma_g,
+    sigma_m, sigma_i)
+}
+\arguments{
+  \item{f}{the growth function of the escapement population
+  (x-h) should be a function of f(t, y, p), with parameters
+  p}
+
+  \item{p}{the parameters of the growth function}
+
+  \item{x_grid}{the discrete values allowed for the
+  population size, x}
+
+  \item{h_grid}{the discrete values of harvest levels to
+  optimize over}
+
+  \item{sigma_g}{the variance of the population growth
+  process}
+
+  \item{sigma_m}{noise in stock assessment (currently
+  assumes lognormal)}
+
+  \item{sigma_i}{noise in implementing the quota
+  (lognormal)}
+}
+\value{
+  the transition matrix at each value of h in the grid.
+}
+\description{
+  Determine the Stochastic Dynamic Programming matrix.
+}
+
