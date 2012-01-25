@@ -7,6 +7,11 @@
 # Contains functions for stochastic dynamic programming 
 # see Reed.R for example uses 
 
+#' 
+#' @import Hmisc
+#' @import RCurl
+#' 
+NULL
 
 
 #' Define a profit function, price minus cost
