@@ -15,9 +15,13 @@ Launch R and do:
 
 ```R 
 > install.packages(c("devtools", "RCurl"))
+> install.packages(c("Hmisc", "cubature", "expm", "ggplot2", "snowfall"))
 > require(devtools)
 > install_github("pdg_control", "cboettig")
 ```
+
+(This second line shouldn't be necessary, but the install_github isn't 
+doing that step automatically for some reason).  
 
 Then you should be able to run the R scripts in the /demo directory by 
 setting it as your "working directory" for R, and then sourcing in the 
