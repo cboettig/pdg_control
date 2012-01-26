@@ -8,10 +8,6 @@
 # see Reed.R for example uses 
 
 #' 
-#' @import Hmisc
-#' @import RCurl
-#' 
-NULL
 
 
 #' Define a profit function, price minus cost
@@ -103,6 +99,8 @@ determine_SDP_matrix <- function(f, p, x_grid, h_grid, sigma_g){
 
 
 #' Determine the Stochastic Dynamic Programming matrix.
+#'
+#' Integrate the multidimensional function using the cubature package
 #' @param f the growth function of the escapement population (x-h)
 #'   should be a function of f(t, y, p), with parameters p
 #' @param p the parameters of the growth function
@@ -157,6 +155,7 @@ integrate_SDP_matrix  <- function(f, p, x_grid, h_grid, sigma_g, sigma_m, sigma_
 #' @return the transition matrix at each value of h in the grid.  
 #' @import snowfall
 #' @import ggplot2
+#' @import Hmisc
 #' @export
 SDP_by_simulation <- function(f, p, x_grid, h_grid, z_g, z_m, z_i, reps = 999){
   require(snowfall) # support parallelization of this

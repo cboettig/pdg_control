@@ -31,6 +31,7 @@
   the transition matrix at each value of h in the grid.
 }
 \description{
-  Determine the Stochastic Dynamic Programming matrix.
+  Integrate the multidimensional function using the
+  cubature package
 }
 

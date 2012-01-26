@@ -6,6 +6,18 @@ Version: 0.0-1
 License: BSD
 Author: Carl Boettiger
 Maintainer: Carl Boettiger, <cboettig@gmail.com>
+Depends:
+    Hmisc,
+    cubature,
+    expm,
+    ggplot2,
+    snowfall
+Imports:
+    Hmisc,
+    cubature,
+    expm,
+    ggplot2,
+    snowfall
 Collate:
     'plots.R'
     'population_models.R'

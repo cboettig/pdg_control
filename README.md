@@ -14,7 +14,7 @@ Install required packages:
 Launch R and do:
 
 ```R 
-> install.packages("devtools")
+> install.packages(c("devtools", "RCurl"))
 > require(devtools)
 > install_github("pdg_control", "cboettig")
 ```

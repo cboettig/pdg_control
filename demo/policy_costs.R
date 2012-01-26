@@ -5,10 +5,9 @@
 rm(list=ls())   # Start wtih clean workspace 
 require(pdgControl)
 
-# shouldn't be necessary - these are imported!
+# we'll be using these libraries directly, so we load them up
 require(ggplot2)
 require(Hmisc)
-require(expm)
 
 ## consider defaults for these
 # Define all parameters 

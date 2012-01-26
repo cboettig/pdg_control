@@ -14,7 +14,6 @@
 #' @details if line values for any S, allee, e_star are not specified 
 #' then these are omitted from the plot.
 #' @import ggplot2
-#' @import reshape
 #' @import Hmisc
 #' @export 
 plot_replicates <- function(sims, S = NULL, allee = 0, e_star = NULL,
