@@ -413,9 +413,8 @@ optim_policy <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit,
 #'  fishstock and harvest dynamics, if calculated
 #' @export
 simulate_optim <- function(f, pars, x_grid, h_grid, x0, D, z_g,
-                            z_m, z_i, alt_D = NULL){
+                            z_m, z_i, alt_D = NULL, OptTime = dim(D[[1]])[2] ){
   # initialize variables with initial conditions
-  OptTime <- dim(D[[1]])[2]    # Stopping time
   x_h <- numeric(OptTime) # population dynamics with harvest
   h <- numeric(OptTime) # optimal havest level
   x_h[1] <- x0  # initial values

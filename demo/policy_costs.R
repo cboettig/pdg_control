@@ -7,6 +7,7 @@ require(pdgControl)
 
 # we'll be using these libraries directly, so we load them up
 require(ggplot2)
+require(reshape2)
 require(Hmisc)
 
 ## consider defaults for these
@@ -25,14 +26,14 @@ z_m <- function() 1 # no measurement (stock assessment) noise
 z_i <- function() 1 # no implementation (quota) noise
 
 ## Chose the state equation / population dynamics function
-f <- BevHolt              # Select the state equation
-pars <- c(2,4)            # parameters for the state equation
-K <- (pars[1]-1)/pars[2]  # Carrying capacity 
-xT <- 0                   # boundary conditions
-scrap_value <- 0          # reward profit offered for finishing >= xT stock
-e_star <- 0               # model's bifurcation point (just for reference)
-control <- "harvest"      # control variable is total harvest, h = e * x
-x0 <- K/2                 # initial condition
+f <- BevHolt                # Select the state equation
+pars <- c(2, 4)             # parameters for the state equation
+K <- (pars[1] - 1)/pars[2]  # Carrying capacity 
+xT <- 0                     # boundary conditions
+scrap_value <- 0            # reward profit offered for finishing >= xT stock
+e_star <- 0                 # model's bifurcation point (just for reference)
+control <- "harvest"        # control variable is total harvest, h = e * x
+x0 <- K / 2                 # initial condition
 # use a harvest-based profit function with default parameters
 profit <- profit_harvest() # functions defined in stochastic_dynamic_programming.R
 
@@ -65,7 +66,7 @@ sims <- lapply(1:100, function(i)
 ## Reshape and summarize data ###
 dat <- melt(sims, id="time") # reshapes the data matrix to "long" form
 ## Show dynamics of a single replicate 
-ex <- sample(1:100,1) # a random replicate
+ex <- sample(1:100, 1) # a random replicate
 example <- subset(dat, variable %in% c("fishstock", "alternate","harvest", "harvest_alt") & L1 == ex)
 example[[2]] <- as.factor(as.character(example[[2]]))
 p0 <- ggplot(example) +
