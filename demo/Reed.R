@@ -116,14 +116,14 @@ sims2 <- lapply(1:100, function(i){
 #######################################################################
 
 ## Reshape and summarize data ###
-dat <- melt(sims, id="time") # reshapes the data matrix to "long" form
+dat <- melt(sims2, id="time") # reshapes the data matrix to "long" form
 ## Show dynamics of a single replicate 
 ex <- sample(1:100,1) # a random replicate
 example <- subset(dat, variable %in% c("fishstock", "alternate","harvest", "harvest_alt") & L1 == ex)
 example[[2]] <- as.factor(as.character(example[[2]]))
 p0 <- ggplot(example) +
       geom_line(aes(time, value, color = variable), position="jitter") 
-p0 <- p0 + geom_abline(intercept = opt$S, slope = 0, col = "darkred") 
+p0 <- p0 + geom_abline(intercept = cheap$S, slope = 0, col = "darkred") 
 print(p0)
 
 
