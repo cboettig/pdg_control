@@ -90,7 +90,7 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT,
 
 
 # What if parameter estimation is inaccurate? e.g.:
-pars[1] <- pars[1] * 0.95
+#pars[1] <- pars[1] * 0.95
 
 
 #######################################################################
@@ -132,7 +132,7 @@ q <- quantile(total_profit, probs=0.95)
 tycoons <- which(total_profit > q)
 q <- quantile(total_profit)
 half.to.75 <- which(total_profit > q[3] & total_profit < q[4])
-failures <-  which(total_profit <= q[2])
+failures <-  which(total_profit == reward)
 
 class <- rep("normal", 100)
 class[1:100 %in% failures] <- "failures"
@@ -141,18 +141,19 @@ class[1:100 %in% half.to.75] <- "middle"
 class <- as.factor(class)
 cl <- data.table(reps=1:100, class=class)
 setkey(cl, reps)
-dt <- dt[cl]
+dt <- dt[cl] # not working correctly?? 
 
-p1 <- ggplot(subset(dt, class %in% c("failures", "tycoons"))) + 
+
+
+p1 <- ggplot(subset(dt, reps %in% failures)) + 
   geom_line(aes(time, fishstock, group = reps, color=class), alpha = 0.7)
+p1 <- p1 + geom_line(aes(time, fishstock, group = reps, color=class),
+               alpha = 0.7, dat = subset(dt, reps %in% tycoons))
 p1
 
 ## Shows clearly that groups are determined by how many times they got to harvest.  
 p4 <- qplot(total_profit)
 
-p3 <- ggplot(subset(dt, class %in% c("tycoons", "middle"))) + 
-  geom_jitter(aes(time, profit, group = reps, color=class), alpha = 0.2)
-p3
 
 
 ## Add some reference lines?
@@ -167,14 +168,15 @@ p2 <-
               fill = "blue", alpha = 0.2)
   
 
+## harvest levels in failures 
+p5 <- ggplot(subset(dt, reps %in% failures)) + 
+  geom_line(aes(time, harvest, group = reps, color=class))
+p5
 
 
-####### PLOTS OF PROFIT.
+p5 <- ggplot(subset(dt, class %in% c("failures"))) + 
+  geom_line(aes(time, harvest, group = reps, color=class), alpha = 0.7)
+p5
 
-
-#ggplot(dt) + geom_line(aes(time, profits, group=reps), alpha=.3)
-
-
-
-
+ggsave(plot=p4)
 
