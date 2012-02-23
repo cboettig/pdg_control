@@ -33,6 +33,7 @@ gridsize <- 100   # gridsize (discretized population)
 sigma_g <- 0.2    # Noise in population growth
 sigma_m <- 0.     # noise in stock assessment measurement
 sigma_i <- 0.     # noise in implementation of the quota
+reward <- 1       # bonus for satisfying the boundary condition
 
 # load noise distributions  
 source("noise_dists.R")
@@ -41,7 +42,7 @@ source("noise_dists.R")
 f <- BevHolt                # Select the state equation
 pars <- c(2, 4)             # parameters for the state equation
 K <- (pars[1] - 1)/pars[2]  # Carrying capacity 
-xT <- 0                     # boundary conditions
+xT <- K/10                 # boundary conditions
 e_star <- 0                 # model's bifurcation point (just for reference)
 control = "harvest"         # control variable is total harvest, h = e * x
 
@@ -58,7 +59,7 @@ control = "harvest"         # control variable is total harvest, h = e * x
 x0 <- K - sigma_g ^ 2 / 2 
 
 # use a harvest-based profit function with default parameters
-##profit <- profit_harvest(c = 1) # we'll use two different versions and compare, see below
+profit <- profit_harvest(c = 0.1) # we'll use two different versions and compare, see below
 
 # Set up the discrete grids
 x_grid <- seq(0, 2 * K, length = gridsize)  # population size
@@ -73,9 +74,10 @@ h_grid <- x_grid  # vector of havest levels, use same resolution as for stock
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
 
 ## Most accurate way: use integral (lognormal growth noise only)
+## didn't work to integrate all noise forms
 #SDP_Mat <- integrate_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
 
-## calculate the transition matrix by simulation, generic
+## calculate the transition matrix by simulation, generic to types of noise
 #require(snowfall) # use parallelization since this can be slow
 #sfInit(parallel=TRUE, cpu=4)
 #SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=999)
@@ -84,20 +86,11 @@ SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
 # Find the optimum by dynamic programming                             #
 #######################################################################
 opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                     profit_harvest(c=1), delta, reward=10)
-
-## Compare to case with profit function having little extraction cost
-
-cheap <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                     profit_harvest(c=.0001), delta, reward=10)
-
-
-opt_sim <-  ForwardSimulate(f, pars, x_grid, h_grid, x0, opt$D, z_g, z_m, z_i)
-cheap_sim <-  ForwardSimulate(f, pars, x_grid, h_grid, x0, cheap$D, z_g, z_m, z_i)
+                     profit, delta, reward)
 
 
 # What if parameter estimation is inaccurate? e.g.:
-#pars[1] <- pars[1] * 0.95
+pars[1] <- pars[1] * 0.95
 
 
 #######################################################################
@@ -108,25 +101,80 @@ sims <- lapply(1:100, function(i){
   ForwardSimulate(f, pars, x_grid, h_grid, x0, opt$D, z_g, z_m, z_i)
 })
 
-sims2 <- lapply(1:100, function(i){
-  ForwardSimulate(f, pars, x_grid, h_grid, x0, cheap$D, z_g, z_m, z_i)
-})
 #######################################################################
 # Plot the results                                                    #
 #######################################################################
 
-## Reshape and summarize data ###
-dat <- melt(sims2, id="time") # reshapes the data matrix to "long" form
-## Show dynamics of a single replicate 
-ex <- sample(1:100,1) # a random replicate
-example <- subset(dat, variable %in% c("fishstock", "alternate","harvest", "harvest_alt") & L1 == ex)
-example[[2]] <- as.factor(as.character(example[[2]]))
-p0 <- ggplot(example) +
-      geom_line(aes(time, value, color = variable), position="jitter") 
-p0 <- p0 + geom_abline(intercept = cheap$S, slope = 0, col = "darkred") 
-print(p0)
+# Make data tidy
+dat <- melt(sims, id=names(sims[[1]]))  
+# Faster if we use data.table objects
+require(data.table)
+dt <- data.table(dat)
+setnames(dt, "L1", "reps") # names are nice
+setkey(dt, reps, time)  # nice to sort by reps, then time
+
+
+crashed <- dt[time==OptTime, fishstock == 0, by=reps]
+rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
+
+pfn <- function(x) sapply(x, function(x) max(0,x - 0.0001/x))
+profit <- dt[,pfn(harvest), by=reps]
+setnames(profit, "V1", "profit")
+dt <- dt[profit]
+
+
+total_profit <- dt[,sum(profit), by=reps]$V1 + rewarded$V1 * reward 
+total_profit[crashed$V1]
+total_profit[!crashed$V1]
+
+
+q <- quantile(total_profit, probs=0.95)
+tycoons <- which(total_profit > q)
+q <- quantile(total_profit)
+half.to.75 <- which(total_profit > q[3] & total_profit < q[4])
+failures <-  which(total_profit <= q[2])
+
+class <- rep("normal", 100)
+class[1:100 %in% failures] <- "failures"
+class[1:100 %in% tycoons] <- "tycoons"
+class[1:100 %in% half.to.75] <- "middle"
+class <- as.factor(class)
+cl <- data.table(reps=1:100, class=class)
+setkey(cl, reps)
+dt <- dt[cl]
+
+p1 <- ggplot(subset(dt, class %in% c("failures", "tycoons"))) + 
+  geom_line(aes(time, fishstock, group = reps, color=class), alpha = 0.7)
+p1
+
+## Shows clearly that groups are determined by how many times they got to harvest.  
+p4 <- qplot(total_profit)
+
+p3 <- ggplot(subset(dt, class %in% c("tycoons", "middle"))) + 
+  geom_jitter(aes(time, profit, group = reps, color=class), alpha = 0.2)
+p3
+
+
+## Add some reference lines?
+#p1 <- p1 + geom_abline(intercept=opt$S, slope = 0)          
+#p1 <- p1 + geom_abline(intercept=allee, slope = 0, lty=2) 
+
+## A statistical summary plot
+stats <- dt[ , mean_sdl(harvest), by = time]
+p2 <- 
+  ggplot(stats) + geom_line(aes(x=time, y=y)) + 
+  geom_ribbon(aes(x = time, ymin = max(0,ymin), ymax = ymax),
+              fill = "blue", alpha = 0.2)
+  
 
 
 
-p1 <- plot_replicates(sims)
+####### PLOTS OF PROFIT.
+
+
+#ggplot(dt) + geom_line(aes(time, profits, group=reps), alpha=.3)
+
+
+
+
 

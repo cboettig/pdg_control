@@ -38,7 +38,7 @@ p1 <- plot_replicates(sims)
 #          (L1 %in% optimal_crashed$L1)),  col = "darkblue", alpha = 0.5) 
 
 
-
+#### p2 Plots the unharvested dynamics ###
 crashed = subset(dat, variable =="unharvested" & time == OptTime - 1 & value < xT)
 p2 <- ggplot(data = subset(dat, variable == "unharvested"),
              aes(time, value, group = L1)) + geom_line(alpha = 0.2) + 
@@ -47,18 +47,27 @@ p2 <- ggplot(data = subset(dat, variable == "unharvested"),
                geom = "smooth", mult = 1) +
   opts(title=sprintf("Unfished dynamics, %d populations crash", dim(crashed)[1]))
 
-## Profits plot
 
-p3 <- ggplot(subset(dat, variable == "harvest"), aes(time, profit(value,K), 
-                                                     group=L1)) + 
-  geom_line(alpha=.2) + labs(x="Time (yrs)", y="Profit" ) + 
-  stat_summary(fun.data = mean_sdl, geom="smooth", mapping=aes(group = 1),
-               lwd=1, col="darkred", mult=1)
+
+## Profits plot #######
+p3 <- ggplot(subset(dat, variable == "harvest"), 
+             aes(time, profit(value, K), group = L1)) + 
+  geom_line(alpha = .2) + 
+  labs(x = "Time (yrs)", y = "Profit") + 
+  stat_summary(fun.data = mean_sdl, 
+    geom = "smooth", mapping = aes(group = 1),
+    lwd = 1, col = "darkred", mult = 1)
+
 # fun.data should be used for functions that give mean+sd back
 # otherwise, use fun.y = mean, fun.ymin = 
 
-
-cash <- cast(subset(dat,variable=="harvest"), time ~ variable, profit, K) # profits for each rep, by timestep
+# profits for each rep, by timestep
+require(plyr)
+cash <- ddply(subset(dat, variable == "harvest"), "L1", 
+  function(df) profit(dat$variable, K))
+require(data.table)
+DT <- data.table(dat)
+DT[, profit
 
 # add mean line by hand
 # p3 <- p3+geom_line(aes(time,rowMeans(cash))) # average profit made as function of time

@@ -25,14 +25,14 @@ plot_replicates <- function(sims, S = NULL, allee = 0, e_star = NULL,
 
   require(ggplot2)
 
-  ## must write these to global environment 
+  ## Should rewrite this to be act like a proper ggplot2 extension 
 
   dat <- melt(sims, id="time") # reshapes the data matrix to "long" form
   dat <<- dat
   # some stats on the replicates, (stat_sumary can do this instead)
-  m <- cast(dat, time ~ variable, mean) # mean population
+  m <- dcast(dat, time ~ variable, mean) # mean population
   m <<- m
-  err <- cast(dat, time ~ variable, sd) # sd population
+  err <- dcast(dat, time ~ variable, sd) # sd population
   err <<- err
   
   ## Create the ggplot object with this data
