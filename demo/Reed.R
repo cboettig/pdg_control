@@ -39,21 +39,21 @@ reward <- 1       # bonus for satisfying the boundary condition
 source("noise_dists.R")
 
 ## Chose the state equation / population dynamics function
-f <- BevHolt                # Select the state equation
-pars <- c(2, 4)             # parameters for the state equation
-K <- (pars[1] - 1)/pars[2]  # Carrying capacity 
-xT <- K/10                 # boundary conditions
-e_star <- 0                 # model's bifurcation point (just for reference)
-control = "harvest"         # control variable is total harvest, h = e * x
+#f <- BevHolt                # Select the state equation
+#pars <- c(2, 4)             # parameters for the state equation
+#K <- (pars[1] - 1)/pars[2]  # Carrying capacity 
+#xT <- K/10                 # boundary conditions
+#e_star <- 0                 # model's bifurcation point (just for reference)
+#control = "harvest"         # control variable is total harvest, h = e * x
 
 ## An alternative state equation, with allee effect: (uncomment to select)
-#f <- Myer_harvest
-#pars <- c(1, 2, 6) 
-#p <- pars # shorthand 
-#K <- p[1] * p[3] / 2 + sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2
-#xT <- p[1] * p[3] / 2 - sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2 # allee threshold
-#e_star <- (p[1] * sqrt(p[3]) - 2) / 2 ## Bifurcation point 
-#control <- "harvest"          # control variable is harvest effort, e = h / x (for price eqn)
+f <- Myer_harvest
+pars <- c(1, 2, 6) 
+p <- pars # shorthand 
+K <- p[1] * p[3] / 2 + sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2
+xT <- p[1] * p[3] / 2 - sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2 # allee threshold
+e_star <- (p[1] * sqrt(p[3]) - 2) / 2 ## Bifurcation point 
+control <- "harvest"          # control variable is harvest effort, e = h / x (for price eqn)
 
 # initial condition near equib size (note the stochastic deflation of mean)
 x0 <- K - sigma_g ^ 2 / 2 
