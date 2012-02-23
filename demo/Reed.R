@@ -90,7 +90,7 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT,
 
 
 # What if parameter estimation is inaccurate? e.g.:
-#pars[1] <- pars[1] * 0.95
+pars[1] <- pars[1] * 0.95
 
 
 #######################################################################
@@ -118,9 +118,8 @@ crashed <- dt[time==OptTime, fishstock == 0, by=reps]
 rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
 
 pfn <- function(x) sapply(x, function(x) max(0,x - 0.0001/x))
-profit <- dt[,pfn(harvest), by=reps]
-setnames(profit, "V1", "profit")
-dt <- dt[profit]
+profit <- dt[,pfn(harvest)]
+dt <- data.table(dt, profit)
 
 
 total_profit <- dt[,sum(profit), by=reps]$V1 + rewarded$V1 * reward 
@@ -128,27 +127,13 @@ total_profit[crashed$V1]
 total_profit[!crashed$V1]
 
 
-q <- quantile(total_profit, probs=0.95)
-tycoons <- which(total_profit > q)
-q <- quantile(total_profit)
-half.to.75 <- which(total_profit > q[3] & total_profit < q[4])
-failures <-  which(total_profit == reward)
+p1 <- ggplot(dt) + 
+  geom_line(aes(time, fishstock, group = reps), alpha = 0.1)
 
-class <- rep("normal", 100)
-class[1:100 %in% failures] <- "failures"
-class[1:100 %in% tycoons] <- "tycoons"
-class[1:100 %in% half.to.75] <- "middle"
-class <- as.factor(class)
-cl <- data.table(reps=1:100, class=class)
-setkey(cl, reps)
-dt <- dt[cl] # not working correctly?? 
-
-
-
-p1 <- ggplot(subset(dt, reps %in% failures)) + 
-  geom_line(aes(time, fishstock, group = reps, color=class), alpha = 0.7)
-p1 <- p1 + geom_line(aes(time, fishstock, group = reps, color=class),
-               alpha = 0.7, dat = subset(dt, reps %in% tycoons))
+#p1 <- ggplot(subset(dt, reps %in% failures)) + 
+#  geom_line(aes(time, fishstock, group = reps, color=class), alpha = 0.7)
+#p1 <- p1 + geom_line(aes(time, fishstock, group = reps, color=class),
+#               alpha = 0.7, dat = subset(dt, reps %in% tycoons))
 p1
 
 ## Shows clearly that groups are determined by how many times they got to harvest.  
@@ -166,7 +151,29 @@ p2 <-
   ggplot(stats) + geom_line(aes(x=time, y=y)) + 
   geom_ribbon(aes(x = time, ymin = max(0,ymin), ymax = ymax),
               fill = "blue", alpha = 0.2)
-  
+
+
+
+
+
+
+q <- quantile(total_profit, probs=0.95)
+tycoons <- which(total_profit > q)
+q <- quantile(total_profit)
+half.to.75 <- which(total_profit > q[3] & total_profit < q[4])
+failures <-  which(total_profit < q[2])
+
+class <- rep("normal", 100)
+class[1:100 %in% failures] <- "failures"
+class[1:100 %in% tycoons] <- "tycoons"
+class[1:100 %in% half.to.75] <- "middle"
+class <- as.factor(class)
+cl <- data.table(reps=1:100, class=class)
+setkey(cl, reps)
+dt <- dt[cl] # not working correctly??
+
+
+
 
 ## harvest levels in failures 
 p5 <- ggplot(subset(dt, reps %in% failures)) + 
@@ -178,5 +185,7 @@ p5 <- ggplot(subset(dt, class %in% c("failures"))) +
   geom_line(aes(time, harvest, group = reps, color=class), alpha = 0.7)
 p5
 
-ggsave(plot=p4)
+
+
+
 
