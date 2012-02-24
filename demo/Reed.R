@@ -33,33 +33,35 @@ gridsize <- 100   # gridsize (discretized population)
 sigma_g <- 0.2    # Noise in population growth
 sigma_m <- 0.     # noise in stock assessment measurement
 sigma_i <- 0.     # noise in implementation of the quota
-reward <- 1       # bonus for satisfying the boundary condition
+reward <- 0       # bonus for satisfying the boundary condition
 
 # load noise distributions  
 source("noise_dists.R")
 
 ## Chose the state equation / population dynamics function
-#f <- BevHolt                # Select the state equation
-#pars <- c(2, 4)             # parameters for the state equation
-#K <- (pars[1] - 1)/pars[2]  # Carrying capacity 
-#xT <- K/10                 # boundary conditions
-#e_star <- 0                 # model's bifurcation point (just for reference)
-#control = "harvest"         # control variable is total harvest, h = e * x
+f <- BevHolt                # Select the state equation
+pars <- c(2, 4)             # parameters for the state equation
+K <- (pars[1] - 1)/pars[2]  # Carrying capacity 
+xT <- 0                     # boundary conditions
+e_star <- 0                 # model's bifurcation point (just for reference)
+control = "harvest"         # control variable is total harvest, h = e * x
+price <- 1
+cost <- .1
 
 ## An alternative state equation, with allee effect: (uncomment to select)
-f <- Myer_harvest
-pars <- c(1, 2, 6) 
-p <- pars # shorthand 
-K <- p[1] * p[3] / 2 + sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2
-xT <- p[1] * p[3] / 2 - sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2 # allee threshold
-e_star <- (p[1] * sqrt(p[3]) - 2) / 2 ## Bifurcation point 
-control <- "harvest"          # control variable is harvest effort, e = h / x (for price eqn)
+#f <- Myer_harvest
+#pars <- c(1, 2, 6) 
+#p <- pars # shorthand 
+#K <- p[1] * p[3] / 2 + sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2
+#xT <- p[1] * p[3] / 2 - sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2 # allee threshold
+#e_star <- (p[1] * sqrt(p[3]) - 2) / 2 ## Bifurcation point 
+#control <- "harvest"          # control variable is harvest effort, e = h / x (for price eqn)
 
 # initial condition near equib size (note the stochastic deflation of mean)
 x0 <- K - sigma_g ^ 2 / 2 
 
 # use a harvest-based profit function with default parameters
-profit <- profit_harvest(c = 1) # we'll use two different versions and compare, see below
+profit <- profit_harvest(p=price, c = cost) 
 
 # Set up the discrete grids
 x_grid <- seq(0, 2 * K, length = gridsize)  # population size
@@ -90,7 +92,7 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT,
 
 
 # What if parameter estimation is inaccurate? e.g.:
-pars[1] <- pars[1] * 0.95
+#pars[1] <- pars[1] * 0.95
 
 
 #######################################################################
@@ -115,13 +117,19 @@ setnames(dt, "L1", "reps") # names are nice
 ## Compute some further descriptors
 crashed <- dt[time==OptTime, fishstock == 0, by=reps]
 rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
-pfn <- function(x) sapply(x, function(x) max(0,x - 0.0001/x))
-profit <- dt[,pfn(harvest)]
+pfn <- function(x) sapply(x, function(x) max(0,price * x - cost / x))
+profits <- dt[,pfn(harvest)]
 
-### Add this information to the data.table
-dt <- data.table(dt, profit)
+### And add this information to the data.table
+dt <- data.table(dt, profits)
 setkey(dt, reps)
-total_profit <- dt[,sum(profit), by=reps]
+
+## Compute total profit
+total_profit <- dt[,sum(profits), by=reps]
+## Add the boundary reward into the profit total?
+total_profit <- total_profit + rewarded$V1 * reward 
+
+## Add these three columns to the data.table
 setkey(total_profit, reps)
 setkey(crashed, reps)
 setkey(rewarded, reps)
@@ -130,67 +138,54 @@ dt <- dt[crashed]
 dt <- dt[rewarded]
 setnames(dt, c("V1", "V1.1", "V1.2"), c("total.profit", "crashed", "rewarded"))
 
-# profit including the reward
-total_profit + rewarded$V1 * reward 
 
-#total_profit[crashed$V1]
+p1 <- ggplot(dt) + geom_line(aes(time, fishstock, group = reps), alpha = 0.2) +
+ geom_line(aes(time, harvest, group = reps), alpha = 0.05, col="darkgreen")
+
+## Ensemble as a summary ribbon 
+stats <- dt[ , mean_sdl(fishstock), by = time]
+p1 <- p1 + geom_line(dat=stats, aes(x=time, y=y), col="lightgrey") + 
+  geom_ribbon(aes(x = time, ymin = ymin, ymax = ymax),
+              fill = "blue", alpha = 0.1, dat=stats)
+## Add some reference lines?
+p1 <- p1 + geom_abline(intercept=opt$S, slope = 0)          
+p1 <- p1 + geom_abline(intercept=xT, slope = 0, lty=2) 
+
+p1
+
+#p2 <- ggplot(dt) + geom_line(aes(time, harvest, group = reps), alpha = 0.2, col="green")
+p3 <- ggplot(dt) + geom_line(aes(time, profits, group = reps), alpha = 0.6)
+#p2 <- ggplot(dt) + geom_point(aes(time, harvest), alpha=.2)
 
 
-p1 <- ggplot(dt) + geom_line(aes(time, fishstock, group = reps, color=total.profit), alpha = 0.1)
-p1 <- ggplot(dt) + geom_line(aes(time, fishstock, group = reps, color=crashed), alpha = 0.6)
 
-p2 <- ggplot(dt) + geom_point(aes(time, harvest), alpha=.2)
+p0 <- ggplot(subset(dt,reps==sample(1:100))) + 
+  geom_line(aes(time, fishstock)) + 
+  geom_line(aes(time, harvest), col="darkgreen") + 
+  geom_line(aes(time, unharvested), col="lightblue", alpha=.7) +   
+  geom_line(aes(time, escapement), col="darkred", alpha=.4) + 
+  geom_abline(intercept=opt$S, slope = 0, lwd=1, lty=2)          
+p0
+
 
 ## Shows clearly that groups are determined by how many times they got to harvest.  
-p4 <- qplot(dt, aes(total.profit, fill=crashed)) + geom_histogram()
+p4 <- ggplot(dt, aes(total.profit, fill=crashed)) + geom_density(alpha=.8)
 
 
-
-## Add some reference lines?
-#p1 <- p1 + geom_abline(intercept=opt$S, slope = 0)          
-#p1 <- p1 + geom_abline(intercept=allee, slope = 0, lty=2) 
-
-## A statistical summary plot
-stats <- dt[ , mean_sdl(harvest), by = time]
-p2 <- 
-  ggplot(stats) + geom_line(aes(x=time, y=y)) + 
-  geom_ribbon(aes(x = time, ymin = max(0,ymin), ymax = ymax),
-              fill = "blue", alpha = 0.2)
-
-
+## Add discrete classes by total profit
+quantile_me <- function(x, ...){
+  q <- quantile(x, ...)
+  class <- character(length(x))
+  for(i in 1:length(q))
+    class[x > q[i] ] <- i
+  class
+}
+q <- data.table(reps=total_profit$reps, quantile=quantile_me(total_profit$V1))
+setkey(q, reps)
+dt <- dt[q]
 
 
-
-
-q <- quantile(total_profit, probs=0.95)
-tycoons <- which(total_profit > q)
-q <- quantile(total_profit)
-half.to.75 <- which(total_profit > q[3] & total_profit < q[4])
-failures <-  which(total_profit < q[2])
-
-class <- rep("normal", 100)
-class[1:100 %in% failures] <- "failures"
-class[1:100 %in% tycoons] <- "tycoons"
-class[1:100 %in% half.to.75] <- "middle"
-class <- as.factor(class)
-cl <- data.table(reps=1:100, class=class)
-setkey(cl, reps)
-dt <- dt[cl] # not working correctly??
-
-
-
-
-## harvest levels in failures 
-p5 <- ggplot(subset(dt, reps %in% failures)) + 
-  geom_line(aes(time, harvest, group = reps, color=class))
-p5
-
-
-p5 <- ggplot(subset(dt, class %in% c("failures"))) + 
-  geom_line(aes(time, harvest, group = reps, color=class), alpha = 0.7)
-p5
-
-
-
-
+# fast way to get p0
+#simple <- melt(sims, "time")  
+#p0 <- ggplot(subset(simple, L1==sample(1:100))) + geom_line(aes(time, value, color=variable))
 

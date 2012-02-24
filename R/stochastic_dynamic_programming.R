@@ -195,7 +195,6 @@ SDP_by_simulation <- function(f, p, x_grid, h_grid, z_g, z_m, z_i, reps = 999){
 #' @param delta the exponential discounting rate
 #' @param reward  the profit for finishing with >= Xt fish at the end 
 #' (i.e. enforces the boundary condition)
-#' @param interval the delay interval between updated assessment/quotas
 #' @return list containing the matrices D and V.  D is an x_grid by OptTime
 #'  matrix with the indices of h_grid giving the optimal h at each value x
 #'  as the columns, with a column for each time.  
@@ -205,7 +204,7 @@ SDP_by_simulation <- function(f, p, x_grid, h_grid, z_g, z_m, z_i, reps = 999){
 #' @import expm
 #' @export
 find_dp_optim <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, 
-                          delta, reward=10, interval=1){
+                          delta, reward=10){
 
  
   ## Initialize space for the matrices
@@ -218,14 +217,13 @@ find_dp_optim <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit,
   V[x_grid >= xT] <- reward # a "scrap value" for x(T) >= xT
 
   # loop through time  
-  for(time in 1:floor(OptTime / interval)){ # updates only on interval yrs
+  for(time in 1:OptTime){ 
     # try all potential havest rates
     V1 <- sapply(1:HL, function(i){
       # Transition matrix times V gives dist in next time
-      (SDP_Mat[[i]] %^% interval) %*% V + 
+      SDP_Mat[[i]] %*% V + 
       # then (add) harvested amount times discount
-       profit(x_grid, h_grid[i]) * (1 - delta) ^ interval
-      # decides update based on "interval" years ahead
+       profit(x_grid, h_grid[i]) * (1 - delta) 
     })
 
     # find havest, h that gives the maximum value
@@ -264,12 +262,11 @@ find_dp_optim <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit,
 #'  assessment of stock size
 #' @param z_i a function which returns a random number from a distribution 
 #' for the implementation uncertainty in quotas 
-#' @param interval is the years between updating the harvest quota
 #' @return a data frame with the time, fishstock, harvested amount,
 #'  and what the escapement ("unharvested"). 
 #' @export
 ForwardSimulate <- function(f, pars, x_grid, h_grid, x0, D, z_g,
-                            z_m, z_i, interval = 1){
+                            z_m, z_i){
   # initialize variables with initial conditions
   OptTime <- dim(D)[2]    # Stopping time
   x_h <- numeric(OptTime) # population dynamics with harvest
@@ -286,11 +283,7 @@ ForwardSimulate <- function(f, pars, x_grid, h_grid, x0, D, z_g,
     m_t <- x_h[t] * z_m()
     # Current state (is closest to which grid posititon) 
     St <- which.min(abs(x_grid - m_t)) 
-    # Set harvest quota on update years
-    if(t %% interval == 0)
-      q_t <- h_grid[D[St, floor((t + 1) / interval)]] 
-    else # quota remains the same if not an update yr
-      q_t <- h[t-1] 
+    q_t <- h_grid[D[St, (t + 1) ]] 
     # Implement harvest/(effort) based on quota with noise 
     h[t] <- q_t * z_i()
     # Noise in growth 
