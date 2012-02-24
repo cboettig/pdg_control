@@ -37,7 +37,7 @@ profit_effort <- function(p = 1, c = 0.001){
 #' @return a function computing profit at harvest intensity h_i over
 #' possible stock values x_grid, profit(x_grid, h_i)
 #' @export
-profit_harvest  <- function(p = 1, c = 0.001){
+profit_harvest  <- function(p = 1, c = 0.000){
 #' @param x_grid is a the grid of state values (profit will evaluate at each of them)
 #' @param h_i is total harvest level
 #' @return the profits of harvesting at intensity h_i for each possible stock
@@ -46,8 +46,9 @@ profit_harvest  <- function(p = 1, c = 0.001){
 #'  of harvest values, rather than a range of stock values, by simply swapping 
 #'  x and h, i.e. give a vector of h values as x_grid, and a single stock size as h_i. 
   function(x_grid, h_i){
-    harvest <- sapply(x_grid, function(x_i) min(h_i, x_i)) 
-    sapply(harvest, function(x) max(0, p * x - c / x))
+    sapply(x_grid, function(x_i){
+      max(0, p * min(h_i, x_i) - c / x_i)
+    })
   }
 }
 
@@ -201,10 +202,9 @@ SDP_by_simulation <- function(f, p, x_grid, h_grid, z_g, z_m, z_i, reps = 999){
 #'  V is a matrix of x_grid by x_grid, which is used to store the value 
 #'  function at each point along the grid at each point in time.  
 #'  The returned V gives the value matrix at the first (last) time. 
-#' @import expm
 #' @export
 find_dp_optim <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, 
-                          delta, reward=10){
+                          delta, reward=0){
 
  
   ## Initialize space for the matrices

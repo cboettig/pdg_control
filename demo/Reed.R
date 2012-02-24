@@ -38,24 +38,26 @@ reward <- 0       # bonus for satisfying the boundary condition
 # load noise distributions  
 source("noise_dists.R")
 
-## Chose the state equation / population dynamics function
-f <- BevHolt                # Select the state equation
-pars <- c(2, 4)             # parameters for the state equation
-K <- (pars[1] - 1)/pars[2]  # Carrying capacity 
-xT <- 0                     # boundary conditions
-e_star <- 0                 # model's bifurcation point (just for reference)
-control = "harvest"         # control variable is total harvest, h = e * x
-price <- 1
-cost <- .1
-
+### Chose the state equation / population dynamics function
+#f <- BevHolt                # Select the state equation
+#pars <- c(2, 4)             # parameters for the state equation
+#K <- (pars[1] - 1)/pars[2]  # Carrying capacity 
+#xT <- 0                     # boundary conditions
+#e_star <- 0                 # model's bifurcation point (just for reference)
+#control = "harvest"         # control variable is total harvest, h = e * x
+#price <- 1
+#cost <- K^2/2^2
+#
 ## An alternative state equation, with allee effect: (uncomment to select)
-#f <- Myer_harvest
-#pars <- c(1, 2, 6) 
-#p <- pars # shorthand 
-#K <- p[1] * p[3] / 2 + sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2
-#xT <- p[1] * p[3] / 2 - sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2 # allee threshold
-#e_star <- (p[1] * sqrt(p[3]) - 2) / 2 ## Bifurcation point 
-#control <- "harvest"          # control variable is harvest effort, e = h / x (for price eqn)
+f <- Myer_harvest
+pars <- c(1, 2, 6) 
+p <- pars # shorthand 
+K <- p[1] * p[3] / 2 + sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2
+xT <- p[1] * p[3] / 2 - sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2 # allee threshold
+e_star <- (p[1] * sqrt(p[3]) - 2) / 2 ## Bifurcation point 
+control <- "harvest"          # control variable is harvest effort, e = h / x (for price eqn)
+price <- 1
+cost <- 0.00001
 
 # initial condition near equib size (note the stochastic deflation of mean)
 x0 <- K - sigma_g ^ 2 / 2 
@@ -66,14 +68,14 @@ profit <- profit_harvest(p=price, c = cost)
 # Set up the discrete grids
 x_grid <- seq(0, 2 * K, length = gridsize)  # population size
 h_grid <- x_grid  # vector of havest levels, use same resolution as for stock
-#h_grid <- seq(0, 2, length=gridsize) 
+#h_grid <- seq(0.01, K, length=gridsize) 
 
 
 #######################################################################
 # Calculate the transition matrix (with noise in growth only)         #
 #######################################################################
-## Fast & decent approximation (lognormal growth noise only)
-SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
+## Fast & decent approximation (lognormal growth noise only) # over or understimating noise does what you think
+SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g )
 
 ## Most accurate way: use integral (lognormal growth noise only)
 ## didn't work to integrate all noise forms
@@ -117,11 +119,15 @@ setnames(dt, "L1", "reps") # names are nice
 ## Compute some further descriptors
 crashed <- dt[time==OptTime, fishstock == 0, by=reps]
 rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
-pfn <- function(x) sapply(x, function(x) max(0,price * x - cost / x))
-profits <- dt[,pfn(harvest)]
+
+dt <- data.table(dt, id=1:5000)
+profits <- dt[, profit(fishstock, harvest), by=id]
 
 ### And add this information to the data.table
-dt <- data.table(dt, profits)
+setkey(dt, id)
+setkey(profits, id)
+dt <- dt[profits]
+setnames(dt, "V1", "profits")
 setkey(dt, reps)
 
 ## Compute total profit
@@ -154,7 +160,7 @@ p1 <- p1 + geom_abline(intercept=xT, slope = 0, lty=2)
 p1
 
 #p2 <- ggplot(dt) + geom_line(aes(time, harvest, group = reps), alpha = 0.2, col="green")
-p3 <- ggplot(dt) + geom_line(aes(time, profits, group = reps), alpha = 0.6)
+p3 <- ggplot(dt) + geom_line(aes(time, profits, group = reps), alpha = 0.2)
 #p2 <- ggplot(dt) + geom_point(aes(time, harvest), alpha=.2)
 
 
