@@ -59,7 +59,7 @@ control <- "harvest"          # control variable is harvest effort, e = h / x (f
 x0 <- K - sigma_g ^ 2 / 2 
 
 # use a harvest-based profit function with default parameters
-profit <- profit_harvest(c = 0.1) # we'll use two different versions and compare, see below
+profit <- profit_harvest(c = 1) # we'll use two different versions and compare, see below
 
 # Set up the discrete grids
 x_grid <- seq(0, 2 * K, length = gridsize)  # population size
@@ -111,33 +111,38 @@ dat <- melt(sims, id=names(sims[[1]]))
 require(data.table)
 dt <- data.table(dat)
 setnames(dt, "L1", "reps") # names are nice
-setkey(dt, reps, time)  # nice to sort by reps, then time
 
-
+## Compute some further descriptors
 crashed <- dt[time==OptTime, fishstock == 0, by=reps]
 rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
-
 pfn <- function(x) sapply(x, function(x) max(0,x - 0.0001/x))
 profit <- dt[,pfn(harvest)]
+
+### Add this information to the data.table
 dt <- data.table(dt, profit)
+setkey(dt, reps)
+total_profit <- dt[,sum(profit), by=reps]
+setkey(total_profit, reps)
+setkey(crashed, reps)
+setkey(rewarded, reps)
+dt <- dt[total_profit]
+dt <- dt[crashed]
+dt <- dt[rewarded]
+setnames(dt, c("V1", "V1.1", "V1.2"), c("total.profit", "crashed", "rewarded"))
+
+# profit including the reward
+total_profit + rewarded$V1 * reward 
+
+#total_profit[crashed$V1]
 
 
-total_profit <- dt[,sum(profit), by=reps]$V1 + rewarded$V1 * reward 
-total_profit[crashed$V1]
-total_profit[!crashed$V1]
+p1 <- ggplot(dt) + geom_line(aes(time, fishstock, group = reps, color=total.profit), alpha = 0.1)
+p1 <- ggplot(dt) + geom_line(aes(time, fishstock, group = reps, color=crashed), alpha = 0.6)
 
-
-p1 <- ggplot(dt) + 
-  geom_line(aes(time, fishstock, group = reps), alpha = 0.1)
-
-#p1 <- ggplot(subset(dt, reps %in% failures)) + 
-#  geom_line(aes(time, fishstock, group = reps, color=class), alpha = 0.7)
-#p1 <- p1 + geom_line(aes(time, fishstock, group = reps, color=class),
-#               alpha = 0.7, dat = subset(dt, reps %in% tycoons))
-p1
+p2 <- ggplot(dt) + geom_point(aes(time, harvest), alpha=.2)
 
 ## Shows clearly that groups are determined by how many times they got to harvest.  
-p4 <- qplot(total_profit)
+p4 <- qplot(dt, aes(total.profit, fill=crashed)) + geom_histogram()
 
 
 
