@@ -1,0 +1,18 @@
+Package: pdgControl
+Description: Research in optimal control. Examples focus on fisheries
+    management.
+Title: Pretty Darn Good Control
+Version: 0.0-1
+License: BSD
+Author: Carl Boettiger
+Maintainer: Carl Boettiger, <cboettig@gmail.com>
+Imports:
+    Hmisc,
+    cubature,
+    expm,
+    ggplot2,
+    snowfall
+Collate:
+    'plots.R'
+    'population_models.R'
+    'stochastic_dynamic_programming.R'
