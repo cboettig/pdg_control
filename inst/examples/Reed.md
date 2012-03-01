@@ -19,7 +19,7 @@
 
  
   Fish population dynamics:
-  \( X_{t+1} = Z_n f(X_n) \)
+ \\( X_{t+1} = Z_n f(X_n) \\)
 
 
 Clear the workspace and load package dependencies: 
@@ -31,18 +31,6 @@ require(pdgControl)
 require(reshape2)
 require(ggplot2)
 require(data.table)
-```
-
-
-
-```
-## Loading required package: data.table
-```
-
-
-
-```
-## data.table 1.7.10  For help type: help("data.table")
 ```
 
 
@@ -89,7 +77,6 @@ f <- BevHolt  # Select the state equation
 pars <- c(2, 4)  # parameters for the state equation
 K <- (pars[1] - 1)/pars[2]  # Carrying capacity
 xT <- 0  # boundary conditions
-e_star <- 0  # model's bifurcation point (just for reference)
 control = "harvest"  # control variable is total harvest, h = e * x
 price <- 1
 cost <- 0.12
@@ -114,6 +101,7 @@ control <- "harvest"  # control variable can be harvest or effort
 price <- 1
 cost <- 0.01
 ```
+
 
 
 
@@ -232,11 +220,11 @@ Let's begin by looking at the dynamics of a single replicate.
 
 
 ```r
-ggplot(subset(dt, reps == sample(1:100))) + geom_line(aes(time, 
+ggplot(subset(dt, reps == 1)) + geom_line(aes(time, 
     fishstock))
 ```
 
-![plot of chunk unnamed-chunk-12](http://i.imgur.com/TM6FK.png) 
+![plot of chunk unnamed-chunk-12](http://i.imgur.com/dtDuD.png) 
 
 
 
@@ -258,17 +246,7 @@ p1 <- p1 + geom_abline(intercept = xT, slope = 0,
 print(p1)
 ```
 
-![plot of chunk unnamed-chunk-13](http://i.imgur.com/2PWR5.png) 
-
-
-
-
-
-```r
-p3 <- ggplot(dt) + geom_line(aes(time, profits, 
-    group = reps), alpha = 0.2)
-```
-
+![plot of chunk unnamed-chunk-13](http://i.imgur.com/md6jn.png) 
 
 
 
@@ -286,7 +264,7 @@ p0 <- ggplot(subset(dt, reps == sample(1:100))) +
 p0
 ```
 
-![plot of chunk unnamed-chunk-15](http://i.imgur.com/rzWNj.png) 
+![plot of chunk unnamed-chunk-14](http://i.imgur.com/sFJ10.png) 
 
 
 
@@ -365,17 +343,33 @@ setnames(dt, c("V1", "V1.1", "V1.2"), c("total.profit",
 
 
 
-
 #### Profit plots
-
+Profit over time
 
 
 ```r
-p4 <- ggplot(dt, aes(total.profit, fill = crashed)) + 
+ggplot(dt) + geom_line(aes(time, profits, group = reps), 
+    alpha = 0.2)
+```
+
+![plot of chunk unnamed-chunk-20](http://i.imgur.com/duaOe.png) 
+
+
+Total profits
+
+
+```r
+ggplot(dt, aes(total.profit, fill = crashed)) + 
     geom_histogram(alpha = 0.8)
 ```
 
 
+
+```
+## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
+```
+
+![plot of chunk unnamed-chunk-21](http://i.imgur.com/bkTih.png) 
 
 
 
