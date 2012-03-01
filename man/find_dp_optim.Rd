@@ -3,7 +3,7 @@
 \title{Identify the dynamic optimum using backward iteration (dynamic programming)}
 \usage{
   find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT,
-    profit, delta, reward = 10, interval = 1)
+    profit, delta, reward = 0)
 }
 \arguments{
   \item{SDP_Mat}{the stochastic transition matrix at each h
@@ -27,9 +27,6 @@
 
   \item{reward}{the profit for finishing with >= Xt fish at
   the end (i.e. enforces the boundary condition)}
-
-  \item{interval}{the delay interval between updated
-  assessment/quotas}
 }
 \value{
   list containing the matrices D and V.  D is an x_grid by

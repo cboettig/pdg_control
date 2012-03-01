@@ -3,7 +3,7 @@
 \title{Forward simulate given the optimal havesting policy, D}
 \usage{
   ForwardSimulate(f, pars, x_grid, h_grid, x0, D, z_g, z_m,
-    z_i, interval = 1)
+    z_i)
 }
 \arguments{
   \item{f}{the growth function of the escapement population
@@ -31,9 +31,6 @@
   \item{z_i}{a function which returns a random number from
   a distribution for the implementation uncertainty in
   quotas}
-
-  \item{interval}{is the years between updating the harvest
-  quota}
 }
 \value{
   a data frame with the time, fishstock, harvested amount,

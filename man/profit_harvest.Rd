@@ -2,7 +2,7 @@
 \alias{profit_harvest}
 \title{Define a profit function, price minus cost}
 \usage{
-  profit_harvest(p = 1, c = 0.001)
+  profit_harvest(p = 1, c = 0)
 }
 \arguments{
   \item{p}{price of fish (Note, optimal will scrap xT if

@@ -3,7 +3,7 @@
 \title{Forward simulate given the optimal havesting policy when cost depends on prev harvest}
 \usage{
   simulate_optim(f, pars, x_grid, h_grid, x0, D, z_g, z_m,
-    z_i, alt_D = NULL)
+    z_i, alt_D = NULL, OptTime = dim(D[[1]])[2])
 }
 \arguments{
   \item{f}{the growth function of the escapement population
@@ -42,7 +42,7 @@
   alternate fishstock and harvest dynamics, if calculated
 }
 \description{
-  Forward simulate given the optimal havesting policy when
-  cost depends on prev harvest
+  This simulates a process where there is a cost to
+  changing the policy.
 }
 

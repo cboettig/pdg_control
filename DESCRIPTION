@@ -15,4 +15,8 @@ Imports:
 Collate:
     'plots.R'
     'population_models.R'
-    'stochastic_dynamic_programming.R'
+    'ForwardSimulate.R'
+    'determine_SDP_matrix.R'
+    'find_dp_optim.R'
+    'policy_costs.R'
+    'profit_functions.R'
