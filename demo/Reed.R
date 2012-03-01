@@ -46,9 +46,9 @@ source("noise_dists.R")
 #e_star <- 0                 # model's bifurcation point (just for reference)
 #control = "harvest"         # control variable is total harvest, h = e * x
 #price <- 1
-#cost <- K^2/2^2
+#cost <- .12
 #
-## An alternative state equation, with allee effect: (uncomment to select)
+## An alternative state equation, with allee effect: (uncomment to select
 f <- Myer_harvest
 pars <- c(1, 2, 6) 
 p <- pars # shorthand 
@@ -57,8 +57,8 @@ xT <- p[1] * p[3] / 2 - sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2 # allee thresho
 e_star <- (p[1] * sqrt(p[3]) - 2) / 2 ## Bifurcation point 
 control <- "harvest"          # control variable is harvest effort, e = h / x (for price eqn)
 price <- 1
-cost <- 0.00001
-
+cost <- .01
+#
 # initial condition near equib size (note the stochastic deflation of mean)
 x0 <- K - sigma_g ^ 2 / 2 
 
@@ -90,16 +90,15 @@ SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g )
 # Find the optimum by dynamic programming                             #
 #######################################################################
 opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                     profit, delta, reward)
+                     profit, delta, reward=1)
 
 
 # What if parameter estimation is inaccurate? e.g.:
-#pars[1] <- pars[1] * 0.95
-
 
 #######################################################################
 # Now we'll simulate this process many times under this optimal havest#
 #######################################################################
+sigma_g <- .3 
 sims <- lapply(1:100, function(i){
 # simulate the optimal routine on a stoch realization of growth dynamics
   ForwardSimulate(f, pars, x_grid, h_grid, x0, opt$D, z_g, z_m, z_i)
@@ -112,9 +111,25 @@ sims <- lapply(1:100, function(i){
 # Make data tidy
 dat <- melt(sims, id=names(sims[[1]]))  
 # Faster if we use data.table objects
+
+
+ggplot(subset(dat,L1==sample(1:100))) + geom_line(aes(time, fishstock))
+
+ggplot(dat) + geom_line(aes(time, fishstock, group=L1), alpha=.5)
+
 require(data.table)
 dt <- data.table(dat)
 setnames(dt, "L1", "reps") # names are nice
+
+
+
+
+
+
+
+
+
+
 
 ## Compute some further descriptors
 crashed <- dt[time==OptTime, fishstock == 0, by=reps]
@@ -143,6 +158,16 @@ dt <- dt[total_profit]
 dt <- dt[crashed]
 dt <- dt[rewarded]
 setnames(dt, c("V1", "V1.1", "V1.2"), c("total.profit", "crashed", "rewarded"))
+
+
+ ggplot(dt) + geom_line(aes(time, fishstock, group = reps), alpha = 0.2) 
+
+
+
+
+
+
+
 
 
 p1 <- ggplot(dt) + geom_line(aes(time, fishstock, group = reps), alpha = 0.2) +
@@ -176,6 +201,7 @@ p0
 
 ## Shows clearly that groups are determined by how many times they got to harvest.  
 p4 <- ggplot(dt, aes(total.profit, fill=crashed)) + geom_density(alpha=.8)
+p4 <- ggplot(dt, aes(total.profit, fill=crashed)) + geom_histogram(alpha=.8)
 
 
 ## Add discrete classes by total profit
