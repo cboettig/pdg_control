@@ -43,7 +43,7 @@ ForwardSimulate <- function(f, pars, x_grid, h_grid, x0, D, z_g,
     z <- z_g() 
     # population grows
     x_h[t+1] <- z * f(x_h[t], h[t], pars) # with havest
-    s[t+1]   <- x_h[t] - q_t # anticipated escapement
+    s[t]   <- x_h[t] - q_t # anticipated escapement
     x[t+1]   <- z * f(x[t], 0, pars) # havest-free dynamics
   }
   # formats output 

@@ -1,4 +1,4 @@
-<!--roptions dev="png", fig.width=7, fig.height=5, fig.path='ex-out-', tidy=TRUE, warning=FALSE-->
+<!--roptions dev="png", fig.width=7, fig.height=5, fig.path='ex-out-', tidy=FALSE, warning=FALSE, comment=NA-->
 <!--begin.rcode echo=FALSE 
 render_gfm()
 opts_knit$set(upload = TRUE)
@@ -7,8 +7,7 @@ end.rcode-->
 
 # Reed Model
  * author Carl Boettiger, <cboettig@gmail.com>
- * date 2011-11-02
- * # license CC0
+ * license: CC0
 
  Implements a numerical version of the SDP described in:
  
@@ -33,7 +32,6 @@ require(reshape2)
 require(ggplot2)
 require(data.table)
 end.rcode-->
-
 
 
 
@@ -127,9 +125,7 @@ end.rcode-->
 ### Simulate 
 Now we'll simulate 100 replicates of this stochastic process under the optimal harvest policy determined above.
 <!--begin.rcode 
-sigma_g <- .3 
 sims <- lapply(1:100, function(i){
-# simulate the optimal routine on a stoch realization of growth dynamics
   ForwardSimulate(f, pars, x_grid, h_grid, x0, opt$D, z_g, z_m, z_i)
 })
 end.rcode-->
@@ -147,37 +143,32 @@ end.rcode-->
 
 ### Plots 
 
-Let's begin by looking at the dynamics of a single replicate. 
+Let's begin by looking at the dynamics of a single replicate. The line shows Reed's S, the level above which the stock should be harvested (where catch should be the difference between stock and S).  To confirm that this policy is being followed, note that harvesting only occurs when the stock is above this line, and harvest is proportional to the amount by which it is above. 
 <!--begin.rcode
-ggplot(subset(dt,reps==1)) + geom_line(aes(time, fishstock))
+ggplot(subset(dt,reps==1)) +
+  geom_line(aes(time, fishstock)) +
+  geom_abline(intercept=opt$S, slope = 0) +
+  geom_line(aes(time, harvest), col="darkgreen") 
 end.rcode-->
 
 
-This plot summarizes the stock and harvest dynamics by visualizing the replicates.
+This plot summarizes the stock dynamics by visualizing the replicates. Reed's S shown again, along with the dotted line showing the allee threshold, below which the stock will go to zero (unless rescued stochastically). 
 <!--begin.rcode
-p1 <- ggplot(dt) + geom_line(aes(time, fishstock, group = reps), alpha = 0.1) +
- geom_line(aes(time, harvest, group = reps), alpha = 0.05, col="darkgreen")
-stats <- dt[ , mean_sdl(fishstock), by = time]
-p1 <- p1 + geom_line(dat=stats, aes(x=time, y=y), col="lightgrey") + 
-  geom_ribbon(aes(x = time, ymin = ymin, ymax = ymax),
-              fill = "blue", alpha = 0.1, dat=stats)
-p1 <- p1 + geom_abline(intercept=opt$S, slope = 0)          
-p1 <- p1 + geom_abline(intercept=xT, slope = 0, lty=2) 
-print(p1)
+p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) + 
+  geom_abline(intercept=xT, slope = 0, lty=2) 
+p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 end.rcode-->
 
-
-
-
+We can also look at the harvest dynamics:
 <!--begin.rcode
-p0 <- ggplot(subset(dt,reps==sample(1:100))) + 
-  geom_line(aes(time, fishstock)) + 
-  geom_line(aes(time, harvest), col="darkgreen") + 
-  geom_line(aes(time, unharvested), col="lightblue", alpha=.7) +   
-  geom_line(aes(time, escapement), col="darkred", alpha=.4) + 
-  geom_abline(intercept=opt$S, slope = 0, lwd=1, lty=2)          
-p0
+p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 end.rcode-->
+
+This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement: 
+<!--begin.rcode
+p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
+end.rcode-->
+
 
 
 ### Computing additional statistics about the data
@@ -228,10 +219,14 @@ end.rcode-->
 
 
 #### Profit plots
-Profit over time
+Since the optimal strategy maximizes expected profit, it may be more useful to look at the distribution statistics of profit over time:
 <!--begin.rcode
-ggplot(dt) + geom_line(aes(time, profits, group = reps), alpha = 0.2)
+stats <- dt[ , mean_sdl(profit), by = time]
+p1 + geom_line(dat=stats, aes(x=time, y=y), col="lightgrey") + 
+  geom_ribbon(aes(x = time, ymin = ymin, ymax = ymax),
+              fill = "darkred", alpha = 0.2, dat=stats)
 end.rcode-->
+
 
 Total profits
 <!--begin.rcode
@@ -262,5 +257,6 @@ end.rcode-->
 
 Then we can plot the fishstock trajectories, indicating which derive the highest and smallest profits by color code: 
 <!--begin.rcode
-p1 <- ggplot(subset(dt, quantile %in% c(1,5) ) ) + geom_line(aes(time, fishstock, group = reps, color=quantile), alpha = 0.6) 
+ggplot(subset(dt, quantile %in% c(1,4))) + 
+  geom_line(aes(time, fishstock, group = reps, color=quantile), alpha = 0.6) 
 end.rcode-->
