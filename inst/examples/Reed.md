@@ -1,7 +1,6 @@
 
 
 
-
 # Reed Model
  * author Carl Boettiger, <cboettig@gmail.com>
  * license: CC0
@@ -408,3 +407,5 @@ ggplot(subset(dt, quantile %in% c(1,4))) +
 ```
 
 ![plot of chunk unnamed-chunk-25](http://i.imgur.com/3oRO5.png) 
+
+![plot of flickrexample](http://www.flickr.com/photos/cboettig/6793388404)
