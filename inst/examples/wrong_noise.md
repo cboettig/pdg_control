@@ -201,7 +201,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest), col="darkgreen") 
 ```
 
-![plot of chunk plot_rep](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-plot_rep2.png) 
+![plot of chunk plot_rep](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-plot_rep.png) 
 
 
 
@@ -214,7 +214,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk fishstock](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-fishstock2.png) 
+![plot of chunk fishstock](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock.png) 
 
 
 We can also look at the harvest dynamics:
@@ -224,7 +224,7 @@ We can also look at the harvest dynamics:
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 ```
 
-![plot of chunk harvest](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-harvest2.png) 
+![plot of chunk harvest](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-harvest.png) 
 
 
 This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement and see if it is less variable than fish stock, and if it is near Reed's S: 
@@ -234,7 +234,7 @@ This strategy is supposed to be a constant-escapement strategy. We can visualize
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 ```
 
-![plot of chunk escapement](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-escapement2.png) 
+![plot of chunk escapement](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-escapement.png) 
 
 
 
@@ -356,7 +356,7 @@ ggplot(dt, aes(total.profit, fill=crashed)) + geom_histogram(alpha=.8)
 stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
 ```
 
-![plot of chunk totals](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-totals2.png) 
+![plot of chunk totals](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-totals.png) 
 
 
 
@@ -389,7 +389,7 @@ ggplot(subset(dt, quantile %in% c(1,4))) +
   geom_line(aes(time, fishstock, group = reps, color=quantile), alpha = 0.6) 
 ```
 
-![plot of chunk winners_losers](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-winners_losers2.png) 
+![plot of chunk winners_losers](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-winners_losers.png) 
 
 
 ### Visualizing the optimal policy
@@ -407,7 +407,7 @@ p5 <- ggplot(policy_zoom) +
 p5
 ```
 
-![plot of chunk policyvis](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-policyvis.png) 
+![plot of chunk policyvis](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-policyvis.png) 
 
 
 
@@ -422,6 +422,6 @@ p6 <- ggplot(policy_zoom) +
 p6 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1, data=dt)
 ```
 
-![plot of chunk policyvis2](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-policyvis2.png) 
+![plot of chunk policyvis2](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-policyvis2.png) 
 
 

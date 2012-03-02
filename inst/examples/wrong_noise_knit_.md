@@ -1,18 +1,15 @@
 <!--begin.rcode setup, echo=FALSE 
 render_gfm()  
 opts_knit$set(upload = TRUE)   
-# opts_knit$set(imgur.key = getOption("imgur"))
-
 opts_knit$set(upload.fun = function(file){
    library(RWordPress) 
    uploadFile(file)$url
   })
-
 ## The real source code is externalized from this file:
 read_chunk("Reed.R")
 end.rcode-->
 
-<!--roptions dev="png", fig.width=7, fig.height=5, fig.path='ex-out-', tidy=FALSE, warning=FALSE, comment=NA, external=TRUE, cache=FALSE, cache.path="wrong_noise"-->
+<!--roptions dev="png", fig.width=7, fig.height=5, tidy=FALSE, warning=FALSE, comment=NA, external=TRUE, cache=TRUE, cache.path="wrong_noise"-->
 
 # Reed Model, when in reality growth noise is slightly larger
  * author Carl Boettiger, <cboettig@gmail.com>
@@ -177,9 +174,9 @@ Then we can plot the fishstock trajectories, indicating which derive the highest
 end.rcode-->
 
 ### Visualizing the optimal policy
-<!--begin.rcode policyvis
+<!--begin.rcode policyvis, fig.width=9
 end.rcode-->
 
-<!--begin.rcode policyvis2
+<!--begin.rcode policyvis2, fig.width=10
 end.rcode-->
 
