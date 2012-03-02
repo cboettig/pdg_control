@@ -26,7 +26,7 @@ end.rcode-->
 
 
 Clear the workspace and load package dependencies: 
-<!--begin.rcode
+<!--begin.rcode setup, echo=FALSE
 rm(list=ls())   
 require(pdgControl)
 require(reshape2)
@@ -282,7 +282,7 @@ end.rcode-->
 The harvest intensity is limited by the stock size.  If instead we look at the difference between proposed harvest intensity and stock,
 then the red zones correspond to places where harvest equals stock, i.e. we slam the population. The allee band is clearly seen. Just for fun, we overlay the replicate dynamics on this plot 
 
-<!--begin.rcode
+<!--begin.rcode fig.width=10,
 p6 <- ggplot(policy_zoom) + 
   geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
   labs(x = "time", y = "fishstock") +
