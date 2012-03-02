@@ -1,4 +1,4 @@
-<!--roptions dev="png", fig.width=7, fig.height=5, tidy=FALSE, warning=FALSE, comment=NA, cache.path="policycost/"-->
+<!--roptions dev="png", fig.width=7, fig.height=5, tidy=FALSE, warning=FALSE, message=FALSE, comment=NA, cache.path="policycost/"-->
 
 <!--begin.rcode setup, include=FALSE
 render_gfm()  

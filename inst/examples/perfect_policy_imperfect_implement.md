@@ -11,36 +11,6 @@
 Clear the workspace and load package dependencies: 
 
 
-```
-Loading required package: pdgControl
-```
-
-
-
-```
-Loading required package: reshape2
-```
-
-
-
-```
-Loading required package: ggplot2
-```
-
-
-
-```
-Loading required package: data.table
-```
-
-
-
-```
-data.table 1.7.10  For help type: help("data.table")
-```
-
-
-
 
 Define parameters
 
@@ -143,7 +113,8 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT,
 
 
 
-### The optimal policy is implemented imperfectly: 
+### The optimal policy is implemented imperfectly
+We add implementation noise: an imperfect implementation (though a symmetric one -- on average the implementation is not worse than assumed by the optimal solution, it is simply variable). 
 
 
 ```r
@@ -189,7 +160,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk fishstock](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock2.png) 
+![plot of chunk fishstock](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock3.png) 
 
 
 We can also look at the harvest dynamics:
@@ -199,7 +170,7 @@ We can also look at the harvest dynamics:
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 ```
 
-![plot of chunk harvest](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-harvest2.png) 
+![plot of chunk harvest](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-harvest3.png) 
 
 
 This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement and see if it is less variable than fish stock, and if it is near Reed's S: 
@@ -209,7 +180,7 @@ This strategy is supposed to be a constant-escapement strategy. We can visualize
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 ```
 
-![plot of chunk escapement](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-escapement2.png) 
+![plot of chunk escapement](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-escapement3.png) 
 
 
 ### Computing additional statistics about the data
@@ -295,7 +266,7 @@ p1 + geom_line(dat=stats, aes(x=time, y=y), col="lightgrey") +
               fill = "darkred", alpha = 0.2, dat=stats)
 ```
 
-![plot of chunk profit_by_time](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-profit_by_time.png) 
+![plot of chunk profit_by_time](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-profit_by_time1.png) 
 
 
 
@@ -306,13 +277,94 @@ Total profits
 ggplot(dt, aes(total.profit, fill=crashed)) + geom_histogram(alpha=.8)
 ```
 
+![plot of chunk totals](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-totals3.png) 
 
 
+## Compare to a non-optimal solution
+Compare another model, that likewise assumes no implementation error, and also makes a mistake in its estimate of the growth parameter, making it conservative rather than optimal.
+
+
+
+```r
+sigma_i <- 0.0
+sigma_g <- 0.4
 ```
-stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
+
+
+
+
+
+
+
+```r
+opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, 
+                     profit, delta, reward=1)
 ```
 
-![plot of chunk totals](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-totals2.png) 
+
+
+
+For the simulated implementation, we add the same implementation error back, and we restore biological growth noise to it's true value
+
+
+```r
+sigma_i <- 0.8
+sigma_g <- 0.2
+```
+
+
+
+
+
+### Simulate 
+Now we simulate as before
+
+
+```r
+sims <- lapply(1:100, function(i){
+  ForwardSimulate(f, pars, x_grid, h_grid, x0, opt$D, z_g, z_m, z_i)
+})
+```
+
+
+
+
+## Summarize and plot the results                                                  
+Using the code above, recreate the plots for this policy and simulation: 
+
+
+
+### Plots 
+
+
+
+
+
+
+
+
+
+### Computing additional statistics about the data
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#### Profit plots
+
+
+
+
 
 
 

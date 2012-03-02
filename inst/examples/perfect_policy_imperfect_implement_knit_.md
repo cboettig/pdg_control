@@ -9,7 +9,7 @@ opts_knit$set(upload.fun = function(file){
 read_chunk("Reed.R")
 end.rcode-->
 
-<!--roptions dev="png", fig.width=7, fig.height=5, tidy=FALSE, warning=FALSE, comment=NA, external=TRUE, cache=FALSE, cache.path="wrong_noise/"-->
+<!--roptions dev="png", fig.width=7, fig.height=5, tidy=FALSE, warning=FALSE, message=FALSE, comment=NA, external=TRUE, cache=TRUE, cache.path="perfectpolicy/"-->
 
 # Perfect Policy, Imperfect Implementation
 
@@ -55,7 +55,8 @@ Bellman's algorithm to compute the optimal solution for all possible trajectorie
 <!--begin.rcode find_dp_optim 
 end.rcode-->
 
-### The optimal policy is implemented imperfectly: 
+### The optimal policy is implemented imperfectly
+We add implementation noise: an imperfect implementation (though a symmetric one -- on average the implementation is not worse than assumed by the optimal solution, it is simply variable). 
 <!--begin.rcode implementation_errors
 sigma_i <- 0.8
 end.rcode-->
@@ -120,6 +121,68 @@ end.rcode-->
 
 Total profits
 <!--begin.rcode totals
+end.rcode-->
+
+## Compare to a non-optimal solution
+Compare another model, that likewise assumes no implementation error, and also makes a mistake in its estimate of the growth parameter, making it conservative rather than optimal.
+
+<!--begin.rcode model2_guesses
+sigma_i <- 0.0
+sigma_g <- 0.4
+end.rcode-->
+
+
+<!--begin.rcode find_dp_optim 
+end.rcode-->
+
+For the simulated implementation, we add the same implementation error back, and we restore biological growth noise to it's true value
+<!--begin.rcode implement_error_again
+sigma_i <- 0.8
+sigma_g <- 0.2
+end.rcode-->
+
+
+### Simulate 
+Now we simulate as before
+<!--begin.rcode simagain, ref.label="simulate"
+end.rcode-->
+
+## Summarize and plot the results                                                  
+Using the code above, recreate the plots for this policy and simulation: 
+<!--begin.rcode tidy2, ref.label="tidy", include=FALSE
+end.rcode-->
+
+### Plots 
+<!--begin.rcode ref.label="fishstock", include=FALSE
+end.rcode-->
+
+<!--begin.rcode ref.label="harvest", include=FALSE
+end.rcode-->
+
+<!--begin.rcode ref.label="escapement", include=FALSE
+end.rcode-->
+
+### Computing additional statistics about the data
+<!--begin.rcode ref.label="crashed", include=FALSE
+end.rcode-->
+
+<!--begin.rcode ref.label="profits", include=FALSE
+end.rcode-->
+
+<!--begin.rcode ref.label="join", include=FALSE
+end.rcode-->
+
+<!--begin.rcode ref.label="total_profit", include=FALSE
+end.rcode-->
+
+<!--begin.rcode ref.label="joinmore", include=FALSE
+end.rcode-->
+
+#### Profit plots
+<!--begin.rcode ref.label="profit_by_time", include=FALSE
+end.rcode-->
+
+<!--begin.rcode ref.label="totals", include=FALSE
 end.rcode-->
 
 

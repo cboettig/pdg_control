@@ -7,20 +7,6 @@
 # Policy Costs 
  * author Carl Boettiger, <cboettig@gmail.com>
  * license: CC0
- Z_n f(X_n) \\)
-
-
-
-
-```
-Loading required package: data.table
-```
-
-
-
-```
-data.table 1.7.10  For help type: help("data.table")
-```
 
 
 
@@ -150,7 +136,7 @@ policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, .25*K,
 
 
 ### Simulate 
-Now we'll simulate 100 replicates of this stochastic process under the optimal harvest policy determined above.  We use a modified simulation function that can simulate an alternate policy (the Reed optimum, where policy costs are zero, `opt$D`) and a focal policy, `policycost$D`,
+Now we'll simulate 100 replicates of this stochastic process under the optimal harvest policy determined above.  We use a modified simulation function that can simulate an alternate policy (the Reed optimum, where policy costs are zero, `opt$D` ) and a focal policy, `policycost$D`
 
 
 
