@@ -1,6 +1,12 @@
 
 
 
+```
+Error: could not find function ".hook_plot_md_wrapper"
+```
+
+
+
 
 # Reed Model
  * author Carl Boettiger, <cboettig@gmail.com>
@@ -27,6 +33,17 @@ Clear the workspace and load package dependencies:
 ```r
 rm(list=ls())   
 require(pdgControl)
+```
+
+
+
+```
+Loading required package: pdgControl
+```
+
+
+
+```r
 require(reshape2)
 require(ggplot2)
 require(data.table)
@@ -215,7 +232,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest), col="darkgreen") 
 ```
 
-![plot of chunk unnamed-chunk-12](http://farm8.staticflickr.com/7057/6945363907_f02d9eeef7_z.jpg) 
+![plot of chunk unnamed-chunk-12](http://i.imgur.com/r8SGD.png) 
 
 
 
@@ -228,7 +245,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk unnamed-chunk-13](http://farm8.staticflickr.com/7041/6799252436_dab7721753_z.jpg) 
+![plot of chunk unnamed-chunk-13](http://i.imgur.com/FipxK.png) 
 
 
 We can also look at the harvest dynamics:
@@ -238,7 +255,7 @@ We can also look at the harvest dynamics:
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 ```
 
-![plot of chunk unnamed-chunk-14](http://farm8.staticflickr.com/7064/6945364267_84611bfa06_z.jpg) 
+![plot of chunk unnamed-chunk-14](http://i.imgur.com/ALt1Q.png) 
 
 
 This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement: 
@@ -248,7 +265,7 @@ This strategy is supposed to be a constant-escapement strategy. We can visualize
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 ```
 
-![plot of chunk unnamed-chunk-15](http://farm8.staticflickr.com/7039/6945364485_2ea7abb6e1_z.jpg) 
+![plot of chunk unnamed-chunk-15](http://i.imgur.com/4SkL0.png) 
 
 
 
@@ -370,7 +387,7 @@ ggplot(dt, aes(total.profit, fill=crashed)) + geom_histogram(alpha=.8)
 stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
 ```
 
-![plot of chunk unnamed-chunk-22](http://farm8.staticflickr.com/7183/6945364667_cff124f881_z.jpg) 
+![plot of chunk unnamed-chunk-22](http://i.imgur.com/bV8ds.png) 
 
 
 
@@ -407,4 +424,24 @@ ggplot(subset(dt, quantile %in% c(1,4))) +
   geom_line(aes(time, fishstock, group = reps, color=quantile), alpha = 0.6) 
 ```
 
-![plot of chunk unnamed-chunk-25](http://farm8.staticflickr.com/7180/6945364855_3d8da0b5b2_z.jpg) 
+![plot of chunk unnamed-chunk-25](http://i.imgur.com/Lhsau.png) 
+
+
+
+#### Visualizing the optimal policy
+Note that when the boundary is sufficiently far away, i.e. for the first couple timesteps, the optimal policy is stationary,
+
+
+```r
+identical(opt$D[,1], opt$D[2])
+```
+
+
+
+```
+[1] FALSE
+```
+
+
+
+

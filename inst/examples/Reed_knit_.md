@@ -1,8 +1,8 @@
-<!--roptions dev="png", fig.width=7, fig.height=5, fig.path='ex-out-', tidy=FALSE, warning=FALSE, comment=NA-->
+<!--roptions dev="png", fig.width=7, fig.height=5, fig.path='ex-out-', tidy=FALSE, warning=FALSE, comment=NA, cache=FALSE-->
 <!--begin.rcode echo=FALSE 
 render_gfm()
 opts_knit$set(upload = TRUE)
-knit_hooks$set(plot=.hook_plot_md_wrapper(.flickr.url))
+knit_hooks$set(plot=.hook_plot_md_wrapper(.wordpress.url))
 end.rcode-->
 
 # Reed Model
@@ -260,3 +260,11 @@ Then we can plot the fishstock trajectories, indicating which derive the highest
 ggplot(subset(dt, quantile %in% c(1,4))) + 
   geom_line(aes(time, fishstock, group = reps, color=quantile), alpha = 0.6) 
 end.rcode-->
+
+
+#### Visualizing the optimal policy
+Note that when the boundary is sufficiently far away, i.e. for the first couple timesteps, the optimal policy is stationary,
+<!--begin.rcode
+identical(opt$D[,1], opt$D[2])
+end.rcode-->
+
