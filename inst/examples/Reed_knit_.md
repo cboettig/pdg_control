@@ -2,7 +2,7 @@
 <!--begin.rcode echo=FALSE 
 render_gfm()
 opts_knit$set(upload = TRUE)
-knit_hooks$set(plot=.hook_plot_md_wrapper(.wordpress.url))
+knit_hooks$set(plot=.hook_plot_md_wrapper(.flickr.url))
 end.rcode-->
 
 # Reed Model
