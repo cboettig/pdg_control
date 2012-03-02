@@ -1,6 +1,7 @@
 
 
 
+
 # Reed Model
  * author Carl Boettiger, <cboettig@gmail.com>
  * license: CC0
@@ -26,9 +27,54 @@ Clear the workspace and load package dependencies:
 ```r
 rm(list=ls())   
 require(pdgControl)
+```
+
+
+
+```
+Loading required package: pdgControl
+```
+
+
+
+```r
 require(reshape2)
+```
+
+
+
+```
+Loading required package: reshape2
+```
+
+
+
+```r
 require(ggplot2)
+```
+
+
+
+```
+Loading required package: ggplot2
+```
+
+
+
+```r
 require(data.table)
+```
+
+
+
+```
+Loading required package: data.table
+```
+
+
+
+```
+data.table 1.7.10  For help type: help("data.table")
 ```
 
 
@@ -214,7 +260,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest), col="darkgreen") 
 ```
 
-![plot of chunk unnamed-chunk-12](http://i.imgur.com/QqBfH.png) 
+![plot of chunk unnamed-chunk-12](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-unnamed-chunk-12.png) 
 
 
 
@@ -227,7 +273,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk unnamed-chunk-13](http://i.imgur.com/9xzaF.png) 
+![plot of chunk unnamed-chunk-13](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-unnamed-chunk-13.png) 
 
 
 We can also look at the harvest dynamics:
@@ -237,7 +283,7 @@ We can also look at the harvest dynamics:
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 ```
 
-![plot of chunk unnamed-chunk-14](http://i.imgur.com/rABO7.png) 
+![plot of chunk unnamed-chunk-14](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-unnamed-chunk-14.png) 
 
 
 This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement: 
@@ -247,7 +293,7 @@ This strategy is supposed to be a constant-escapement strategy. We can visualize
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 ```
 
-![plot of chunk unnamed-chunk-15](http://i.imgur.com/KJK54.png) 
+![plot of chunk unnamed-chunk-15](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-unnamed-chunk-15.png) 
 
 
 
@@ -369,7 +415,7 @@ ggplot(dt, aes(total.profit, fill=crashed)) + geom_histogram(alpha=.8)
 stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
 ```
 
-![plot of chunk unnamed-chunk-22](http://i.imgur.com/2l6fq.png) 
+![plot of chunk unnamed-chunk-22](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-unnamed-chunk-22.png) 
 
 
 
@@ -406,6 +452,4 @@ ggplot(subset(dt, quantile %in% c(1,4))) +
   geom_line(aes(time, fishstock, group = reps, color=quantile), alpha = 0.6) 
 ```
 
-![plot of chunk unnamed-chunk-25](http://i.imgur.com/3oRO5.png) 
-
-![plot of flickrexample](http://www.flickr.com/photos/cboettig/6793388404)
+![plot of chunk unnamed-chunk-25](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-unnamed-chunk-25.png) 

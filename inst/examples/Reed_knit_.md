@@ -2,7 +2,7 @@
 <!--begin.rcode echo=FALSE 
 render_gfm()
 opts_knit$set(upload = TRUE)
-opts_knit$set(imgur.key = getOption("imgur"))
+knit_hooks$set(plot=.hook_plot_md_wrapper(.wordpress.url))
 end.rcode-->
 
 # Reed Model
