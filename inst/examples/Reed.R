@@ -122,7 +122,7 @@ dt <- dt[rewarded]
 setnames(dt, c("V1", "V1.1", "V1.2"), c("total.profit", "crashed", "rewarded"))
 
 ## @knitr profit_by_time
-stats <- dt[ , mean_sdl(profit), by = time]
+stats <- dt[ , mean_sdl(profits), by = time]
 p1 + geom_line(dat=stats, aes(x=time, y=y), col="lightgrey") + 
   geom_ribbon(aes(x = time, ymin = ymin, ymax = ymax),
               fill = "darkred", alpha = 0.2, dat=stats)

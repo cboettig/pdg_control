@@ -11,6 +11,36 @@
 Clear the workspace and load package dependencies: 
 
 
+```
+Loading required package: pdgControl
+```
+
+
+
+```
+Loading required package: reshape2
+```
+
+
+
+```
+Loading required package: ggplot2
+```
+
+
+
+```
+Loading required package: data.table
+```
+
+
+
+```
+data.table 1.7.10  For help type: help("data.table")
+```
+
+
+
 
 Define parameters
 
@@ -117,7 +147,7 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT,
 
 
 ```r
-sigma_i <- .2
+sigma_i <- 0.8
 ```
 
 
@@ -159,7 +189,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk fishstock](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock1.png) 
+![plot of chunk fishstock](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock2.png) 
 
 
 We can also look at the harvest dynamics:
@@ -169,7 +199,7 @@ We can also look at the harvest dynamics:
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 ```
 
-![plot of chunk harvest](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-harvest1.png) 
+![plot of chunk harvest](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-harvest2.png) 
 
 
 This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement and see if it is less variable than fish stock, and if it is near Reed's S: 
@@ -179,7 +209,7 @@ This strategy is supposed to be a constant-escapement strategy. We can visualize
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 ```
 
-![plot of chunk escapement](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-escapement1.png) 
+![plot of chunk escapement](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-escapement2.png) 
 
 
 ### Computing additional statistics about the data
@@ -259,30 +289,13 @@ Since the optimal strategy maximizes expected profit, it may be more useful to l
 
 
 ```r
-stats <- dt[ , mean_sdl(profit), by = time]
-```
-
-
-
-```
-Error: object of type 'closure' is not subsettable
-```
-
-
-
-```r
+stats <- dt[ , mean_sdl(profits), by = time]
 p1 + geom_line(dat=stats, aes(x=time, y=y), col="lightgrey") + 
   geom_ribbon(aes(x = time, ymin = ymin, ymax = ymax),
               fill = "darkred", alpha = 0.2, dat=stats)
 ```
 
-
-
-```
-Error: object 'stats' not found
-```
-
-
+![plot of chunk profit_by_time](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-profit_by_time.png) 
 
 
 
@@ -299,7 +312,7 @@ ggplot(dt, aes(total.profit, fill=crashed)) + geom_histogram(alpha=.8)
 stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
 ```
 
-![plot of chunk totals](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-totals1.png) 
+![plot of chunk totals](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-totals2.png) 
 
 
 

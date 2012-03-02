@@ -9,7 +9,7 @@ opts_knit$set(upload.fun = function(file){
 read_chunk("Reed.R")
 end.rcode-->
 
-<!--roptions dev="png", fig.width=7, fig.height=5, tidy=FALSE, warning=FALSE, comment=NA, external=TRUE, cache=TRUE, cache.path="wrong_noise/"-->
+<!--roptions dev="png", fig.width=7, fig.height=5, tidy=FALSE, warning=FALSE, comment=NA, external=TRUE, cache=FALSE, cache.path="wrong_noise/"-->
 
 # Perfect Policy, Imperfect Implementation
 
@@ -57,7 +57,7 @@ end.rcode-->
 
 ### The optimal policy is implemented imperfectly: 
 <!--begin.rcode implementation_errors
-sigma_i <- .2
+sigma_i <- 0.8
 end.rcode-->
 
 ### Simulate 
