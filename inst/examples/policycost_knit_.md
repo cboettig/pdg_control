@@ -1,4 +1,4 @@
-<!--roptions dev="png", fig.width=7, fig.height=5, tidy=FALSE, warning=FALSE, comment=NA, external=TRUE-->
+<!--roptions dev="png", fig.width=7, fig.height=5, tidy=FALSE, warning=FALSE, comment=NA, cache.path="policycost/"-->
 
 <!--begin.rcode setup, include=FALSE
 render_gfm()  
@@ -14,8 +14,6 @@ end.rcode-->
 # Policy Costs 
  * author Carl Boettiger, <cboettig@gmail.com>
  * license: CC0
- Z_n f(X_n) \\)
-
 
 <!--begin.rcode libraries, echo=FALSE
 end.rcode-->
@@ -67,7 +65,7 @@ end.rcode-->
 
 
 ### Simulate 
-Now we'll simulate 100 replicates of this stochastic process under the optimal harvest policy determined above.  We use a modified simulation function that can simulate an alternate policy (the Reed optimum, where policy costs are zero, `opt$D`) and a focal policy, `policycost$D`,
+Now we'll simulate 100 replicates of this stochastic process under the optimal harvest policy determined above.  We use a modified simulation function that can simulate an alternate policy (the Reed optimum, where policy costs are zero, `opt$D` ) and a focal policy, `policycost$D`
 
 <!--begin.rcode simulate_policy
 sims <- lapply(1:100, function(i)
