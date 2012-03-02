@@ -2,7 +2,13 @@
 
 
 ```
-Error: could not find function ".hook_plot_md_wrapper"
+Loading required package: socialR
+```
+
+
+
+```
+Error: invalid subscript type 'closure'
 ```
 
 
@@ -45,8 +51,42 @@ Loading required package: pdgControl
 
 ```r
 require(reshape2)
+```
+
+
+
+```
+Loading required package: reshape2
+```
+
+
+
+```r
 require(ggplot2)
+```
+
+
+
+```
+Loading required package: ggplot2
+```
+
+
+
+```r
 require(data.table)
+```
+
+
+
+```
+Loading required package: data.table
+```
+
+
+
+```
+data.table 1.7.10  For help type: help("data.table")
 ```
 
 
@@ -65,7 +105,7 @@ gridsize <- 100   # gridsize (discretized population)
 sigma_g <- 0.2    # Noise in population growth
 sigma_m <- 0.     # noise in stock assessment measurement
 sigma_i <- 0.     # noise in implementation of the quota
-reward <- 0       # bonus for satisfying the boundary condition
+reward <- 1       # bonus for satisfying the boundary condition
 ```
 
 
@@ -185,7 +225,7 @@ Bellman's algorithm to compute the optimal solution for all possible trajectorie
 
 ```r
 opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                     profit, delta, reward=1)
+                     profit, delta, reward=reward)
 ```
 
 
@@ -232,7 +272,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest), col="darkgreen") 
 ```
 
-![plot of chunk unnamed-chunk-12](http://i.imgur.com/r8SGD.png) 
+![plot of chunk unnamed-chunk-12](http://i.imgur.com/F7EQe.png) 
 
 
 
@@ -245,7 +285,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk unnamed-chunk-13](http://i.imgur.com/FipxK.png) 
+![plot of chunk unnamed-chunk-13](http://i.imgur.com/tqkye.png) 
 
 
 We can also look at the harvest dynamics:
@@ -255,7 +295,7 @@ We can also look at the harvest dynamics:
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 ```
 
-![plot of chunk unnamed-chunk-14](http://i.imgur.com/ALt1Q.png) 
+![plot of chunk unnamed-chunk-14](http://i.imgur.com/5ezvY.png) 
 
 
 This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement: 
@@ -265,7 +305,7 @@ This strategy is supposed to be a constant-escapement strategy. We can visualize
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 ```
 
-![plot of chunk unnamed-chunk-15](http://i.imgur.com/4SkL0.png) 
+![plot of chunk unnamed-chunk-15](http://i.imgur.com/20WR2.png) 
 
 
 
@@ -387,7 +427,7 @@ ggplot(dt, aes(total.profit, fill=crashed)) + geom_histogram(alpha=.8)
 stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
 ```
 
-![plot of chunk unnamed-chunk-22](http://i.imgur.com/bV8ds.png) 
+![plot of chunk unnamed-chunk-22](http://i.imgur.com/CQuLX.png) 
 
 
 
@@ -424,24 +464,44 @@ ggplot(subset(dt, quantile %in% c(1,4))) +
   geom_line(aes(time, fishstock, group = reps, color=quantile), alpha = 0.6) 
 ```
 
-![plot of chunk unnamed-chunk-25](http://i.imgur.com/Lhsau.png) 
+![plot of chunk unnamed-chunk-25](http://i.imgur.com/cFpOj.png) 
 
 
 
-#### Visualizing the optimal policy
-Note that when the boundary is sufficiently far away, i.e. for the first couple timesteps, the optimal policy is stationary,
+### Visualizing the optimal policy
+Note that when the boundary is sufficiently far away, i.e. for the first couple timesteps, the optimal policy is stationary.  The optimal policy is shown here over time, where the color indicates the harvest recommended for each possible stock value at that time (shown on the vertical axis).  Note that below a certain stock value, harvesting is not recommended and the dots turn red (Reed's constant escapement rule!)  However, at very low values, harvesting starts again (orange dots), because of the allee effect - these populations are doomed anyway, so may as well fish all that remains.
+
+Note that interestingly, populations just below the allee threshold are given the chance to be rescued stochastically early on - that small chance that they recover is worth the expected loss.  The "no-harvest" zones stand out clearly in the red areas of this graph.
 
 
 ```r
-identical(opt$D[,1], opt$D[2])
+policy <- melt(opt$D)
+policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
+p5 <- ggplot(policy_zoom) + 
+  geom_point(aes(Var2, (x_grid[Var1]), col=h_grid[value])) + 
+  labs(x = "time", y = "fishstock") +
+  scale_colour_gradientn(colours = rainbow(4)) +
+  geom_abline(intercept=opt$S, slope = 0) +
+  geom_abline(intercept=xT, slope=0, lty=2)
+p5
 ```
 
+![plot of chunk unnamed-chunk-26](http://i.imgur.com/vDDlW.png) 
 
 
+The harvest intensity is limited by the stock size.  If instead we look at the difference between proposed harvest intensity and stock,
+then the red zones correspond to places where harvest equals stock, i.e. we slam the population. The allee band is clearly seen. Just for fun, we overlay the replicate dynamics on this plot 
+
+
+
+```r
+p6 <- ggplot(policy_zoom) + 
+  geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
+  labs(x = "time", y = "fishstock") +
+  scale_colour_gradientn(colours = rainbow(4)) +
+  geom_abline(intercept=opt$S, slope = 0) +
+  geom_abline(intercept=xT, slope=0, lty=2)
+p6 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1, data=dt)
 ```
-[1] FALSE
-```
 
-
-
-
+![plot of chunk unnamed-chunk-27](http://i.imgur.com/0P0yN.png) 

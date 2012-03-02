@@ -2,7 +2,8 @@
 <!--begin.rcode echo=FALSE 
 render_gfm()
 opts_knit$set(upload = TRUE)
-knit_hooks$set(plot=.hook_plot_md_wrapper(.wordpress.url))
+require(socialR)
+opts_knit$get(wordpress.url)
 end.rcode-->
 
 # Reed Model
@@ -44,7 +45,7 @@ gridsize <- 100   # gridsize (discretized population)
 sigma_g <- 0.2    # Noise in population growth
 sigma_m <- 0.     # noise in stock assessment measurement
 sigma_i <- 0.     # noise in implementation of the quota
-reward <- 0       # bonus for satisfying the boundary condition
+reward <- 1       # bonus for satisfying the boundary condition
 end.rcode-->
 
 we'll use log normal noise functions
@@ -119,7 +120,7 @@ end.rcode-->
 Bellman's algorithm to compute the optimal solution for all possible trajectories.
 <!--begin.rcode 
 opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                     profit, delta, reward=1)
+                     profit, delta, reward=reward)
 end.rcode-->
 
 ### Simulate 
@@ -262,9 +263,31 @@ ggplot(subset(dt, quantile %in% c(1,4))) +
 end.rcode-->
 
 
-#### Visualizing the optimal policy
-Note that when the boundary is sufficiently far away, i.e. for the first couple timesteps, the optimal policy is stationary,
+### Visualizing the optimal policy
+Note that when the boundary is sufficiently far away, i.e. for the first couple timesteps, the optimal policy is stationary.  The optimal policy is shown here over time, where the color indicates the harvest recommended for each possible stock value at that time (shown on the vertical axis).  Note that below a certain stock value, harvesting is not recommended and the dots turn red (Reed's constant escapement rule!)  However, at very low values, harvesting starts again (orange dots), because of the allee effect - these populations are doomed anyway, so may as well fish all that remains.
+
+Note that interestingly, populations just below the allee threshold are given the chance to be rescued stochastically early on - that small chance that they recover is worth the expected loss.  The "no-harvest" zones stand out clearly in the red areas of this graph.
 <!--begin.rcode
-identical(opt$D[,1], opt$D[2])
+policy <- melt(opt$D)
+policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
+p5 <- ggplot(policy_zoom) + 
+  geom_point(aes(Var2, (x_grid[Var1]), col=h_grid[value])) + 
+  labs(x = "time", y = "fishstock") +
+  scale_colour_gradientn(colours = rainbow(4)) +
+  geom_abline(intercept=opt$S, slope = 0) +
+  geom_abline(intercept=xT, slope=0, lty=2)
+p5
 end.rcode-->
+
+The harvest intensity is limited by the stock size.  If instead we look at the difference between proposed harvest intensity and stock,
+then the red zones correspond to places where harvest equals stock, i.e. we slam the population. The allee band is clearly seen. Just for fun, we overlay the replicate dynamics on this plot 
+
+<!--begin.rcode
+p6 <- ggplot(policy_zoom) + 
+  geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
+  labs(x = "time", y = "fishstock") +
+  scale_colour_gradientn(colours = rainbow(4)) +
+  geom_abline(intercept=opt$S, slope = 0) +
+  geom_abline(intercept=xT, slope=0, lty=2)
+p6 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1, data=dt)
 
