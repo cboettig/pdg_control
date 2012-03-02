@@ -9,7 +9,7 @@ opts_knit$set(upload.fun = function(file){
 read_chunk("Reed.R")
 end.rcode-->
 
-<!--roptions dev="png", fig.width=7, fig.height=5, tidy=FALSE, warning=FALSE, comment=NA, external=TRUE, cache=TRUE, cache.path="wrong_noise"-->
+<!--roptions dev="png", fig.width=7, fig.height=5, tidy=FALSE, warning=FALSE, comment=NA, external=TRUE, cache=TRUE, cache.path="wrong_noise/"-->
 
 # Reed Model, when in reality growth noise is slightly larger
  * author Carl Boettiger, <cboettig@gmail.com>

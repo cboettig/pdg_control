@@ -1,4 +1,5 @@
-#@knitr libraries
+
+## @knitr libraries
 rm(list=ls())   
 require(pdgControl)
 require(reshape2)
