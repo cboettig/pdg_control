@@ -8,7 +8,7 @@ opts_knit$set(upload = TRUE)   # trigger to use remote image hosting
 
 ## Instead, I'll use wordpress to host my images 
 ## Create a markdown hook based on the wordpress method
-knit_hooks$set(plot=.hook_plot_md_wrapper(.upload_wordpress))
+knit_hooks$set(plot=.hook_plot_md_wrapper(.wordpress.url))
 
 ## The real source code is externalized from this file:
 read_chunk("Reed.R")

@@ -1,11 +1,11 @@
-#@knit libraries
+#@knitr libraries
 rm(list=ls())   
 require(pdgControl)
 require(reshape2)
 require(ggplot2)
 require(data.table)
 
-## @knit parameters 
+## @knitr parameters 
 delta <- 0.1      # economic discounting rate
 OptTime <- 50     # stopping time
 gridsize <- 100   # gridsize (discretized population)
@@ -14,14 +14,14 @@ sigma_m <- 0.     # noise in stock assessment measurement
 sigma_i <- 0.     # noise in implementation of the quota
 reward <- 0       # bonus for satisfying the boundary condition
 
-## @knit noise_dists
+## @knitr noise_dists
 z_g <- function() rlnorm(1,  0, sigma_g) # mean 1
 z_m <- function() rlnorm(1,  0, sigma_m) # mean 1
 z_i <- function() rlnorm(1,  0, sigma_i) # mean 1
-end.rcode-->
 
 
-## @knit BevHolt 
+
+## @knitr BevHolt 
 f <- BevHolt                # Select the state equation
 pars <- c(2, 4)             # parameters for the state equation
 K <- (pars[1] - 1)/pars[2]  # Carrying capacity 
@@ -30,7 +30,7 @@ control = "harvest"         # control variable is total harvest, h = e * x
 price <- 1
 cost <- .12
 
-## @knit Myer
+## @knitr Myer
 f <- Myer_harvest
 pars <- c(1, 2, 6) 
 p <- pars # shorthand 
@@ -42,76 +42,76 @@ price <- 1
 cost <- .01
 
 
-## @knit initx
+## @knitr initx
 x0 <- K - sigma_g ^ 2 / 2 
 
-## @knit profit 
+## @knitr profit 
 profit <- profit_harvest(p=price, c = cost) 
 
-## @knit create_grid
+## @knitr create_grid
 x_grid <- seq(0, 2 * K, length = gridsize)  
 h_grid <- x_grid  
 
-## @knit determine_SDP_matrix
+## @knitr determine_SDP_matrix
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g )
 
-## @knit stochastic
+## @knitr stochastic
 require(snowfall) 
 sfInit(parallel=TRUE, cpu=4)
 SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=999)
 
-## @knit find_dp_optim 
+## @knitr find_dp_optim 
 opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, 
                      profit, delta, reward=1)
 
-## @knit simulate
+## @knitr simulate
 sims <- lapply(1:100, function(i){
   ForwardSimulate(f, pars, x_grid, h_grid, x0, opt$D, z_g, z_m, z_i)
 })
 
-## @knit tidy
+## @knitr tidy
 dat <- melt(sims, id=names(sims[[1]]))  
 dt <- data.table(dat)
 setnames(dt, "L1", "reps") # names are nice
 
-## @knit plot_rep
+## @knitr plot_rep
 ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, fishstock)) +
   geom_abline(intercept=opt$S, slope = 0) +
   geom_line(aes(time, harvest), col="darkgreen") 
 
-## @knit fishstock 
+## @knitr fishstock 
 p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) + 
   geom_abline(intercept=xT, slope = 0, lty=2) 
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 
 
-## @knit harvest
+## @knitr harvest
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 
-## @knit escapement
+## @knitr escapement
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 
-## @knit crashed
+## @knitr crashed
 crashed <- dt[time==OptTime, fishstock == 0, by=reps]
 rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
 
-## @knit profits
+## @knitr profits
 dt <- data.table(dt, id=1:dim(dt)[1])
 profits <- dt[, profit(fishstock, harvest), by=id]
 
-## @knit join
+## @knitr join
 setkey(dt, id)
 setkey(profits, id)
 dt <- dt[profits]
 setnames(dt, "V1", "profits")
 setkey(dt, reps)
 
-## @knit total_profit
+## @knitr total_profit
 total_profit <- dt[,sum(profits), by=reps]
 total_profit <- total_profit + rewarded$V1 * reward 
 
-## @knit joinmore
+## @knitr joinmore
 setkey(total_profit, reps)
 setkey(crashed, reps)
 setkey(rewarded, reps)
@@ -120,16 +120,16 @@ dt <- dt[crashed]
 dt <- dt[rewarded]
 setnames(dt, c("V1", "V1.1", "V1.2"), c("total.profit", "crashed", "rewarded"))
 
-## @knit profit_by_time
+## @knitr profit_by_time
 stats <- dt[ , mean_sdl(profit), by = time]
 p1 + geom_line(dat=stats, aes(x=time, y=y), col="lightgrey") + 
   geom_ribbon(aes(x = time, ymin = ymin, ymax = ymax),
               fill = "darkred", alpha = 0.2, dat=stats)
 
-## @knit totals
+## @knitr totals
 ggplot(dt, aes(total.profit, fill=crashed)) + geom_histogram(alpha=.8)
 
-## @knit quantile
+## @knitr quantile
 quantile_me <- function(x, ...){
   q <- quantile(x, ...)
   class <- character(length(x))
@@ -141,7 +141,7 @@ q <- data.table(reps=total_profit$reps, quantile=quantile_me(total_profit$V1))
 setkey(q, reps)
 dt <- dt[q]
 
-## @knit winners_losers
+## @knitr winners_losers
 ggplot(subset(dt, quantile %in% c(1,4))) + 
   geom_line(aes(time, fishstock, group = reps, color=quantile), alpha = 0.6) 
 
