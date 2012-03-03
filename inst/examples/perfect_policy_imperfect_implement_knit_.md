@@ -91,11 +91,7 @@ Which replicates crashed?  Which met the boundary requirment and recieved the re
 <!--begin.rcode crashed
 end.rcode-->
 
-A total of 
-<!--begin.rcode crashedsum
-sum(crashed$V1)
-end.rcode--> 
-crash.
+A total of <!--rinline sum(crashed$V1) --> crash.
 
 Let's compute the profits at each time-step for each replicate. 
 Using `data.table` to evaluate our profit function over the stock and harvest levels requires indexing our data:
@@ -169,11 +165,7 @@ end.rcode-->
 ### Computing additional statistics about the data
 <!--begin.rcode ref.label="crashed"
 end.rcode-->
-A total of 
-<!--begin.rcode crashedsum
-sum(crashed$V1)
-end.rcode--> 
-crash.
+A total of <!--rinline sum(crashed$V1) --> crash.
 
 <!--begin.rcode ref.label="profits"
 end.rcode-->

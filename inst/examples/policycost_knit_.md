@@ -50,17 +50,15 @@ end.rcode-->
 We calculate the stochastic transition matrix for the probability of going from any state \(x_t \) to any other state \(x_{t+1}\) the following year, for each possible choice of harvest \( h_t \).  This provides a look-up table for the dynamic programming calculations. Note that this only includes uncertainty in the growth rate (projected stock next year). 
 <!--begin.rcode determine_SDP_matrix
 end.rcode-->
-<!--begin.rcode stochastic, eval=FALSE, include=FALSE
-end.rcode-->
 ### Find the optimum by dynamic programming 
 We use Bellman's dynamic programming algorithm to compute the optimal solution for all possible trajectories, ignoring potential policy costs as before.  We will later use this solution to compare against the optimal solution with policy costs.
 <!--begin.rcode find_dp_optim 
 end.rcode-->
 
-A modified algorithm lets us include a penalty of magnitude `P` and a functional form that can be an `L1` norm, `L2`  norm, `asymmetric` L1 norm, fixed cost, or `none` (no cost).  Here is an asymmetric norm example.  Note that this calculation is considerably slower. 
+A modified algorithm lets us include a penalty of magnitude `P` and a functional form that can be an `L1` norm, `L2`  norm, `asymmetric` L1 norm (costly to lower harvest rates), fixed cost, or `none` (no cost).  Here is an asymmetric norm example.  Note that this calculation is considerably slower. 
 <!--begin.rcode policycost_optim
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                    profit, delta, reward=reward, P=.3, penalty="asym")
+                    profit, delta, reward, P = 1, penalty = "asym")
 end.rcode-->
 
 
@@ -116,5 +114,37 @@ ggplot(subset(dt,reps==1)) +
 
 end.rcode-->
 
+## Alternate policy cost models 
+
+#### L2 norm
+<!--begin.rcode policycost_optim_l2
+policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
+                    profit, delta, reward, P = 1, penalty = "L2")
+end.rcode-->
+<!--begin.rcode policy_cost_vis_l2, fig.width=10
+policy <- melt(policycost$D)
+policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
+ggplot(policy_zoom) + 
+  geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
+  labs(x = "time", y = "fishstock") +
+  scale_colour_gradientn(colours = rainbow(4)) +
+  geom_abline(intercept=xT, slope=0, lty=2)
+end.rcode-->
+
+
+#### L1 norm
+<!--begin.rcode policycost_optim_l1
+policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
+                    profit, delta, reward, P = 1, penalty = "L1")
+end.rcode-->
+<!--begin.rcode policy_cost_vis_l1, fig.width=10
+policy <- melt(policycost$D)
+policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
+ggplot(policy_zoom) + 
+  geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
+  labs(x = "time", y = "fishstock") +
+  scale_colour_gradientn(colours = rainbow(4)) +
+  geom_abline(intercept=xT, slope=0, lty=2)
+end.rcode-->
 
 
