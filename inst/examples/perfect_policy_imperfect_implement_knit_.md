@@ -29,7 +29,7 @@ Use log-normal noise functions
 end.rcode-->
 
 Chose the state equation / population dynamics function
-<!--begin.rcode Myer
+<!--begin.rcode RickerAllee
 end.rcode-->
 
 Our initial condition is the equilibrium size (note the stochastic deflation of mean)
@@ -133,8 +133,7 @@ end.rcode-->
 Compare another model, that likewise assumes no implementation error, and also makes a mistake in its estimate of the growth parameter, making it conservative rather than optimal.
 
 <!--begin.rcode model2_guesses
-sigma_i <- 0.0
-sigma_g <- 0.6
+pars <- c(1, K, 1.5)
 end.rcode-->
 
 
@@ -144,7 +143,6 @@ end.rcode-->
 For the simulated implementation, we add the same implementation error back, and we restore biological growth noise to it's true value
 <!--begin.rcode implement_error_again
 sigma_i <- 0.4
-sigma_g <- 0.2
 end.rcode-->
 
 

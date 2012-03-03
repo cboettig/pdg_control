@@ -47,7 +47,8 @@ pars <- c(1, K, xT)
 x0 <- K - sigma_g ^ 2 / 2 
 
 ## @knitr profit 
-profit <- profit_harvest(price_fish=1, cost_stock_effect=0, operating_cost = 0.1*price)
+profit <- profit_harvest(price_fish = 1, cost_stock_effect = 0,
+ operating_cost = 0.1 * price)
 
 
 ## @knitr create_grid

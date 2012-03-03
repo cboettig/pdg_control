@@ -44,15 +44,10 @@ Chose the state equation / population dynamics function
 
 
 ```r
-f <- Myer_harvest
-pars <- c(1, 2, 6) 
-p <- pars # shorthand 
-K <- p[1] * p[3] / 2 + sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2
-xT <- p[1] * p[3] / 2 - sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2 # allee threshold
-e_star <- (p[1] * sqrt(p[3]) - 2) / 2 ## Bifurcation point 
-control <- "harvest"          # control variable can be harvest or effort 
-price <- 1
-cost <- .01
+f <- RickerAllee
+K <- 4 
+xT <- 1 # final value, also allee threshold
+pars <- c(1, K, xT) 
 ```
 
 
@@ -72,7 +67,14 @@ and we use a harvest-based profit function with default parameters
 
 
 ```r
-profit <- profit_harvest(p=price, c = cost) 
+profit <- profit_harvest(price_fish = 1, cost_stock_effect = 0,
+ operating_cost = 0.1 * price)
+```
+
+
+
+```
+Error: unused argument(s) (price_fish = 1, cost_stock_effect = 0, operating_cost = 0.1 * price)
 ```
 
 
@@ -112,6 +114,12 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT,
 
 
 
+```
+Error: object 'profit' not found
+```
+
+
+
 
 ### The optimal policy is implemented imperfectly
 We add implementation noise: an imperfect implementation (though a symmetric one -- on average the implementation is not worse than assumed by the optimal solution, it is simply variable). 
@@ -136,6 +144,12 @@ sims <- lapply(1:100, function(i){
 
 
 
+```
+Error: object 'opt' not found
+```
+
+
+
 
 ## Summarize and plot the results                                                   
 Make data tidy (melt), fast (data.tables), and nicely labeled.
@@ -143,8 +157,36 @@ Make data tidy (melt), fast (data.tables), and nicely labeled.
 
 ```r
 dat <- melt(sims, id=names(sims[[1]]))  
+```
+
+
+
+```
+Error: object 'sims' not found
+```
+
+
+
+```r
 dt <- data.table(dat)
+```
+
+
+
+```
+Error: object 'dat' not found
+```
+
+
+
+```r
 setnames(dt, "L1", "reps") # names are nice
+```
+
+
+
+```
+Error: x is not a data.table
 ```
 
 
@@ -157,10 +199,27 @@ This plot summarizes the stock dynamics by visualizing the replicates. Reed's S 
 ```r
 p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) + 
   geom_abline(intercept=xT, slope = 0, lty=2) 
+```
+
+
+
+```
+Error: ggplot2 doesn't know how to deal with data of class function
+```
+
+
+
+```r
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk fishstock](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock7.png) 
+
+
+```
+Error: object 'p1' not found
+```
+
+
 
 
 We can also look at the harvest dynamics:
@@ -170,7 +229,13 @@ We can also look at the harvest dynamics:
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 ```
 
-![plot of chunk harvest](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-harvest7.png) 
+
+
+```
+Error: object 'p1' not found
+```
+
+
 
 
 This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement and see if it is less variable than fish stock, and if it is near Reed's S: 
@@ -180,7 +245,13 @@ This strategy is supposed to be a constant-escapement strategy. We can visualize
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 ```
 
-![plot of chunk escapement](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-escapement7.png) 
+
+
+```
+Error: object 'p1' not found
+```
+
+
 
 
 ### Computing additional statistics about the data
@@ -191,7 +262,24 @@ Which replicates crashed?  Which met the boundary requirment and recieved the re
 
 ```r
 crashed <- dt[time==OptTime, fishstock == 0, by=reps]
+```
+
+
+
+```
+Error: comparison (1) is possible only for atomic and list types
+```
+
+
+
+```r
 rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
+```
+
+
+
+```
+Error: comparison (1) is possible only for atomic and list types
 ```
 
 
@@ -207,7 +295,7 @@ sum(crashed$V1)
 
 
 ```
-[1] 52
+Error: object 'crashed' not found
 ```
 
 
@@ -221,7 +309,24 @@ Using `data.table` to evaluate our profit function over the stock and harvest le
 
 ```r
 dt <- data.table(dt, id=1:dim(dt)[1])
+```
+
+
+
+```
+Error: argument of length 0
+```
+
+
+
+```r
 profits <- dt[, profit(fishstock, harvest), by=id]
+```
+
+
+
+```
+Error: could not find function "profit"
 ```
 
 
@@ -232,10 +337,60 @@ Merging this calculation back into our data table using fast join (needs to defi
 
 ```r
 setkey(dt, id)
+```
+
+
+
+```
+Error: x is not a data.table
+```
+
+
+
+```r
 setkey(profits, id)
+```
+
+
+
+```
+Error: object 'profits' not found
+```
+
+
+
+```r
 dt <- dt[profits]
+```
+
+
+
+```
+Error: object 'profits' not found
+```
+
+
+
+```r
 setnames(dt, "V1", "profits")
+```
+
+
+
+```
+Error: x is not a data.table
+```
+
+
+
+```r
 setkey(dt, reps)
+```
+
+
+
+```
+Error: x is not a data.table
 ```
 
 
@@ -247,7 +402,24 @@ Compute total profit by summing over each timeseries (including the reward for s
 
 ```r
 total_profit <- dt[,sum(profits), by=reps]
+```
+
+
+
+```
+Error: object 'profits' not found
+```
+
+
+
+```r
 total_profit <- total_profit + rewarded$V1 * reward 
+```
+
+
+
+```
+Error: object 'total_profit' not found
 ```
 
 
@@ -259,12 +431,84 @@ Add these three columns to the data.table (fast join and re-label):
 
 ```r
 setkey(total_profit, reps)
+```
+
+
+
+```
+Error: object 'total_profit' not found
+```
+
+
+
+```r
 setkey(crashed, reps)
+```
+
+
+
+```
+Error: object 'crashed' not found
+```
+
+
+
+```r
 setkey(rewarded, reps)
+```
+
+
+
+```
+Error: object 'rewarded' not found
+```
+
+
+
+```r
 dt <- dt[total_profit]
+```
+
+
+
+```
+Error: object 'total_profit' not found
+```
+
+
+
+```r
 dt <- dt[crashed]
+```
+
+
+
+```
+Error: object 'crashed' not found
+```
+
+
+
+```r
 dt <- dt[rewarded]
+```
+
+
+
+```
+Error: object 'rewarded' not found
+```
+
+
+
+```r
 setnames(dt, c("V1", "V1.1", "V1.2"), c("total.profit", "crashed", "rewarded"))
+```
+
+
+
+```
+Error: x is not a data.table
 ```
 
 
@@ -283,7 +527,7 @@ stats <- dt[ , mean_sdl(profits), by = time]
 
 
 ```
-Error: columns of j don't evaluate to consistent types for each group: result for group 51 has column 1 type 'logical' but expecting type 'numeric'
+Error: object 'profits' not found
 ```
 
 
@@ -297,7 +541,7 @@ p1 + geom_line(dat=stats, aes(x=time, y=y), col="lightgrey") +
 
 
 ```
-Error: object 'stats' not found
+Error: object 'p1' not found
 ```
 
 
@@ -311,7 +555,13 @@ Total profits
 ggplot(dt, aes(total.profit, fill=crashed)) + geom_histogram(alpha=.8)
 ```
 
-![plot of chunk totals](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-totals7.png) 
+
+
+```
+Error: ggplot2 doesn't know how to deal with data of class function
+```
+
+
 
 
 ## Compare to a non-optimal solution
@@ -320,8 +570,7 @@ Compare another model, that likewise assumes no implementation error, and also m
 
 
 ```r
-sigma_i <- 0.0
-sigma_g <- 0.6
+pars <- c(1, K, 1.5)
 ```
 
 
@@ -337,13 +586,18 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT,
 
 
 
+```
+Error: object 'profit' not found
+```
+
+
+
 
 For the simulated implementation, we add the same implementation error back, and we restore biological growth noise to it's true value
 
 
 ```r
 sigma_i <- 0.4
-sigma_g <- 0.2
 ```
 
 
@@ -362,6 +616,12 @@ sims <- lapply(1:100, function(i){
 
 
 
+```
+Error: object 'opt' not found
+```
+
+
+
 
 ## Summarize and plot the results                                                  
 Using the code above, recreate the plots for this policy and simulation: 
@@ -369,8 +629,36 @@ Using the code above, recreate the plots for this policy and simulation:
 
 ```r
 dat <- melt(sims, id=names(sims[[1]]))  
+```
+
+
+
+```
+Error: object 'sims' not found
+```
+
+
+
+```r
 dt <- data.table(dat)
+```
+
+
+
+```
+Error: object 'dat' not found
+```
+
+
+
+```r
 setnames(dt, "L1", "reps") # names are nice
+```
+
+
+
+```
+Error: x is not a data.table
 ```
 
 
@@ -382,10 +670,27 @@ setnames(dt, "L1", "reps") # names are nice
 ```r
 p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) + 
   geom_abline(intercept=xT, slope = 0, lty=2) 
+```
+
+
+
+```
+Error: ggplot2 doesn't know how to deal with data of class function
+```
+
+
+
+```r
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk unnamed-chunk-1](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-14.png) 
+
+
+```
+Error: object 'p1' not found
+```
+
+
 
 
 
@@ -394,7 +699,13 @@ p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 ```
 
-![plot of chunk unnamed-chunk-2](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-24.png) 
+
+
+```
+Error: object 'p1' not found
+```
+
+
 
 
 
@@ -403,7 +714,13 @@ p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 ```
 
-![plot of chunk unnamed-chunk-3](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-34.png) 
+
+
+```
+Error: object 'p1' not found
+```
+
+
 
 
 ### Computing additional statistics about the data
@@ -411,7 +728,24 @@ p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 
 ```r
 crashed <- dt[time==OptTime, fishstock == 0, by=reps]
+```
+
+
+
+```
+Error: comparison (1) is possible only for atomic and list types
+```
+
+
+
+```r
 rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
+```
+
+
+
+```
+Error: comparison (1) is possible only for atomic and list types
 ```
 
 
@@ -426,7 +760,7 @@ sum(crashed$V1)
 
 
 ```
-[1] 61
+Error: object 'crashed' not found
 ```
 
 
@@ -437,7 +771,24 @@ crash.
 
 ```r
 dt <- data.table(dt, id=1:dim(dt)[1])
+```
+
+
+
+```
+Error: argument of length 0
+```
+
+
+
+```r
 profits <- dt[, profit(fishstock, harvest), by=id]
+```
+
+
+
+```
+Error: could not find function "profit"
 ```
 
 
@@ -447,10 +798,60 @@ profits <- dt[, profit(fishstock, harvest), by=id]
 
 ```r
 setkey(dt, id)
+```
+
+
+
+```
+Error: x is not a data.table
+```
+
+
+
+```r
 setkey(profits, id)
+```
+
+
+
+```
+Error: object 'profits' not found
+```
+
+
+
+```r
 dt <- dt[profits]
+```
+
+
+
+```
+Error: object 'profits' not found
+```
+
+
+
+```r
 setnames(dt, "V1", "profits")
+```
+
+
+
+```
+Error: x is not a data.table
+```
+
+
+
+```r
 setkey(dt, reps)
+```
+
+
+
+```
+Error: x is not a data.table
 ```
 
 
@@ -460,7 +861,24 @@ setkey(dt, reps)
 
 ```r
 total_profit <- dt[,sum(profits), by=reps]
+```
+
+
+
+```
+Error: object 'profits' not found
+```
+
+
+
+```r
 total_profit <- total_profit + rewarded$V1 * reward 
+```
+
+
+
+```
+Error: object 'total_profit' not found
 ```
 
 
@@ -470,12 +888,84 @@ total_profit <- total_profit + rewarded$V1 * reward
 
 ```r
 setkey(total_profit, reps)
+```
+
+
+
+```
+Error: object 'total_profit' not found
+```
+
+
+
+```r
 setkey(crashed, reps)
+```
+
+
+
+```
+Error: object 'crashed' not found
+```
+
+
+
+```r
 setkey(rewarded, reps)
+```
+
+
+
+```
+Error: object 'rewarded' not found
+```
+
+
+
+```r
 dt <- dt[total_profit]
+```
+
+
+
+```
+Error: object 'total_profit' not found
+```
+
+
+
+```r
 dt <- dt[crashed]
+```
+
+
+
+```
+Error: object 'crashed' not found
+```
+
+
+
+```r
 dt <- dt[rewarded]
+```
+
+
+
+```
+Error: object 'rewarded' not found
+```
+
+
+
+```r
 setnames(dt, c("V1", "V1.1", "V1.2"), c("total.profit", "crashed", "rewarded"))
+```
+
+
+
+```
+Error: x is not a data.table
 ```
 
 
@@ -491,7 +981,7 @@ stats <- dt[ , mean_sdl(profits), by = time]
 
 
 ```
-Error: columns of j don't evaluate to consistent types for each group: result for group 51 has column 1 type 'logical' but expecting type 'numeric'
+Error: object 'profits' not found
 ```
 
 
@@ -505,7 +995,7 @@ p1 + geom_line(dat=stats, aes(x=time, y=y), col="lightgrey") +
 
 
 ```
-Error: object 'stats' not found
+Error: object 'p1' not found
 ```
 
 
@@ -517,7 +1007,13 @@ Error: object 'stats' not found
 ggplot(dt, aes(total.profit, fill=crashed)) + geom_histogram(alpha=.8)
 ```
 
-![plot of chunk unnamed-chunk-10](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-104.png) 
+
+
+```
+Error: ggplot2 doesn't know how to deal with data of class function
+```
+
+
 
 
 
