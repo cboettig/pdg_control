@@ -1,4 +1,4 @@
-<!--roptions dev="png", fig.width=7, fig.height=5, fig.path='ex-out-', tidy=FALSE, warning=FALSE, comment=NA, cache=FALSE-->
+<!--roptions dev="png", fig.width=7, fig.height=5, fig.path='ex-out-', tidy=FALSE, warning=FALSE, comment=NA, cache.path="reed/", message=FALSE, cache=TRUE-->
 <!--begin.rcode echo=FALSE 
 render_gfm()
 opts_knit$set(upload = TRUE)
@@ -267,7 +267,7 @@ end.rcode-->
 Note that when the boundary is sufficiently far away, i.e. for the first couple timesteps, the optimal policy is stationary.  The optimal policy is shown here over time, where the color indicates the harvest recommended for each possible stock value at that time (shown on the vertical axis).  Note that below a certain stock value, harvesting is not recommended and the dots turn red (Reed's constant escapement rule!)  However, at very low values, harvesting starts again (orange dots), because of the allee effect - these populations are doomed anyway, so may as well fish all that remains.
 
 Note that interestingly, populations just below the allee threshold are given the chance to be rescued stochastically early on - that small chance that they recover is worth the expected loss.  The "no-harvest" zones stand out clearly in the red areas of this graph.
-<!--begin.rcode
+<!--begin.rcode fig.width=9,
 policy <- melt(opt$D)
 policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
 p5 <- ggplot(policy_zoom) + 
@@ -290,4 +290,5 @@ p6 <- ggplot(policy_zoom) +
   geom_abline(intercept=opt$S, slope = 0) +
   geom_abline(intercept=xT, slope=0, lty=2)
 p6 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1, data=dt)
+end.rcode-->
 
