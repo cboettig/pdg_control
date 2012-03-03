@@ -172,20 +172,14 @@ Compare the optimal policy that involves this cost:
 policy <- melt(policycost$D)
 policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
 p5 <- ggplot(policy_zoom) + 
-  geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[V1] - h_grid[value])) + 
+  geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
   labs(x = "time", y = "fishstock") +
   scale_colour_gradientn(colours = rainbow(4)) +
   geom_abline(intercept=xT, slope=0, lty=2)
 p5 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1, data=dt)
 ```
 
-
-
-```
-Error: object 'V1' not found
-```
-
-
+![plot of chunk policy_cost_vis](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-policy_cost_vis.png) 
 
 
 Against the policy with no cost: 
@@ -195,7 +189,7 @@ Against the policy with no cost:
 policy <- melt(opt$D)
 policy_zoom <- subset(policy, x_grid[Var1] < max(dt$alternate) )
 p6 <- ggplot(policy_zoom) + 
-  geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[V1] - h_grid[value])) + 
+  geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
   labs(x = "time", y = "fishstock") +
   scale_colour_gradientn(colours = rainbow(4)) +
   geom_abline(intercept=opt$S, slope = 0) +
@@ -203,13 +197,7 @@ p6 <- ggplot(policy_zoom) +
 p6 + geom_line(aes(time, alternate, group = reps), alpha = 0.1, data=dt)
 ```
 
-
-
-```
-Error: object 'V1' not found
-```
-
-
+![plot of chunk no_policy_cost_vis](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-no_policy_cost_vis.png) 
 
 
 
