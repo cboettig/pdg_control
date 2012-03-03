@@ -92,6 +92,7 @@ Compare another model, that likewise assumes no implementation error, and also m
 
 
 <!--begin.rcode redoSDP
+sigma_i <- 0
 SDP_Mat <- determine_SDP_matrix(f, c(1,4,2), x_grid, h_grid, sigma_g )
 end.rcode-->
 

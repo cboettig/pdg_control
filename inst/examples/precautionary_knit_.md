@@ -116,7 +116,7 @@ sims <- lapply(1:100, function(i){
 dat <- melt(sims, id=names(sims[[1]]))  
 dt <- data.table(dat)
 setnames(dt, "L1", "reps") # names are nice
-crashed <- dt[time==(OptTime-1), fishstock == 0, by=reps]
+crashed <- dt[time==as.integer(OptTime-1), fishstock == 0, by=reps]
 p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) + 
   geom_abline(intercept=xT, slope = 0, lty=2) 
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)

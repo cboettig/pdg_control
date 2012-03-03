@@ -147,13 +147,13 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk fishstock](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock19.png) 
+![plot of chunk fishstock](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock21.png) 
 
 
 
 
 ```r
-crashed <- dt[time==(OptTime-1), fishstock == 0, by=reps]
+crashed <- dt[time==as.integer(OptTime-1), fishstock == 0, by=reps]
 rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
 ```
 
@@ -197,13 +197,13 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk unnamed-chunk-2](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-29.png) 
+![plot of chunk unnamed-chunk-2](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-210.png) 
 
 
 
 
 ```r
-crashed <- dt[time==(OptTime-1), fishstock == 0, by=reps]
+crashed <- dt[time==as.integer(OptTime-1), fishstock == 0, by=reps]
 rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
 ```
 
@@ -227,13 +227,13 @@ sims <- lapply(1:100, function(i){
 dat <- melt(sims, id=names(sims[[1]]))  
 dt <- data.table(dat)
 setnames(dt, "L1", "reps") # names are nice
-crashed <- dt[time==(OptTime-1), fishstock == 0, by=reps]
+crashed <- dt[time==as.integer(OptTime-1), fishstock == 0, by=reps]
 p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) + 
   geom_abline(intercept=xT, slope = 0, lty=2) 
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk unnamed-chunk-4](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-41.png) 
+![plot of chunk unnamed-chunk-4](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-42.png) 
 
 
 A total of `NaN &times; 10<sup>-Inf</sup>` crash.
