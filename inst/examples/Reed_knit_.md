@@ -1,11 +1,11 @@
-<!--roptions dev="png", fig.width=7, fig.height=5, fig.path='ex-out-', tidy=FALSE, warning=FALSE, comment=NA, cache.path="reed/", message=FALSE, cache=FALSE-->
+<!--roptions dev="png", fig.width=7, fig.height=5, fig.path='ex-out-', tidy=FALSE, warning=FALSE, comment=NA, cache.path="reed/", message=FALSE, cache=TRUE-->
 <!--begin.rcode echo=FALSE 
 render_gfm()
 opts_knit$set(upload = TRUE)
-#opts_knit$set(upload.fun = function(file){
-#   library(RWordPress) 
-#   uploadFile(file)$url
-#  })
+opts_knit$set(upload.fun = function(file){
+   library(RWordPress) 
+   uploadFile(file, type="image/png")$url
+  })
 end.rcode-->
 
 # Reed Model

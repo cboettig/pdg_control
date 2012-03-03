@@ -1,6 +1,6 @@
 require(pdgControl)
 
-sigma_g <- 0.2    # Noise in population growth
+sigma_g <- 0.8    # Noise in population growth
 z_g <- function() rlnorm(1,  0, sigma_g) # mean 1
 f <- BevHolt                # Select the state equation
 pars <- c(2, 4)             # parameters for the state equation
@@ -17,14 +17,20 @@ likelihood_estimator <- function(f, x, guess_p = NULL){
   loglikfn <- function(pars){
     probs <- sapply(1:(length(x)-1), function(i){
       mu <- f(x[i],0,pars)
-      dlnorm(x[i+1], meanlog=log(mu), sdlog=sigma_g, log=TRUE)
+      sigma <-  
+      dlnorm(x[i+1], meanlog=log(mu+sigma_g^2/2), sdlog=sigma_g, log=TRUE)
     })
     -sum(probs)
   }
   o <- optim(guess_p, loglikfn)
 }
 
+out <- likelihood_estimator(f, x, pars)
+out
 
+
+X <- 5 * rlnorm(10000, 0, 1)
+-sum(dlnorm(X, log(5), 1))
 
 
 
