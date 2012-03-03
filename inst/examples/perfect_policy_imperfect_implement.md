@@ -160,7 +160,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk fishstock](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock6.png) 
+![plot of chunk fishstock](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock7.png) 
 
 
 We can also look at the harvest dynamics:
@@ -170,7 +170,7 @@ We can also look at the harvest dynamics:
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 ```
 
-![plot of chunk harvest](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-harvest6.png) 
+![plot of chunk harvest](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-harvest7.png) 
 
 
 This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement and see if it is less variable than fish stock, and if it is near Reed's S: 
@@ -180,7 +180,7 @@ This strategy is supposed to be a constant-escapement strategy. We can visualize
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 ```
 
-![plot of chunk escapement](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-escapement6.png) 
+![plot of chunk escapement](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-escapement7.png) 
 
 
 ### Computing additional statistics about the data
@@ -197,7 +197,22 @@ rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
 
 
 
-A total of \Sexpr{sum(crashed$V1)} crash.
+A total of 
+
+
+```r
+sum(crashed$V1)
+```
+
+
+
+```
+[1] 52
+```
+
+
+
+crash.
 
 Let's compute the profits at each time-step for each replicate. 
 Using `data.table` to evaluate our profit function over the stock and harvest levels requires indexing our data:
@@ -296,7 +311,7 @@ Total profits
 ggplot(dt, aes(total.profit, fill=crashed)) + geom_histogram(alpha=.8)
 ```
 
-![plot of chunk totals](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-totals6.png) 
+![plot of chunk totals](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-totals7.png) 
 
 
 ## Compare to a non-optimal solution
@@ -370,7 +385,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk unnamed-chunk-1](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-13.png) 
+![plot of chunk unnamed-chunk-1](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-14.png) 
 
 
 
@@ -379,7 +394,7 @@ p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 ```
 
-![plot of chunk unnamed-chunk-2](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-23.png) 
+![plot of chunk unnamed-chunk-2](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-24.png) 
 
 
 
@@ -388,7 +403,7 @@ p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 ```
 
-![plot of chunk unnamed-chunk-3](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-33.png) 
+![plot of chunk unnamed-chunk-3](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-34.png) 
 
 
 ### Computing additional statistics about the data
@@ -401,6 +416,22 @@ rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
 
 
 
+A total of 
+
+
+```r
+sum(crashed$V1)
+```
+
+
+
+```
+[1] 61
+```
+
+
+
+crash.
 
 
 
@@ -486,7 +517,7 @@ Error: object 'stats' not found
 ggplot(dt, aes(total.profit, fill=crashed)) + geom_histogram(alpha=.8)
 ```
 
-![plot of chunk unnamed-chunk-10](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-103.png) 
+![plot of chunk unnamed-chunk-10](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-104.png) 
 
 
 

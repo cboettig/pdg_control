@@ -1,10 +1,11 @@
 <!--roptions dev="png", fig.width=7, fig.height=5, fig.path='ex-out-', tidy=FALSE, warning=FALSE, comment=NA, cache.path="reed/", message=FALSE, cache=TRUE-->
+
 <!--begin.rcode echo=FALSE 
 render_gfm()
 opts_knit$set(upload = TRUE)
 opts_knit$set(upload.fun = function(file){
    library(RWordPress) 
-   uploadFile(file, type="image/png")$url
+   uploadFile(file)$url
   })
 end.rcode-->
 
@@ -258,7 +259,7 @@ end.rcode-->
 Note that when the boundary is sufficiently far away, i.e. for the first couple timesteps, the optimal policy is stationary.  The optimal policy is shown here over time, where the color indicates the harvest recommended for each possible stock value at that time (shown on the vertical axis).  Note that below a certain stock value, harvesting is not recommended and the dots turn red (Reed's constant escapement rule!)  However, at very low values, harvesting starts again (orange dots), because of the allee effect - these populations are doomed anyway, so may as well fish all that remains.
 
 Note that interestingly, populations just below the allee threshold are given the chance to be rescued stochastically early on - that small chance that they recover is worth the expected loss.  The "no-harvest" zones stand out clearly in the red areas of this graph.
-<!--begin.rcode policy, fig.width=9,
+<!--begin.rcode policy, fig.width=9
 policy <- melt(opt$D)
 policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
 p5 <- ggplot(policy_zoom) + 
@@ -273,7 +274,7 @@ end.rcode-->
 The harvest intensity is limited by the stock size.  If instead we look at the difference between proposed harvest intensity and stock,
 then the red zones correspond to places where harvest equals stock, i.e. we slam the population. The allee band is clearly seen. Just for fun, we overlay the replicate dynamics on this plot 
 
-<!--begin.rcode policy2, fig.width=10,
+<!--begin.rcode policy2, fig.width=10
 p6 <- ggplot(policy_zoom) + 
   geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
   labs(x = "time", y = "fishstock") +
