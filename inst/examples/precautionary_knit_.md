@@ -76,6 +76,11 @@ This plot summarizes the stock dynamics by visualizing the replicates. Reed's S 
 <!--begin.rcode fishstock 
 end.rcode-->
 
+<!--begin.rcode crashed
+end.rcode-->
+A total of <!--rinline sum(crashed$V1) --> crash.
+
+
 
 
 

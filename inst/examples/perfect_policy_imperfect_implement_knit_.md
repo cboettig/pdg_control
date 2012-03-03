@@ -90,25 +90,24 @@ A total of <!--rinline sum(crashed$V1) --> crash.
 ## Compare to a non-optimal solution
 Compare another model, that likewise assumes no implementation error, and also makes a mistake in its estimate of the growth parameter, making it conservative rather than optimal.
 
-<!--begin.rcode model2_guesses
-pars <- c(1, K, 1.5)
+
+<!--begin.rcode redoSDP
+SDP_Mat <- determine_SDP_matrix(f, c(1,4,2), x_grid, h_grid, sigma_g )
 end.rcode-->
 
-<!--begin.rcode redoSDP, ref.label="determine_SDP_matrix"
+<!--begin.rcode redoOpt
+nonopt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, 
+                     profit, delta, reward=reward)
 end.rcode-->
 
-<!--begin.rcode redoOpt, ref.label="find_dp_optim"
-end.rcode-->
-
-For the simulated implementation, we add the same implementation error back, and we restore biological allee threshold to it's true value. 
-<!--begin.rcode implement_error_again
-sigma_i <- 0.4
-pars <- c(1, K, 1)
-end.rcode-->
 
 ### Simulate 
-Now we simulate as before
-<!--begin.rcode simagain, ref.label="simulate"
+For the simulated implementation, we add the same implementation error back, and we restore biological allee threshold to it's true value. 
+<!--begin.rcode simagain
+sigma_i <- .4
+sims <- lapply(1:100, function(i){
+  ForwardSimulate(f, c(1,4,2), x_grid, h_grid, x0, nonopt$D, z_g, z_m, z_i)
+})
 end.rcode-->
 
 ## Summarize and plot the results                                                  

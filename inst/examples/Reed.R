@@ -161,6 +161,8 @@ p5
 
 
 ## @knitr policyvis2
+policy <- melt(opt$D)
+policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
 p6 <- ggplot(policy_zoom) + 
   geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
   labs(x = "time", y = "fishstock") +
