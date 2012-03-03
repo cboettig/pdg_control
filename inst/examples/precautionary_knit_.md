@@ -85,7 +85,7 @@ A total of <!--rinline sum(crashed$V1) --> crash.
 ### So is this more robust?
 Here's the policy under higher intrinsic noise than it was designed for:
 <!--begin.rcode simulate_edited_noisy
-sigma_g <- .3
+sigma_g <- .25
 sims <- lapply(1:100, function(i){
   ForwardSimulate(f, c(1,K,1), x_grid, h_grid, x0, opt$D, z_g, z_m, z_i)
 })
@@ -109,14 +109,14 @@ pars <- c(1,K,1)
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g=.2)
 opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, 
                      profit, delta, reward=reward)
-sigma_g <- .3
+sigma_g <- .25
 sims <- lapply(1:100, function(i){
   ForwardSimulate(f, pars, x_grid, h_grid, x0, opt$D, z_g, z_m, z_i)
 })
 dat <- melt(sims, id=names(sims[[1]]))  
 dt <- data.table(dat)
 setnames(dt, "L1", "reps") # names are nice
-crashed <- dt[time==OptTime-1, fishstock == 0, by=reps]
+crashed <- dt[time==(OptTime-1), fishstock == 0, by=reps]
 p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) + 
   geom_abline(intercept=xT, slope = 0, lty=2) 
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)

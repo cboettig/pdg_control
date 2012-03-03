@@ -147,13 +147,13 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk fishstock](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock18.png) 
+![plot of chunk fishstock](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock19.png) 
 
 
 
 
 ```r
-crashed <- dt[time==OptTime-1, fishstock == 0, by=reps]
+crashed <- dt[time==(OptTime-1), fishstock == 0, by=reps]
 rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
 ```
 
@@ -168,7 +168,7 @@ Here's the policy under higher intrinsic noise than it was designed for:
 
 
 ```r
-sigma_g <- .3
+sigma_g <- .25
 sims <- lapply(1:100, function(i){
   ForwardSimulate(f, c(1,K,1), x_grid, h_grid, x0, opt$D, z_g, z_m, z_i)
 })
@@ -197,13 +197,13 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk unnamed-chunk-2](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-28.png) 
+![plot of chunk unnamed-chunk-2](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-29.png) 
 
 
 
 
 ```r
-crashed <- dt[time==OptTime-1, fishstock == 0, by=reps]
+crashed <- dt[time==(OptTime-1), fishstock == 0, by=reps]
 rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
 ```
 
@@ -220,20 +220,20 @@ pars <- c(1,K,1)
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g=.2)
 opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, 
                      profit, delta, reward=reward)
-sigma_g <- .3
+sigma_g <- .25
 sims <- lapply(1:100, function(i){
   ForwardSimulate(f, pars, x_grid, h_grid, x0, opt$D, z_g, z_m, z_i)
 })
 dat <- melt(sims, id=names(sims[[1]]))  
 dt <- data.table(dat)
 setnames(dt, "L1", "reps") # names are nice
-crashed <- dt[time==OptTime-1, fishstock == 0, by=reps]
+crashed <- dt[time==(OptTime-1), fishstock == 0, by=reps]
 p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) + 
   geom_abline(intercept=xT, slope = 0, lty=2) 
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk unnamed-chunk-4](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-4.png) 
+![plot of chunk unnamed-chunk-4](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-41.png) 
 
 
 A total of `NaN &times; 10<sup>-Inf</sup>` crash.
