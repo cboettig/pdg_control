@@ -132,8 +132,10 @@ Compare another model, that likewise assumes no implementation error, and also m
 pars <- c(1, K, 1.5)
 end.rcode-->
 
+<!--begin.rcode redoSDP, ref.label="determine_SDP_matrix"
+end.rcode-->
 
-<!--begin.rcode find_dp_optim 
+<!--begin.rcode redoOpt, ref.label="find_dp_optim"
 end.rcode-->
 
 For the simulated implementation, we add the same implementation error back, and we restore biological growth noise to it's true value

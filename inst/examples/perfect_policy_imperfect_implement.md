@@ -156,7 +156,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk fishstock](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock8.png) 
+![plot of chunk fishstock](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock10.png) 
 
 
 We can also look at the harvest dynamics:
@@ -166,7 +166,7 @@ We can also look at the harvest dynamics:
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 ```
 
-![plot of chunk harvest](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-harvest8.png) 
+![plot of chunk harvest](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-harvest10.png) 
 
 
 This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement and see if it is less variable than fish stock, and if it is near Reed's S: 
@@ -176,7 +176,7 @@ This strategy is supposed to be a constant-escapement strategy. We can visualize
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 ```
 
-![plot of chunk escapement](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-escapement8.png) 
+![plot of chunk escapement](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-escapement10.png) 
 
 
 ### Computing additional statistics about the data
@@ -193,7 +193,7 @@ rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
 
 
 
-A total of `48` crash.
+A total of `47` crash.
 
 Let's compute the profits at each time-step for each replicate. 
 Using `data.table` to evaluate our profit function over the stock and harvest levels requires indexing our data:
@@ -292,7 +292,7 @@ Total profits
 ggplot(dt, aes(total.profit, fill=crashed)) + geom_histogram(alpha=.8)
 ```
 
-![plot of chunk totals](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-totals8.png) 
+![plot of chunk totals](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-totals10.png) 
 
 
 ## Compare to a non-optimal solution
@@ -304,6 +304,14 @@ Compare another model, that likewise assumes no implementation error, and also m
 pars <- c(1, K, 1.5)
 ```
 
+
+
+
+
+
+```r
+SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g )
+```
 
 
 
@@ -364,7 +372,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk unnamed-chunk-1](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-15.png) 
+![plot of chunk unnamed-chunk-1](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-17.png) 
 
 
 
@@ -373,7 +381,7 @@ p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 ```
 
-![plot of chunk unnamed-chunk-2](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-25.png) 
+![plot of chunk unnamed-chunk-2](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-27.png) 
 
 
 
@@ -382,7 +390,7 @@ p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 ```
 
-![plot of chunk unnamed-chunk-3](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-35.png) 
+![plot of chunk unnamed-chunk-3](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-37.png) 
 
 
 ### Computing additional statistics about the data
@@ -395,7 +403,7 @@ rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
 
 
 
-A total of `45` crash.
+A total of `49` crash.
 
 
 
@@ -481,7 +489,7 @@ Error: object 'stats' not found
 ggplot(dt, aes(total.profit, fill=crashed)) + geom_histogram(alpha=.8)
 ```
 
-![plot of chunk unnamed-chunk-10](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-105.png) 
+![plot of chunk unnamed-chunk-10](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-107.png) 
 
 
 
