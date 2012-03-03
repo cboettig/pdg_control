@@ -156,7 +156,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk fishstock](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock11.png) 
+![plot of chunk fishstock](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock16.png) 
 
 
 ### Computing additional statistics about the data
@@ -173,7 +173,7 @@ rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
 
 
 
-A total of `38` crash.
+A total of `46` crash.
 
 
 
@@ -182,8 +182,9 @@ Compare another model, that likewise assumes no implementation error, and also m
 
 
 
+
 ```r
-pars <- c(1, K, 1.5)
+SDP_Mat <- determine_SDP_matrix(f, c(1,4,2), x_grid, h_grid, sigma_g )
 ```
 
 
@@ -192,40 +193,22 @@ pars <- c(1, K, 1.5)
 
 
 ```r
-SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g )
-```
-
-
-
-
-
-
-```r
-opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, 
+nonopt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, 
                      profit, delta, reward=reward)
 ```
 
 
 
 
+
+### Simulate 
 For the simulated implementation, we add the same implementation error back, and we restore biological allee threshold to it's true value. 
 
 
 ```r
-sigma_i <- 0.4
-pars <- c(1, K, 1)
-```
-
-
-
-
-### Simulate 
-Now we simulate as before
-
-
-```r
+sigma_i <- .4
 sims <- lapply(1:100, function(i){
-  ForwardSimulate(f, pars, x_grid, h_grid, x0, opt$D, z_g, z_m, z_i)
+  ForwardSimulate(f, c(1,4,2), x_grid, h_grid, x0, nonopt$D, z_g, z_m, z_i)
 })
 ```
 
@@ -254,7 +237,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk unnamed-chunk-1](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-18.png) 
+![plot of chunk unnamed-chunk-1](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-110.png) 
 
 
 ### Computing additional statistics about the data
@@ -267,6 +250,6 @@ rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
 
 
 
-A total of `50` crash.
+A total of `53` crash.
 
 
