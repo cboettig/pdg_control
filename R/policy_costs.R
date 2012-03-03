@@ -36,8 +36,6 @@ optim_policy <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit,
     Vi[x_grid >= xT] <- reward # a "scrap value" for x(T) >= xT
     Vi
   }) 
-
- 
   # loop through time  
   for(time in 1:OptTime ){ 
   # loop over all possible values for last year's harvest level
@@ -50,7 +48,7 @@ optim_policy <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit,
         else if(penalty=="L1")
           change_cost <- P * abs(h_grid[i] - h_grid[ h_prev]) 
         else if(penalty=="asymmetric")
-          change_cost <- P * max(h_grid[h_prev]-h_grid[i], 0) 
+          change_cost <- P * max(h_grid[h_prev] - h_grid[i], 0) 
         else if(penalty=="fixed")
           change_cost <- P
         else 

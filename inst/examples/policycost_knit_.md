@@ -1,4 +1,4 @@
-<!--roptions dev="png", fig.width=7, fig.height=5, tidy=FALSE, warning=FALSE, message=FALSE, comment=NA, cache.path="policycost/, cache=FALSE"-->
+<!--roptions dev='png', fig.width=7, fig.height=5, tidy=FALSE, warning=FALSE, message=FALSE, comment=NA, cache.path="policycost/", cache=FALSE-->
 
 <!--begin.rcode setup, include=FALSE
 render_gfm()  
@@ -57,10 +57,10 @@ We use Bellman's dynamic programming algorithm to compute the optimal solution f
 <!--begin.rcode find_dp_optim 
 end.rcode-->
 
-A modified algorithm lets us include a penalty of magnitude `P` and a functional form that can be an `L1` norm, `L2`  norm, `asymmetric` L1 norm, fixed cost, or `none` (no cost).  Here is an asymmetric norm example. 
+A modified algorithm lets us include a penalty of magnitude `P` and a functional form that can be an `L1` norm, `L2`  norm, `asymmetric` L1 norm, fixed cost, or `none` (no cost).  Here is an asymmetric norm example.  Note that this calculation is considerably slower. 
 <!--begin.rcode policycost_optim
-policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, .25*K, 
-                    profit, delta, reward=0, P=.3, penalty="asym")
+policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
+                    profit, delta, reward=reward, P=.3, penalty="asym")
 end.rcode-->
 
 
@@ -105,5 +105,16 @@ p6 <- ggplot(policy_zoom) +
   geom_abline(intercept=xT, slope=0, lty=2)  
 p6 + geom_line(aes(time, alternate, group = reps), alpha = 0.1, data=dt)
 end.rcode-->
+
+
+Compare dynamics on a single replicate to see how this policy differs from the Reed policy. 
+<!--begin.rcode plot_rep2
+ggplot(subset(dt,reps==1)) +
+  geom_line(aes(time, fishstock)) +
+  geom_abline(intercept=opt$S, slope = 0) +
+  geom_line(aes(time, harvest), col="darkgreen") 
+
+end.rcode-->
+
 
 

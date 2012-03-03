@@ -47,7 +47,18 @@ cost <- .01
 x0 <- K - sigma_g ^ 2 / 2 
 
 ## @knitr profit 
-profit <- profit_harvest(p=price, c = cost) 
+profit <-
+function(x_grid, h_i){
+  price_fish <- price
+  stock_effect <- 0
+  operating_cost <- cost * price_fish # trying to harvest more than costs
+  sapply(x_grid, function(x_i){
+    price_fish * min(h_i, x_i) - operating_cost * h_i  - stock_effect / (x_i + 1e-12)
+    # avoids NaNs when checking the 0 stock condition
+  })
+}
+
+
 
 ## @knitr create_grid
 x_grid <- seq(0, 2 * K, length = gridsize)  

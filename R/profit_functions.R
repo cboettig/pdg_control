@@ -34,8 +34,12 @@ profit_harvest  <- function(p = 1, c = 0.000){
 #'  of harvest values, rather than a range of stock values, by simply swapping 
 #'  x and h, i.e. give a vector of h values as x_grid, and a single stock size as h_i. 
   function(x_grid, h_i){
+    price_fish <- p
+    stock_effect <- c
+    operating_cost <- .1 * p ## doesn't matter if we gonna take max(0,profit)
     sapply(x_grid, function(x_i){
-      max(0, p * min(h_i, x_i) - c / x_i)
+      price_fish * min(h_i, x_i) - operating_cost * h_i  - stock_effect / (x_i + 1e-12)
+      # 1e-12 to avoid NaNs at zero stock condition
     })
   }
 }
