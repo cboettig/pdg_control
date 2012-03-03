@@ -117,7 +117,7 @@ A modified algorithm lets us include a penalty of magnitude `P` and a functional
 
 ```r
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                    profit, delta, reward, P = 1, penalty = "asym")
+                    profit, delta, reward, P = .3, penalty = "asym")
 ```
 
 
@@ -168,7 +168,7 @@ p5 <- ggplot(policy_zoom) +
 p5 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1, data=dt)
 ```
 
-![plot of chunk policy_cost_vis](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-policy_cost_vis2.png) 
+![plot of chunk policy_cost_vis](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-policy_cost_vis3.png) 
 
 
 Against the policy with no cost: 
@@ -186,7 +186,7 @@ p6 <- ggplot(policy_zoom) +
 p6 + geom_line(aes(time, alternate, group = reps), alpha = 0.1, data=dt)
 ```
 
-![plot of chunk no_policy_cost_vis](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-no_policy_cost_vis2.png) 
+![plot of chunk no_policy_cost_vis](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-no_policy_cost_vis3.png) 
 
 
 
@@ -200,7 +200,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest), col="darkgreen") 
 ```
 
-![plot of chunk plot_rep2](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-plot_rep21.png) 
+![plot of chunk plot_rep2](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-plot_rep22.png) 
 
 
 ## Alternate policy cost models 
@@ -210,7 +210,7 @@ ggplot(subset(dt,reps==1)) +
 
 ```r
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                    profit, delta, reward, P = 1, penalty = "L2")
+                    profit, delta, reward, P = .3, penalty = "L2")
 ```
 
 
@@ -226,7 +226,7 @@ ggplot(policy_zoom) +
   geom_abline(intercept=xT, slope=0, lty=2)
 ```
 
-![plot of chunk policy_cost_vis_l2](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-policy_cost_vis_l2.png) 
+![plot of chunk policy_cost_vis_l2](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-policy_cost_vis_l21.png) 
 
 
 
@@ -235,7 +235,7 @@ ggplot(policy_zoom) +
 
 ```r
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                    profit, delta, reward, P = 1, penalty = "L1")
+                    profit, delta, reward, P = .3, penalty = "L1")
 ```
 
 
@@ -251,7 +251,7 @@ ggplot(policy_zoom) +
   geom_abline(intercept=xT, slope=0, lty=2)
 ```
 
-![plot of chunk policy_cost_vis_l1](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-policy_cost_vis_l1.png) 
+![plot of chunk policy_cost_vis_l1](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-policy_cost_vis_l11.png) 
 
 
 
