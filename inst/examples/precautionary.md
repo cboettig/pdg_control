@@ -147,7 +147,19 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk fishstock](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock13.png) 
+![plot of chunk fishstock](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock15.png) 
+
+
+
+
+```r
+crashed <- dt[time==OptTime, fishstock == 0, by=reps]
+rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
+```
+
+
+
+A total of `47` crash.
 
 
 
