@@ -9,7 +9,7 @@ opts_knit$set(upload.fun = function(file){
 read_chunk("Reed.R")
 end.rcode-->
 
-<!--roptions dev="png", fig.width=7, fig.height=5, tidy=FALSE, warning=FALSE, message=FALSE, comment=NA, external=TRUE, cache=TRUE, cache.path="perfectpolicy/"-->
+<!--roptions dev="png", fig.width=7, fig.height=5, tidy=FALSE, warning=FALSE, message=FALSE, comment=NA, external=TRUE, cache=FALSE, cache.path="perfectpolicy/"-->
 
 # Perfect Policy, Imperfect Implementation
 
@@ -58,7 +58,7 @@ end.rcode-->
 ### The optimal policy is implemented imperfectly
 We add implementation noise: an imperfect implementation (though a symmetric one -- on average the implementation is not worse than assumed by the optimal solution, it is simply variable). 
 <!--begin.rcode implementation_errors
-sigma_i <- 0.8
+sigma_i <- 0.4
 end.rcode-->
 
 ### Simulate 
@@ -137,7 +137,7 @@ end.rcode-->
 
 For the simulated implementation, we add the same implementation error back, and we restore biological growth noise to it's true value
 <!--begin.rcode implement_error_again
-sigma_i <- 0.8
+sigma_i <- 0.4
 sigma_g <- 0.2
 end.rcode-->
 
@@ -179,10 +179,10 @@ end.rcode-->
 end.rcode-->
 
 #### Profit plots
-<!--begin.rcode ref.label="profit_by_time", include=FALSE
+<!--begin.rcode ref.label="profit_by_time" 
 end.rcode-->
 
-<!--begin.rcode ref.label="totals", include=FALSE
+<!--begin.rcode ref.label="totals" 
 end.rcode-->
 
 
