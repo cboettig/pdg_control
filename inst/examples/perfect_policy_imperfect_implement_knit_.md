@@ -91,6 +91,8 @@ Which replicates crashed?  Which met the boundary requirment and recieved the re
 <!--begin.rcode crashed
 end.rcode-->
 
+A total of \Sexpr{sum(crashed$V1)} crash.
+
 Let's compute the profits at each time-step for each replicate. 
 Using `data.table` to evaluate our profit function over the stock and harvest levels requires indexing our data:
 
@@ -128,7 +130,7 @@ Compare another model, that likewise assumes no implementation error, and also m
 
 <!--begin.rcode model2_guesses
 sigma_i <- 0.0
-sigma_g <- 0.4
+sigma_g <- 0.6
 end.rcode-->
 
 

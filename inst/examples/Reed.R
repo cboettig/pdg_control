@@ -13,7 +13,7 @@ gridsize <- 100   # gridsize (discretized population)
 sigma_g <- 0.2    # Noise in population growth
 sigma_m <- 0.     # noise in stock assessment measurement
 sigma_i <- 0.     # noise in implementation of the quota
-reward <- 0       # bonus for satisfying the boundary condition
+reward <- 1       # bonus for satisfying the boundary condition
 
 ## @knitr noise_dists
 z_g <- function() rlnorm(1,  0, sigma_g) # mean 1
@@ -63,7 +63,7 @@ SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=999)
 
 ## @knitr find_dp_optim 
 opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                     profit, delta, reward=1)
+                     profit, delta, reward=reward)
 
 ## @knitr simulate
 sims <- lapply(1:100, function(i){
