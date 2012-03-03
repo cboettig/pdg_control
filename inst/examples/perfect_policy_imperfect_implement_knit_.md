@@ -76,14 +76,6 @@ This plot summarizes the stock dynamics by visualizing the replicates. Reed's S 
 <!--begin.rcode fishstock 
 end.rcode-->
 
-We can also look at the harvest dynamics:
-<!--begin.rcode harvest
-end.rcode-->
-
-This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement and see if it is less variable than fish stock, and if it is near Reed's S: 
-<!--begin.rcode escapement
-end.rcode-->
-
 ### Computing additional statistics about the data
 In this section we add some additional information to our data.table on the profits obtained by each replicate.  The algorithm has supposedly maximized the expected profit, so it is useful to look at both the mean total profit and the distribution.  Despite this maximization, the distribution can be rather lop-sided or even bimodal. 
 
@@ -93,37 +85,7 @@ end.rcode-->
 
 A total of <!--rinline sum(crashed$V1) --> crash.
 
-Let's compute the profits at each time-step for each replicate. 
-Using `data.table` to evaluate our profit function over the stock and harvest levels requires indexing our data:
 
-<!--begin.rcode profits
-end.rcode-->
-
-Merging this calculation back into our data table using fast join (needs to define 'id' as a key on which to match things up though). 
-<!--begin.rcode join
-end.rcode-->
-
-Compute total profit by summing over each timeseries (including the reward for satisfying the terminal boundary condition, if any). 
-
-<!--begin.rcode total_profit
-end.rcode-->
-
-
-Add these three columns to the data.table (fast join and re-label):
-<!--begin.rcode joinmore
-end.rcode-->
-
-
-
-#### Profit plots
-Since the optimal strategy maximizes expected profit, it may be more useful to look at the distribution statistics of profit over time:
-<!--begin.rcode profit_by_time
-end.rcode-->
-
-
-Total profits
-<!--begin.rcode totals
-end.rcode-->
 
 ## Compare to a non-optimal solution
 Compare another model, that likewise assumes no implementation error, and also makes a mistake in its estimate of the growth parameter, making it conservative rather than optimal.
@@ -138,11 +100,11 @@ end.rcode-->
 <!--begin.rcode redoOpt, ref.label="find_dp_optim"
 end.rcode-->
 
-For the simulated implementation, we add the same implementation error back, and we restore biological growth noise to it's true value
+For the simulated implementation, we add the same implementation error back, and we restore biological allee threshold to it's true value. 
 <!--begin.rcode implement_error_again
 sigma_i <- 0.4
+pars <- c(1, K, 1)
 end.rcode-->
-
 
 ### Simulate 
 Now we simulate as before
@@ -158,34 +120,9 @@ end.rcode-->
 <!--begin.rcode ref.label="fishstock"
 end.rcode-->
 
-<!--begin.rcode ref.label="harvest"
-end.rcode-->
-
-<!--begin.rcode ref.label="escapement"
-end.rcode-->
-
 ### Computing additional statistics about the data
 <!--begin.rcode ref.label="crashed"
 end.rcode-->
 A total of <!--rinline sum(crashed$V1) --> crash.
-
-<!--begin.rcode ref.label="profits"
-end.rcode-->
-
-<!--begin.rcode ref.label="join"
-end.rcode-->
-
-<!--begin.rcode ref.label="total_profit"
-end.rcode-->
-
-<!--begin.rcode ref.label="joinmore"
-end.rcode-->
-
-#### Profit plots
-<!--begin.rcode ref.label="profit_by_time" 
-end.rcode-->
-
-<!--begin.rcode ref.label="totals" 
-end.rcode-->
 
 

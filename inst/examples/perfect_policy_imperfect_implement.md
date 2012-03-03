@@ -156,27 +156,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk fishstock](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock10.png) 
-
-
-We can also look at the harvest dynamics:
-
-
-```r
-p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
-```
-
-![plot of chunk harvest](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-harvest10.png) 
-
-
-This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement and see if it is less variable than fish stock, and if it is near Reed's S: 
-
-
-```r
-p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
-```
-
-![plot of chunk escapement](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-escapement10.png) 
+![plot of chunk fishstock](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock11.png) 
 
 
 ### Computing additional statistics about the data
@@ -193,106 +173,8 @@ rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
 
 
 
-A total of `47` crash.
+A total of `38` crash.
 
-Let's compute the profits at each time-step for each replicate. 
-Using `data.table` to evaluate our profit function over the stock and harvest levels requires indexing our data:
-
-
-
-```r
-dt <- data.table(dt, id=1:dim(dt)[1])
-profits <- dt[, profit(fishstock, harvest), by=id]
-```
-
-
-
-
-Merging this calculation back into our data table using fast join (needs to define 'id' as a key on which to match things up though). 
-
-
-```r
-setkey(dt, id)
-setkey(profits, id)
-dt <- dt[profits]
-setnames(dt, "V1", "profits")
-setkey(dt, reps)
-```
-
-
-
-
-Compute total profit by summing over each timeseries (including the reward for satisfying the terminal boundary condition, if any). 
-
-
-
-```r
-total_profit <- dt[,sum(profits), by=reps]
-total_profit <- total_profit + rewarded$V1 * reward 
-```
-
-
-
-
-
-Add these three columns to the data.table (fast join and re-label):
-
-
-```r
-setkey(total_profit, reps)
-setkey(crashed, reps)
-setkey(rewarded, reps)
-dt <- dt[total_profit]
-dt <- dt[crashed]
-dt <- dt[rewarded]
-setnames(dt, c("V1", "V1.1", "V1.2"), c("total.profit", "crashed", "rewarded"))
-```
-
-
-
-
-
-
-#### Profit plots
-Since the optimal strategy maximizes expected profit, it may be more useful to look at the distribution statistics of profit over time:
-
-
-```r
-stats <- dt[ , mean_sdl(profits), by = time]
-```
-
-
-
-```
-Error: columns of j don't evaluate to consistent types for each group: result for group 51 has column 1 type 'logical' but expecting type 'numeric'
-```
-
-
-
-```r
-p1 + geom_line(dat=stats, aes(x=time, y=y), col="lightgrey") + 
-  geom_ribbon(aes(x = time, ymin = ymin, ymax = ymax),
-              fill = "darkred", alpha = 0.2, dat=stats)
-```
-
-
-
-```
-Error: object 'stats' not found
-```
-
-
-
-
-
-Total profits
-
-
-```r
-ggplot(dt, aes(total.profit, fill=crashed)) + geom_histogram(alpha=.8)
-```
-
-![plot of chunk totals](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-totals10.png) 
 
 
 ## Compare to a non-optimal solution
@@ -326,13 +208,13 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT,
 
 
 
-For the simulated implementation, we add the same implementation error back, and we restore biological growth noise to it's true value
+For the simulated implementation, we add the same implementation error back, and we restore biological allee threshold to it's true value. 
 
 
 ```r
 sigma_i <- 0.4
+pars <- c(1, K, 1)
 ```
-
 
 
 
@@ -372,25 +254,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk unnamed-chunk-1](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-17.png) 
-
-
-
-
-```r
-p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
-```
-
-![plot of chunk unnamed-chunk-2](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-27.png) 
-
-
-
-
-```r
-p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
-```
-
-![plot of chunk unnamed-chunk-3](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-37.png) 
+![plot of chunk unnamed-chunk-1](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-18.png) 
 
 
 ### Computing additional statistics about the data
@@ -403,93 +267,6 @@ rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
 
 
 
-A total of `49` crash.
-
-
-
-```r
-dt <- data.table(dt, id=1:dim(dt)[1])
-profits <- dt[, profit(fishstock, harvest), by=id]
-```
-
-
-
-
-
-
-```r
-setkey(dt, id)
-setkey(profits, id)
-dt <- dt[profits]
-setnames(dt, "V1", "profits")
-setkey(dt, reps)
-```
-
-
-
-
-
-
-```r
-total_profit <- dt[,sum(profits), by=reps]
-total_profit <- total_profit + rewarded$V1 * reward 
-```
-
-
-
-
-
-
-```r
-setkey(total_profit, reps)
-setkey(crashed, reps)
-setkey(rewarded, reps)
-dt <- dt[total_profit]
-dt <- dt[crashed]
-dt <- dt[rewarded]
-setnames(dt, c("V1", "V1.1", "V1.2"), c("total.profit", "crashed", "rewarded"))
-```
-
-
-
-
-#### Profit plots
-
-
-```r
-stats <- dt[ , mean_sdl(profits), by = time]
-```
-
-
-
-```
-Error: columns of j don't evaluate to consistent types for each group: result for group 51 has column 1 type 'logical' but expecting type 'numeric'
-```
-
-
-
-```r
-p1 + geom_line(dat=stats, aes(x=time, y=y), col="lightgrey") + 
-  geom_ribbon(aes(x = time, ymin = ymin, ymax = ymax),
-              fill = "darkred", alpha = 0.2, dat=stats)
-```
-
-
-
-```
-Error: object 'stats' not found
-```
-
-
-
-
-
-
-```r
-ggplot(dt, aes(total.profit, fill=crashed)) + geom_histogram(alpha=.8)
-```
-
-![plot of chunk unnamed-chunk-10](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-107.png) 
-
+A total of `50` crash.
 
 
