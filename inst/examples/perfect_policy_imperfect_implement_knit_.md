@@ -149,33 +149,33 @@ end.rcode-->
 
 ## Summarize and plot the results                                                  
 Using the code above, recreate the plots for this policy and simulation: 
-<!--begin.rcode tidy2, ref.label="tidy", include=FALSE
+<!--begin.rcode tidy2, ref.label="tidy"
 end.rcode-->
 
 ### Plots 
-<!--begin.rcode ref.label="fishstock", include=FALSE
+<!--begin.rcode ref.label="fishstock"
 end.rcode-->
 
-<!--begin.rcode ref.label="harvest", include=FALSE
+<!--begin.rcode ref.label="harvest"
 end.rcode-->
 
-<!--begin.rcode ref.label="escapement", include=FALSE
+<!--begin.rcode ref.label="escapement"
 end.rcode-->
 
 ### Computing additional statistics about the data
-<!--begin.rcode ref.label="crashed", include=FALSE
+<!--begin.rcode ref.label="crashed"
 end.rcode-->
 
-<!--begin.rcode ref.label="profits", include=FALSE
+<!--begin.rcode ref.label="profits"
 end.rcode-->
 
-<!--begin.rcode ref.label="join", include=FALSE
+<!--begin.rcode ref.label="join"
 end.rcode-->
 
-<!--begin.rcode ref.label="total_profit", include=FALSE
+<!--begin.rcode ref.label="total_profit"
 end.rcode-->
 
-<!--begin.rcode ref.label="joinmore", include=FALSE
+<!--begin.rcode ref.label="joinmore"
 end.rcode-->
 
 #### Profit plots

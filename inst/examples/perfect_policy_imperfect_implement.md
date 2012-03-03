@@ -22,7 +22,7 @@ gridsize <- 100   # gridsize (discretized population)
 sigma_g <- 0.2    # Noise in population growth
 sigma_m <- 0.     # noise in stock assessment measurement
 sigma_i <- 0.     # noise in implementation of the quota
-reward <- 0       # bonus for satisfying the boundary condition
+reward <- 1       # bonus for satisfying the boundary condition
 ```
 
 
@@ -107,7 +107,7 @@ Bellman's algorithm to compute the optimal solution for all possible trajectorie
 
 ```r
 opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                     profit, delta, reward=1)
+                     profit, delta, reward=reward)
 ```
 
 
@@ -118,7 +118,7 @@ We add implementation noise: an imperfect implementation (though a symmetric one
 
 
 ```r
-sigma_i <- 0.8
+sigma_i <- 0.4
 ```
 
 
@@ -160,7 +160,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk fishstock](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock4.png) 
+![plot of chunk fishstock](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock5.png) 
 
 
 We can also look at the harvest dynamics:
@@ -170,7 +170,7 @@ We can also look at the harvest dynamics:
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 ```
 
-![plot of chunk harvest](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-harvest4.png) 
+![plot of chunk harvest](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-harvest5.png) 
 
 
 This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement and see if it is less variable than fish stock, and if it is near Reed's S: 
@@ -180,7 +180,7 @@ This strategy is supposed to be a constant-escapement strategy. We can visualize
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 ```
 
-![plot of chunk escapement](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-escapement4.png) 
+![plot of chunk escapement](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-escapement5.png) 
 
 
 ### Computing additional statistics about the data
@@ -261,12 +261,29 @@ Since the optimal strategy maximizes expected profit, it may be more useful to l
 
 ```r
 stats <- dt[ , mean_sdl(profits), by = time]
+```
+
+
+
+```
+Error: columns of j don't evaluate to consistent types for each group: result for group 51 has column 1 type 'logical' but expecting type 'numeric'
+```
+
+
+
+```r
 p1 + geom_line(dat=stats, aes(x=time, y=y), col="lightgrey") + 
   geom_ribbon(aes(x = time, ymin = ymin, ymax = ymax),
               fill = "darkred", alpha = 0.2, dat=stats)
 ```
 
-![plot of chunk profit_by_time](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-profit_by_time2.png) 
+
+
+```
+Error: object 'stats' not found
+```
+
+
 
 
 
@@ -277,7 +294,7 @@ Total profits
 ggplot(dt, aes(total.profit, fill=crashed)) + geom_histogram(alpha=.8)
 ```
 
-![plot of chunk totals](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-totals4.png) 
+![plot of chunk totals](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-totals5.png) 
 
 
 ## Compare to a non-optimal solution
@@ -298,7 +315,7 @@ sigma_g <- 0.4
 
 ```r
 opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                     profit, delta, reward=1)
+                     profit, delta, reward=reward)
 ```
 
 
@@ -308,7 +325,7 @@ For the simulated implementation, we add the same implementation error back, and
 
 
 ```r
-sigma_i <- 0.8
+sigma_i <- 0.4
 sigma_g <- 0.2
 ```
 
@@ -333,29 +350,100 @@ sims <- lapply(1:100, function(i){
 Using the code above, recreate the plots for this policy and simulation: 
 
 
+```r
+dat <- melt(sims, id=names(sims[[1]]))  
+dt <- data.table(dat)
+setnames(dt, "L1", "reps") # names are nice
+```
+
+
+
 
 ### Plots 
 
 
+```r
+p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) + 
+  geom_abline(intercept=xT, slope = 0, lty=2) 
+p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
+```
+
+![plot of chunk unnamed-chunk-1](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-12.png) 
 
 
 
 
+```r
+p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
+```
 
+![plot of chunk unnamed-chunk-2](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-22.png) 
+
+
+
+
+```r
+p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
+```
+
+![plot of chunk unnamed-chunk-3](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-32.png) 
 
 
 ### Computing additional statistics about the data
 
 
+```r
+crashed <- dt[time==OptTime, fishstock == 0, by=reps]
+rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
+```
 
 
 
 
 
 
+```r
+dt <- data.table(dt, id=1:dim(dt)[1])
+profits <- dt[, profit(fishstock, harvest), by=id]
+```
 
 
 
+
+
+
+```r
+setkey(dt, id)
+setkey(profits, id)
+dt <- dt[profits]
+setnames(dt, "V1", "profits")
+setkey(dt, reps)
+```
+
+
+
+
+
+
+```r
+total_profit <- dt[,sum(profits), by=reps]
+total_profit <- total_profit + rewarded$V1 * reward 
+```
+
+
+
+
+
+
+```r
+setkey(total_profit, reps)
+setkey(crashed, reps)
+setkey(rewarded, reps)
+dt <- dt[total_profit]
+dt <- dt[crashed]
+dt <- dt[rewarded]
+setnames(dt, c("V1", "V1.1", "V1.2"), c("total.profit", "crashed", "rewarded"))
+```
 
 
 
@@ -365,12 +453,29 @@ Using the code above, recreate the plots for this policy and simulation:
 
 ```r
 stats <- dt[ , mean_sdl(profits), by = time]
+```
+
+
+
+```
+Error: columns of j don't evaluate to consistent types for each group: result for group 51 has column 1 type 'logical' but expecting type 'numeric'
+```
+
+
+
+```r
 p1 + geom_line(dat=stats, aes(x=time, y=y), col="lightgrey") + 
   geom_ribbon(aes(x = time, ymin = ymin, ymax = ymax),
               fill = "darkred", alpha = 0.2, dat=stats)
 ```
 
-![plot of chunk unnamed-chunk-9](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-91.png) 
+
+
+```
+Error: object 'stats' not found
+```
+
+
 
 
 
@@ -379,7 +484,7 @@ p1 + geom_line(dat=stats, aes(x=time, y=y), col="lightgrey") +
 ggplot(dt, aes(total.profit, fill=crashed)) + geom_histogram(alpha=.8)
 ```
 
-![plot of chunk unnamed-chunk-10](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-101.png) 
+![plot of chunk unnamed-chunk-10](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-102.png) 
 
 
 
