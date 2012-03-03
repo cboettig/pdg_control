@@ -2,10 +2,10 @@
 <!--begin.rcode echo=FALSE 
 render_gfm()
 opts_knit$set(upload = TRUE)
-opts_knit$set(upload.fun = function(file){
-   library(RWordPress) 
-   uploadFile(file)$url
-  })
+#opts_knit$set(upload.fun = function(file){
+#   library(RWordPress) 
+#   uploadFile(file)$url
+#  })
 end.rcode-->
 
 # Reed Model

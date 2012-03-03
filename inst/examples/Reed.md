@@ -199,7 +199,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest), col="darkgreen") 
 ```
 
-![plot of chunk unnamed-chunk-11](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-unnamed-chunk-11.png) 
+![plot of chunk unnamed-chunk-11](http://i.imgur.com/NWMOP.png) 
 
 
 
@@ -212,7 +212,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk unnamed-chunk-12](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-unnamed-chunk-121.png) 
+![plot of chunk unnamed-chunk-12](http://i.imgur.com/opMVT.png) 
 
 
 We can also look at the harvest dynamics:
@@ -222,7 +222,7 @@ We can also look at the harvest dynamics:
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 ```
 
-![plot of chunk unnamed-chunk-13](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-unnamed-chunk-131.png) 
+![plot of chunk unnamed-chunk-13](http://i.imgur.com/Xm9q8.png) 
 
 
 This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement: 
@@ -232,7 +232,7 @@ This strategy is supposed to be a constant-escapement strategy. We can visualize
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 ```
 
-![plot of chunk unnamed-chunk-14](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-unnamed-chunk-141.png) 
+![plot of chunk unnamed-chunk-14](http://i.imgur.com/HlIoH.png) 
 
 
 
@@ -320,7 +320,7 @@ p1 + geom_line(dat=stats, aes(x=time, y=y), col="lightgrey") +
               fill = "darkred", alpha = 0.2, dat=stats)
 ```
 
-![plot of chunk unnamed-chunk-20](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-unnamed-chunk-20.png) 
+![plot of chunk unnamed-chunk-20](http://i.imgur.com/ptYDD.png) 
 
 
 
@@ -331,7 +331,7 @@ Total profits
 ggplot(dt, aes(total.profit, fill=crashed)) + geom_histogram(alpha=.8)
 ```
 
-![plot of chunk unnamed-chunk-21](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-unnamed-chunk-21.png) 
+![plot of chunk unnamed-chunk-21](http://i.imgur.com/xbeHt.png) 
 
 
 
@@ -364,7 +364,7 @@ ggplot(subset(dt, quantile %in% c(1,4))) +
   geom_line(aes(time, fishstock, group = reps, color=quantile), alpha = 0.6) 
 ```
 
-![plot of chunk unnamed-chunk-23](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-unnamed-chunk-23.png) 
+![plot of chunk unnamed-chunk-23](http://i.imgur.com/9gzOr.png) 
 
 
 
