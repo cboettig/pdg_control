@@ -1,9 +1,11 @@
-<!--roptions dev="png", fig.width=7, fig.height=5, fig.path='ex-out-', tidy=FALSE, warning=FALSE, comment=NA, cache.path="reed/", message=FALSE, cache=TRUE-->
+<!--roptions dev="png", fig.width=7, fig.height=5, fig.path='ex-out-', tidy=FALSE, warning=FALSE, comment=NA, cache.path="reed/", message=FALSE, cache=FALSE-->
 <!--begin.rcode echo=FALSE 
 render_gfm()
 opts_knit$set(upload = TRUE)
-require(socialR)
-opts_knit$get(wordpress.url)
+opts_knit$set(upload.fun = function(file){
+   library(RWordPress) 
+   uploadFile(file)$url
+  })
 end.rcode-->
 
 # Reed Model
@@ -20,10 +22,6 @@ end.rcode-->
    and Deterministic Harvesting Models. Journal of Environmental 
    Economics and Management. 6: 350-363.
 
- 
-  Fish population dynamics:
- \\( X_{t+1} = Z_n f(X_n) \\)
-
 
 Clear the workspace and load package dependencies: 
 <!--begin.rcode setup, echo=FALSE
@@ -33,8 +31,6 @@ require(reshape2)
 require(ggplot2)
 require(data.table)
 end.rcode-->
-
-
 
 
 ### Define all parameters 
@@ -250,11 +246,6 @@ q <- data.table(reps=total_profit$reps, quantile=quantile_me(total_profit$V1))
 setkey(q, reps)
 dt <- dt[q]
 end.rcode-->
-
-<!--begin.rcode include=FALSE
-save(list=ls(), file="reed.rda")
-end.rcode-->
-
 
 Then we can plot the fishstock trajectories, indicating which derive the highest and smallest profits by color code: 
 <!--begin.rcode

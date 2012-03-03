@@ -1,12 +1,6 @@
 
 
 
-```
-Error: invalid subscript type 'closure'
-```
-
-
-
 
 # Reed Model
  * author Carl Boettiger, <cboettig@gmail.com>
@@ -22,14 +16,8 @@ Error: invalid subscript type 'closure'
    and Deterministic Harvesting Models. Journal of Environmental 
    Economics and Management. 6: 350-363.
 
- 
-  Fish population dynamics:
- \\( X_{t+1} = Z_n f(X_n) \\)
-
 
 Clear the workspace and load package dependencies: 
-
-
 
 
 
@@ -211,7 +199,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest), col="darkgreen") 
 ```
 
-![plot of chunk unnamed-chunk-11](http://i.imgur.com/1dlf8.png) 
+![plot of chunk unnamed-chunk-11](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-unnamed-chunk-11.png) 
 
 
 
@@ -224,7 +212,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk unnamed-chunk-12](http://i.imgur.com/NxKFn.png) 
+![plot of chunk unnamed-chunk-12](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-unnamed-chunk-121.png) 
 
 
 We can also look at the harvest dynamics:
@@ -234,7 +222,7 @@ We can also look at the harvest dynamics:
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 ```
 
-![plot of chunk unnamed-chunk-13](http://i.imgur.com/WTAwz.png) 
+![plot of chunk unnamed-chunk-13](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-unnamed-chunk-131.png) 
 
 
 This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement: 
@@ -244,7 +232,7 @@ This strategy is supposed to be a constant-escapement strategy. We can visualize
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 ```
 
-![plot of chunk unnamed-chunk-14](http://i.imgur.com/k1JD6.png) 
+![plot of chunk unnamed-chunk-14](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-unnamed-chunk-141.png) 
 
 
 
@@ -332,7 +320,7 @@ p1 + geom_line(dat=stats, aes(x=time, y=y), col="lightgrey") +
               fill = "darkred", alpha = 0.2, dat=stats)
 ```
 
-![plot of chunk unnamed-chunk-20](http://i.imgur.com/fdxi6.png) 
+![plot of chunk unnamed-chunk-20](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-unnamed-chunk-20.png) 
 
 
 
@@ -343,7 +331,7 @@ Total profits
 ggplot(dt, aes(total.profit, fill=crashed)) + geom_histogram(alpha=.8)
 ```
 
-![plot of chunk unnamed-chunk-21](http://i.imgur.com/v4FF8.png) 
+![plot of chunk unnamed-chunk-21](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-unnamed-chunk-21.png) 
 
 
 
@@ -368,10 +356,6 @@ dt <- dt[q]
 
 
 
-
-
-
-
 Then we can plot the fishstock trajectories, indicating which derive the highest and smallest profits by color code: 
 
 
@@ -380,7 +364,7 @@ ggplot(subset(dt, quantile %in% c(1,4))) +
   geom_line(aes(time, fishstock, group = reps, color=quantile), alpha = 0.6) 
 ```
 
-![plot of chunk unnamed-chunk-24](http://i.imgur.com/zlEgu.png) 
+![plot of chunk unnamed-chunk-23](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-unnamed-chunk-23.png) 
 
 
 
