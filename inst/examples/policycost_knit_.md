@@ -58,7 +58,7 @@ end.rcode-->
 A modified algorithm lets us include a penalty of magnitude `P` and a functional form that can be an `L1` norm, `L2`  norm, `asymmetric` L1 norm (costly to lower harvest rates), fixed cost, or `none` (no cost).  Here is an asymmetric norm example.  Note that this calculation is considerably slower. 
 <!--begin.rcode policycost_optim
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                    profit, delta, reward, P = 1, penalty = "asym")
+                    profit, delta, reward, P = .3, penalty = "asym")
 end.rcode-->
 
 
@@ -119,7 +119,7 @@ end.rcode-->
 #### L2 norm
 <!--begin.rcode policycost_optim_l2
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                    profit, delta, reward, P = 1, penalty = "L2")
+                    profit, delta, reward, P = .3, penalty = "L2")
 end.rcode-->
 <!--begin.rcode policy_cost_vis_l2, fig.width=10
 policy <- melt(policycost$D)
@@ -135,7 +135,7 @@ end.rcode-->
 #### L1 norm
 <!--begin.rcode policycost_optim_l1
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                    profit, delta, reward, P = 1, penalty = "L1")
+                    profit, delta, reward, P = .3, penalty = "L1")
 end.rcode-->
 <!--begin.rcode policy_cost_vis_l1, fig.width=10
 policy <- melt(policycost$D)

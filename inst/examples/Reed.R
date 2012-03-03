@@ -96,7 +96,7 @@ p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 
 ## @knitr crashed
-crashed <- dt[time==OptTime, fishstock == 0, by=reps]
+crashed <- dt[time==OptTime-1, fishstock == 0, by=reps]
 rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
 
 ## @knitr profits
