@@ -222,7 +222,7 @@ end.rcode-->
 #### Profit plots
 Since the optimal strategy maximizes expected profit, it may be more useful to look at the distribution statistics of profit over time:
 <!--begin.rcode
-stats <- dt[ , mean_sdl(profit), by = time]
+stats <- dt[ , mean_sdl(profits), by = time]
 p1 + geom_line(dat=stats, aes(x=time, y=y), col="lightgrey") + 
   geom_ribbon(aes(x = time, ymin = ymin, ymax = ymax),
               fill = "darkred", alpha = 0.2, dat=stats)

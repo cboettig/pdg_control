@@ -36,21 +36,8 @@ Error: invalid subscript type 'closure'
 Clear the workspace and load package dependencies: 
 
 
-```r
-rm(list=ls())   
-require(pdgControl)
-```
-
-
-
 ```
 Loading required package: pdgControl
-```
-
-
-
-```r
-require(reshape2)
 ```
 
 
@@ -61,20 +48,8 @@ Loading required package: reshape2
 
 
 
-```r
-require(ggplot2)
-```
-
-
-
 ```
 Loading required package: ggplot2
-```
-
-
-
-```r
-require(data.table)
 ```
 
 
@@ -272,7 +247,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest), col="darkgreen") 
 ```
 
-![plot of chunk unnamed-chunk-12](http://i.imgur.com/F7EQe.png) 
+![plot of chunk unnamed-chunk-11](http://i.imgur.com/dwjPX.png) 
 
 
 
@@ -285,7 +260,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk unnamed-chunk-13](http://i.imgur.com/tqkye.png) 
+![plot of chunk unnamed-chunk-12](http://i.imgur.com/mDCAF.png) 
 
 
 We can also look at the harvest dynamics:
@@ -295,7 +270,7 @@ We can also look at the harvest dynamics:
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 ```
 
-![plot of chunk unnamed-chunk-14](http://i.imgur.com/5ezvY.png) 
+![plot of chunk unnamed-chunk-13](http://i.imgur.com/cyzZZ.png) 
 
 
 This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement: 
@@ -305,7 +280,7 @@ This strategy is supposed to be a constant-escapement strategy. We can visualize
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 ```
 
-![plot of chunk unnamed-chunk-15](http://i.imgur.com/20WR2.png) 
+![plot of chunk unnamed-chunk-14](http://i.imgur.com/lqzbB.png) 
 
 
 
@@ -387,30 +362,13 @@ Since the optimal strategy maximizes expected profit, it may be more useful to l
 
 
 ```r
-stats <- dt[ , mean_sdl(profit), by = time]
-```
-
-
-
-```
-Error: object of type 'closure' is not subsettable
-```
-
-
-
-```r
+stats <- dt[ , mean_sdl(profits), by = time]
 p1 + geom_line(dat=stats, aes(x=time, y=y), col="lightgrey") + 
   geom_ribbon(aes(x = time, ymin = ymin, ymax = ymax),
               fill = "darkred", alpha = 0.2, dat=stats)
 ```
 
-
-
-```
-Error: object 'stats' not found
-```
-
-
+![plot of chunk unnamed-chunk-20](http://i.imgur.com/RNXDh.png) 
 
 
 
@@ -427,7 +385,7 @@ ggplot(dt, aes(total.profit, fill=crashed)) + geom_histogram(alpha=.8)
 stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
 ```
 
-![plot of chunk unnamed-chunk-22](http://i.imgur.com/CQuLX.png) 
+![plot of chunk unnamed-chunk-21](http://i.imgur.com/ebwAW.png) 
 
 
 
@@ -464,7 +422,7 @@ ggplot(subset(dt, quantile %in% c(1,4))) +
   geom_line(aes(time, fishstock, group = reps, color=quantile), alpha = 0.6) 
 ```
 
-![plot of chunk unnamed-chunk-25](http://i.imgur.com/cFpOj.png) 
+![plot of chunk unnamed-chunk-24](http://i.imgur.com/YmzHi.png) 
 
 
 
@@ -486,22 +444,10 @@ p5 <- ggplot(policy_zoom) +
 p5
 ```
 
-![plot of chunk unnamed-chunk-26](http://i.imgur.com/vDDlW.png) 
+![plot of chunk unnamed-chunk-25](http://i.imgur.com/NIHvf.png) 
 
 
 The harvest intensity is limited by the stock size.  If instead we look at the difference between proposed harvest intensity and stock,
 then the red zones correspond to places where harvest equals stock, i.e. we slam the population. The allee band is clearly seen. Just for fun, we overlay the replicate dynamics on this plot 
 
 
-
-```r
-p6 <- ggplot(policy_zoom) + 
-  geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
-  labs(x = "time", y = "fishstock") +
-  scale_colour_gradientn(colours = rainbow(4)) +
-  geom_abline(intercept=opt$S, slope = 0) +
-  geom_abline(intercept=xT, slope=0, lty=2)
-p6 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1, data=dt)
-```
-
-![plot of chunk unnamed-chunk-27](http://i.imgur.com/0P0yN.png) 
