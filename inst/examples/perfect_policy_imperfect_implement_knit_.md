@@ -106,7 +106,7 @@ For the simulated implementation, we add the same implementation error back, and
 <!--begin.rcode simagain
 sigma_i <- .4
 sims <- lapply(1:100, function(i){
-  ForwardSimulate(f, c(1,4,2), x_grid, h_grid, x0, nonopt$D, z_g, z_m, z_i)
+  ForwardSimulate(f, c(1,4,1), x_grid, h_grid, x0, nonopt$D, z_g, z_m, z_i)
 })
 end.rcode-->
 

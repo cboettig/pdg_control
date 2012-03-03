@@ -156,7 +156,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk fishstock](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock16.png) 
+![plot of chunk fishstock](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock17.png) 
 
 
 ### Computing additional statistics about the data
@@ -173,7 +173,7 @@ rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
 
 
 
-A total of `46` crash.
+A total of `54` crash.
 
 
 
@@ -208,7 +208,7 @@ For the simulated implementation, we add the same implementation error back, and
 ```r
 sigma_i <- .4
 sims <- lapply(1:100, function(i){
-  ForwardSimulate(f, c(1,4,2), x_grid, h_grid, x0, nonopt$D, z_g, z_m, z_i)
+  ForwardSimulate(f, c(1,4,1), x_grid, h_grid, x0, nonopt$D, z_g, z_m, z_i)
 })
 ```
 
@@ -237,7 +237,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk unnamed-chunk-1](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-110.png) 
+![plot of chunk unnamed-chunk-1](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-111.png) 
 
 
 ### Computing additional statistics about the data
@@ -250,6 +250,6 @@ rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
 
 
 
-A total of `53` crash.
+A total of `55` crash.
 
 
