@@ -23,6 +23,13 @@ This example illustrates the impact of adding a cost to changing the harvest lev
 
 ### Define all parameters 
 <!--begin.rcode parameters
+delta <- 0.01     # SMALLER economic discounting rate
+OptTime <- 50     # stopping time
+gridsize <- 100   # gridsize (discretized population)
+sigma_g <- 0.2    # Noise in population growth
+sigma_m <- 0.     # noise in stock assessment measurement
+sigma_i <- 0.     # noise in implementation of the quota
+reward <- 1       # bonus for satisfying the boundary condition
 end.rcode-->
 
 we'll use log normal noise functions
@@ -39,7 +46,9 @@ Our initial condition is the equilibrium size (note the stochastic deflation of 
 end.rcode-->
 
 and we use a harvest-based profit function with default parameters
-<!--begin.rcode profit
+<!--begin.rcode profit_
+profit <- profit_harvest(price_fish = 2, cost_stock_effect = 0,
+ operating_cost = 0.1)
 end.rcode-->
 
 Set up the discrete grids for stock size and havest levels (which will use same resolution as for stock). 
@@ -58,7 +67,7 @@ end.rcode-->
 A modified algorithm lets us include a penalty of magnitude `P` and a functional form that can be an `L1` norm, `L2`  norm, `asymmetric` L1 norm (costly to lower harvest rates), fixed cost, or `none` (no cost).  Here is an asymmetric norm example.  Note that this calculation is considerably slower. 
 <!--begin.rcode policycost_optim
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                    profit, delta, reward, P = .3, penalty = "asym")
+                    profit, delta, reward, P = .5, penalty = "asym")
 end.rcode-->
 
 
@@ -119,32 +128,53 @@ end.rcode-->
 #### L2 norm
 <!--begin.rcode policycost_optim_l2
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                    profit, delta, reward, P = .3, penalty = "L2")
+                    profit, delta, reward, P = .5, penalty = "L2")
 end.rcode-->
 <!--begin.rcode policy_cost_vis_l2, fig.width=10
+sims <- lapply(1:100, function(i)
+  simulate_optim(f, pars, x_grid, h_grid, x0, policycost$D, z_g, z_m, z_i, opt$D)
+)
+
+dat <- melt(sims, id=names(sims[[1]]))  
+dt <- data.table(dat)
+setnames(dt, "L1", "reps") # names are nice
+
+
 policy <- melt(policycost$D)
 policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
 ggplot(policy_zoom) + 
   geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
   labs(x = "time", y = "fishstock") +
   scale_colour_gradientn(colours = rainbow(4)) +
-  geom_abline(intercept=xT, slope=0, lty=2)
+  geom_abline(intercept=xT, slope=0, lty=2) +
+  geom_line(aes(time, alternate, group = reps), alpha = 0.1, data=dt)
 end.rcode-->
 
 
 #### L1 norm
 <!--begin.rcode policycost_optim_l1
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                    profit, delta, reward, P = .3, penalty = "L1")
+                    profit, delta, reward, P = .5, penalty = "L1")
 end.rcode-->
 <!--begin.rcode policy_cost_vis_l1, fig.width=10
+sims <- lapply(1:100, function(i)
+  simulate_optim(f, pars, x_grid, h_grid, x0, policycost$D, z_g, z_m, z_i, opt$D)
+)
+
+dat <- melt(sims, id=names(sims[[1]]))  
+dt <- data.table(dat)
+setnames(dt, "L1", "reps") # names are nice
+
+
+
 policy <- melt(policycost$D)
 policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
 ggplot(policy_zoom) + 
   geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
   labs(x = "time", y = "fishstock") +
   scale_colour_gradientn(colours = rainbow(4)) +
-  geom_abline(intercept=xT, slope=0, lty=2)
+  geom_abline(intercept=xT, slope=0, lty=2) +
+  geom_line(aes(time, alternate, group = reps), alpha = 0.1, data=dt)
 end.rcode-->
 
 

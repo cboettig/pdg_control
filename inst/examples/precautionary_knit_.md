@@ -6,7 +6,6 @@ opts_knit$set(upload.fun = function(file){
    uploadFile(file)$url
   })
 ## The real source code is externalized from this file:
-read_chunk("Reed.R")
 end.rcode-->
 
 <!--roptions dev="png", fig.width=7, fig.height=5, tidy=FALSE, warning=FALSE, message=FALSE, comment=NA, external=TRUE, cache=FALSE, cache.path="perfectpolicy/"-->
@@ -17,45 +16,53 @@ end.rcode-->
 ## Model setup 
 
 Clear the workspace and load package dependencies: 
-<!--begin.rcode libraries, echo=FALSE
+<!--begin.rcode libraries_, echo=FALSE
+rm(list=ls())   
+require(pdgControl)
+require(reshape2)
+require(ggplot2)
+require(data.table)
 end.rcode-->
 
 Define parameters
-<!--begin.rcode parameters
+<!--begin.rcode parameters_
+delta <- 0.1      # economic discounting rate
+OptTime <- 50     # stopping time
+gridsize <- 100   # gridsize (discretized population)
+sigma_g <- 0.2    # Noise in population growth
+sigma_m <- 0.     # noise in stock assessment measurement
+sigma_i <- 0.     # noise in implementation of the quota
+reward <- 1       # bonus for satisfying the boundary condition
 end.rcode-->
 
 Use log-normal noise functions
-<!--begin.rcode noise_dists
+<!--begin.rcode noise_dists_
+z_g <- function() rlnorm(1,  0, sigma_g) # mean 1
+z_m <- function() rlnorm(1,  0, sigma_m) # mean 1
+z_i <- function() rlnorm(1,  0, sigma_i) # mean 1
 end.rcode-->
 
 Chose the state equation / population dynamics function
-<!--begin.rcode RickerAllee
-end.rcode-->
-
-Our initial condition is the equilibrium size (note the stochastic deflation of mean)
-<!--begin.rcode initx
-end.rcode-->
-
-and we use a harvest-based profit function with default parameters
-<!--begin.rcode profit
-end.rcode-->
-
-Set up discrete grids for stock size and havest levels (which will use same resolution as for stock). 
-<!--begin.rcode create_grid
+<!--begin.rcode RickerAllee_
+f <- RickerAllee
+K <- 4 
+xT <- 1 # final value, also allee threshold
+pars <- c(1, K, xT) 
+x0 <- K - sigma_g ^ 2 / 2 
+profit <- profit_harvest(price_fish = 1, cost_stock_effect = 0,
+ operating_cost = 0.1)
+x_grid <- seq(0, 2 * K, length = gridsize)  
+h_grid <- x_grid  
 end.rcode-->
 
 
 ### Calculate the transition matrix (with noise in growth only)      
-We calculate the stochastic transition matrix for the probability of going from any state \(x_t \) to any other state \(x_{t+1}\) the following year, for each possible choice of harvest \( h_t \).  This provides a look-up table for the dynamic programming calculations. 
 
 Here we assume a precautionary high value of the threshold parameter.
-<!--begin.rcode determine_SDP_matrix_edited
-  SDP_Mat <- determine_SDP_matrix(f, c(1,4,2), x_grid, h_grid, sigma_g )
-end.rcode-->
-
-### Find the optimum by dynamic programming 
-Bellman's algorithm to compute the optimal solution for all possible trajectories.
-<!--begin.rcode find_dp_optim 
+<!--begin.rcode precuationary 
+SDP_Mat <- determine_SDP_matrix(f, c(1,4,2), x_grid, h_grid, sigma_g )
+opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, 
+                     profit, delta, reward=reward)
 end.rcode-->
 
 ### Simulate 
@@ -67,16 +74,29 @@ sims <- lapply(1:100, function(i){
 end.rcode-->
 
 ## Summarize and plot the results                                                   
-Make data tidy (melt), fast (data.tables), and nicely labeled.
-<!--begin.rcode tidy
+<!--begin.rcode tidy_
+dat <- melt(sims, id=names(sims[[1]]))  
+dt <- data.table(dat)
+setnames(dt, "L1", "reps") # names are nice
 end.rcode-->
 
 ### Plots 
 This plot summarizes the stock dynamics by visualizing the replicates. Reed's S shown again, along with the dotted line showing the allee threshold, below which the stock will go to zero (unless rescued stochastically). 
-<!--begin.rcode fishstock 
+<!--begin.rcode fishstock_policy 
+policy <- melt(opt$D)
+policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
+p6 <- ggplot(policy_zoom) + 
+  geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
+  labs(x = "time", y = "fishstock") +
+  scale_colour_gradientn(colours = rainbow(4)) +
+  geom_abline(intercept=opt$S, slope = 0) +
+  geom_abline(intercept=xT, slope=0, lty=2)
+p6 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2, data=dt)
 end.rcode-->
 
-<!--begin.rcode crashed
+Calculate which crashed
+<!--begin.rcode hascrashed
+crashed <- dt[time==as.integer(OptTime-1), fishstock < xT/4, by=reps]
 end.rcode-->
 A total of <!--rinline sum(crashed$V1) --> crash.
 
@@ -92,18 +112,18 @@ sims <- lapply(1:100, function(i){
 end.rcode-->
 
 Make data tidy (melt), fast (data.tables), and nicely labeled.
-<!--begin.rcode ref.label="tidy"
+<!--begin.rcode ref.label="tidy_"
 end.rcode-->
 
-<!--begin.rcode ref.label="fishstock"
+<!--begin.rcode ref.label="fishstock_policy"
 end.rcode-->
 
-<!--begin.rcode ref.label="crashed"
+<!--begin.rcode ref.label="hascrashed"
 end.rcode-->
 A total of <!--rinline sum(crashed$V1) --> crash.
 
 
-## Compare to the optimal policy performance
+## Compare to the optimal policy performance when faced with additional growth noise
 <!--begin.rcode
 pars <- c(1,K,1)
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g=.2)

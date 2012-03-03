@@ -156,7 +156,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk fishstock](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock17.png) 
+![plot of chunk fishstock](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock23.png) 
 
 
 ### Computing additional statistics about the data
@@ -166,14 +166,14 @@ Which replicates crashed?  Which met the boundary requirment and recieved the re
 
 
 ```r
-crashed <- dt[time==OptTime, fishstock == 0, by=reps]
+crashed <- dt[time==as.integer(OptTime-1), fishstock < xT/4, by=reps]
 rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
 ```
 
 
 
 
-A total of `54` crash.
+A total of `21` crash.
 
 
 
@@ -184,6 +184,7 @@ Compare another model, that likewise assumes no implementation error, and also m
 
 
 ```r
+sigma_i <- 0
 SDP_Mat <- determine_SDP_matrix(f, c(1,4,2), x_grid, h_grid, sigma_g )
 ```
 
@@ -237,19 +238,19 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk unnamed-chunk-1](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-111.png) 
+![plot of chunk unnamed-chunk-1](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-114.png) 
 
 
 ### Computing additional statistics about the data
 
 
 ```r
-crashed <- dt[time==OptTime, fishstock == 0, by=reps]
+crashed <- dt[time==as.integer(OptTime-1), fishstock < xT/4, by=reps]
 rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
 ```
 
 
 
-A total of `55` crash.
+A total of `22` crash.
 
 

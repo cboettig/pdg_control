@@ -48,36 +48,9 @@ f <- RickerAllee
 K <- 4 
 xT <- 1 # final value, also allee threshold
 pars <- c(1, K, xT) 
-```
-
-
-
-
-Our initial condition is the equilibrium size (note the stochastic deflation of mean)
-
-
-```r
 x0 <- K - sigma_g ^ 2 / 2 
-```
-
-
-
-
-and we use a harvest-based profit function with default parameters
-
-
-```r
 profit <- profit_harvest(price_fish = 1, cost_stock_effect = 0,
  operating_cost = 0.1)
-```
-
-
-
-
-Set up discrete grids for stock size and havest levels (which will use same resolution as for stock). 
-
-
-```r
 x_grid <- seq(0, 2 * K, length = gridsize)  
 h_grid <- x_grid  
 ```
@@ -87,23 +60,12 @@ h_grid <- x_grid
 
 
 ### Calculate the transition matrix (with noise in growth only)      
-We calculate the stochastic transition matrix for the probability of going from any state \(x_t \) to any other state \(x_{t+1}\) the following year, for each possible choice of harvest \( h_t \).  This provides a look-up table for the dynamic programming calculations. 
 
 Here we assume a precautionary high value of the threshold parameter.
 
 
 ```r
-  SDP_Mat <- determine_SDP_matrix(f, c(1,4,2), x_grid, h_grid, sigma_g )
-```
-
-
-
-
-### Find the optimum by dynamic programming 
-Bellman's algorithm to compute the optimal solution for all possible trajectories.
-
-
-```r
+SDP_Mat <- determine_SDP_matrix(f, c(1,4,2), x_grid, h_grid, sigma_g )
 opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, 
                      profit, delta, reward=reward)
 ```
@@ -125,7 +87,6 @@ sims <- lapply(1:100, function(i){
 
 
 ## Summarize and plot the results                                                   
-Make data tidy (melt), fast (data.tables), and nicely labeled.
 
 
 ```r
@@ -142,24 +103,30 @@ This plot summarizes the stock dynamics by visualizing the replicates. Reed's S 
 
 
 ```r
-p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) + 
-  geom_abline(intercept=xT, slope = 0, lty=2) 
-p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
+policy <- melt(opt$D)
+policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
+p6 <- ggplot(policy_zoom) + 
+  geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
+  labs(x = "time", y = "fishstock") +
+  scale_colour_gradientn(colours = rainbow(4)) +
+  geom_abline(intercept=opt$S, slope = 0) +
+  geom_abline(intercept=xT, slope=0, lty=2)
+p6 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2, data=dt)
 ```
 
-![plot of chunk fishstock](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock21.png) 
+![plot of chunk fishstock_policy](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock_policy.png) 
 
 
+Calculate which crashed
 
 
 ```r
-crashed <- dt[time==as.integer(OptTime-1), fishstock == 0, by=reps]
-rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
+crashed <- dt[time==as.integer(OptTime-1), fishstock < xT/4, by=reps]
 ```
 
 
 
-A total of `NaN &times; 10<sup>-Inf</sup>` crash.
+A total of `5` crash.
 
 
 
@@ -192,27 +159,32 @@ setnames(dt, "L1", "reps") # names are nice
 
 
 ```r
-p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) + 
-  geom_abline(intercept=xT, slope = 0, lty=2) 
-p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
+policy <- melt(opt$D)
+policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
+p6 <- ggplot(policy_zoom) + 
+  geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
+  labs(x = "time", y = "fishstock") +
+  scale_colour_gradientn(colours = rainbow(4)) +
+  geom_abline(intercept=opt$S, slope = 0) +
+  geom_abline(intercept=xT, slope=0, lty=2)
+p6 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2, data=dt)
 ```
 
-![plot of chunk unnamed-chunk-2](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-210.png) 
+![plot of chunk unnamed-chunk-2](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-211.png) 
 
 
 
 
 ```r
-crashed <- dt[time==as.integer(OptTime-1), fishstock == 0, by=reps]
-rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
+crashed <- dt[time==as.integer(OptTime-1), fishstock < xT/4, by=reps]
 ```
 
 
 
-A total of `NaN &times; 10<sup>-Inf</sup>` crash.
+A total of `14` crash.
 
 
-## Compare to the optimal policy performance
+## Compare to the optimal policy performance when faced with additional growth noise
 
 
 ```r
@@ -233,7 +205,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk unnamed-chunk-4](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-42.png) 
+![plot of chunk unnamed-chunk-4](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-43.png) 
 
 
 A total of `NaN &times; 10<sup>-Inf</sup>` crash.
