@@ -27,9 +27,6 @@ f <- BevHolt                # Select the state equation
 pars <- c(2, 4)             # parameters for the state equation
 K <- (pars[1] - 1)/pars[2]  # Carrying capacity 
 xT <- 0                     # boundary conditions
-control = "harvest"         # control variable is total harvest, h = e * x
-price <- 1
-cost <- .12
 
 ## @knitr Myer
 f <- Myer_harvest
@@ -37,27 +34,20 @@ pars <- c(1, 2, 6)
 p <- pars # shorthand 
 K <- p[1] * p[3] / 2 + sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2
 xT <- p[1] * p[3] / 2 - sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2 # allee threshold
-e_star <- (p[1] * sqrt(p[3]) - 2) / 2 ## Bifurcation point 
-control <- "harvest"          # control variable can be harvest or effort 
-price <- 1
-cost <- .01
+e_star <- (p[1] * sqrt(p[3]) - 2) / 2 ## Bifurcation point, for reference 
+
+## @knitr RickerAllee
+f <- RickerAllee
+K <- 4 
+xT <- 1 # final value, also allee threshold
+pars <- c(1, K, xT) 
 
 
 ## @knitr initx
 x0 <- K - sigma_g ^ 2 / 2 
 
 ## @knitr profit 
-profit <-
-function(x_grid, h_i){
-  price_fish <- price
-  stock_effect <- 0
-  operating_cost <- cost * price_fish # trying to harvest more than costs
-  sapply(x_grid, function(x_i){
-    price_fish * min(h_i, x_i) - operating_cost * h_i  - stock_effect / (x_i + 1e-12)
-    # avoids NaNs when checking the 0 stock condition
-  })
-}
-
+profit <- profit_harvest(price_fish=1, cost_stock_effect=0, operating_cost = 0.1*price)
 
 
 ## @knitr create_grid
