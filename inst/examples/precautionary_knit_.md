@@ -47,8 +47,10 @@ end.rcode-->
 
 ### Calculate the transition matrix (with noise in growth only)      
 We calculate the stochastic transition matrix for the probability of going from any state \(x_t \) to any other state \(x_{t+1}\) the following year, for each possible choice of harvest \( h_t \).  This provides a look-up table for the dynamic programming calculations. 
-<!--begin.rcode determine_SDP_matrix
 
+Here we assume a precautionary high value of the threshold parameter.
+<!--begin.rcode determine_SDP_matrix
+  SDP_Mat <- determine_SDP_matrix(f, c(1,4,1.5), x_grid, h_grid, sigma_g )
 end.rcode-->
 
 ### Find the optimum by dynamic programming 
@@ -57,10 +59,10 @@ Bellman's algorithm to compute the optimal solution for all possible trajectorie
 end.rcode-->
 
 ### Simulate 
-Now we'll simulate 100 replicates of this stochastic process under the optimal harvest policy determined above, but with a conservative estimate of the threshold location: 
+Now we'll simulate 100 replicates of this stochastic process under the optimal harvest policy determined above, with a threshold value that is actually lower than we assumed. 
 <!--begin.rcode simulate
 sims <- lapply(1:100, function(i){
-  ForwardSimulate(f, c(1,K,1.5), x_grid, h_grid, x0, opt$D, z_g, z_m, z_i)
+  ForwardSimulate(f, c(1,K,1), x_grid, h_grid, x0, opt$D, z_g, z_m, z_i)
 })
 end.rcode-->
 
@@ -74,17 +76,6 @@ This plot summarizes the stock dynamics by visualizing the replicates. Reed's S 
 <!--begin.rcode fishstock 
 end.rcode-->
 
-### Computing additional statistics about the data
-In this section we add some additional information to our data.table on the profits obtained by each replicate.  The algorithm has supposedly maximized the expected profit, so it is useful to look at both the mean total profit and the distribution.  Despite this maximization, the distribution can be rather lop-sided or even bimodal. 
-
-Which replicates crashed?  Which met the boundary requirment and recieved the reward value at the end?
-<!--begin.rcode crashed
-end.rcode-->
-
-A total of <!--rinline sum(crashed$V1) --> crash.
 
 
-Display the optimal policy matrix
-<!--begin.rcode policyvis2
-end.rcode-->
 

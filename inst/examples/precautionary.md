@@ -3,7 +3,7 @@
 
 
 
-# Precautionary policy implementation 
+# Precautionary Principle
 
 
 ## Model setup 
@@ -89,6 +89,8 @@ h_grid <- x_grid
 ### Calculate the transition matrix (with noise in growth only)      
 We calculate the stochastic transition matrix for the probability of going from any state \(x_t \) to any other state \(x_{t+1}\) the following year, for each possible choice of harvest \( h_t \).  This provides a look-up table for the dynamic programming calculations. 
 
+Here we assume a precautionary high value of the threshold parameter.
+
 
 ```r
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g )
@@ -110,7 +112,7 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT,
 
 
 ### Simulate 
-Now we'll simulate 100 replicates of this stochastic process under the optimal harvest policy determined above, but with a conservative estimate of the threshold location: 
+Now we'll simulate 100 replicates of this stochastic process under the optimal harvest policy determined above, with a threshold value that is actually lower than we assumed. 
 
 
 ```r
@@ -145,41 +147,9 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk fishstock](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock12.png) 
-
-
-### Computing additional statistics about the data
-In this section we add some additional information to our data.table on the profits obtained by each replicate.  The algorithm has supposedly maximized the expected profit, so it is useful to look at both the mean total profit and the distribution.  Despite this maximization, the distribution can be rather lop-sided or even bimodal. 
-
-Which replicates crashed?  Which met the boundary requirment and recieved the reward value at the end?
-
-
-```r
-crashed <- dt[time==OptTime, fishstock == 0, by=reps]
-rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
-```
+![plot of chunk fishstock](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock13.png) 
 
 
 
-
-A total of `46` crash.
-
-
-Display the optimal policy matrix
-
-
-```r
-policy <- melt(opt$D)
-policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
-p6 <- ggplot(policy_zoom) + 
-  geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
-  labs(x = "time", y = "fishstock") +
-  scale_colour_gradientn(colours = rainbow(4)) +
-  geom_abline(intercept=opt$S, slope = 0) +
-  geom_abline(intercept=xT, slope=0, lty=2)
-p6 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1, data=dt)
-```
-
-![plot of chunk policyvis2](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-policyvis21.png) 
 
 
