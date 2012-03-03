@@ -49,8 +49,8 @@ end.rcode-->
 We calculate the stochastic transition matrix for the probability of going from any state \(x_t \) to any other state \(x_{t+1}\) the following year, for each possible choice of harvest \( h_t \).  This provides a look-up table for the dynamic programming calculations. 
 
 Here we assume a precautionary high value of the threshold parameter.
-<!--begin.rcode determine_SDP_matrix
-  SDP_Mat <- determine_SDP_matrix(f, c(1,4,1.5), x_grid, h_grid, sigma_g )
+<!--begin.rcode determine_SDP_matrix_edited
+  SDP_Mat <- determine_SDP_matrix(f, c(1,4,2), x_grid, h_grid, sigma_g )
 end.rcode-->
 
 ### Find the optimum by dynamic programming 
@@ -60,7 +60,7 @@ end.rcode-->
 
 ### Simulate 
 Now we'll simulate 100 replicates of this stochastic process under the optimal harvest policy determined above, with a threshold value that is actually lower than we assumed. 
-<!--begin.rcode simulate
+<!--begin.rcode simulate_edited
 sims <- lapply(1:100, function(i){
   ForwardSimulate(f, c(1,K,1), x_grid, h_grid, x0, opt$D, z_g, z_m, z_i)
 })
@@ -82,5 +82,45 @@ A total of <!--rinline sum(crashed$V1) --> crash.
 
 
 
+### So is this more robust?
+Here's the policy under higher intrinsic noise than it was designed for:
+<!--begin.rcode simulate_edited_noisy
+sigma_g <- .3
+sims <- lapply(1:100, function(i){
+  ForwardSimulate(f, c(1,K,1), x_grid, h_grid, x0, opt$D, z_g, z_m, z_i)
+})
+end.rcode-->
 
+Make data tidy (melt), fast (data.tables), and nicely labeled.
+<!--begin.rcode ref.label="tidy"
+end.rcode-->
+
+<!--begin.rcode ref.label="fishstock"
+end.rcode-->
+
+<!--begin.rcode ref.label="crashed"
+end.rcode-->
+A total of <!--rinline sum(crashed$V1) --> crash.
+
+
+## Compare to the optimal policy performance
+<!--begin.rcode
+pars <- c(1,K,1)
+SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g=.2)
+opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, 
+                     profit, delta, reward=reward)
+sigma_g <- .3
+sims <- lapply(1:100, function(i){
+  ForwardSimulate(f, pars, x_grid, h_grid, x0, opt$D, z_g, z_m, z_i)
+})
+dat <- melt(sims, id=names(sims[[1]]))  
+dt <- data.table(dat)
+setnames(dt, "L1", "reps") # names are nice
+crashed <- dt[time==OptTime-1, fishstock == 0, by=reps]
+p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) + 
+  geom_abline(intercept=xT, slope = 0, lty=2) 
+p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
+end.rcode-->
+
+A total of <!--rinline sum(crashed$V1) --> crash.
 
