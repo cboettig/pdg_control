@@ -29,7 +29,7 @@ gridsize <- 100   # gridsize (discretized population)
 sigma_g <- 0.2    # Noise in population growth
 sigma_m <- 0.     # noise in stock assessment measurement
 sigma_i <- 0.     # noise in implementation of the quota
-reward <- 1       # bonus for satisfying the boundary condition
+reward <- 0       # bonus for satisfying the boundary condition
 end.rcode-->
 
 we'll use log normal noise functions
@@ -38,7 +38,7 @@ end.rcode-->
 
 
 Chose the state equation / population dynamics function
-<!--begin.rcode Myer
+<!--begin.rcode BevHolt
 end.rcode-->
 
 Our initial condition is the equilibrium size (note the stochastic deflation of mean)
@@ -47,7 +47,7 @@ end.rcode-->
 
 and we use a harvest-based profit function with default parameters
 <!--begin.rcode profit_
-profit <- profit_harvest(price_fish = 2, cost_stock_effect = 0,
+profit <- profit_harvest(price_fish = 1, cost_stock_effect = 0,
  operating_cost = 0.1)
 end.rcode-->
 
@@ -67,7 +67,7 @@ end.rcode-->
 A modified algorithm lets us include a penalty of magnitude `P` and a functional form that can be an `L1` norm, `L2`  norm, `asymmetric` L1 norm (costly to lower harvest rates), fixed cost, or `none` (no cost).  Here is an asymmetric norm example.  Note that this calculation is considerably slower. 
 <!--begin.rcode policycost_optim
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                    profit, delta, reward, P = .5, penalty = "asym")
+                    profit, delta, reward, P = .3, penalty = "asym")
 end.rcode-->
 
 
@@ -88,6 +88,17 @@ end.rcode-->
 
 ### Plots 
 
+A single replicate, alternate dynamics should show the Reed optimum, while harvest/fishstock should show the impact of having policy costs.  
+<!--begin.rcode rep
+ggplot(subset(dt,reps==1)) +
+  geom_line(aes(time, alternate)) +
+  geom_line(aes(time, fishstock), col="darkblue") +
+  geom_abline(intercept=opt$S, slope = 0) +
+  geom_line(aes(time, harvest), col="purple") + 
+  geom_line(aes(time, harvest_alt), col="darkgreen") 
+end.rcode-->
+
+
 Compare the optimal policy that involves this cost:
 <!--begin.rcode policy_cost_vis, fig.width=10
 policy <- melt(policycost$D)
@@ -99,6 +110,7 @@ p5 <- ggplot(policy_zoom) +
   geom_abline(intercept=xT, slope=0, lty=2)
 p5 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1, data=dt)
 end.rcode-->
+
 
 Against the policy with no cost: 
 <!--begin.rcode no_policy_cost_vis, fig.width=10
@@ -128,7 +140,7 @@ end.rcode-->
 #### L2 norm
 <!--begin.rcode policycost_optim_l2
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                    profit, delta, reward, P = .5, penalty = "L2")
+                    profit, delta, reward, P = .3, penalty = "L2")
 end.rcode-->
 <!--begin.rcode policy_cost_vis_l2, fig.width=10
 sims <- lapply(1:100, function(i)
@@ -154,7 +166,7 @@ end.rcode-->
 #### L1 norm
 <!--begin.rcode policycost_optim_l1
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                    profit, delta, reward, P = .5, penalty = "L1")
+                    profit, delta, reward, P = .3, penalty = "L1")
 end.rcode-->
 <!--begin.rcode policy_cost_vis_l1, fig.width=10
 sims <- lapply(1:100, function(i)

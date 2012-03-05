@@ -18,7 +18,6 @@ gridsize <- 40   # gridsize (discretized population)
 sigma_g <- 0.2    # Noise in population growth
 sigma_m <- 0.     # noise in stock assessment measurement
 sigma_i <- 0.     # noise in implementation of the quota
-interval <- 1     # period of updating the stock assessment
 
 # Define noise distributions  
 z_g <- function() rlnorm(1,  0, sigma_g) # growth noise
@@ -49,7 +48,7 @@ opt <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, .25*K,
 
 # Calculate the Reed optimum (e.g. no cost to policy adjustment):
 reed <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, .25*K, 
-                      profit, delta, reward=0, interval=interval)
+                      profit, delta, reward=0)
 
 sims <- lapply(1:100, function(i)
   simulate_optim(f, pars, x_grid, h_grid, x0, opt$D, z_g, z_m, z_i, reed$D)

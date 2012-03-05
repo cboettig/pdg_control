@@ -13,7 +13,7 @@ gridsize <- 100   # gridsize (discretized population)
 sigma_g <- 0.2    # Noise in population growth
 sigma_m <- 0.     # noise in stock assessment measurement
 sigma_i <- 0.     # noise in implementation of the quota
-reward <- 1       # bonus for satisfying the boundary condition
+reward <- 0       # bonus for satisfying the boundary condition
 
 ## @knitr noise_dists
 z_g <- function() rlnorm(1,  0, sigma_g) # mean 1
