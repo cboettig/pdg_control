@@ -111,9 +111,16 @@ A total of <!--rinline sum(crashed$V1) --> crash.
 
 
 ### A non-optimal policy 
-Let's adjust the optimal policy by a rule-of-thumb buffer, resulting in a non-optimal policy:
+Let's adjust the optimal policy by a rule-of-thumb buffer, resulting in a non-optimal policy.
+<!--begin.rcode safe_policy
+buffer <- 0.1
+safe_policy <- matrix(sapply(opt$D - buffer * length(h_grid), function(x) max(0, x)), ncol=dim(opt$D)[2])
+end.rcode-->
+
+This adds a <!--rinline 100*buffer--> % buffer below the optimal harvest rate. 
+
+
 <!--begin.rcode simulate_edited_noisy
-safe_policy <- opt$D - 0.05 * length(x_grid)
 sims <- lapply(1:100, function(i){
   ForwardSimulate(f, c(1,K,1), x_grid, h_grid, x0, safe_policy, z_g, z_m, z_i)
 })
