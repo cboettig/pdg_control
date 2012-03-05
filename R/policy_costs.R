@@ -43,20 +43,18 @@ optim_policy <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit,
       # try all potential havest rates
       V1 <- sapply(1:HL, function(i){
         # cost of changing the policy from the previous year
-        if(penalty=="L2")
-          change_cost <- P * (h_grid[i] - h_grid[ h_prev])^2 
-        else if(penalty=="L1")
-          change_cost <- P * abs(h_grid[i] - h_grid[ h_prev]) 
-        else if(penalty=="asymmetric")
-          change_cost <- P * max(h_grid[h_prev] - h_grid[i], 0) 
-        else if(penalty=="fixed")
-          change_cost <- P
-        else 
-          0
+        change_cost <- 
+        switch(penalty,
+          L2 = P * (h_grid[i] - h_grid[ h_prev])^2,
+          L1 = P * abs(h_grid[i] - h_grid[ h_prev]),
+          asymmetric = P * max(h_grid[h_prev] - h_grid[i], 0),
+          fixed = P,
+          none = 0)
+
         # Transition matrix times V gives dist in next time
         SDP_Mat[[i]]  %*% V[, h_prev] + 
         # then (add) harvested amount - policy cost times discount
-         (profit(x_grid, h_grid[i]) - change_cost ) * (1 - delta)
+        { profit(x_grid, h_grid[i]) - change_cost }  * {1 - delta}
       })
       # find havest, h that gives the maximum value
       out <- sapply(1:gridsize, function(j){

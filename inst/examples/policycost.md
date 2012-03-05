@@ -164,7 +164,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest_alt), col="darkgreen") 
 ```
 
-
+![plot of chunk rep](http://farm8.staticflickr.com/7182/6811103072_dd00a0a138_z.jpg) 
 
 
 
@@ -182,7 +182,7 @@ p5 <- ggplot(policy_zoom) +
 p5 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1, data=dt)
 ```
 
-
+![plot of chunk policy_cost_vis](http://farm8.staticflickr.com/7189/6957216285_0eff22d8a2_z.jpg) 
 
 
 
@@ -201,7 +201,7 @@ p6 <- ggplot(policy_zoom) +
 p6 + geom_line(aes(time, alternate, group = reps), alpha = 0.1, data=dt)
 ```
 
-
+![plot of chunk no_policy_cost_vis](http://farm8.staticflickr.com/7202/6957216701_0aaa40e850_z.jpg) 
 
 
 
@@ -215,7 +215,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest), col="darkgreen") 
 ```
 
-
+![plot of chunk plot_rep2](http://farm8.staticflickr.com/7060/6957216997_009948dee4_z.jpg) 
 
 
 ## Alternate policy cost models 
@@ -251,7 +251,7 @@ ggplot(policy_zoom) +
   geom_line(aes(time, alternate, group = reps), alpha = 0.1, data=dt)
 ```
 
-
+![plot of chunk policy_cost_vis_l2](http://farm8.staticflickr.com/7179/6811164850_755e737311_z.jpg) 
 
 
 
@@ -262,6 +262,9 @@ ggplot(policy_zoom) +
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
                     profit, delta, reward, P = .3, penalty = "L1")
 ```
+
+
+
 
 
 
@@ -287,7 +290,7 @@ ggplot(policy_zoom) +
   geom_line(aes(time, alternate, group = reps), alpha = 0.1, data=dt)
 ```
 
-
+![plot of chunk policy_cost_vis_l1](http://farm8.staticflickr.com/7196/6957313031_6b29584ec8_z.jpg) 
 
 
 

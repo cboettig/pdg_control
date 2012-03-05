@@ -3,10 +3,12 @@
 <!--begin.rcode echo=FALSE 
 render_gfm()
 opts_knit$set(upload = TRUE)
-opts_knit$set(upload.fun = function(file){
-   library(RWordPress) 
-   uploadFile(file)$url
-  })
+## use flickr to upload with these options
+require(socialR)
+options(flickrOptions=list(
+  description="https://github.com/cboettig/pdg_control/blob/master/inst/examples/Reed.md",
+  tags="stochpop, pdg_control"))
+opts_knit$set(upload.fun = flickr.url)
 end.rcode-->
 
 # Reed Model

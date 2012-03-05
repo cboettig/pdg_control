@@ -3,10 +3,11 @@
 <!--begin.rcode setup, include=FALSE
 render_gfm()  
 opts_knit$set(upload = TRUE)   
-opts_knit$set(upload.fun = function(file){
-   library(RWordPress) 
-   uploadFile(file)$url
-  })
+require(socialR)
+options(flickrOptions=list(
+  description="https://github.com/cboettig/pdg_control/blob/master/inst/examples/policycost.md",
+  tags="stochpop, pdg_control"))
+opts_knit$set(upload.fun = flickr.url)
 read_chunk("Reed.R")
 end.rcode-->
 
@@ -168,6 +169,8 @@ end.rcode-->
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
                     profit, delta, reward, P = .3, penalty = "L1")
 end.rcode-->
+
+
 <!--begin.rcode policy_cost_vis_l1, fig.width=10
 sims <- lapply(1:100, function(i)
   simulate_optim(f, pars, x_grid, h_grid, x0, policycost$D, z_g, z_m, z_i, opt$D)
