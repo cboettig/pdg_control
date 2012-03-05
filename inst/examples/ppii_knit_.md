@@ -90,7 +90,7 @@ setnames(dt, "L1", "reps") # names are nice
 end.rcode-->
 
 This plot summarizes the stock dynamics by visualizing the replicates. Reed's S shown (solid line), along with the dotted line showing the allee threshold, below which the stock will go to zero (unless rescued stochastically). 
-<!--begin.rcode fishstock_policy 
+<!--begin.rcode fishstock_policy, fig.width=9
 policy <- melt(opt$D)
 policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
 p6 <- ggplot(policy_zoom) + 
@@ -113,7 +113,7 @@ A total of <!--rinline sum(crashed$V1) --> crash.
 ### A non-optimal policy 
 Let's adjust the optimal policy by a rule-of-thumb buffer, resulting in a non-optimal policy:
 <!--begin.rcode simulate_edited_noisy
-safe_policy <- opt$D + 0.05 * length(x_grid)
+safe_policy <- opt$D - 0.05 * length(x_grid)
 sims <- lapply(1:100, function(i){
   ForwardSimulate(f, c(1,K,1), x_grid, h_grid, x0, safe_policy, z_g, z_m, z_i)
 })
@@ -122,7 +122,16 @@ end.rcode-->
 <!--begin.rcode ref.label="tidy_"
 end.rcode-->
 
-<!--begin.rcode ref.label="fishstock_policy"
+<!--begin.rcode fishstock_policy2, fig.width=9
+policy <- melt(safe_policy)
+policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
+p6 <- ggplot(policy_zoom) + 
+  geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
+  labs(x = "time", y = "fishstock") +
+  scale_colour_gradientn(colours = rainbow(4)) +
+  geom_abline(intercept=opt$S, slope = 0) +
+  geom_abline(intercept=xT, slope=0, lty=2)
+p6 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2, data=dt)
 end.rcode-->
 
 <!--begin.rcode ref.label="hascrashed"

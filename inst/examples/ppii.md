@@ -132,7 +132,7 @@ p6 <- ggplot(policy_zoom) +
 p6 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2, data=dt)
 ```
 
-![plot of chunk fishstock_policy](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock_policy1.png) 
+![plot of chunk fishstock_policy](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock_policy2.png) 
 
 
 Calculate which crashed
@@ -144,7 +144,7 @@ crashed <- dt[time==as.integer(OptTime-1), fishstock < xT/4, by=reps]
 
 
 
-A total of `30` crash.
+A total of `37` crash.
 
 
 
@@ -153,10 +153,16 @@ Let's adjust the optimal policy by a rule-of-thumb buffer, resulting in a non-op
 
 
 ```r
-safe_policy <- opt$D + 0.05 * length(x_grid)
+safe_policy <- opt$D - 0.05 * length(x_grid)
 sims <- lapply(1:100, function(i){
   ForwardSimulate(f, c(1,K,1), x_grid, h_grid, x0, safe_policy, z_g, z_m, z_i)
 })
+```
+
+
+
+```
+Error: replacement has length zero
 ```
 
 
@@ -176,7 +182,7 @@ setnames(dt, "L1", "reps") # names are nice
 
 
 ```r
-policy <- melt(opt$D)
+policy <- melt(safe_policy)
 policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
 p6 <- ggplot(policy_zoom) + 
   geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
@@ -187,7 +193,13 @@ p6 <- ggplot(policy_zoom) +
 p6 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2, data=dt)
 ```
 
-![plot of chunk unnamed-chunk-2](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-unnamed-chunk-212.png) 
+
+
+```
+Error: only 0's may be mixed with negative subscripts
+```
+
+
 
 
 
@@ -198,7 +210,7 @@ crashed <- dt[time==as.integer(OptTime-1), fishstock < xT/4, by=reps]
 
 
 
-A total of `100` crash.
+A total of `37` crash.
 
 
 
