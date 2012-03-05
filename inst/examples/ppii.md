@@ -132,7 +132,7 @@ p6 <- ggplot(policy_zoom) +
 p6 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2, data=dt)
 ```
 
-![plot of chunk fishstock_policy](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock_policy4.png) 
+![plot of chunk fishstock_policy](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock_policy5.png) 
 
 
 Calculate which crashed
@@ -144,7 +144,7 @@ crashed <- dt[time==as.integer(OptTime-1), fishstock < xT/4, by=reps]
 
 
 
-A total of `35` crash.
+A total of `42` crash.
 
 
 
@@ -153,28 +153,22 @@ Let's adjust the optimal policy by a rule-of-thumb buffer, resulting in a non-op
 
 
 ```r
-buffer <- 0.1
-safe_policy <- matrix(sapply(opt$D - buffer * length(h_grid), function(x) max(0, x)), ncol=dim(opt$D)[2])
+buffer <- 0.05
+safe_policy <- matrix(sapply(opt$D - buffer * length(h_grid), function(x) max(1, x)), ncol=dim(opt$D)[2])
 ```
 
 
 
 
-This adds a `10` % buffer below the optimal harvest rate. 
+This adds a `5` % buffer below the optimal harvest rate. 
 
 
 
 
 ```r
 sims <- lapply(1:100, function(i){
-  ForwardSimulate(f, c(1,K,1), x_grid, h_grid, x0, safe_policy, z_g, z_m, z_i)
+  ForwardSimulate(f, pars, x_grid, h_grid, x0, safe_policy, z_g, z_m, z_i)
 })
-```
-
-
-
-```
-Error: replacement has length zero
 ```
 
 
@@ -185,7 +179,7 @@ Error: replacement has length zero
 ```r
 dat <- melt(sims, id=names(sims[[1]]))  
 dt <- data.table(dat)
-setnames(dt, "L1", "reps") # names are nice
+setnames(dt, "L1", "reps")
 ```
 
 
@@ -205,7 +199,19 @@ p6 <- ggplot(policy_zoom) +
 p6 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2, data=dt)
 ```
 
-![plot of chunk fishstock_policy2](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock_policy22.png) 
+![plot of chunk fishstock_policy2](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock_policy211.png) 
+
+```r
+
+
+p6 <- ggplot(policy) + 
+  geom_point(aes(Var2, x_grid[Var1], col=h_grid[value])) + 
+  labs(x = "time", y = "fishstock") +
+  scale_colour_gradientn(colours = rainbow(4)) 
+p6
+```
+
+![plot of chunk fishstock_policy2](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock_policy221.png) 
 
 
 
@@ -216,7 +222,8 @@ crashed <- dt[time==as.integer(OptTime-1), fishstock < xT/4, by=reps]
 
 
 
-A total of `35` crash.
+A total of `8` crash.
+
 
 
 

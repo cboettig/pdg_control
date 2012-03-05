@@ -5,7 +5,6 @@ opts_knit$set(upload.fun = function(file){
    library(RWordPress) 
    uploadFile(file)$url
   })
-## The real source code is externalized from this file:
 end.rcode-->
 
 <!--roptions dev="png", fig.width=7, fig.height=5, tidy=FALSE, warning=FALSE, message=FALSE, comment=NA, external=TRUE, cache=FALSE, cache.path="perfectpolicy/"-->
@@ -113,8 +112,8 @@ A total of <!--rinline sum(crashed$V1) --> crash.
 ### A non-optimal policy 
 Let's adjust the optimal policy by a rule-of-thumb buffer, resulting in a non-optimal policy.
 <!--begin.rcode safe_policy
-buffer <- 0.1
-safe_policy <- matrix(sapply(opt$D - buffer * length(h_grid), function(x) max(0, x)), ncol=dim(opt$D)[2])
+buffer <- 0.05
+safe_policy <- matrix(sapply(opt$D - buffer * length(h_grid), function(x) max(1, x)), ncol=dim(opt$D)[2])
 end.rcode-->
 
 This adds a <!--rinline 100*buffer--> % buffer below the optimal harvest rate. 
@@ -122,11 +121,14 @@ This adds a <!--rinline 100*buffer--> % buffer below the optimal harvest rate.
 
 <!--begin.rcode simulate_edited_noisy
 sims <- lapply(1:100, function(i){
-  ForwardSimulate(f, c(1,K,1), x_grid, h_grid, x0, safe_policy, z_g, z_m, z_i)
+  ForwardSimulate(f, pars, x_grid, h_grid, x0, safe_policy, z_g, z_m, z_i)
 })
 end.rcode-->
 
-<!--begin.rcode ref.label="tidy_"
+<!--begin.rcode tidy2
+dat <- melt(sims, id=names(sims[[1]]))  
+dt <- data.table(dat)
+setnames(dt, "L1", "reps")
 end.rcode-->
 
 <!--begin.rcode fishstock_policy2, fig.width=9
@@ -139,11 +141,19 @@ p6 <- ggplot(policy_zoom) +
   geom_abline(intercept=opt$S, slope = 0) +
   geom_abline(intercept=xT, slope=0, lty=2)
 p6 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2, data=dt)
+
+
+p6 <- ggplot(policy) + 
+  geom_point(aes(Var2, x_grid[Var1], col=h_grid[value])) + 
+  labs(x = "time", y = "fishstock") +
+  scale_colour_gradientn(colours = rainbow(4)) 
+p6
 end.rcode-->
 
 <!--begin.rcode ref.label="hascrashed"
 end.rcode-->
 A total of <!--rinline sum(crashed$V1) --> crash.
+
 
 
 
