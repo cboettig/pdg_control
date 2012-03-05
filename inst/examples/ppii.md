@@ -124,7 +124,7 @@ This plot summarizes the stock dynamics by visualizing the replicates. Reed's S 
 policy <- melt(opt$D)
 policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
 p6 <- ggplot(policy_zoom) + 
-  geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
+  geom_point(aes(Var2, (x_grid[Var1]), col=h_grid[value])) + 
   labs(x = "time", y = "fishstock") +
   scale_colour_gradientn(colours = rainbow(4)) +
   geom_abline(intercept=opt$S, slope = 0) +
@@ -132,7 +132,7 @@ p6 <- ggplot(policy_zoom) +
 p6 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2, data=dt)
 ```
 
-![plot of chunk fishstock_policy](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock_policy5.png) 
+![plot of chunk fishstock_policy](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock_policy6.png) 
 
 
 Calculate which crashed
@@ -144,7 +144,31 @@ crashed <- dt[time==as.integer(OptTime-1), fishstock < xT/4, by=reps]
 
 
 
-A total of `42` crash.
+A total of `34` crash.
+
+
+Single replicate
+
+
+```r
+ggplot(subset(dt,reps==1)) +
+  geom_line(aes(time, fishstock)) +
+  geom_abline(intercept=opt$S, slope = 0) +
+  geom_line(aes(time, harvest), col="darkgreen") 
+```
+
+![plot of chunk rep](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-rep.png) 
+
+
+harvest dynamics
+
+
+```r
+ggplot(dt) + geom_line(aes(time, harvest, group = reps), alpha = 0.2, col="darkgreen")
+```
+
+![plot of chunk harvest](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-harvest11.png) 
+
 
 
 
@@ -190,28 +214,16 @@ setnames(dt, "L1", "reps")
 ```r
 policy <- melt(safe_policy)
 policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
-p6 <- ggplot(policy_zoom) + 
-  geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
+p5 <- ggplot(policy_zoom) + 
+  geom_point(aes(Var2, (x_grid[Var1]), col=h_grid[value])) + 
   labs(x = "time", y = "fishstock") +
   scale_colour_gradientn(colours = rainbow(4)) +
   geom_abline(intercept=opt$S, slope = 0) +
   geom_abline(intercept=xT, slope=0, lty=2)
-p6 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2, data=dt)
+p5 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2, data=dt)
 ```
 
-![plot of chunk fishstock_policy2](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock_policy211.png) 
-
-```r
-
-
-p6 <- ggplot(policy) + 
-  geom_point(aes(Var2, x_grid[Var1], col=h_grid[value])) + 
-  labs(x = "time", y = "fishstock") +
-  scale_colour_gradientn(colours = rainbow(4)) 
-p6
-```
-
-![plot of chunk fishstock_policy2](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock_policy221.png) 
+![plot of chunk fishstock_policy2](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-fishstock_policy23.png) 
 
 
 
@@ -222,7 +234,29 @@ crashed <- dt[time==as.integer(OptTime-1), fishstock < xT/4, by=reps]
 
 
 
-A total of `8` crash.
+A total of `12` crash.
+
+Single replicate
+
+
+```r
+ggplot(subset(dt,reps==1)) +
+  geom_line(aes(time, fishstock)) +
+  geom_abline(intercept=opt$S, slope = 0) +
+  geom_line(aes(time, harvest), col="darkgreen") 
+```
+
+![plot of chunk rep2](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-rep2.png) 
+
+
+harvest dynamics
+
+
+```r
+ggplot(dt) + geom_line(aes(time, harvest, group = reps), alpha = 0.2, col="darkgreen")
+```
+
+![plot of chunk harvest2](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-harvest21.png) 
 
 
 

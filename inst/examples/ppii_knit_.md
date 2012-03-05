@@ -7,7 +7,7 @@ opts_knit$set(upload.fun = function(file){
   })
 end.rcode-->
 
-<!--roptions dev="png", fig.width=7, fig.height=5, tidy=FALSE, warning=FALSE, message=FALSE, comment=NA, external=TRUE, cache=FALSE, cache.path="perfectpolicy/"-->
+<!--roptions dev="png", fig.width=7, fig.height=5, tidy=FALSE, warning=FALSE, message=FALSE, comment=NA, external=TRUE, cache=FALSE, cache.path="ppii/"-->
 
 # perfect policy, imperfect implementation 
 Compare to non-optimal, rule-of-thumb policy.
@@ -93,7 +93,7 @@ This plot summarizes the stock dynamics by visualizing the replicates. Reed's S 
 policy <- melt(opt$D)
 policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
 p6 <- ggplot(policy_zoom) + 
-  geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
+  geom_point(aes(Var2, (x_grid[Var1]), col=h_grid[value])) + 
   labs(x = "time", y = "fishstock") +
   scale_colour_gradientn(colours = rainbow(4)) +
   geom_abline(intercept=opt$S, slope = 0) +
@@ -106,6 +106,20 @@ Calculate which crashed
 crashed <- dt[time==as.integer(OptTime-1), fishstock < xT/4, by=reps]
 end.rcode-->
 A total of <!--rinline sum(crashed$V1) --> crash.
+
+
+Single replicate
+<!--begin.rcode rep 
+ggplot(subset(dt,reps==1)) +
+  geom_line(aes(time, fishstock)) +
+  geom_abline(intercept=opt$S, slope = 0) +
+  geom_line(aes(time, harvest), col="darkgreen") 
+end.rcode-->
+
+harvest dynamics
+<!--begin.rcode harvest
+ggplot(dt) + geom_line(aes(time, harvest, group = reps), alpha = 0.2, col="darkgreen")
+end.rcode-->
 
 
 
@@ -134,26 +148,31 @@ end.rcode-->
 <!--begin.rcode fishstock_policy2, fig.width=9
 policy <- melt(safe_policy)
 policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
-p6 <- ggplot(policy_zoom) + 
-  geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
+p5 <- ggplot(policy_zoom) + 
+  geom_point(aes(Var2, (x_grid[Var1]), col=h_grid[value])) + 
   labs(x = "time", y = "fishstock") +
   scale_colour_gradientn(colours = rainbow(4)) +
   geom_abline(intercept=opt$S, slope = 0) +
   geom_abline(intercept=xT, slope=0, lty=2)
-p6 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2, data=dt)
-
-
-p6 <- ggplot(policy) + 
-  geom_point(aes(Var2, x_grid[Var1], col=h_grid[value])) + 
-  labs(x = "time", y = "fishstock") +
-  scale_colour_gradientn(colours = rainbow(4)) 
-p6
+p5 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2, data=dt)
 end.rcode-->
 
 <!--begin.rcode ref.label="hascrashed"
 end.rcode-->
 A total of <!--rinline sum(crashed$V1) --> crash.
 
+Single replicate
+<!--begin.rcode rep2 
+ggplot(subset(dt,reps==1)) +
+  geom_line(aes(time, fishstock)) +
+  geom_abline(intercept=opt$S, slope = 0) +
+  geom_line(aes(time, harvest), col="darkgreen") 
+end.rcode-->
+
+harvest dynamics
+<!--begin.rcode harvest2 
+ggplot(dt) + geom_line(aes(time, harvest, group = reps), alpha = 0.2, col="darkgreen")
+end.rcode-->
 
 
 
