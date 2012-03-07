@@ -1,5 +1,4 @@
 
-
 ```
 ## Loading required package: socialR
 ```
@@ -11,6 +10,7 @@
 
 # Stability analysis
 In this example, we compute the distribution of the stability coefficients estimated from the fished and unfished simulations. 
+Overall this shows little success in distinguishing between the stability of the fished and unfished populations -- i.e. no hint that we are managing near an edge.
 
 The optimal policy calculations are just straight-froward implementations of Reed, W.J., 1979, in which population growth is stochastic.
 
