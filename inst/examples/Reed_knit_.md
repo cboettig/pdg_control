@@ -56,16 +56,6 @@ end.rcode-->
 
 
 Chose the state equation / population dynamics function
-<!--begin.rcode BevHolt, eval=FALSE, include=FALSE
-f <- BevHolt                # Select the state equation
-pars <- c(2, 4)             # parameters for the state equation
-K <- (pars[1] - 1)/pars[2]  # Carrying capacity 
-xT <- 0                     # boundary conditions
-control = "harvest"         # control variable is total harvest, h = e * x
-price <- 1
-cost <- .12
-end.rcode-->
-
 And a state equation with an allee effect
 <!--begin.rcode Myer
 f <- Myer_harvest
