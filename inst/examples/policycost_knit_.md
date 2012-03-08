@@ -1,4 +1,4 @@
-<!--roptions dev='png', fig.width=7, fig.height=5, tidy=FALSE, warning=FALSE, message=FALSE, comment=NA, cache.path="policycost/", cache=FALSE-->
+<!--roptions dev='png', fig.width=10, fig.height=7, tidy=FALSE, warning=FALSE, message=FALSE, comment=NA, cache.path="policycost/", cache=FALSE-->
 
 <!--begin.rcode setup, include=FALSE
 render_gfm()  
@@ -102,11 +102,11 @@ end.rcode-->
 
 
 Compare the optimal policy that involves this cost:
-<!--begin.rcode policy_cost_vis, fig.width=10
+<!--begin.rcode policy_cost_vis
 policy <- melt(policycost$D)
 policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
 p5 <- ggplot(policy_zoom) + 
-  geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
+  geom_point(aes(Var2, (x_grid[Var1]), col=h_grid[value])) + 
   labs(x = "time", y = "fishstock") +
   scale_colour_gradientn(colours = rainbow(4)) +
   geom_abline(intercept=xT, slope=0, lty=2)
@@ -115,11 +115,11 @@ end.rcode-->
 
 
 Against the policy with no cost: 
-<!--begin.rcode no_policy_cost_vis, fig.width=10
+<!--begin.rcode no_policy_cost_vis
 policy <- melt(opt$D)
 policy_zoom <- subset(policy, x_grid[Var1] < max(dt$alternate) )
 p6 <- ggplot(policy_zoom) + 
-  geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
+  geom_point(aes(Var2, (x_grid[Var1]), col= h_grid[value])) + 
   labs(x = "time", y = "fishstock") +
   scale_colour_gradientn(colours = rainbow(4)) +
   geom_abline(intercept=opt$S, slope = 0) +
@@ -148,6 +148,7 @@ total_profit <- dt[,sum(profits), by=reps]
 setkey(total_profit, reps)
 setkey(dt, reps)
 dt <- dt[total_profit]
+setnames(dt, "V1", "total.profit")
 end.rcode-->
 
 <!--begin.rcode
@@ -164,7 +165,7 @@ policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT,
 end.rcode-->
 
 
-<!--begin.rcode policy_cost_vis_l2, fig.width=10
+<!--begin.rcode policy_cost_vis_l2
 sims <- lapply(1:100, function(i)
   simulate_optim(f, pars, x_grid, h_grid, x0, policycost$D, z_g, z_m, z_i, opt$D)
 )
@@ -189,7 +190,7 @@ end.rcode-->
 policy <- melt(policycost$D)
 policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
 ggplot(policy_zoom) + 
-  geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
+  geom_point(aes(Var2, (x_grid[Var1]), col=h_grid[value])) + 
   labs(x = "time", y = "fishstock") +
   scale_colour_gradientn(colours = rainbow(4)) +
   geom_abline(intercept=xT, slope=0, lty=2) +
@@ -217,6 +218,7 @@ total_profit <- dt[,sum(profits), by=reps]
 setkey(total_profit, reps)
 setkey(dt, reps)
 dt <- dt[total_profit]
+setnames(dt, "V1", "total.profit")
 end.rcode-->
 
 <!--begin.rcode
@@ -231,7 +233,7 @@ policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT,
 end.rcode-->
 
 
-<!--begin.rcode policy_cost_vis_l1, fig.width=10
+<!--begin.rcode policy_cost_vis_l1
 sims <- lapply(1:100, function(i)
   simulate_optim(f, pars, x_grid, h_grid, x0, policycost$D, z_g, z_m, z_i, opt$D)
 )
@@ -287,6 +289,7 @@ total_profit <- dt[,sum(profits), by=reps]
 setkey(total_profit, reps)
 setkey(dt, reps)
 dt <- dt[total_profit]
+setnames(dt, "V1", "total.profit")
 end.rcode-->
 
 <!--begin.rcode

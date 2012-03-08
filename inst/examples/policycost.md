@@ -165,7 +165,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest_alt), col="darkgreen") 
 ```
 
-![plot of chunk rep1](http://farm8.staticflickr.com/7183/6963340687_20475b2155_n.jpg) 
+![plot of chunk rep1](http://farm8.staticflickr.com/7050/6963419199_312cc8061b_n.jpg) 
 
 
 
@@ -176,14 +176,14 @@ Compare the optimal policy that involves this cost:
 policy <- melt(policycost$D)
 policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
 p5 <- ggplot(policy_zoom) + 
-  geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
+  geom_point(aes(Var2, (x_grid[Var1]), col=h_grid[value])) + 
   labs(x = "time", y = "fishstock") +
   scale_colour_gradientn(colours = rainbow(4)) +
   geom_abline(intercept=xT, slope=0, lty=2)
 p5 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1, data=dt)
 ```
 
-![plot of chunk policy_cost_vis](http://farm8.staticflickr.com/7188/6817221352_4b647efeb3_n.jpg) 
+![plot of chunk policy_cost_vis](http://farm8.staticflickr.com/7049/6817298492_478604b0a7_n.jpg) 
 
 
 
@@ -194,7 +194,7 @@ Against the policy with no cost:
 policy <- melt(opt$D)
 policy_zoom <- subset(policy, x_grid[Var1] < max(dt$alternate) )
 p6 <- ggplot(policy_zoom) + 
-  geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
+  geom_point(aes(Var2, (x_grid[Var1]), col= h_grid[value])) + 
   labs(x = "time", y = "fishstock") +
   scale_colour_gradientn(colours = rainbow(4)) +
   geom_abline(intercept=opt$S, slope = 0) +
@@ -202,7 +202,7 @@ p6 <- ggplot(policy_zoom) +
 p6 + geom_line(aes(time, alternate, group = reps), alpha = 0.1, data=dt)
 ```
 
-![plot of chunk no_policy_cost_vis](http://farm8.staticflickr.com/7203/6963342443_733c8992a4_n.jpg) 
+![plot of chunk no_policy_cost_vis](http://farm8.staticflickr.com/7179/6817298782_b278dddc71_n.jpg) 
 
 
 ### Profits
@@ -238,6 +238,7 @@ total_profit <- dt[,sum(profits), by=reps]
 setkey(total_profit, reps)
 setkey(dt, reps)
 dt <- dt[total_profit]
+setnames(dt, "V1", "total.profit")
 ```
 
 
@@ -261,13 +262,7 @@ Error: arguments imply differing number of rows: 5000, 0
 ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
 ```
 
-
-
-```
-Error: object 'total.profit' not found
-```
-
-
+![plot of chunk unnamed-chunk-5](http://farm8.staticflickr.com/7208/6963421049_9644cf6ec6_n.jpg) 
 
 
 # Alternate policy cost models 
@@ -310,7 +305,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest_alt), col="darkgreen") 
 ```
 
-![plot of chunk unnamed-chunk-6](http://farm8.staticflickr.com/7036/6963363557_596143959f_n.jpg) 
+![plot of chunk unnamed-chunk-6](http://farm8.staticflickr.com/7036/6963441673_06952ef8b6_n.jpg) 
 
 
 
@@ -321,14 +316,14 @@ ggplot(subset(dt,reps==1)) +
 policy <- melt(policycost$D)
 policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
 ggplot(policy_zoom) + 
-  geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
+  geom_point(aes(Var2, (x_grid[Var1]), col=h_grid[value])) + 
   labs(x = "time", y = "fishstock") +
   scale_colour_gradientn(colours = rainbow(4)) +
   geom_abline(intercept=xT, slope=0, lty=2) +
   geom_line(aes(time, alternate, group = reps), alpha = 0.1, data=dt)
 ```
 
-![plot of chunk unnamed-chunk-7](http://farm8.staticflickr.com/7192/6963364509_ee96a36c9d_n.jpg) 
+![plot of chunk unnamed-chunk-7](http://farm8.staticflickr.com/7181/6817320804_48fd65d98c_n.jpg) 
 
 
 ### Profits
@@ -364,6 +359,7 @@ total_profit <- dt[,sum(profits), by=reps]
 setkey(total_profit, reps)
 setkey(dt, reps)
 dt <- dt[total_profit]
+setnames(dt, "V1", "total.profit")
 ```
 
 
@@ -387,13 +383,7 @@ Error: arguments imply differing number of rows: 5000, 0
 ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
 ```
 
-
-
-```
-Error: object 'total.profit' not found
-```
-
-
+![plot of chunk unnamed-chunk-11](http://farm8.staticflickr.com/7056/6817321002_10f79f4a1b_n.jpg) 
 
 
 ## L1 norm
@@ -435,7 +425,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest_alt), col="darkgreen") 
 ```
 
-![plot of chunk unnamed-chunk-12](http://farm8.staticflickr.com/7194/6963385875_4935eb7bae_n.jpg) 
+![plot of chunk unnamed-chunk-12](http://farm8.staticflickr.com/7045/6817341894_60aa6cbd5b_n.jpg) 
 
 
 
@@ -452,7 +442,7 @@ ggplot(policy_zoom) +
   geom_line(aes(time, alternate, group = reps), alpha = 0.05, data=dt)
 ```
 
-![plot of chunk unnamed-chunk-13](http://farm8.staticflickr.com/7199/6817265822_79f271fe95_n.jpg) 
+![plot of chunk unnamed-chunk-13](http://farm8.staticflickr.com/7037/6817343168_e547bf5bc9_n.jpg) 
 
 
 
@@ -491,6 +481,7 @@ total_profit <- dt[,sum(profits), by=reps]
 setkey(total_profit, reps)
 setkey(dt, reps)
 dt <- dt[total_profit]
+setnames(dt, "V1", "total.profit")
 ```
 
 
@@ -514,10 +505,4 @@ Error: arguments imply differing number of rows: 5000, 0
 ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
 ```
 
-
-
-```
-Error: object 'total.profit' not found
-```
-
-
+![plot of chunk unnamed-chunk-17](http://farm8.staticflickr.com/7050/6963465117_5e17c43c7a_n.jpg) 
