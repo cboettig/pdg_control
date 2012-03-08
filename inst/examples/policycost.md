@@ -18,13 +18,14 @@ This example illustrates the impact of adding a cost to changing the harvest lev
 
 
 ```r
-delta <- 0.1      # economic discounting rate
+delta <- 0.01     # SMALLER economic discounting rate
 OptTime <- 50     # stopping time
 gridsize <- 100   # gridsize (discretized population)
 sigma_g <- 0.2    # Noise in population growth
 sigma_m <- 0.     # noise in stock assessment measurement
 sigma_i <- 0.     # noise in implementation of the quota
-reward <- 1       # bonus for satisfying the boundary condition
+reward <- 0       # bonus for satisfying the boundary condition
+PolicyFee <- .4
 ```
 
 
@@ -115,7 +116,7 @@ A modified algorithm lets us include a penalty of magnitude `P` and a functional
 
 ```r
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                    profit, delta, reward, P = .3, penalty = "asym")
+                    profit, delta, reward, P = PolicyFee, penalty = "asym")
 ```
 
 
@@ -164,7 +165,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest_alt), col="darkgreen") 
 ```
 
-![plot of chunk rep](http://farm8.staticflickr.com/7182/6811103072_dd00a0a138_z.jpg) 
+![plot of chunk rep1](http://farm8.staticflickr.com/7183/6963340687_20475b2155_n.jpg) 
 
 
 
@@ -182,7 +183,7 @@ p5 <- ggplot(policy_zoom) +
 p5 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1, data=dt)
 ```
 
-![plot of chunk policy_cost_vis](http://farm8.staticflickr.com/7189/6957216285_0eff22d8a2_z.jpg) 
+![plot of chunk policy_cost_vis](http://farm8.staticflickr.com/7188/6817221352_4b647efeb3_n.jpg) 
 
 
 
@@ -201,32 +202,210 @@ p6 <- ggplot(policy_zoom) +
 p6 + geom_line(aes(time, alternate, group = reps), alpha = 0.1, data=dt)
 ```
 
-![plot of chunk no_policy_cost_vis](http://farm8.staticflickr.com/7202/6957216701_0aaa40e850_z.jpg) 
+![plot of chunk no_policy_cost_vis](http://farm8.staticflickr.com/7203/6963342443_733c8992a4_n.jpg) 
+
+
+### Profits
 
 
 
-Compare dynamics on a single replicate to see how this policy differs from the Reed policy. 
+```r
+dt <- data.table(dt, id=1:dim(dt)[1])
+profits <- dt[, profit(fishstock, harvest), by=id]
+```
+
+
+
+
+Merge in profits to data.table (should be a way to avoid having to do these joins?)
+
+
+```r
+setkey(dt, id)
+setkey(profits, id)
+dt <- dt[profits]
+setnames(dt, "V1", "profits")
+```
+
+
+
+
+merge in total profits to data.table
+
+
+```r
+total_profit <- dt[,sum(profits), by=reps]
+setkey(total_profit, reps)
+setkey(dt, reps)
+dt <- dt[total_profit]
+```
+
+
+
+
+
+
+```r
+ggplot(dt) + geom_line(aes(time, profit, group=reps))
+```
+
+
+
+```
+Error: arguments imply differing number of rows: 5000, 0
+```
+
+
+
+```r
+ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
+```
+
+
+
+```
+Error: object 'total.profit' not found
+```
+
+
+
+
+# Alternate policy cost models 
+
+## L2 norm
+
+
+```r
+policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
+                    profit, delta, reward, P = PolicyFee, penalty = "L2")
+```
+
+
+
+
+
+
+
+```r
+sims <- lapply(1:100, function(i)
+  simulate_optim(f, pars, x_grid, h_grid, x0, policycost$D, z_g, z_m, z_i, opt$D)
+)
+
+dat <- melt(sims, id=names(sims[[1]]))  
+dt <- data.table(dat)
+setnames(dt, "L1", "reps") # names are nice
+```
+
+
+
+
 
 
 ```r
 ggplot(subset(dt,reps==1)) +
-  geom_line(aes(time, fishstock)) +
+  geom_line(aes(time, alternate)) +
+  geom_line(aes(time, fishstock), col="darkblue") +
   geom_abline(intercept=opt$S, slope = 0) +
-  geom_line(aes(time, harvest), col="darkgreen") 
+  geom_line(aes(time, harvest), col="purple") + 
+  geom_line(aes(time, harvest_alt), col="darkgreen") 
 ```
 
-![plot of chunk plot_rep2](http://farm8.staticflickr.com/7060/6957216997_009948dee4_z.jpg) 
+![plot of chunk unnamed-chunk-6](http://farm8.staticflickr.com/7036/6963363557_596143959f_n.jpg) 
 
 
-## Alternate policy cost models 
 
-#### L2 norm
+
+
+
+```r
+policy <- melt(policycost$D)
+policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
+ggplot(policy_zoom) + 
+  geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
+  labs(x = "time", y = "fishstock") +
+  scale_colour_gradientn(colours = rainbow(4)) +
+  geom_abline(intercept=xT, slope=0, lty=2) +
+  geom_line(aes(time, alternate, group = reps), alpha = 0.1, data=dt)
+```
+
+![plot of chunk unnamed-chunk-7](http://farm8.staticflickr.com/7192/6963364509_ee96a36c9d_n.jpg) 
+
+
+### Profits
+
+
+
+```r
+dt <- data.table(dt, id=1:dim(dt)[1])
+profits <- dt[, profit(fishstock, harvest), by=id]
+```
+
+
+
+
+Merge in profits to data.table (should be a way to avoid having to do these joins?)
+
+
+```r
+setkey(dt, id)
+setkey(profits, id)
+dt <- dt[profits]
+setnames(dt, "V1", "profits")
+```
+
+
+
+
+merge in total profits to data.table
+
+
+```r
+total_profit <- dt[,sum(profits), by=reps]
+setkey(total_profit, reps)
+setkey(dt, reps)
+dt <- dt[total_profit]
+```
+
+
+
+
+
+
+```r
+ggplot(dt) + geom_line(aes(time, profit, group=reps))
+```
+
+
+
+```
+Error: arguments imply differing number of rows: 5000, 0
+```
+
+
+
+```r
+ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
+```
+
+
+
+```
+Error: object 'total.profit' not found
+```
+
+
+
+
+## L1 norm
 
 
 ```r
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                    profit, delta, reward, P = .3, penalty = "L2")
+                    profit, delta, reward, P = PolicyFee, penalty = "L1")
 ```
+
+
+
 
 
 
@@ -239,28 +418,6 @@ sims <- lapply(1:100, function(i)
 dat <- melt(sims, id=names(sims[[1]]))  
 dt <- data.table(dat)
 setnames(dt, "L1", "reps") # names are nice
-
-
-policy <- melt(policycost$D)
-policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
-ggplot(policy_zoom) + 
-  geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
-  labs(x = "time", y = "fishstock") +
-  scale_colour_gradientn(colours = rainbow(4)) +
-  geom_abline(intercept=xT, slope=0, lty=2) +
-  geom_line(aes(time, alternate, group = reps), alpha = 0.1, data=dt)
-```
-
-![plot of chunk policy_cost_vis_l2](http://farm8.staticflickr.com/7179/6811164850_755e737311_z.jpg) 
-
-
-
-#### L1 norm
-
-
-```r
-policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                    profit, delta, reward, P = .3, penalty = "L1")
 ```
 
 
@@ -270,27 +427,97 @@ policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT,
 
 
 ```r
-sims <- lapply(1:100, function(i)
-  simulate_optim(f, pars, x_grid, h_grid, x0, policycost$D, z_g, z_m, z_i, opt$D)
-)
+ggplot(subset(dt,reps==1)) +
+  geom_line(aes(time, alternate)) +
+  geom_line(aes(time, fishstock), col="darkblue") +
+  geom_abline(intercept=opt$S, slope = 0) +
+  geom_line(aes(time, harvest), col="purple") + 
+  geom_line(aes(time, harvest_alt), col="darkgreen") 
+```
 
-dat <- melt(sims, id=names(sims[[1]]))  
-dt <- data.table(dat)
-setnames(dt, "L1", "reps") # names are nice
+![plot of chunk unnamed-chunk-12](http://farm8.staticflickr.com/7194/6963385875_4935eb7bae_n.jpg) 
 
 
 
+
+
+```r
 policy <- melt(policycost$D)
 policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
 ggplot(policy_zoom) + 
-  geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
+  geom_point(aes(Var2, (x_grid[Var1]), col=h_grid[value])) + 
   labs(x = "time", y = "fishstock") +
   scale_colour_gradientn(colours = rainbow(4)) +
   geom_abline(intercept=xT, slope=0, lty=2) +
-  geom_line(aes(time, alternate, group = reps), alpha = 0.1, data=dt)
+  geom_line(aes(time, alternate, group = reps), alpha = 0.05, data=dt)
 ```
 
-![plot of chunk policy_cost_vis_l1](http://farm8.staticflickr.com/7196/6957313031_6b29584ec8_z.jpg) 
+![plot of chunk unnamed-chunk-13](http://farm8.staticflickr.com/7199/6817265822_79f271fe95_n.jpg) 
 
+
+
+
+
+### Profits
+
+
+
+```r
+dt <- data.table(dt, id=1:dim(dt)[1])
+profits <- dt[, profit(fishstock, harvest), by=id]
+```
+
+
+
+
+Merge in profits to data.table (should be a way to avoid having to do these joins?)
+
+
+```r
+setkey(dt, id)
+setkey(profits, id)
+dt <- dt[profits]
+setnames(dt, "V1", "profits")
+```
+
+
+
+
+merge in total profits to data.table
+
+
+```r
+total_profit <- dt[,sum(profits), by=reps]
+setkey(total_profit, reps)
+setkey(dt, reps)
+dt <- dt[total_profit]
+```
+
+
+
+
+
+
+```r
+ggplot(dt) + geom_line(aes(time, profit, group=reps))
+```
+
+
+
+```
+Error: arguments imply differing number of rows: 5000, 0
+```
+
+
+
+```r
+ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
+```
+
+
+
+```
+Error: object 'total.profit' not found
+```
 
 

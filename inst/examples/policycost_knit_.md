@@ -23,7 +23,7 @@ end.rcode-->
 This example illustrates the impact of adding a cost to changing the harvest level between years 
 
 ### Define all parameters 
-<!--begin.rcode parameters
+<!--begin.rcode
 delta <- 0.01     # SMALLER economic discounting rate
 OptTime <- 50     # stopping time
 gridsize <- 100   # gridsize (discretized population)
@@ -31,6 +31,7 @@ sigma_g <- 0.2    # Noise in population growth
 sigma_m <- 0.     # noise in stock assessment measurement
 sigma_i <- 0.     # noise in implementation of the quota
 reward <- 0       # bonus for satisfying the boundary condition
+PolicyFee <- .4
 end.rcode-->
 
 we'll use log normal noise functions
@@ -66,16 +67,16 @@ We use Bellman's dynamic programming algorithm to compute the optimal solution f
 end.rcode-->
 
 A modified algorithm lets us include a penalty of magnitude `P` and a functional form that can be an `L1` norm, `L2`  norm, `asymmetric` L1 norm (costly to lower harvest rates), fixed cost, or `none` (no cost).  Here is an asymmetric norm example.  Note that this calculation is considerably slower. 
-<!--begin.rcode policycost_optim
+<!--begin.rcode policycost_optim_
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                    profit, delta, reward, P = .3, penalty = "asym")
+                    profit, delta, reward, P = PolicyFee, penalty = "asym")
 end.rcode-->
 
 
 ### Simulate 
 Now we'll simulate 100 replicates of this stochastic process under the optimal harvest policy determined above.  We use a modified simulation function that can simulate an alternate policy (the Reed optimum, where policy costs are zero, `opt$D` ) and a focal policy, `policycost$D`
 
-<!--begin.rcode simulate_policy
+<!--begin.rcode simulate_policy_
 sims <- lapply(1:100, function(i)
   simulate_optim(f, pars, x_grid, h_grid, x0, policycost$D, z_g, z_m, z_i, opt$D)
   )
@@ -90,7 +91,7 @@ end.rcode-->
 ### Plots 
 
 A single replicate, alternate dynamics should show the Reed optimum, while harvest/fishstock should show the impact of having policy costs.  
-<!--begin.rcode rep
+<!--begin.rcode rep1
 ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, alternate)) +
   geom_line(aes(time, fishstock), col="darkblue") +
@@ -126,23 +127,43 @@ p6 <- ggplot(policy_zoom) +
 p6 + geom_line(aes(time, alternate, group = reps), alpha = 0.1, data=dt)
 end.rcode-->
 
+### Profits
 
-Compare dynamics on a single replicate to see how this policy differs from the Reed policy. 
-<!--begin.rcode plot_rep2
-ggplot(subset(dt,reps==1)) +
-  geom_line(aes(time, fishstock)) +
-  geom_abline(intercept=opt$S, slope = 0) +
-  geom_line(aes(time, harvest), col="darkgreen") 
-
+<!--begin.rcode
+dt <- data.table(dt, id=1:dim(dt)[1])
+profits <- dt[, profit(fishstock, harvest), by=id]
 end.rcode-->
 
-## Alternate policy cost models 
+Merge in profits to data.table (should be a way to avoid having to do these joins?)
+<!--begin.rcode
+setkey(dt, id)
+setkey(profits, id)
+dt <- dt[profits]
+setnames(dt, "V1", "profits")
+end.rcode-->
 
-#### L2 norm
+merge in total profits to data.table
+<!--begin.rcode
+total_profit <- dt[,sum(profits), by=reps]
+setkey(total_profit, reps)
+setkey(dt, reps)
+dt <- dt[total_profit]
+end.rcode-->
+
+<!--begin.rcode
+ggplot(dt) + geom_line(aes(time, profit, group=reps))
+ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
+end.rcode-->
+
+# Alternate policy cost models 
+
+## L2 norm
 <!--begin.rcode policycost_optim_l2
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                    profit, delta, reward, P = .3, penalty = "L2")
+                    profit, delta, reward, P = PolicyFee, penalty = "L2")
 end.rcode-->
+
+
 <!--begin.rcode policy_cost_vis_l2, fig.width=10
 sims <- lapply(1:100, function(i)
   simulate_optim(f, pars, x_grid, h_grid, x0, policycost$D, z_g, z_m, z_i, opt$D)
@@ -151,8 +172,20 @@ sims <- lapply(1:100, function(i)
 dat <- melt(sims, id=names(sims[[1]]))  
 dt <- data.table(dat)
 setnames(dt, "L1", "reps") # names are nice
+end.rcode-->
+
+<!--begin.rcode 
+ggplot(subset(dt,reps==1)) +
+  geom_line(aes(time, alternate)) +
+  geom_line(aes(time, fishstock), col="darkblue") +
+  geom_abline(intercept=opt$S, slope = 0) +
+  geom_line(aes(time, harvest), col="purple") + 
+  geom_line(aes(time, harvest_alt), col="darkgreen") 
+end.rcode-->
 
 
+
+<!--begin.rcode 
 policy <- melt(policycost$D)
 policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
 ggplot(policy_zoom) + 
@@ -163,11 +196,38 @@ ggplot(policy_zoom) +
   geom_line(aes(time, alternate, group = reps), alpha = 0.1, data=dt)
 end.rcode-->
 
+### Profits
 
-#### L1 norm
+<!--begin.rcode
+dt <- data.table(dt, id=1:dim(dt)[1])
+profits <- dt[, profit(fishstock, harvest), by=id]
+end.rcode-->
+
+Merge in profits to data.table (should be a way to avoid having to do these joins?)
+<!--begin.rcode
+setkey(dt, id)
+setkey(profits, id)
+dt <- dt[profits]
+setnames(dt, "V1", "profits")
+end.rcode-->
+
+merge in total profits to data.table
+<!--begin.rcode
+total_profit <- dt[,sum(profits), by=reps]
+setkey(total_profit, reps)
+setkey(dt, reps)
+dt <- dt[total_profit]
+end.rcode-->
+
+<!--begin.rcode
+ggplot(dt) + geom_line(aes(time, profit, group=reps))
+ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
+end.rcode-->
+
+## L1 norm
 <!--begin.rcode policycost_optim_l1
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                    profit, delta, reward, P = .3, penalty = "L1")
+                    profit, delta, reward, P = PolicyFee, penalty = "L1")
 end.rcode-->
 
 
@@ -179,17 +239,57 @@ sims <- lapply(1:100, function(i)
 dat <- melt(sims, id=names(sims[[1]]))  
 dt <- data.table(dat)
 setnames(dt, "L1", "reps") # names are nice
-
-
-
-policy <- melt(policycost$D)
-policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
-ggplot(policy_zoom) + 
-  geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
-  labs(x = "time", y = "fishstock") +
-  scale_colour_gradientn(colours = rainbow(4)) +
-  geom_abline(intercept=xT, slope=0, lty=2) +
-  geom_line(aes(time, alternate, group = reps), alpha = 0.1, data=dt)
 end.rcode-->
 
 
+<!--begin.rcode 
+ggplot(subset(dt,reps==1)) +
+  geom_line(aes(time, alternate)) +
+  geom_line(aes(time, fishstock), col="darkblue") +
+  geom_abline(intercept=opt$S, slope = 0) +
+  geom_line(aes(time, harvest), col="purple") + 
+  geom_line(aes(time, harvest_alt), col="darkgreen") 
+end.rcode-->
+
+
+<!--begin.rcode
+policy <- melt(policycost$D)
+policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
+ggplot(policy_zoom) + 
+  geom_point(aes(Var2, (x_grid[Var1]), col=h_grid[value])) + 
+  labs(x = "time", y = "fishstock") +
+  scale_colour_gradientn(colours = rainbow(4)) +
+  geom_abline(intercept=xT, slope=0, lty=2) +
+  geom_line(aes(time, alternate, group = reps), alpha = 0.05, data=dt)
+end.rcode-->
+
+
+
+
+### Profits
+
+<!--begin.rcode
+dt <- data.table(dt, id=1:dim(dt)[1])
+profits <- dt[, profit(fishstock, harvest), by=id]
+end.rcode-->
+
+Merge in profits to data.table (should be a way to avoid having to do these joins?)
+<!--begin.rcode
+setkey(dt, id)
+setkey(profits, id)
+dt <- dt[profits]
+setnames(dt, "V1", "profits")
+end.rcode-->
+
+merge in total profits to data.table
+<!--begin.rcode
+total_profit <- dt[,sum(profits), by=reps]
+setkey(total_profit, reps)
+setkey(dt, reps)
+dt <- dt[total_profit]
+end.rcode-->
+
+<!--begin.rcode
+ggplot(dt) + geom_line(aes(time, profit, group=reps))
+ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
+end.rcode-->
