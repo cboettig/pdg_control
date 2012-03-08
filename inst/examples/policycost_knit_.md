@@ -16,7 +16,9 @@ end.rcode-->
  * author Carl Boettiger, <cboettig@gmail.com>
  * license: CC0
 
-<!--begin.rcode libraries, echo=FALSE
+## Setup the system
+
+<!--begin.rcode libraries
 end.rcode-->
 
 
@@ -83,14 +85,14 @@ sims <- lapply(1:100, function(i)
 end.rcode-->
 
 
-## Summarize and plot the results                                                   
+## Asymmetric costs results  
 Make data tidy (melt), fast (data.tables), and nicely labeled.
 <!--begin.rcode tidy
 end.rcode-->
 
 ### Plots 
 
-A single replicate, alternate dynamics should show the Reed optimum, while harvest/fishstock should show the impact of having policy costs.  
+A single replicate, alternate dynamics should show the Reed optimum, while harvest/fishstock should show the impact of having policy costs. 
 <!--begin.rcode rep1
 ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, alternate)) +
@@ -105,12 +107,10 @@ Compare the optimal policy that involves this cost:
 <!--begin.rcode policy_cost_vis
 policy <- melt(policycost$D)
 policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
-p5 <- ggplot(policy_zoom) + 
+ggplot(policy_zoom) + 
   geom_point(aes(Var2, (x_grid[Var1]), col=h_grid[value])) + 
   labs(x = "time", y = "fishstock") +
-  scale_colour_gradientn(colours = rainbow(4)) +
-  geom_abline(intercept=xT, slope=0, lty=2)
-p5 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1, data=dt)
+  scale_colour_gradientn(colours = rainbow(4)) 
 end.rcode-->
 
 
@@ -118,13 +118,11 @@ Against the policy with no cost:
 <!--begin.rcode no_policy_cost_vis
 policy <- melt(opt$D)
 policy_zoom <- subset(policy, x_grid[Var1] < max(dt$alternate) )
-p6 <- ggplot(policy_zoom) + 
+ggplot(policy_zoom) + 
   geom_point(aes(Var2, (x_grid[Var1]), col= h_grid[value])) + 
   labs(x = "time", y = "fishstock") +
-  scale_colour_gradientn(colours = rainbow(4)) +
-  geom_abline(intercept=opt$S, slope = 0) +
-  geom_abline(intercept=xT, slope=0, lty=2)  
-p6 + geom_line(aes(time, alternate, group = reps), alpha = 0.1, data=dt)
+  scale_colour_gradientn(colours = rainbow(4)) + 
+  geom_abline(intercept=opt$S, slope = 0) 
 end.rcode-->
 
 ### Profits
@@ -152,7 +150,7 @@ setnames(dt, "V1", "total.profit")
 end.rcode-->
 
 <!--begin.rcode
-ggplot(dt) + geom_line(aes(time, profit, group=reps))
+ggplot(dt) + geom_line(aes(time, profits, group=reps))
 ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
 end.rcode-->
 
@@ -192,9 +190,7 @@ policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
 ggplot(policy_zoom) + 
   geom_point(aes(Var2, (x_grid[Var1]), col=h_grid[value])) + 
   labs(x = "time", y = "fishstock") +
-  scale_colour_gradientn(colours = rainbow(4)) +
-  geom_abline(intercept=xT, slope=0, lty=2) +
-  geom_line(aes(time, alternate, group = reps), alpha = 0.1, data=dt)
+  scale_colour_gradientn(colours = rainbow(4)) 
 end.rcode-->
 
 ### Profits
@@ -222,7 +218,7 @@ setnames(dt, "V1", "total.profit")
 end.rcode-->
 
 <!--begin.rcode
-ggplot(dt) + geom_line(aes(time, profit, group=reps))
+ggplot(dt) + geom_line(aes(time, profits, group=reps))
 ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
 end.rcode-->
 
@@ -260,9 +256,7 @@ policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
 ggplot(policy_zoom) + 
   geom_point(aes(Var2, (x_grid[Var1]), col=h_grid[value])) + 
   labs(x = "time", y = "fishstock") +
-  scale_colour_gradientn(colours = rainbow(4)) +
-  geom_abline(intercept=xT, slope=0, lty=2) +
-  geom_line(aes(time, alternate, group = reps), alpha = 0.05, data=dt)
+  scale_colour_gradientn(colours = rainbow(4)) 
 end.rcode-->
 
 
@@ -293,6 +287,6 @@ setnames(dt, "V1", "total.profit")
 end.rcode-->
 
 <!--begin.rcode
-ggplot(dt) + geom_line(aes(time, profit, group=reps))
+ggplot(dt) + geom_line(aes(time, profits, group=reps))
 ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
 end.rcode-->

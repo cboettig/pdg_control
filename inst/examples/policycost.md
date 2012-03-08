@@ -8,6 +8,18 @@
  * author Carl Boettiger, <cboettig@gmail.com>
  * license: CC0
 
+## Setup the system
+
+
+
+```r
+rm(list=ls())   
+require(pdgControl)
+require(reshape2)
+require(ggplot2)
+require(data.table)
+```
+
 
 
 
@@ -138,7 +150,7 @@ sims <- lapply(1:100, function(i)
 
 
 
-## Summarize and plot the results                                                   
+## Asymmetric costs results  
 Make data tidy (melt), fast (data.tables), and nicely labeled.
 
 
@@ -153,7 +165,7 @@ setnames(dt, "L1", "reps") # names are nice
 
 ### Plots 
 
-A single replicate, alternate dynamics should show the Reed optimum, while harvest/fishstock should show the impact of having policy costs.  
+A single replicate, alternate dynamics should show the Reed optimum, while harvest/fishstock should show the impact of having policy costs. 
 
 
 ```r
@@ -165,7 +177,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest_alt), col="darkgreen") 
 ```
 
-![plot of chunk rep1](http://farm8.staticflickr.com/7050/6963419199_312cc8061b_n.jpg) 
+![plot of chunk rep1](http://farm8.staticflickr.com/7069/6818470826_74ea320930_o.png) 
 
 
 
@@ -175,15 +187,13 @@ Compare the optimal policy that involves this cost:
 ```r
 policy <- melt(policycost$D)
 policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
-p5 <- ggplot(policy_zoom) + 
+ggplot(policy_zoom) + 
   geom_point(aes(Var2, (x_grid[Var1]), col=h_grid[value])) + 
   labs(x = "time", y = "fishstock") +
-  scale_colour_gradientn(colours = rainbow(4)) +
-  geom_abline(intercept=xT, slope=0, lty=2)
-p5 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1, data=dt)
+  scale_colour_gradientn(colours = rainbow(4)) 
 ```
 
-![plot of chunk policy_cost_vis](http://farm8.staticflickr.com/7049/6817298492_478604b0a7_n.jpg) 
+![plot of chunk policy_cost_vis](http://farm8.staticflickr.com/7052/6964592455_1a3fc737be_o.png) 
 
 
 
@@ -193,16 +203,14 @@ Against the policy with no cost:
 ```r
 policy <- melt(opt$D)
 policy_zoom <- subset(policy, x_grid[Var1] < max(dt$alternate) )
-p6 <- ggplot(policy_zoom) + 
+ggplot(policy_zoom) + 
   geom_point(aes(Var2, (x_grid[Var1]), col= h_grid[value])) + 
   labs(x = "time", y = "fishstock") +
-  scale_colour_gradientn(colours = rainbow(4)) +
-  geom_abline(intercept=opt$S, slope = 0) +
-  geom_abline(intercept=xT, slope=0, lty=2)  
-p6 + geom_line(aes(time, alternate, group = reps), alpha = 0.1, data=dt)
+  scale_colour_gradientn(colours = rainbow(4)) + 
+  geom_abline(intercept=opt$S, slope = 0) 
 ```
 
-![plot of chunk no_policy_cost_vis](http://farm8.staticflickr.com/7179/6817298782_b278dddc71_n.jpg) 
+![plot of chunk no_policy_cost_vis](http://farm8.staticflickr.com/7197/6818472536_d427a48617_o.png) 
 
 
 ### Profits
@@ -247,22 +255,16 @@ setnames(dt, "V1", "total.profit")
 
 
 ```r
-ggplot(dt) + geom_line(aes(time, profit, group=reps))
+ggplot(dt) + geom_line(aes(time, profits, group=reps))
 ```
 
-
-
-```
-Error: arguments imply differing number of rows: 5000, 0
-```
-
-
+![plot of chunk unnamed-chunk-5](http://farm8.staticflickr.com/7058/6964592863_0ef20b3725_o.png) 
 
 ```r
 ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
 ```
 
-![plot of chunk unnamed-chunk-5](http://farm8.staticflickr.com/7208/6963421049_9644cf6ec6_n.jpg) 
+![plot of chunk unnamed-chunk-5](http://farm8.staticflickr.com/7205/6964593083_bd9830fb00_o.png) 
 
 
 # Alternate policy cost models 
@@ -305,7 +307,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest_alt), col="darkgreen") 
 ```
 
-![plot of chunk unnamed-chunk-6](http://farm8.staticflickr.com/7036/6963441673_06952ef8b6_n.jpg) 
+![plot of chunk unnamed-chunk-6](http://farm8.staticflickr.com/7185/6964622085_8f28cb4bdf_o.png) 
 
 
 
@@ -318,12 +320,10 @@ policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
 ggplot(policy_zoom) + 
   geom_point(aes(Var2, (x_grid[Var1]), col=h_grid[value])) + 
   labs(x = "time", y = "fishstock") +
-  scale_colour_gradientn(colours = rainbow(4)) +
-  geom_abline(intercept=xT, slope=0, lty=2) +
-  geom_line(aes(time, alternate, group = reps), alpha = 0.1, data=dt)
+  scale_colour_gradientn(colours = rainbow(4)) 
 ```
 
-![plot of chunk unnamed-chunk-7](http://farm8.staticflickr.com/7181/6817320804_48fd65d98c_n.jpg) 
+![plot of chunk unnamed-chunk-7](http://farm8.staticflickr.com/7199/6964623387_f87c365458_o.png) 
 
 
 ### Profits
@@ -368,22 +368,16 @@ setnames(dt, "V1", "total.profit")
 
 
 ```r
-ggplot(dt) + geom_line(aes(time, profit, group=reps))
+ggplot(dt) + geom_line(aes(time, profits, group=reps))
 ```
 
-
-
-```
-Error: arguments imply differing number of rows: 5000, 0
-```
-
-
+![plot of chunk unnamed-chunk-11](http://farm8.staticflickr.com/7040/6964623629_350957be68_o.png) 
 
 ```r
 ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
 ```
 
-![plot of chunk unnamed-chunk-11](http://farm8.staticflickr.com/7056/6817321002_10f79f4a1b_n.jpg) 
+![plot of chunk unnamed-chunk-11](http://farm8.staticflickr.com/7184/6818503156_9c2efc822c_o.png) 
 
 
 ## L1 norm
@@ -425,7 +419,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest_alt), col="darkgreen") 
 ```
 
-![plot of chunk unnamed-chunk-12](http://farm8.staticflickr.com/7045/6817341894_60aa6cbd5b_n.jpg) 
+![plot of chunk unnamed-chunk-12](http://farm8.staticflickr.com/7062/6964652791_db81893d82_o.png) 
 
 
 
@@ -437,12 +431,10 @@ policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
 ggplot(policy_zoom) + 
   geom_point(aes(Var2, (x_grid[Var1]), col=h_grid[value])) + 
   labs(x = "time", y = "fishstock") +
-  scale_colour_gradientn(colours = rainbow(4)) +
-  geom_abline(intercept=xT, slope=0, lty=2) +
-  geom_line(aes(time, alternate, group = reps), alpha = 0.05, data=dt)
+  scale_colour_gradientn(colours = rainbow(4)) 
 ```
 
-![plot of chunk unnamed-chunk-13](http://farm8.staticflickr.com/7037/6817343168_e547bf5bc9_n.jpg) 
+![plot of chunk unnamed-chunk-13](http://farm8.staticflickr.com/7055/6818533726_036ce47414_o.png) 
 
 
 
@@ -490,19 +482,13 @@ setnames(dt, "V1", "total.profit")
 
 
 ```r
-ggplot(dt) + geom_line(aes(time, profit, group=reps))
+ggplot(dt) + geom_line(aes(time, profits, group=reps))
 ```
 
-
-
-```
-Error: arguments imply differing number of rows: 5000, 0
-```
-
-
+![plot of chunk unnamed-chunk-17](http://farm8.staticflickr.com/7203/6964654651_6a58791efd_o.png) 
 
 ```r
 ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
 ```
 
-![plot of chunk unnamed-chunk-17](http://farm8.staticflickr.com/7050/6963465117_5e17c43c7a_n.jpg) 
+![plot of chunk unnamed-chunk-17](http://farm8.staticflickr.com/7178/6818534266_69801d9d8a_o.png) 
