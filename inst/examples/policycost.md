@@ -3,7 +3,6 @@
 
 
 
-
 # Policy Costs 
  * author Carl Boettiger, <cboettig@gmail.com>
  * license: CC0
@@ -165,7 +164,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest_alt), col="darkgreen") 
 ```
 
-![plot of chunk rep1](http://farm8.staticflickr.com/7050/6963419199_312cc8061b_n.jpg) 
+![plot of chunk rep1](http://farm8.staticflickr.com/7050/6963419199_312cc8061b_o.jpg) 
 
 
 
@@ -183,7 +182,7 @@ p5 <- ggplot(policy_zoom) +
 p5 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1, data=dt)
 ```
 
-![plot of chunk policy_cost_vis](http://farm8.staticflickr.com/7049/6817298492_478604b0a7_n.jpg) 
+![plot of chunk policy_cost_vis](http://farm8.staticflickr.com/7049/6817298492_478604b0a7_o.jpg) 
 
 
 
@@ -202,7 +201,7 @@ p6 <- ggplot(policy_zoom) +
 p6 + geom_line(aes(time, alternate, group = reps), alpha = 0.1, data=dt)
 ```
 
-![plot of chunk no_policy_cost_vis](http://farm8.staticflickr.com/7179/6817298782_b278dddc71_n.jpg) 
+![plot of chunk no_policy_cost_vis](http://farm8.staticflickr.com/7179/6817298782_b278dddc71_o.jpg) 
 
 
 ### Profits
@@ -262,7 +261,7 @@ Error: arguments imply differing number of rows: 5000, 0
 ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
 ```
 
-![plot of chunk unnamed-chunk-5](http://farm8.staticflickr.com/7208/6963421049_9644cf6ec6_n.jpg) 
+![plot of chunk unnamed-chunk-5](http://farm8.staticflickr.com/7208/6963421049_9644cf6ec6_o.jpg) 
 
 
 # Alternate policy cost models 
@@ -305,7 +304,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest_alt), col="darkgreen") 
 ```
 
-![plot of chunk unnamed-chunk-6](http://farm8.staticflickr.com/7036/6963441673_06952ef8b6_n.jpg) 
+![plot of chunk unnamed-chunk-6](http://farm8.staticflickr.com/7036/6963441673_06952ef8b6_o.jpg) 
 
 
 
@@ -323,7 +322,7 @@ ggplot(policy_zoom) +
   geom_line(aes(time, alternate, group = reps), alpha = 0.1, data=dt)
 ```
 
-![plot of chunk unnamed-chunk-7](http://farm8.staticflickr.com/7181/6817320804_48fd65d98c_n.jpg) 
+![plot of chunk unnamed-chunk-7](http://farm8.staticflickr.com/7181/6817320804_48fd65d98c_o.jpg) 
 
 
 ### Profits
@@ -383,7 +382,7 @@ Error: arguments imply differing number of rows: 5000, 0
 ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
 ```
 
-![plot of chunk unnamed-chunk-11](http://farm8.staticflickr.com/7056/6817321002_10f79f4a1b_n.jpg) 
+![plot of chunk unnamed-chunk-11](http://farm8.staticflickr.com/7056/6817321002_10f79f4a1b_o.jpg) 
 
 
 ## L1 norm
@@ -425,7 +424,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest_alt), col="darkgreen") 
 ```
 
-![plot of chunk unnamed-chunk-12](http://farm8.staticflickr.com/7045/6817341894_60aa6cbd5b_n.jpg) 
+![plot of chunk unnamed-chunk-12](http://farm8.staticflickr.com/7045/6817341894_60aa6cbd5b_o.jpg) 
 
 
 
@@ -442,7 +441,7 @@ ggplot(policy_zoom) +
   geom_line(aes(time, alternate, group = reps), alpha = 0.05, data=dt)
 ```
 
-![plot of chunk unnamed-chunk-13](http://farm8.staticflickr.com/7037/6817343168_e547bf5bc9_n.jpg) 
+![plot of chunk unnamed-chunk-13](http://farm8.staticflickr.com/7037/6817343168_e547bf5bc9_o.jpg) 
 
 
 
@@ -505,4 +504,4 @@ Error: arguments imply differing number of rows: 5000, 0
 ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
 ```
 
-![plot of chunk unnamed-chunk-17](http://farm8.staticflickr.com/7050/6963465117_5e17c43c7a_n.jpg) 
+![plot of chunk unnamed-chunk-17](http://farm8.staticflickr.com/7050/6963465117_5e17c43c7a_o.jpg) 
