@@ -3,8 +3,7 @@
 
 
 
-
-# Policy Costs 
+# Assymmetric L1 Policy Costs 
  * author Carl Boettiger, <cboettig@gmail.com>
  * license: CC0
 
@@ -22,8 +21,6 @@ require(data.table)
 
 
 
-
-
 This example illustrates the impact of adding a cost to changing the harvest level between years 
 
 ### Define all parameters 
@@ -37,7 +34,6 @@ sigma_g <- 0.2    # Noise in population growth
 sigma_m <- 0.     # noise in stock assessment measurement
 sigma_i <- 0.     # noise in implementation of the quota
 reward <- 0       # bonus for satisfying the boundary condition
-PolicyFee <- .4
 ```
 
 
@@ -90,12 +86,12 @@ profit <- profit_harvest(price_fish = 1, cost_stock_effect = 0,
 
 
 
-Set up the discrete grids for stock size and havest levels (which will use same resolution as for stock). 
+Set up the discrete grids for stock size and havest levels
 
 
 ```r
-x_grid <- seq(0, 2 * K, length = gridsize)  
-h_grid <- x_grid  
+x_grid <- seq(0, 2.5*K, length = gridsize)  
+h_grid <- seq(0, 2*K, length = gridsize)  
 ```
 
 
@@ -128,7 +124,7 @@ A modified algorithm lets us include a penalty of magnitude `P` and a functional
 
 ```r
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                    profit, delta, reward, P = PolicyFee, penalty = "asym")
+                    profit, delta, reward, P = 0.4, penalty = "L1")
 ```
 
 
@@ -150,7 +146,6 @@ sims <- lapply(1:100, function(i)
 
 
 
-## Asymmetric costs results  
 Make data tidy (melt), fast (data.tables), and nicely labeled.
 
 
@@ -177,11 +172,11 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest_alt), col="darkgreen") 
 ```
 
-![plot of chunk rep1](http://farm8.staticflickr.com/7189/6830162864_ca07f2fd21_o.png) 
+![plot of chunk rep1](http://farm8.staticflickr.com/7041/6831194094_5545ba6262_o.png) 
 
 
 
-We can visualize the equilbirum policy for each possible harvest:
+We can visualize the equilibrium policy for each possible harvest:
 
 
 
@@ -193,21 +188,21 @@ ggplot(melt(policy)) +
       scale_colour_gradientn(colours = rainbow(4)) 
 ```
 
-![plot of chunk unnamed-chunk-2](http://farm8.staticflickr.com/7198/6976287309_a8cb8f69fa_o.png) 
+![plot of chunk unnamed-chunk-2](http://farm8.staticflickr.com/7065/6831205204_52bc61efa3_o.png) 
 
 
-Here we plot previous harvest against the recommended harvest, coloring by stocksize.
+Here we plot previous harvest against the recommended harvest, coloring by stocksize.  Note this swaps the y axis from above with the color density.  Hence each x-axis value has all possible colors, but they map down onto a subset of optimal harvest values (depending on their stock). 
 
 
 ```r
 policy <- sapply(1:length(h_grid), function(i) policycost$D[[i]][,1])
 ggplot(melt(policy)) + 
-  geom_point(aes(h_grid[Var2], (h_grid[value]), col = h_grid[value])) + 
+  geom_point(aes(h_grid[Var2], (h_grid[value]), col = x_grid[Var1]), position=position_jitter(w=.005,h=.005), alpha=.5) + 
     labs(x = "prev harvest", y = "harvest") +
       scale_colour_gradientn(colours = rainbow(4)) 
 ```
 
-![plot of chunk unnamed-chunk-3](http://farm8.staticflickr.com/7067/6830163628_09f4866371_o.png) 
+![plot of chunk unnamed-chunk-3](http://farm8.staticflickr.com/7193/6831216132_81eae50714_o.png) 
 
 
 
@@ -224,7 +219,7 @@ ggplot(policy_zoom) +
   geom_abline(intercept=opt$S, slope = 0) 
 ```
 
-![plot of chunk no_policy_cost_vis](http://farm8.staticflickr.com/7061/6976288021_0c8a2eb43f_o.png) 
+![plot of chunk no_policy_cost_vis](http://farm8.staticflickr.com/7189/6977365985_5f905bc8fc_o.png) 
 
 
 ### Profits
@@ -272,248 +267,15 @@ setnames(dt, "V1", "total.profit")
 ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
 ```
 
-![plot of chunk unnamed-chunk-7](http://farm8.staticflickr.com/7045/6830164348_8c146f9973_o.png) 
-
-
-# Alternate policy cost models 
-
-## L2 norm
-
-
-```r
-policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                    profit, delta, reward, P = PolicyFee, penalty = "L2")
-```
-
-
-
+![plot of chunk unnamed-chunk-7](http://farm8.staticflickr.com/7057/6831237780_e519a0c684_o.png) 
 
 
 
 
 ```r
-sims <- lapply(1:100, function(i)
-  simulate_optim(f, pars, x_grid, h_grid, x0, policycost$D, z_g, z_m, z_i, opt$D)
-)
-
-dat <- melt(sims, id=names(sims[[1]]))  
-dt <- data.table(dat)
-setnames(dt, "L1", "reps") # names are nice
+save(list=ls(), file="asym.rda")
 ```
 
 
 
 
-
-
-```r
-ggplot(subset(dt,reps==1)) +
-  geom_line(aes(time, alternate)) +
-  geom_line(aes(time, fishstock), col="darkblue") +
-  geom_abline(intercept=opt$S, slope = 0) +
-  geom_line(aes(time, harvest), col="purple") + 
-  geom_line(aes(time, harvest_alt), col="darkgreen") 
-```
-
-![plot of chunk unnamed-chunk-8](http://farm8.staticflickr.com/7054/6976322751_5a7148113b_o.png) 
-
-
-
-
-We can visualize the equilbirum policy for each possible harvest:
-
-
-
-```r
-policy <- sapply(1:length(h_grid), function(i) policycost$D[[i]][,1])
-ggplot(melt(policy)) + 
-  geom_point(aes(h_grid[Var2], (x_grid[Var1]), col=h_grid[value])) + 
-    labs(x = "prev harvest", y = "fishstock") +
-      scale_colour_gradientn(colours = rainbow(4)) 
-```
-
-![plot of chunk unnamed-chunk-9](http://farm8.staticflickr.com/7052/6976322993_d57b330cc1_o.png) 
-
-
-Here we plot previous harvest against the recommended harvest, coloring by stocksize.
-
-
-```r
-policy <- sapply(1:length(h_grid), function(i) policycost$D[[i]][,1])
-ggplot(melt(policy)) + 
-  geom_point(aes(h_grid[Var2], (h_grid[value]), col = h_grid[value])) + 
-    labs(x = "prev harvest", y = "harvest") +
-      scale_colour_gradientn(colours = rainbow(4)) 
-```
-
-![plot of chunk unnamed-chunk-10](http://farm8.staticflickr.com/7182/6976323239_abc4d7dd7c_o.png) 
-
-
-
-### Profits
-
-
-
-```r
-dt <- data.table(dt, id=1:dim(dt)[1])
-profits <- dt[, profit(fishstock, harvest), by=id]
-```
-
-
-
-
-Merge in profits to data.table (should be a way to avoid having to do these joins?)
-
-
-```r
-setkey(dt, id)
-setkey(profits, id)
-dt <- dt[profits]
-setnames(dt, "V1", "profits")
-```
-
-
-
-
-merge in total profits to data.table
-
-
-```r
-total_profit <- dt[,sum(profits), by=reps]
-setkey(total_profit, reps)
-setkey(dt, reps)
-dt <- dt[total_profit]
-setnames(dt, "V1", "total.profit")
-```
-
-
-
-
-
-
-```r
-ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
-```
-
-![plot of chunk unnamed-chunk-14](http://farm8.staticflickr.com/7047/6830198938_e5b6333394_o.png) 
-
-
-## L1 norm
-
-
-```r
-policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                    profit, delta, reward, P = PolicyFee, penalty = "L1")
-```
-
-
-
-
-
-
-
-```r
-sims <- lapply(1:100, function(i)
-  simulate_optim(f, pars, x_grid, h_grid, x0, policycost$D, z_g, z_m, z_i, opt$D)
-)
-
-dat <- melt(sims, id=names(sims[[1]]))  
-dt <- data.table(dat)
-setnames(dt, "L1", "reps") # names are nice
-```
-
-
-
-
-
-
-
-```r
-ggplot(subset(dt,reps==1)) +
-  geom_line(aes(time, alternate)) +
-  geom_line(aes(time, fishstock), col="darkblue") +
-  geom_abline(intercept=opt$S, slope = 0) +
-  geom_line(aes(time, harvest), col="purple") + 
-  geom_line(aes(time, harvest_alt), col="darkgreen") 
-```
-
-![plot of chunk unnamed-chunk-15](http://farm8.staticflickr.com/7192/6830231452_e2c32774a3_o.png) 
-
-
-We can visualize the equilbirum policy for each possible harvest:
-
-
-
-```r
-policy <- sapply(1:length(h_grid), function(i) policycost$D[[i]][,1])
-ggplot(melt(policy)) + 
-  geom_point(aes(h_grid[Var2], (x_grid[Var1]), col=h_grid[value])) + 
-    labs(x = "prev harvest", y = "fishstock") +
-      scale_colour_gradientn(colours = rainbow(4)) 
-```
-
-![plot of chunk unnamed-chunk-16](http://farm8.staticflickr.com/7062/6830231694_a854091101_o.png) 
-
-
-Here we plot previous harvest against the recommended harvest, coloring by stocksize.
-
-
-```r
-policy <- sapply(1:length(h_grid), function(i) policycost$D[[i]][,1])
-ggplot(melt(policy)) + 
-  geom_point(aes(h_grid[Var2], (h_grid[value]), col = h_grid[value])) + 
-    labs(x = "prev harvest", y = "harvest") +
-      scale_colour_gradientn(colours = rainbow(4)) 
-```
-
-![plot of chunk unnamed-chunk-17](http://farm8.staticflickr.com/7190/6976357059_7bde81028d_o.png) 
-
-
-
-
-### Profits
-
-
-
-```r
-dt <- data.table(dt, id=1:dim(dt)[1])
-profits <- dt[, profit(fishstock, harvest), by=id]
-```
-
-
-
-
-Merge in profits to data.table (should be a way to avoid having to do these joins?)
-
-
-```r
-setkey(dt, id)
-setkey(profits, id)
-dt <- dt[profits]
-setnames(dt, "V1", "profits")
-```
-
-
-
-
-merge in total profits to data.table
-
-
-```r
-total_profit <- dt[,sum(profits), by=reps]
-setkey(total_profit, reps)
-setkey(dt, reps)
-dt <- dt[total_profit]
-setnames(dt, "V1", "total.profit")
-```
-
-
-
-
-
-
-```r
-ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
-```
-
-![plot of chunk unnamed-chunk-21](http://farm8.staticflickr.com/7207/6830232286_0f0f4ed565_o.png) 

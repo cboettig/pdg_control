@@ -124,7 +124,7 @@ A modified algorithm lets us include a penalty of magnitude `P` and a functional
 
 ```r
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                    profit, delta, reward, P = 0.1, penalty = "fixed")
+                    profit, delta, reward, P = 0.3, penalty = "fixed")
 ```
 
 
@@ -172,7 +172,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest_alt), col="darkgreen") 
 ```
 
-![plot of chunk rep1](http://farm8.staticflickr.com/7043/6831122570_a445dec810_o.png) 
+![plot of chunk rep1](http://farm8.staticflickr.com/7063/6831204080_5e2f48691f_o.png) 
 
 
 
@@ -188,7 +188,7 @@ ggplot(melt(policy)) +
       scale_colour_gradientn(colours = rainbow(4)) 
 ```
 
-![plot of chunk unnamed-chunk-2](http://farm8.staticflickr.com/7205/6831123032_f21c453e63_o.png) 
+![plot of chunk unnamed-chunk-2](http://farm8.staticflickr.com/7201/6831214728_b4a921680c_o.png) 
 
 
 Here we plot previous harvest against the recommended harvest, coloring by stocksize.  Note this swaps the y axis from above with the color density.  Hence each x-axis value has all possible colors, but they map down onto a subset of optimal harvest values (depending on their stock). 
@@ -202,7 +202,7 @@ ggplot(melt(policy)) +
       scale_colour_gradientn(colours = rainbow(4)) 
 ```
 
-![plot of chunk unnamed-chunk-3](http://farm8.staticflickr.com/7070/6831123484_de13b922cf_o.png) 
+![plot of chunk unnamed-chunk-3](http://farm8.staticflickr.com/7054/6977365977_eb42ee8b2a_o.png) 
 
 
 
@@ -219,7 +219,7 @@ ggplot(policy_zoom) +
   geom_abline(intercept=opt$S, slope = 0) 
 ```
 
-![plot of chunk no_policy_cost_vis](http://farm8.staticflickr.com/7039/6977250877_21cf9df072_o.png) 
+![plot of chunk no_policy_cost_vis](http://farm8.staticflickr.com/7050/6831237774_615cefd6ca_o.png) 
 
 
 ### Profits
@@ -267,7 +267,7 @@ setnames(dt, "V1", "total.profit")
 ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
 ```
 
-![plot of chunk unnamed-chunk-7](http://farm8.staticflickr.com/7050/6977251271_67cd72259f_o.png) 
+![plot of chunk unnamed-chunk-7](http://farm8.staticflickr.com/7183/6831237992_bfbd173516_o.png) 
 
 
 
