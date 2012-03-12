@@ -103,18 +103,27 @@ ggplot(subset(dt,reps==1)) +
 end.rcode-->
 
 
-Compare the optimal policy that involves this cost:
-<!--begin.rcode policy_cost_vis
-policy <- melt(policycost$D)
-policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
-ggplot(policy_zoom) + 
-  geom_point(aes(Var2, (x_grid[Var1]), col=h_grid[value])) + 
-  labs(x = "time", y = "fishstock") +
-  scale_colour_gradientn(colours = rainbow(4)) 
+We can visualize the equilbirum policy for each possible harvest:
+
+<!--begin.rcode
+policy <- sapply(1:length(h_grid), function(i) policycost$D[[i]][,1])
+ggplot(melt(policy)) + 
+  geom_point(aes(h_grid[Var2], (x_grid[Var1]), col=h_grid[value])) + 
+    labs(x = "prev harvest", y = "fishstock") +
+      scale_colour_gradientn(colours = rainbow(4)) 
+end.rcode-->
+
+Here we plot previous harvest against the recommended harvest, coloring by stocksize.
+<!--begin.rcode 
+policy <- sapply(1:length(h_grid), function(i) policycost$D[[i]][,1])
+ggplot(melt(policy)) + 
+  geom_point(aes(h_grid[Var2], (h_grid[value]), col = h_grid[value])) + 
+    labs(x = "prev harvest", y = "harvest") +
+      scale_colour_gradientn(colours = rainbow(4)) 
 end.rcode-->
 
 
-Against the policy with no cost: 
+Against the policy with no cost (shown over time) 
 <!--begin.rcode no_policy_cost_vis
 policy <- melt(opt$D)
 policy_zoom <- subset(policy, x_grid[Var1] < max(dt$alternate) )
@@ -150,7 +159,6 @@ setnames(dt, "V1", "total.profit")
 end.rcode-->
 
 <!--begin.rcode
-ggplot(dt) + geom_line(aes(time, profits, group=reps))
 ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
 end.rcode-->
 
@@ -184,14 +192,25 @@ end.rcode-->
 
 
 
-<!--begin.rcode 
-policy <- melt(policycost$D)
-policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
-ggplot(policy_zoom) + 
-  geom_point(aes(Var2, (x_grid[Var1]), col=h_grid[value])) + 
-  labs(x = "time", y = "fishstock") +
-  scale_colour_gradientn(colours = rainbow(4)) 
+We can visualize the equilbirum policy for each possible harvest:
+
+<!--begin.rcode
+policy <- sapply(1:length(h_grid), function(i) policycost$D[[i]][,1])
+ggplot(melt(policy)) + 
+  geom_point(aes(h_grid[Var2], (x_grid[Var1]), col=h_grid[value])) + 
+    labs(x = "prev harvest", y = "fishstock") +
+      scale_colour_gradientn(colours = rainbow(4)) 
 end.rcode-->
+
+Here we plot previous harvest against the recommended harvest, coloring by stocksize.
+<!--begin.rcode 
+policy <- sapply(1:length(h_grid), function(i) policycost$D[[i]][,1])
+ggplot(melt(policy)) + 
+  geom_point(aes(h_grid[Var2], (h_grid[value]), col = h_grid[value])) + 
+    labs(x = "prev harvest", y = "harvest") +
+      scale_colour_gradientn(colours = rainbow(4)) 
+end.rcode-->
+
 
 ### Profits
 
@@ -218,7 +237,6 @@ setnames(dt, "V1", "total.profit")
 end.rcode-->
 
 <!--begin.rcode
-ggplot(dt) + geom_line(aes(time, profits, group=reps))
 ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
 end.rcode-->
 
@@ -249,16 +267,24 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest_alt), col="darkgreen") 
 end.rcode-->
 
+We can visualize the equilbirum policy for each possible harvest:
 
 <!--begin.rcode
-policy <- melt(policycost$D)
-policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
-ggplot(policy_zoom) + 
-  geom_point(aes(Var2, (x_grid[Var1]), col=h_grid[value])) + 
-  labs(x = "time", y = "fishstock") +
-  scale_colour_gradientn(colours = rainbow(4)) 
+policy <- sapply(1:length(h_grid), function(i) policycost$D[[i]][,1])
+ggplot(melt(policy)) + 
+  geom_point(aes(h_grid[Var2], (x_grid[Var1]), col=h_grid[value])) + 
+    labs(x = "prev harvest", y = "fishstock") +
+      scale_colour_gradientn(colours = rainbow(4)) 
 end.rcode-->
 
+Here we plot previous harvest against the recommended harvest, coloring by stocksize.
+<!--begin.rcode 
+policy <- sapply(1:length(h_grid), function(i) policycost$D[[i]][,1])
+ggplot(melt(policy)) + 
+  geom_point(aes(h_grid[Var2], (h_grid[value]), col = h_grid[value])) + 
+    labs(x = "prev harvest", y = "harvest") +
+      scale_colour_gradientn(colours = rainbow(4)) 
+end.rcode-->
 
 
 
@@ -287,6 +313,5 @@ setnames(dt, "V1", "total.profit")
 end.rcode-->
 
 <!--begin.rcode
-ggplot(dt) + geom_line(aes(time, profits, group=reps))
 ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
 end.rcode-->

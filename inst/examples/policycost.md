@@ -177,27 +177,41 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest_alt), col="darkgreen") 
 ```
 
-![plot of chunk rep1](http://farm8.staticflickr.com/7069/6818470826_74ea320930_o.png) 
+![plot of chunk rep1](http://farm8.staticflickr.com/7189/6830162864_ca07f2fd21_o.png) 
 
 
 
-Compare the optimal policy that involves this cost:
+We can visualize the equilbirum policy for each possible harvest:
+
 
 
 ```r
-policy <- melt(policycost$D)
-policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
-ggplot(policy_zoom) + 
-  geom_point(aes(Var2, (x_grid[Var1]), col=h_grid[value])) + 
-  labs(x = "time", y = "fishstock") +
-  scale_colour_gradientn(colours = rainbow(4)) 
+policy <- sapply(1:length(h_grid), function(i) policycost$D[[i]][,1])
+ggplot(melt(policy)) + 
+  geom_point(aes(h_grid[Var2], (x_grid[Var1]), col=h_grid[value])) + 
+    labs(x = "prev harvest", y = "fishstock") +
+      scale_colour_gradientn(colours = rainbow(4)) 
 ```
 
-![plot of chunk policy_cost_vis](http://farm8.staticflickr.com/7052/6964592455_1a3fc737be_o.png) 
+![plot of chunk unnamed-chunk-2](http://farm8.staticflickr.com/7198/6976287309_a8cb8f69fa_o.png) 
+
+
+Here we plot previous harvest against the recommended harvest, coloring by stocksize.
+
+
+```r
+policy <- sapply(1:length(h_grid), function(i) policycost$D[[i]][,1])
+ggplot(melt(policy)) + 
+  geom_point(aes(h_grid[Var2], (h_grid[value]), col = h_grid[value])) + 
+    labs(x = "prev harvest", y = "harvest") +
+      scale_colour_gradientn(colours = rainbow(4)) 
+```
+
+![plot of chunk unnamed-chunk-3](http://farm8.staticflickr.com/7067/6830163628_09f4866371_o.png) 
 
 
 
-Against the policy with no cost: 
+Against the policy with no cost (shown over time) 
 
 
 ```r
@@ -210,7 +224,7 @@ ggplot(policy_zoom) +
   geom_abline(intercept=opt$S, slope = 0) 
 ```
 
-![plot of chunk no_policy_cost_vis](http://farm8.staticflickr.com/7197/6818472536_d427a48617_o.png) 
+![plot of chunk no_policy_cost_vis](http://farm8.staticflickr.com/7061/6976288021_0c8a2eb43f_o.png) 
 
 
 ### Profits
@@ -255,16 +269,10 @@ setnames(dt, "V1", "total.profit")
 
 
 ```r
-ggplot(dt) + geom_line(aes(time, profits, group=reps))
-```
-
-![plot of chunk unnamed-chunk-5](http://farm8.staticflickr.com/7058/6964592863_0ef20b3725_o.png) 
-
-```r
 ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
 ```
 
-![plot of chunk unnamed-chunk-5](http://farm8.staticflickr.com/7205/6964593083_bd9830fb00_o.png) 
+![plot of chunk unnamed-chunk-7](http://farm8.staticflickr.com/7045/6830164348_8c146f9973_o.png) 
 
 
 # Alternate policy cost models 
@@ -307,23 +315,39 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest_alt), col="darkgreen") 
 ```
 
-![plot of chunk unnamed-chunk-6](http://farm8.staticflickr.com/7185/6964622085_8f28cb4bdf_o.png) 
+![plot of chunk unnamed-chunk-8](http://farm8.staticflickr.com/7054/6976322751_5a7148113b_o.png) 
 
 
 
+
+We can visualize the equilbirum policy for each possible harvest:
 
 
 
 ```r
-policy <- melt(policycost$D)
-policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
-ggplot(policy_zoom) + 
-  geom_point(aes(Var2, (x_grid[Var1]), col=h_grid[value])) + 
-  labs(x = "time", y = "fishstock") +
-  scale_colour_gradientn(colours = rainbow(4)) 
+policy <- sapply(1:length(h_grid), function(i) policycost$D[[i]][,1])
+ggplot(melt(policy)) + 
+  geom_point(aes(h_grid[Var2], (x_grid[Var1]), col=h_grid[value])) + 
+    labs(x = "prev harvest", y = "fishstock") +
+      scale_colour_gradientn(colours = rainbow(4)) 
 ```
 
-![plot of chunk unnamed-chunk-7](http://farm8.staticflickr.com/7199/6964623387_f87c365458_o.png) 
+![plot of chunk unnamed-chunk-9](http://farm8.staticflickr.com/7052/6976322993_d57b330cc1_o.png) 
+
+
+Here we plot previous harvest against the recommended harvest, coloring by stocksize.
+
+
+```r
+policy <- sapply(1:length(h_grid), function(i) policycost$D[[i]][,1])
+ggplot(melt(policy)) + 
+  geom_point(aes(h_grid[Var2], (h_grid[value]), col = h_grid[value])) + 
+    labs(x = "prev harvest", y = "harvest") +
+      scale_colour_gradientn(colours = rainbow(4)) 
+```
+
+![plot of chunk unnamed-chunk-10](http://farm8.staticflickr.com/7182/6976323239_abc4d7dd7c_o.png) 
+
 
 
 ### Profits
@@ -368,16 +392,10 @@ setnames(dt, "V1", "total.profit")
 
 
 ```r
-ggplot(dt) + geom_line(aes(time, profits, group=reps))
-```
-
-![plot of chunk unnamed-chunk-11](http://farm8.staticflickr.com/7040/6964623629_350957be68_o.png) 
-
-```r
 ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
 ```
 
-![plot of chunk unnamed-chunk-11](http://farm8.staticflickr.com/7184/6818503156_9c2efc822c_o.png) 
+![plot of chunk unnamed-chunk-14](http://farm8.staticflickr.com/7047/6830198938_e5b6333394_o.png) 
 
 
 ## L1 norm
@@ -419,23 +437,36 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest_alt), col="darkgreen") 
 ```
 
-![plot of chunk unnamed-chunk-12](http://farm8.staticflickr.com/7062/6964652791_db81893d82_o.png) 
+![plot of chunk unnamed-chunk-15](http://farm8.staticflickr.com/7192/6830231452_e2c32774a3_o.png) 
 
 
+We can visualize the equilbirum policy for each possible harvest:
 
 
 
 ```r
-policy <- melt(policycost$D)
-policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
-ggplot(policy_zoom) + 
-  geom_point(aes(Var2, (x_grid[Var1]), col=h_grid[value])) + 
-  labs(x = "time", y = "fishstock") +
-  scale_colour_gradientn(colours = rainbow(4)) 
+policy <- sapply(1:length(h_grid), function(i) policycost$D[[i]][,1])
+ggplot(melt(policy)) + 
+  geom_point(aes(h_grid[Var2], (x_grid[Var1]), col=h_grid[value])) + 
+    labs(x = "prev harvest", y = "fishstock") +
+      scale_colour_gradientn(colours = rainbow(4)) 
 ```
 
-![plot of chunk unnamed-chunk-13](http://farm8.staticflickr.com/7055/6818533726_036ce47414_o.png) 
+![plot of chunk unnamed-chunk-16](http://farm8.staticflickr.com/7062/6830231694_a854091101_o.png) 
 
+
+Here we plot previous harvest against the recommended harvest, coloring by stocksize.
+
+
+```r
+policy <- sapply(1:length(h_grid), function(i) policycost$D[[i]][,1])
+ggplot(melt(policy)) + 
+  geom_point(aes(h_grid[Var2], (h_grid[value]), col = h_grid[value])) + 
+    labs(x = "prev harvest", y = "harvest") +
+      scale_colour_gradientn(colours = rainbow(4)) 
+```
+
+![plot of chunk unnamed-chunk-17](http://farm8.staticflickr.com/7190/6976357059_7bde81028d_o.png) 
 
 
 
@@ -482,13 +513,7 @@ setnames(dt, "V1", "total.profit")
 
 
 ```r
-ggplot(dt) + geom_line(aes(time, profits, group=reps))
-```
-
-![plot of chunk unnamed-chunk-17](http://farm8.staticflickr.com/7203/6964654651_6a58791efd_o.png) 
-
-```r
 ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
 ```
 
-![plot of chunk unnamed-chunk-17](http://farm8.staticflickr.com/7178/6818534266_69801d9d8a_o.png) 
+![plot of chunk unnamed-chunk-21](http://farm8.staticflickr.com/7207/6830232286_0f0f4ed565_o.png) 
