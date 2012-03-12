@@ -49,7 +49,7 @@ optim_policy <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit,
         sales <- profit_matrix[, i]
         change_cost <- 
         switch(penalty,
-          L2 =  sales ^ 2 - P * (h_grid[i] - h_grid[ h_prev]) ^ 2,
+          L2 =  sales - P * (h_grid[i] - h_grid[ h_prev]) ^ 2,
           L1 = sales - P * abs(h_grid[i] - h_grid[ h_prev]),
           asymmetric = sales - P * max(h_grid[h_prev] - h_grid[i], 0),
           fixed = sales - P,
