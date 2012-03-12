@@ -35,7 +35,10 @@ optim_policy <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit,
     # give a fixed reward for having value larger than xT at the end. 
     Vi[x_grid >= xT] <- reward # a "scrap value" for x(T) >= xT
     Vi
-  }) 
+  })
+
+  profit_matrix <- sapply(h_grid, function(h) profit(x_grid, h))
+
   # loop through time  
   for(time in 1:OptTime ){ 
   # loop over all possible values for last year's harvest level
@@ -43,18 +46,18 @@ optim_policy <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit,
       # try all potential havest rates
       V1 <- sapply(1:HL, function(i){
         # cost of changing the policy from the previous year
+        sales <- profit_matrix[, i]
         change_cost <- 
         switch(penalty,
-          L2 = P * (h_grid[i] - h_grid[ h_prev])^2,
-          L1 = P * abs(h_grid[i] - h_grid[ h_prev]),
-          asymmetric = P * max(h_grid[h_prev] - h_grid[i], 0),
-          fixed = P,
+          L2 =  sales ^ 2 - P * (h_grid[i] - h_grid[ h_prev]) ^ 2,
+          L1 = sales - P * abs(h_grid[i] - h_grid[ h_prev]),
+          asymmetric = sales - P * max(h_grid[h_prev] - h_grid[i], 0),
+          fixed = sales - P,
           none = 0)
 
         # Transition matrix times V gives dist in next time
-        SDP_Mat[[i]]  %*% V[, h_prev] + 
+        SDP_Mat[[i]]  %*% V[, h_prev] + change_cost * {1 - delta} 
         # then (add) harvested amount - policy cost times discount
-        { profit(x_grid, h_grid[i]) - change_cost }  * {1 - delta}
       })
       # find havest, h that gives the maximum value
       out <- sapply(1:gridsize, function(j){

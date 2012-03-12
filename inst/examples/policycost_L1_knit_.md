@@ -11,7 +11,7 @@ read_chunk("Reed.R")
 end.rcode-->
 
 
-# Assymmetric L1 Policy Costs 
+# L1 Policy Costs 
  * author Carl Boettiger, <cboettig@gmail.com>
  * license: CC0
 
@@ -69,7 +69,7 @@ end.rcode-->
 A modified algorithm lets us include a penalty of magnitude `P` and a functional form that can be an `L1` norm, `L2`  norm, `asymmetric` L1 norm (costly to lower harvest rates), fixed cost, or `none` (no cost).  Here is an asymmetric norm example.  Note that this calculation is considerably slower. 
 <!--begin.rcode policycost_optim_
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                    profit, delta, reward, P = 0.5, penalty = "asym")
+                    profit, delta, reward, P = 0.4, penalty = "L1")
 end.rcode-->
 
 
@@ -160,6 +160,6 @@ ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
 end.rcode-->
 
 <!--begin.rcode
-save(list=ls(), file="asym.rda")
+save(list=ls(), file="L1.rda")
 end.rcode-->
 
