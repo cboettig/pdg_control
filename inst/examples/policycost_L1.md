@@ -90,8 +90,8 @@ Set up the discrete grids for stock size and havest levels
 
 
 ```r
-x_grid <- seq(0, 1.2*K, length = gridsize)  
-h_grid <- seq(0, 0.7*K, length = gridsize)  
+x_grid <- seq(0, 2 * K, length = gridsize)  
+h_grid <- x_grid  
 ```
 
 
@@ -172,7 +172,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest_alt), col="darkgreen") 
 ```
 
-![plot of chunk rep1](http://farm8.staticflickr.com/7040/6830985654_d73829a506_o.png) 
+![plot of chunk rep1](http://farm8.staticflickr.com/7063/6831734578_50e3fae511_o.png) 
 
 
 
@@ -188,7 +188,7 @@ ggplot(melt(policy)) +
       scale_colour_gradientn(colours = rainbow(4)) 
 ```
 
-![plot of chunk unnamed-chunk-2](http://farm8.staticflickr.com/7053/6977113823_4fd66ed9f4_o.png) 
+![plot of chunk unnamed-chunk-2](http://farm8.staticflickr.com/7199/6831735426_d78d732a7f_o.png) 
 
 
 Here we plot previous harvest against the recommended harvest, coloring by stocksize.  Note this swaps the y axis from above with the color density.  Hence each x-axis value has all possible colors, but they map down onto a subset of optimal harvest values (depending on their stock). 
@@ -202,7 +202,7 @@ ggplot(melt(policy)) +
       scale_colour_gradientn(colours = rainbow(4)) 
 ```
 
-![plot of chunk unnamed-chunk-3](http://farm8.staticflickr.com/7203/6977114263_263bc7cbe5_o.png) 
+![plot of chunk unnamed-chunk-3](http://farm8.staticflickr.com/7070/6977864105_8f1477ff18_o.png) 
 
 
 
@@ -219,7 +219,7 @@ ggplot(policy_zoom) +
   geom_abline(intercept=opt$S, slope = 0) 
 ```
 
-![plot of chunk no_policy_cost_vis](http://farm8.staticflickr.com/7066/6977114633_3205b89204_o.png) 
+![plot of chunk no_policy_cost_vis](http://farm8.staticflickr.com/7189/6831737372_2bff2bde4b_o.png) 
 
 
 ### Profits
@@ -267,7 +267,7 @@ setnames(dt, "V1", "total.profit")
 ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
 ```
 
-![plot of chunk unnamed-chunk-7](http://farm8.staticflickr.com/7205/6977114971_8edfc5c9d6_o.png) 
+![plot of chunk unnamed-chunk-7](http://farm8.staticflickr.com/7206/6831739124_5071170b1b_o.png) 
 
 
 

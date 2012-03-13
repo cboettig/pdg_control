@@ -52,9 +52,7 @@ profit <- profit_harvest(price_fish = 1, cost_stock_effect = 0,
 end.rcode-->
 
 Set up the discrete grids for stock size and havest levels
-<!--begin.rcode create_grid_
-x_grid <- seq(0, 1.2*K, length = gridsize)  
-h_grid <- seq(0, 0.7*K, length = gridsize)  
+<!--begin.rcode create_grid
 end.rcode-->
 
 ### Calculate the stochastic transition matrix
