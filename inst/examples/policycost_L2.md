@@ -163,23 +163,145 @@ setnames(dt, "L1", "reps") # names are nice
 A single replicate, alternate dynamics should show the Reed optimum, while harvest/fishstock should show the impact of having policy costs. 
 
 
+```r
+ggplot(subset(dt,reps==1)) +
+  geom_line(aes(time, alternate)) +
+  geom_line(aes(time, fishstock), col="darkblue") +
+  geom_abline(intercept=opt$S, slope = 0) +
+  geom_line(aes(time, harvest), col="purple") + 
+  geom_line(aes(time, harvest_alt), col="darkgreen") 
+```
+
+![plot of chunk rep1](http://farm8.staticflickr.com/7038/6982916703_4b9b8aed90_o.png) 
+
+
+
+We can visualize the equilibrium policy for each possible harvest:
+
+
+
+```r
+policy <- sapply(1:length(h_grid), function(i) policycost$D[[i]][,1])
+ggplot(melt(policy)) + 
+  geom_point(aes(h_grid[Var2], (x_grid[Var1]), col=h_grid[value] - h_grid[Var2])) + 
+    labs(x = "prev harvest", y = "fishstock") +
+      scale_colour_gradientn(colours = rainbow(4)) 
+```
+
+![plot of chunk unnamed-chunk-2](http://farm8.staticflickr.com/7179/6982916875_8f8b28c3d6_o.png) 
+
+
+Here we plot previous harvest against the recommended harvest, coloring by stocksize.  Note this swaps the y axis from above with the color density.  Hence each x-axis value has all possible colors, but they map down onto a subset of optimal harvest values (depending on their stock). 
+
+
+```r
+policy <- sapply(1:length(h_grid), function(i) policycost$D[[i]][,1])
+ggplot(melt(policy)) + 
+  geom_point(aes(h_grid[Var2], (h_grid[value]), col = x_grid[Var1]), position=position_jitter(w=.005,h=.005), alpha=.5) + 
+    labs(x = "prev harvest", y = "harvest") +
+      scale_colour_gradientn(colours = rainbow(4)) 
+```
+
+![plot of chunk unnamed-chunk-3](http://farm8.staticflickr.com/7044/6982917077_abecdd2da6_o.png) 
+
+
+
+Against the policy with no cost (shown over time) 
+
+
+```r
+policy <- melt(opt$D)
+policy_zoom <- subset(policy, x_grid[Var1] < max(dt$alternate) )
+ggplot(policy_zoom) + 
+  geom_point(aes(Var2, (x_grid[Var1]), col= h_grid[value])) + 
+  labs(x = "time", y = "fishstock") +
+  scale_colour_gradientn(colours = rainbow(4)) + 
+  geom_abline(intercept=opt$S, slope = 0) 
+```
+
+![plot of chunk no_policy_cost_vis](http://farm8.staticflickr.com/7069/6982917243_cdf6b5965b_o.png) 
+
+
+### Profits
+
+
+
+```r
+dt <- data.table(dt, id=1:dim(dt)[1])
+profits <- dt[, profit(fishstock, harvest), by=id]
+```
+
+
+
+
+Merge in profits to data.table (should be a way to avoid having to do these joins?)
+
+
+```r
+setkey(dt, id)
+setkey(profits, id)
+dt <- dt[profits]
+setnames(dt, "V1", "profits")
+```
+
+
+
+
+merge in total profits to data.table
+
+
+```r
+total_profit <- dt[,sum(profits), by=reps]
+setkey(total_profit, reps)
+setkey(dt, reps)
+dt <- dt[total_profit]
+setnames(dt, "V1", "total.profit")
+```
 
 
 
 
 
 
+```r
+ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
+```
+
+![plot of chunk unnamed-chunk-7](http://farm8.staticflickr.com/7058/6836790866_d942e6e3a1_o.png) 
 
 
 
 
+```r
+save(list=ls(), file="L2.rda")
+```
 
 
 
 
+The mean dynamics of the state
 
 
+```r
+stats <- dt[ , mean_sdl(fishstock), by = time]
+ggplot(stats) +   geom_ribbon(aes(x = time, ymin = ymin, ymax = ymax),
+                fill = "darkblue", alpha = 0.2, dat=stats) +
+                geom_line(aes(x=time, y=y), lwd=1) 
+```
+
+![plot of chunk unnamed-chunk-9](http://farm8.staticflickr.com/7177/6982917599_df2afaac5d_o.png) 
 
 
+The mean dynamics of the control
+
+
+```r
+stats <- dt[ , mean_sdl(harvest), by = time]
+ggplot(stats) +   geom_ribbon(aes(x = time, ymin = ymin, ymax = ymax),
+                fill = "darkblue", alpha = 0.2, dat=stats) +
+                geom_line(aes(x=time, y=y), lwd=1) 
+```
+
+![plot of chunk unnamed-chunk-10](http://farm8.staticflickr.com/7058/6836791324_b5e91c2053_o.png) 
 
 
