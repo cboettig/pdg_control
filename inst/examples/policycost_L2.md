@@ -124,7 +124,7 @@ A modified algorithm lets us include a penalty of magnitude `P` and a functional
 
 ```r
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                    profit, delta, reward, P = 1.2, penalty = "L2")
+                    profit, delta, reward, P = 1.5, penalty = "L2")
 ```
 
 
@@ -172,7 +172,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest_alt), col="darkgreen") 
 ```
 
-![plot of chunk rep1](http://farm8.staticflickr.com/7187/6982764163_9e2e98eb9a_o.png) 
+![plot of chunk rep1](http://farm8.staticflickr.com/7050/6982782529_490917f6c2_o.png) 
 
 
 
@@ -188,7 +188,7 @@ ggplot(melt(policy)) +
       scale_colour_gradientn(colours = rainbow(4)) 
 ```
 
-![plot of chunk unnamed-chunk-2](http://farm8.staticflickr.com/7052/6836638290_108f242700_o.png) 
+![plot of chunk unnamed-chunk-2](http://farm8.staticflickr.com/7065/6836656764_bdea517ca8_o.png) 
 
 
 Here we plot previous harvest against the recommended harvest, coloring by stocksize.  Note this swaps the y axis from above with the color density.  Hence each x-axis value has all possible colors, but they map down onto a subset of optimal harvest values (depending on their stock). 
@@ -202,7 +202,7 @@ ggplot(melt(policy)) +
       scale_colour_gradientn(colours = rainbow(4)) 
 ```
 
-![plot of chunk unnamed-chunk-3](http://farm8.staticflickr.com/7052/6836638632_3a3b654552_o.png) 
+![plot of chunk unnamed-chunk-3](http://farm8.staticflickr.com/7180/6982783011_b684cf9c67_o.png) 
 
 
 
@@ -219,7 +219,7 @@ ggplot(policy_zoom) +
   geom_abline(intercept=opt$S, slope = 0) 
 ```
 
-![plot of chunk no_policy_cost_vis](http://farm8.staticflickr.com/7203/6982765189_3cfd25db57_o.png) 
+![plot of chunk no_policy_cost_vis](http://farm8.staticflickr.com/7186/6982783211_ce82c3e63a_o.png) 
 
 
 ### Profits
@@ -267,7 +267,7 @@ setnames(dt, "V1", "total.profit")
 ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
 ```
 
-![plot of chunk unnamed-chunk-7](http://farm8.staticflickr.com/7037/6982765535_90cce8427e_o.png) 
+![plot of chunk unnamed-chunk-7](http://farm8.staticflickr.com/7055/6836657332_033d2b9e2d_o.png) 
 
 
 
@@ -289,7 +289,7 @@ ggplot(stats) +   geom_ribbon(aes(x = time, ymin = ymin, ymax = ymax),
                 geom_line(aes(x=time, y=y), lwd=1) 
 ```
 
-![plot of chunk unnamed-chunk-9](http://farm8.staticflickr.com/7201/6982765819_a4f7808f8e_o.png) 
+![plot of chunk unnamed-chunk-9](http://farm8.staticflickr.com/7044/6836657654_605b3fb071_o.png) 
 
 
 The mean dynamics of the control
@@ -302,6 +302,6 @@ ggplot(stats) +   geom_ribbon(aes(x = time, ymin = ymin, ymax = ymax),
                 geom_line(aes(x=time, y=y), lwd=1) 
 ```
 
-![plot of chunk unnamed-chunk-10](http://farm8.staticflickr.com/7197/6982766029_ab7d5eb81d_o.png) 
+![plot of chunk unnamed-chunk-10](http://farm8.staticflickr.com/7037/6836657982_bd05b32b69_o.png) 
 
 
