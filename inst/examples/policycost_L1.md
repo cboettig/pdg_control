@@ -90,8 +90,8 @@ Set up the discrete grids for stock size and havest levels
 
 
 ```r
-x_grid <- seq(0, 2 * K, length = gridsize)  
-h_grid <- x_grid  
+x_grid <- seq(0, 1.2 * K, length = gridsize)  
+h_grid <- seq(0, 0.8 * K, length = gridsize)  
 ```
 
 
@@ -124,7 +124,7 @@ A modified algorithm lets us include a penalty of magnitude `P` and a functional
 
 ```r
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                    profit, delta, reward, P = 0.4, penalty = "L1")
+                    profit, delta, reward, P = 0.5, penalty = "L1")
 ```
 
 
@@ -172,7 +172,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest_alt), col="darkgreen") 
 ```
 
-![plot of chunk rep1](http://farm8.staticflickr.com/7063/6831734578_50e3fae511_o.png) 
+![plot of chunk rep1](http://farm8.staticflickr.com/7059/6836636730_3cc5b390f6_o.png) 
 
 
 
@@ -183,12 +183,12 @@ We can visualize the equilibrium policy for each possible harvest:
 ```r
 policy <- sapply(1:length(h_grid), function(i) policycost$D[[i]][,1])
 ggplot(melt(policy)) + 
-  geom_point(aes(h_grid[Var2], (x_grid[Var1]), col=h_grid[value])) + 
+  geom_point(aes(h_grid[Var2], (x_grid[Var1]), col=h_grid[value]-h_grid[Var2])) + 
     labs(x = "prev harvest", y = "fishstock") +
       scale_colour_gradientn(colours = rainbow(4)) 
 ```
 
-![plot of chunk unnamed-chunk-2](http://farm8.staticflickr.com/7199/6831735426_d78d732a7f_o.png) 
+![plot of chunk unnamed-chunk-2](http://farm8.staticflickr.com/7189/6982763339_3d9ede9674_o.png) 
 
 
 Here we plot previous harvest against the recommended harvest, coloring by stocksize.  Note this swaps the y axis from above with the color density.  Hence each x-axis value has all possible colors, but they map down onto a subset of optimal harvest values (depending on their stock). 
@@ -202,7 +202,7 @@ ggplot(melt(policy)) +
       scale_colour_gradientn(colours = rainbow(4)) 
 ```
 
-![plot of chunk unnamed-chunk-3](http://farm8.staticflickr.com/7070/6977864105_8f1477ff18_o.png) 
+![plot of chunk unnamed-chunk-3](http://farm8.staticflickr.com/7184/6836637516_404f94c2f8_o.png) 
 
 
 
@@ -219,7 +219,7 @@ ggplot(policy_zoom) +
   geom_abline(intercept=opt$S, slope = 0) 
 ```
 
-![plot of chunk no_policy_cost_vis](http://farm8.staticflickr.com/7189/6831737372_2bff2bde4b_o.png) 
+![plot of chunk no_policy_cost_vis](http://farm8.staticflickr.com/7193/6836637842_410ab1e9c0_o.png) 
 
 
 ### Profits
@@ -267,7 +267,7 @@ setnames(dt, "V1", "total.profit")
 ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
 ```
 
-![plot of chunk unnamed-chunk-7](http://farm8.staticflickr.com/7206/6831739124_5071170b1b_o.png) 
+![plot of chunk unnamed-chunk-7](http://farm8.staticflickr.com/7202/6836638262_4e0b84e71b_o.png) 
 
 
 
@@ -279,3 +279,27 @@ save(list=ls(), file="L1.rda")
 
 
 
+The mean dynamics of the state
+
+
+```r
+stats <- dt[ , mean_sdl(fishstock), by = time]
+ggplot(stats) +   geom_ribbon(aes(x = time, ymin = ymin, ymax = ymax),
+                fill = "darkblue", alpha = 0.2, dat=stats) +
+                geom_line(aes(x=time, y=y), lwd=1) 
+```
+
+![plot of chunk unnamed-chunk-9](http://farm8.staticflickr.com/7047/6982764773_0cba4d6796_o.png) 
+
+
+The mean dynamics of the control
+
+
+```r
+stats <- dt[ , mean_sdl(harvest), by = time]
+ggplot(stats) +  geom_ribbon(aes(x = time, ymin = ymin, ymax = ymax),
+                fill = "darkblue", alpha = 0.2) +
+                geom_line(aes(x=time, y=y), lwd=1) 
+```
+
+![plot of chunk unnamed-chunk-10](http://farm8.staticflickr.com/7059/6836638712_631175c58e_o.png) 
