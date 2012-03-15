@@ -33,6 +33,9 @@ sigma_g <- 0.2    # Noise in population growth
 sigma_m <- 0.     # noise in stock assessment measurement
 sigma_i <- 0.     # noise in implementation of the quota
 reward <- 0       # bonus for satisfying the boundary condition
+
+
+c2 <- 1           # Policy adjustment cost
 ```
 
 
@@ -82,6 +85,20 @@ h_grid <- seq(0, 0.8 * K, length = gridsize)
 
 
 
+
+Specify the functional form of the policy costs:
+
+
+```r
+L2 <- function(h, h_prev)  c2 * (h - h_prev) ^ 2
+L1 <- function(h, h_prev)  c2 * abs(h - h_prev) 
+asymmetric <- function(h, h_prev)  c2 * max(h_grid[h_prev] - h_grid[i], 0)
+fixed <-  function(h, h_prev) c2
+```
+
+
+
+
 ### Calculate the stochastic transition matrix
 We calculate the stochastic transition matrix for the probability of going from any state \(x_t \) to any other state \(x_{t+1}\) the following year, for each possible choice of harvest \( h_t \).  This provides a look-up table for the dynamic programming calculations. Note that this only includes uncertainty in the growth rate (projected stock next year). 
 
@@ -109,7 +126,7 @@ A modified algorithm lets us include a penalty of magnitude `P` and a functional
 
 ```r
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                    profit, delta, reward, P = 1.5, penalty = "L2")
+                    profit, delta, reward, penalty = L2)
 ```
 
 
@@ -123,8 +140,14 @@ Now we'll simulate 100 replicates of this stochastic process under the optimal h
 
 ```r
 sims <- lapply(1:100, function(i)
-  simulate_optim(f, pars, x_grid, h_grid, x0, policycost$D, z_g, z_m, z_i, opt$D)
+  simulate_optim(f, pars, x_grid, h_grid, x0, policycost$D, z_g, z_m, z_i, opt$D, penalty=L2)
   )
+```
+
+
+
+```
+Error: argument "profit" is missing, with no default
 ```
 
 
@@ -136,8 +159,36 @@ Make data tidy (melt), fast (data.tables), and nicely labeled.
 
 ```r
 dat <- melt(sims, id=names(sims[[1]]))  
+```
+
+
+
+```
+Error: object 'sims' not found
+```
+
+
+
+```r
 dt <- data.table(dat)
+```
+
+
+
+```
+Error: object 'dat' not found
+```
+
+
+
+```r
 setnames(dt, "L1", "reps") # names are nice
+```
+
+
+
+```
+Error: x is not a data.table
 ```
 
 
@@ -157,7 +208,13 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest_alt), col="darkgreen") 
 ```
 
-![plot of chunk rep1](http://farm8.staticflickr.com/7068/6983560431_053aa815b0_o.png) 
+
+
+```
+Error: object 'reps' not found
+```
+
+
 
 
 
@@ -173,120 +230,6 @@ ggplot(melt(policy)) +
       scale_colour_gradientn(colours = rainbow(4)) 
 ```
 
-![plot of chunk unnamed-chunk-2](http://farm8.staticflickr.com/7190/6983560721_0f809fe791_o.png) 
-
-
-Here we plot previous harvest against the recommended harvest, coloring by stocksize.  Note this swaps the y axis from above with the color density.  Hence each x-axis value has all possible colors, but they map down onto a subset of optimal harvest values (depending on their stock). 
-
-
-```r
-policy <- sapply(1:length(h_grid), function(i) policycost$D[[i]][,1])
-ggplot(melt(policy)) + 
-  geom_point(aes(h_grid[Var2], (h_grid[value]), col = x_grid[Var1]), position=position_jitter(w=.005,h=.005), alpha=.5) + 
-    labs(x = "prev harvest", y = "harvest") +
-      scale_colour_gradientn(colours = rainbow(4)) 
-```
-
-![plot of chunk unnamed-chunk-3](http://farm8.staticflickr.com/7195/6983560939_3ef346f72e_o.png) 
-
-
-
-Against the policy with no cost (shown over time) 
-
-
-```r
-policy <- melt(opt$D)
-policy_zoom <- subset(policy, x_grid[Var1] < max(dt$alternate) )
-ggplot(policy_zoom) + 
-  geom_point(aes(Var2, (x_grid[Var1]), col= h_grid[value])) + 
-  labs(x = "time", y = "fishstock") +
-  scale_colour_gradientn(colours = rainbow(4)) + 
-  geom_abline(intercept=opt$S, slope = 0) 
-```
-
-![plot of chunk no_policy_cost_vis](http://farm8.staticflickr.com/7050/6837437086_092711cf8f_o.png) 
-
-
-### Profits
-
-
-
-```r
-dt <- data.table(dt, id=1:dim(dt)[1])
-profits <- dt[, profit(fishstock, harvest), by=id]
-```
-
-
-
-
-Merge in profits to data.table (should be a way to avoid having to do these joins?)
-
-
-```r
-setkey(dt, id)
-setkey(profits, id)
-dt <- dt[profits]
-setnames(dt, "V1", "profits")
-```
-
-
-
-
-merge in total profits to data.table
-
-
-```r
-total_profit <- dt[,sum(profits), by=reps]
-setkey(total_profit, reps)
-setkey(dt, reps)
-dt <- dt[total_profit]
-setnames(dt, "V1", "total.profit")
-```
-
-
-
-
-
-
-```r
-ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
-```
-
-![plot of chunk unnamed-chunk-7](http://farm8.staticflickr.com/7047/6837437280_18afccbb16_o.png) 
-
-
-
-
-```r
-save(list=ls(), file="L2.rda")
-```
-
-
-
-
-The mean dynamics of the state
-
-
-```r
-stats <- dt[ , mean_sdl(fishstock), by = time]
-ggplot(stats) +   geom_ribbon(aes(x = time, ymin = ymin, ymax = ymax),
-                fill = "darkblue", alpha = 0.2, dat=stats) +
-                geom_line(aes(x=time, y=y), lwd=1) 
-```
-
-![plot of chunk unnamed-chunk-9](http://farm8.staticflickr.com/7199/6983561543_28421a1139_o.png) 
-
-
-The mean dynamics of the control
-
-
-```r
-stats <- dt[ , mean_sdl(harvest), by = time]
-ggplot(stats) +   geom_ribbon(aes(x = time, ymin = ymin, ymax = ymax),
-                fill = "darkblue", alpha = 0.2, dat=stats) +
-                geom_line(aes(x=time, y=y), lwd=1) 
-```
-
-![plot of chunk unnamed-chunk-10](http://farm8.staticflickr.com/7204/6837437640_9bb8d415bb_o.png) 
+![plot of chunk unnamed-chunk-2](http://farm8.staticflickr.com/7184/6837543660_35fce1a893_o.png) 
 
 
