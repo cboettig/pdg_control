@@ -22,7 +22,7 @@
 #' @import expm
 #' @export
 optim_policy <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, 
-                          delta, reward=0, penalty){
+                          delta, reward=0, penalty, effort_penalty=function(x,h) 0){
            
   ## Initialize space for the matrices
   gridsize <- length(x_grid)
@@ -34,10 +34,16 @@ optim_policy <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit,
     Vi[x_grid >= xT] <- reward # a "scrap value" for x(T) >= xT
     Vi
   })
+  
+  penalty_free_V <- V
 
   profit_matrix <- sapply(h_grid, function(h) profit(x_grid, h))
   penalty_matrix <- sapply(h_grid, function(h) 
                            sapply(h_grid, function(h_prev) penalty(h, h_prev)))
+
+  quadratic_penalty <- 
+    sapply(h_grid, function(h) sapply(x_grid, function(x)
+      effort_penalty(h,x) ))
 
   # loop through time  
   for(time in 1:OptTime ){ 
@@ -45,34 +51,34 @@ optim_policy <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit,
    for(h_prev in 1:HL){
       # try all potential havest rates
       V1 <- sapply(1:HL, function(i){
-        # cost of changing the policy from the previous year
-        sales <- profit_matrix[, i]
-        
-  
-        # Transition matrix times V gives dist in next time
         SDP_Mat[[i]]  %*% V[, h_prev] + 
-          {profit_matrix[,i] - penalty_matrix[i, h_prev] } * {1 - delta} 
-        # then (add) harvested amount - policy cost times discount
+          {profit_matrix[,i] - penalty_matrix[i, h_prev] - quadratic_penalty[,i] } * {1 - delta} 
       })
+       V0 <- sapply(1:HL, function(i){
+        SDP_Mat[[i]]  %*% V[, h_prev] + profit_matrix[,i] * {1 - delta} 
+      })
+
       # find havest, h that gives the maximum value
       out <- sapply(1:gridsize, function(j){
         value <- max(V1[j,], na.rm = T) # each col is a diff h, max over these
-        index <- which.max(V1[j,])  # store index so we can recover h's 
-        c(value, index) # returns both profit value & index of optimal h.  
+        index <- which.max(V1[j,])  # store index so we can recover h's
+        penalty_free <- V0[j, index]
+        c(value, index, penalty_free) # returns both profit value & index of optimal h.  
       })
       # Sets V[t+1] = max_h V[t] at each possible state value, x
       V[, h_prev] <- out[1,]                        # The new value-to-go
       D[[h_prev]][,OptTime-time+1] <- out[2,]       # The index positions
+      penalty_free_V[, h_prev] <- out[3,]
     }
   }
   # Reed derives a const escapement policy saying to fish the pop down to
   # the largest population for which you shouldn't harvest: 
   # ReedThreshold <- x_grid[max(which(D[,1] == 1))]
   # Format the output 
-  list(D=D, V=V)
+  list(D=D, V=V, penalty_free_V = penalty_free_V)
 }
 
-
+## V is the most recent time, (i.e. first timestep).  
 
 
 

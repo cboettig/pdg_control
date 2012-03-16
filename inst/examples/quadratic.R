@@ -78,8 +78,55 @@ lapply(penaltyfns, function(penalty){
 })
 dat <- melt(policies, id = names(policies[[1]]))
 names(dat) <- c(names(policies[[1]]), "penalty")
-dt <- data.table(dat)
-dt
+c2 <-  seq(0.01, 3, length.out = 15)
+c2_index <- sapply(dat$c2, function(c) which(c2 %in% c))
+dat2 <- data.frame(dat, c2_index = c2_index)
+dt <- data.table(dat2)
+setkey(dt,penalty,c2_index,reps)
+
+
+## Beautiful
+vartrend <- 
+sapply(c("L2", "L1", "fixed", "asy"), function(plty){
+  sapply(1:15, function(i){
+    pl <- quote(plty)
+    mean(dt[penalty==eval(pl) & c2_index ==i,
+         sd(harvest)/sd(fishstock), by=reps]$V1)
+  })
+})
+df <- melt(data.frame(c2=c2, vartrend),id="c2") 
+p1 <- ggplot(df) + geom_point(aes(c2, value, color=variable))+ geom_line(aes(c2, value, color=variable))
+
+
+cortrend <- sapply(c("L2", "L1", "fixed", "asy"), function(plty){
+  sapply(1:15, function(i){
+    pl <- quote(plty)
+    mean(dt[penalty==eval(pl) & c2_index ==i,
+         cor(harvest, fishstock), by=reps]$V1)
+  })
+})
+df <- melt(data.frame(c2=c2, cortrend),id="c2") 
+p2 <- ggplot(df) + geom_point(aes(c2, value, color=variable)) + geom_line(aes(c2, value, color=variable))
+
+discount <- (1-delta)^seq(1:50)
+
+npv <- sapply(c("L2", "L1", "fixed", "asy"), function(plty){
+  sapply(1:15, function(i){
+    pl <- quote(plty)
+    mean(dt[penalty==eval(pl) & c2_index ==i,
+         sum(profit_fishing*discount), by=reps]$V1)
+  })
+})
+df <- melt(data.frame(c2=c2, npv),id="c2") 
+NPV0 <- mean(npv[1,])
+p2 <- ggplot(df) + geom_point(aes(c2, (NPV0-value)/NPV0, color=variable)) + geom_line(aes(c2, (NPV0-value)/NPV0, color=variable))
+
+
+
+
+
+
+
 
 
 save(list=ls(), file="quadratic.rda")
