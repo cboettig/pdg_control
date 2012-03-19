@@ -133,6 +133,14 @@ sims <- lapply(1:100, function(i)
 Make data tidy (melt), fast (data.tables), and nicely labeled.
 
 
+```r
+dat <- melt(sims, id=names(sims[[1]]))  
+dt <- data.table(dat)
+setnames(dt, "L1", "reps") # names are nice
+```
+
+
+
 
 ### Plots 
 
@@ -147,13 +155,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest_alt), col="darkgreen") 
 ```
 
-
-
-```
-Error: object 'reps' not found
-```
-
-
+![plot of chunk rep1](http://farm7.staticflickr.com/6227/6997004245_6680414d22_o.png) 
 
 
 
@@ -169,7 +171,7 @@ ggplot(melt(policy)) +
       scale_colour_gradientn(colours = rainbow(4)) 
 ```
 
-![plot of chunk unnamed-chunk-1](http://farm8.staticflickr.com/7131/6849564366_df19674a25_o.png) 
+![plot of chunk unnamed-chunk-1](http://farm8.staticflickr.com/7238/6997004707_d45150b10f_o.png) 
 
 
 Here we plot previous harvest against the recommended harvest, coloring by stocksize.  Note this swaps the y axis from above with the color density.  Hence each x-axis value has all possible colors, but they map down onto a subset of optimal harvest values (depending on their stock). 
@@ -183,7 +185,7 @@ ggplot(melt(policy)) +
       scale_colour_gradientn(colours = rainbow(4)) 
 ```
 
-![plot of chunk unnamed-chunk-2](http://farm8.staticflickr.com/7264/6849564786_3ef7c9aa48_o.png) 
+![plot of chunk unnamed-chunk-2](http://farm7.staticflickr.com/6053/6997005141_b0e3849675_o.png) 
 
 
 
@@ -192,24 +194,7 @@ ggplot(melt(policy)) +
 
 ```r
 dt <- data.table(dt, id=1:dim(dt)[1])
-```
-
-
-
-```
-Error: argument of length 0
-```
-
-
-
-```r
 profits <- dt[, profit(fishstock, harvest), by=id]
-```
-
-
-
-```
-Error: object 'fishstock' not found
 ```
 
 
@@ -220,48 +205,9 @@ Merge in profits to data.table (should be a way to avoid having to do these join
 
 ```r
 setkey(dt, id)
-```
-
-
-
-```
-Error: x is not a data.table
-```
-
-
-
-```r
 setkey(profits, id)
-```
-
-
-
-```
-Error: object 'profits' not found
-```
-
-
-
-```r
 dt <- dt[profits]
-```
-
-
-
-```
-Error: object 'profits' not found
-```
-
-
-
-```r
 setnames(dt, "V1", "profits")
-```
-
-
-
-```
-Error: x is not a data.table
 ```
 
 
@@ -272,60 +218,10 @@ merge in total profits to data.table
 
 ```r
 total_profit <- dt[,sum(profits), by=reps]
-```
-
-
-
-```
-Error: object 'profits' not found
-```
-
-
-
-```r
 setkey(total_profit, reps)
-```
-
-
-
-```
-Error: object 'total_profit' not found
-```
-
-
-
-```r
 setkey(dt, reps)
-```
-
-
-
-```
-Error: x is not a data.table
-```
-
-
-
-```r
 dt <- dt[total_profit]
-```
-
-
-
-```
-Error: object 'total_profit' not found
-```
-
-
-
-```r
 setnames(dt, "V1", "total.profit")
-```
-
-
-
-```
-Error: x is not a data.table
 ```
 
 
@@ -337,13 +233,7 @@ Error: x is not a data.table
 ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
 ```
 
-
-
-```
-Error: ggplot2 doesn't know how to deal with data of class function
-```
-
-
+![plot of chunk unnamed-chunk-6](http://farm7.staticflickr.com/6045/6850880550_8bacce9044_o.png) 
 
 
 
@@ -360,29 +250,12 @@ The mean dynamics of the state
 
 ```r
 stats <- dt[ , mean_sdl(fishstock), by = time]
-```
-
-
-
-```
-Error: object 'fishstock' not found
-```
-
-
-
-```r
 ggplot(stats) +   geom_ribbon(aes(x = time, ymin = ymin, ymax = ymax),
                 fill = "darkblue", alpha = 0.2, dat=stats) +
                 geom_line(aes(x=time, y=y), lwd=1) 
 ```
 
-
-
-```
-Error: object 'stats' not found
-```
-
-
+![plot of chunk unnamed-chunk-8](http://farm7.staticflickr.com/6093/6997005719_b157db2a7a_o.png) 
 
 
 The mean dynamics of the control
@@ -390,26 +263,9 @@ The mean dynamics of the control
 
 ```r
 stats <- dt[ , mean_sdl(harvest), by = time]
-```
-
-
-
-```
-Error: object 'harvest' not found
-```
-
-
-
-```r
 ggplot(stats) +  geom_ribbon(aes(x = time, ymin = ymin, ymax = ymax),
                 fill = "darkblue", alpha = 0.2) +
                 geom_line(aes(x=time, y=y), lwd=1) 
 ```
 
-
-
-```
-Error: object 'stats' not found
-```
-
-
+![plot of chunk unnamed-chunk-9](http://farm7.staticflickr.com/6102/6850881184_9b15bc8dec_o.png) 

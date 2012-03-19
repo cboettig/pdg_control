@@ -72,6 +72,9 @@ end.rcode-->
 
 Make data tidy (melt), fast (data.tables), and nicely labeled.
 <!--begin.rcode tidy
+dat <- melt(sims, id=names(sims[[1]]))  
+dt <- data.table(dat)
+setnames(dt, "L1", "reps") # names are nice
 end.rcode-->
 
 ### Plots 
