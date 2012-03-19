@@ -94,6 +94,8 @@ We calculate the stochastic transition matrix for the probability of going from 
 
 ```r
     SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g )
+    opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, 
+                     profit, delta, reward=reward)
 ```
 
 
@@ -122,12 +124,6 @@ Now we'll simulate 100 replicates of this stochastic process under the optimal h
 sims <- lapply(1:100, function(i)
   simulate_optim(f, pars, x_grid, h_grid, x0, policycost$D, z_g, z_m, z_i, opt$D, profit=profit, penalty=L1(.5))
   )
-```
-
-
-
-```
-Error: object 'opt' not found
 ```
 
 
@@ -173,7 +169,7 @@ ggplot(melt(policy)) +
       scale_colour_gradientn(colours = rainbow(4)) 
 ```
 
-![plot of chunk unnamed-chunk-1](http://farm8.staticflickr.com/7266/6995639333_1b33a58da1_o.png) 
+![plot of chunk unnamed-chunk-1](http://farm8.staticflickr.com/7131/6849564366_df19674a25_o.png) 
 
 
 Here we plot previous harvest against the recommended harvest, coloring by stocksize.  Note this swaps the y axis from above with the color density.  Hence each x-axis value has all possible colors, but they map down onto a subset of optimal harvest values (depending on their stock). 
@@ -187,7 +183,7 @@ ggplot(melt(policy)) +
       scale_colour_gradientn(colours = rainbow(4)) 
 ```
 
-![plot of chunk unnamed-chunk-2](http://farm7.staticflickr.com/6058/6995639699_a6b5c97644_o.png) 
+![plot of chunk unnamed-chunk-2](http://farm8.staticflickr.com/7264/6849564786_3ef7c9aa48_o.png) 
 
 
 
