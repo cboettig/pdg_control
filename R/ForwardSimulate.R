@@ -19,7 +19,7 @@
 #'  and what the escapement ("unharvested"). 
 #' @export
 ForwardSimulate <- function(f, pars, x_grid, h_grid, x0, D, z_g,
-                            z_m, z_i){
+                            z_m=function(x) 1, z_i = function(x) 1){
   # initialize variables with initial conditions
   OptTime <- dim(D)[2]    # Stopping time
   x_h <- numeric(OptTime) # population dynamics with harvest
