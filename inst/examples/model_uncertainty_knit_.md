@@ -36,8 +36,7 @@ end.rcode-->
 
 <!--begin.rcode f2
 f2 = function(x_t1, x_t0){
-#  mu = 1.5 * x_t0^2/(1 + x_t0^2/10)  
-   mu = 0 * x_t0 / (1 - 0.05 * x_t0)
+   mu = 10 * x_t0 / (1 - 0.05 * x_t0)
   (mu <= 0) * (x_t1 == 0) +
   (mu > 0) * dlnorm(x_t1, log(mu), sigma_g)
 }
@@ -66,6 +65,17 @@ f = function(x_t0, p_t0, x_t1, p_t1){
 end.rcode-->
 
 
+Some unit tests of this behavior: Should you see a transition from 1 to 10, you should be almost sure it came from model 2, and hence move to the first bin where belief in model 1 is <!--inline.rcode p_grid[1]-->, even if you were 0.99 sure that model 1 was correct until then.
+<!--begin.rcode unittest
+sapply(p_grid, function(p) f(1,.99,10,p))
+end.rcode-->
+Should you see a transition from 1 to 2, you should become almost sure model 1 is correct, even if it had only a 1% probability previously:
+<!--begin.rcode unittest2
+sapply(p_grid, function(p) f(1,.01,2,p))
+end.rcode-->
+
+
+
 A simple way to use this function to generate the matrix of all possible transitions (with thanks to [some SO folks](http://stackoverflow.com/questions/9652079/elegant-way-to-loop-over-a-function-for-a-transition-matrix-in-2-dimensions-in-r/9652497#9652497))
 
 <!--begin.rcode matrix
@@ -80,6 +90,7 @@ model_uncertainty <- function(x_grid, p_grid, h_grid){
   })
 }
 end.rcode-->
+
 
 
 A modified version of finding the dynamic programming solution.  Not sure I've gotten this correct yet. 
@@ -122,6 +133,17 @@ dp_optim <- function(M, x_grid, h_grid, OptTime, xT, profit,
 }
 end.rcode-->
 
+
+Define some utilities to handle the combined state-space/belief-space, `(x,p)`. 
+<!--begin.rcode utils
+nx <- length(x_grid)
+np <- length(p_grid)
+indices_fixed_x <- function(x) (1:np-1)*nx + x
+indices_fixed_p <- function(p) (p-1)*nx + 1:nx
+extract_policy <- function(D, p_i, nx, np) D[(p_i-1)*nx + 1:nx,]
+end.rcode-->
+
+
 Sticking the pieces together,
 <!--begin.rcode pars
 require(pdgControl)
@@ -139,6 +161,21 @@ M <- model_uncertainty(x_grid, p_grid, h_grid)
 active <- dp_optim(M, x_grid, h_grid, T, xT=0, profit, delta, reward, p_grid=p_grid) 
 end.rcode-->
 
+
+Let's make sure the matrix is working correctly.  Transitions from 1 to 2 should be going to the far right bins, representing model 1, while those from 1 to 10 should go to the far left, representing no faith in model 1.  
+<!--begin.rcode
+M[[1]][indices_fixed_x(1), indices_fixed_x(2)]
+M[[1]][indices_fixed_x(1), indices_fixed_x(10)]
+end.rcode-->
+
+How about at higher harvest levels?
+<!--begin.rcode
+M[[4]][indices_fixed_x(1), indices_fixed_x(2)]
+M[[4]][indices_fixed_x(1), indices_fixed_x(10)]
+end.rcode-->
+
+
+
 Static solution
 <!--begin.rcode static
 bevholt <- function(x,h, p) p[1] * (x-h) / (1 - p[2] * (x-h))
@@ -146,23 +183,16 @@ sdp <- determine_SDP_matrix(bevholt, c(1.5, 0.05), x_grid, h_grid, .2)
 static <- find_dp_optim(sdp, x_grid, h_grid, T, xT=0, profit, delta, reward)
 end.rcode-->
 
-Define some utilities to handle the combined state-space/belief-space, `(x,p)`. 
-<!--begin.rcode utils
-indices_fixed_x <- function(x, np, nx) (1:np-1)*nx + x
-indices_fixed_p <- function(p, nx) (p-1)*nx + 1:nx
-extract_policy <- function(D, p_i, nx, np) D[(p_i-1)*nx + 1:nx,]
-end.rcode-->
-
 
 Confirm that the policy with high probability on model 1 matches the static solution for model 1:
 <!--begin.rcode f1_belief
-extract_policy(active$D, length(p_grid), length(x_grid), length(p_grid)) 
 static$D
 end.rcode-->
 
 Is the policy any different if most of our belief is on model 2?
 <!--begin.rcode f2_belief
+extract_policy(active$D, length(p_grid), length(x_grid), length(p_grid)) 
 extract_policy(active$D, 1, length(x_grid), length(p_grid)) 
 end.rcode-->
-
+Hmm, something is up. 
 

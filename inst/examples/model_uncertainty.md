@@ -40,8 +40,7 @@ f1 = function(x_t1, x_t0){
 
 ```r
 f2 = function(x_t1, x_t0){
-#  mu = 1.5 * x_t0^2/(1 + x_t0^2/10)  
-   mu = 0 * x_t0 / (1 - 0.05 * x_t0)
+   mu = 10 * x_t0 / (1 - 0.05 * x_t0)
   (mu <= 0) * (x_t1 == 0) +
   (mu > 0) * dlnorm(x_t1, log(mu), sigma_g)
 }
@@ -77,6 +76,39 @@ f = function(x_t0, p_t0, x_t1, p_t1){
 
 
 
+Some unit tests of this behavior: Should you see a transition from 1 to 10, you should be almost sure it came from model 2, and hence move to the first bin where belief in model 1 is <!--inline.rcode p_grid[1]-->, even if you were 0.99 sure that model 1 was correct until then.
+
+
+```r
+sapply(p_grid, function(p) f(1,.99,10,p))
+```
+
+
+
+```
+[1] 6.367e-20 0.000e+00 0.000e+00 0.000e+00 0.000e+00
+```
+
+
+
+Should you see a transition from 1 to 2, you should become almost sure model 1 is correct, even if it had only a 1% probability previously:
+
+
+```r
+sapply(p_grid, function(p) f(1,.01,2,p))
+```
+
+
+
+```
+[1] 0.000 0.000 0.000 0.000 0.496
+```
+
+
+
+
+
+
 A simple way to use this function to generate the matrix of all possible transitions (with thanks to [some SO folks](http://stackoverflow.com/questions/9652079/elegant-way-to-loop-over-a-function-for-a-transition-matrix-in-2-dimensions-in-r/9652497#9652497))
 
 
@@ -93,6 +125,7 @@ model_uncertainty <- function(x_grid, p_grid, h_grid){
   })
 }
 ```
+
 
 
 
@@ -143,6 +176,22 @@ dp_optim <- function(M, x_grid, h_grid, OptTime, xT, profit,
 
 
 
+
+Define some utilities to handle the combined state-space/belief-space, `(x,p)`. 
+
+
+```r
+nx <- length(x_grid)
+np <- length(p_grid)
+indices_fixed_x <- function(x) (1:np-1)*nx + x
+indices_fixed_p <- function(p) (p-1)*nx + 1:nx
+extract_policy <- function(D, p_i, nx, np) D[(p_i-1)*nx + 1:nx,]
+```
+
+
+
+
+
 Sticking the pieces together,
 
 
@@ -170,6 +219,85 @@ active <- dp_optim(M, x_grid, h_grid, T, xT=0, profit, delta, reward, p_grid=p_g
 
 
 
+
+Let's make sure the matrix is working correctly.  Transitions from 1 to 2 should be going to the far right bins, representing model 1, while those from 1 to 10 should go to the far left, representing no faith in model 1.  
+
+
+```r
+M[[1]][indices_fixed_x(1), indices_fixed_x(2)]
+```
+
+
+
+```
+     [,1] [,2] [,3] [,4]   [,5]
+[1,]    0    0    0    0 0.7668
+[2,]    0    0    0    0 0.7668
+[3,]    0    0    0    0 0.7668
+[4,]    0    0    0    0 0.7668
+[5,]    0    0    0    0 0.7668
+```
+
+
+
+```r
+M[[1]][indices_fixed_x(1), indices_fixed_x(10)]
+```
+
+
+
+```
+          [,1] [,2] [,3] [,4] [,5]
+[1,] 9.843e-20    0    0    0    0
+[2,] 9.843e-20    0    0    0    0
+[3,] 9.843e-20    0    0    0    0
+[4,] 9.843e-20    0    0    0    0
+[5,] 9.843e-20    0    0    0    0
+```
+
+
+
+
+How about at higher harvest levels?
+
+
+```r
+M[[4]][indices_fixed_x(1), indices_fixed_x(2)]
+```
+
+
+
+```
+     [,1] [,2] [,3] [,4] [,5]
+[1,]  NaN  NaN  NaN  NaN  NaN
+[2,]  NaN  NaN  NaN  NaN  NaN
+[3,]  NaN  NaN  NaN  NaN  NaN
+[4,]  NaN  NaN  NaN  NaN  NaN
+[5,]  NaN  NaN  NaN  NaN  NaN
+```
+
+
+
+```r
+M[[4]][indices_fixed_x(1), indices_fixed_x(10)]
+```
+
+
+
+```
+     [,1] [,2] [,3] [,4] [,5]
+[1,]  NaN  NaN  NaN  NaN  NaN
+[2,]  NaN  NaN  NaN  NaN  NaN
+[3,]  NaN  NaN  NaN  NaN  NaN
+[4,]  NaN  NaN  NaN  NaN  NaN
+[5,]  NaN  NaN  NaN  NaN  NaN
+```
+
+
+
+
+
+
 Static solution
 
 
@@ -182,42 +310,8 @@ static <- find_dp_optim(sdp, x_grid, h_grid, T, xT=0, profit, delta, reward)
 
 
 
-Define some utilities to handle the combined state-space/belief-space, `(x,p)`. 
-
-
-```r
-indices_fixed_x <- function(x, np, nx) (1:np-1)*nx + x
-indices_fixed_p <- function(p, nx) (p-1)*nx + 1:nx
-extract_policy <- function(D, p_i, nx, np) D[(p_i-1)*nx + 1:nx,]
-```
-
-
-
-
 
 Confirm that the policy with high probability on model 1 matches the static solution for model 1:
-
-
-```r
-extract_policy(active$D, length(p_grid), length(x_grid), length(p_grid)) 
-```
-
-
-
-```
-      [,1] [,2] [,3] [,4] [,5]
- [1,]    1    1    1    1    1
- [2,]    1    1    1    1    1
- [3,]    1    1    1    1    3
- [4,]    1    1    1    1    4
- [5,]    1    1    1    1    5
- [6,]    2    2    2    1    6
- [7,]    3    3    3    2    7
- [8,]    4    4    4    4    8
- [9,]    5    5    5    5    9
-[10,]    6    6    6    6   10
-```
-
 
 
 ```r
@@ -247,6 +341,28 @@ Is the policy any different if most of our belief is on model 2?
 
 
 ```r
+extract_policy(active$D, length(p_grid), length(x_grid), length(p_grid)) 
+```
+
+
+
+```
+      [,1] [,2] [,3] [,4] [,5]
+ [1,]    1    1    1    1    1
+ [2,]    1    1    1    1    1
+ [3,]    1    1    1    1    3
+ [4,]    1    1    1    1    4
+ [5,]    1    1    1    1    5
+ [6,]    2    2    2    1    6
+ [7,]    3    3    3    2    7
+ [8,]    4    4    4    4    8
+ [9,]    5    5    5    5    9
+[10,]    6    6    6    6   10
+```
+
+
+
+```r
 extract_policy(active$D, 1, length(x_grid), length(p_grid)) 
 ```
 
@@ -268,5 +384,5 @@ extract_policy(active$D, 1, length(x_grid), length(p_grid))
 
 
 
-
+Hmm, something is up. 
 
