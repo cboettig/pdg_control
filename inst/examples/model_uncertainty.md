@@ -12,34 +12,41 @@ Set a moderate example grid
 
 
 ```r
-p_grid = seq(0,.9,length=10)
-x_grid = seq(0,10,length=11)
+p_grid = seq(0.01,.99, length=5) 
+x_grid = seq(1,10,length=10) 
+sigma_g = 0.2
 ```
 
 
 
 
 
-Define the two possible models:
+SO, this is NOT the same 
 
 
 ```r
-sigma_g = 0.2
-
 f1 = function(x_t1, x_t0){
   a = 1.5
   b = 0.05
   mu = a * x_t0 / (1 - b * x_t0)
   (mu <= 0) * (x_t1 == 0) +
-  (mu > 0) * dlnorm(x_t1, log(mu) - sigma_g ^ 2 / 2, sigma_g)
+  (mu > 0) * dlnorm(x_t1, log(mu), sigma_g)
 }
+```
 
+
+
+
+
+
+```r
 f2 = function(x_t1, x_t0){
-  A = 1
-  B = 0.05
+  A = 5
+  B = 0.4
   mu = A * x_t0 / (1 - B * x_t0)
   (mu <= 0) * (x_t1 == 0) +
-  (mu > 0) * dlnorm(x_t1, log(mu) - sigma_g ^ 2 / 2, sigma_g)
+  (mu > 0) * dlnorm(x_t1, log(mu), sigma_g)
+  
 }
 ```
 
@@ -52,65 +59,54 @@ Define the transition probability function for going from any state `x_t0` and b
 
 ```r
 f = function(x_t0, p_t0, x_t1, p_t1){
-  bw = (p_grid[2] - p_grid[1] ) / 2 # bin-width
   y1 = f1(x_t1, x_t0)
   y2 = f2(x_t1, x_t0)
-  if(y1 == 0 && y2 == 0){
+  P1 = p_t0 * y1
+  P1 = P1 / (P1 + (1 - p_t0) * y2)
+  if(is.na(P1))
     P1 = p_t0
-  } else {
-    P1 = (p_t0 + bw) * y1
-    P1 = P1 / (P1 + (1 - (p_t0+bw)) * f2(x_t1, x_t0))
-    P1 = p_grid[p_grid < P1]
-    P1 = P1[length(P1)]
+  else{
+    i <- 1
+    np <- length(p_grid)
+    while(p_grid[i] < P1 & i < np)
+      i <- i+1
+    P1 <- p_grid[i]  
  }
-   y1 * ( p_t1 == P1)
+ y1 * ( p_t1 == P1)
 }
 ```
 
 
 
 
-A simple way to use this function to generate the matrix of all possible transitions (with thanks to [some SO folks](http://stackoverflow.com/questions/9652079/elegant-way-to-loop-over-a-function-for-a-transition-matrix-in-2-dimensions-in-r/9652497#9652497))
 
 
 ```r
-model_uncertainty <- function(x_grid, p_grid){
-  bw = (p_grid[2] - p_grid[1] ) / 2 # bin-width
-  d = expand.grid(p_t0 = p_grid, x_t0 = x_grid, p_t1 = p_grid, x_t1 = x_grid)
-  M = matrix(mapply(f, d$x_t0, d$p_t0, d$x_t1, d$p_t1), nrow = length(p_grid) * length(x_grid) )
-  for(i in 1:dim(M)[1])
-    M[i,] = M[i,]/sum(M[i,])
-  M
+# f = function(a,b,c,d) sprintf("%.1f, %.1f, %.1f, %.1f", a,b,c,d)
+
+model_uncertainty <- function(x_grid, p_grid, h_grid){
+  Matrices <- lapply(h_grid, function(h){
+    x_minus_h <- (x_grid-h) * as.integer( (x_grid-h)>0 )
+
+    d = expand.grid(x_t0 = x_minus_h, p_t0 = p_grid, x_t1 = x_grid, p_t1 = p_grid)
+    M = matrix(mapply(f, d$x_t0, d$p_t0, d$x_t1, d$p_t1), nrow = length(p_grid) * length(x_grid) )
+
+## old way
+#    M <- matrix(
+#    sapply(p_grid, function(p_t1)
+#      sapply(x_grid, function(x_t1)
+#        sapply(p_grid, function(p_t0)
+#          sapply(x_minus_h, function(x_t0)
+#            f(x_t0, p_t0, x_t1, p_t1) )))),
+#    nrow = length(p_grid) * length(x_grid))
+
+    
+    for(i in 1:dim(M)[1]) # normalize
+      M[i,] = M[i,]/sum(M[i,])
+    M })
+  Matrices
 }
 ```
-
-
-
-We can generate the matrix for each `h` value from the rows of the existing matrix, rather than editing all the functions above to depend on `h` as well and looping over all possible harvest values. Outputs seem reasonable, but not quite sure this is correct yet.
-
-
-```r
-harvest_matrices = function(M, h, x_grid, p_grid){
-  nx <- length(x_grid)
-  np <- length(p_grid)
-  harvest_all <- M[1:np,] ## assumes x_grid[1] = 0
-  M_ <- M
-  if(sum(x_grid < h) > 0){
-    s <- which(x_grid < h)
-    s <- s[length(s)] - 1 
-    for(i in 1:nx){
-      j = 1+(i-1)*np
-      k = 1+(i-s-1)*np
-      if(x_grid[i] < h)
-        M_[j:(j+np-1),] <- harvest_all
-      else
-        M_[j:(j+np-1),] <- M[k:(k+np-1),]
-    }
-  }
-  M_
-}
-```
-
 
 
 
@@ -125,6 +121,9 @@ dp_optim <- function(M, x_grid, h_grid, OptTime, xT, profit,
   D <- matrix(NA, nrow=gridsize, ncol=OptTime)
   V <- rep(0,gridsize) # initialize BC,
 
+  profit.grid <- function(x_grid, h_i)
+    expand.grid(profit(x_grid, h_i), p_grid)[[1]]
+
   # give a fixed reward for having value larger than xT at the end. 
   V[1+(x_grid-1)*length(p_grid) >= xT] <- reward # a "scrap value" for x(T) >= xT
 
@@ -133,9 +132,9 @@ dp_optim <- function(M, x_grid, h_grid, OptTime, xT, profit,
     # try all potential havest rates
     V1 <- sapply(1:HL, function(i){
       # Transition matrix times V gives dist in next time
-      harvest_matrices(M, h_grid[i], x_grid, p_grid) %*% V + 
+      M[[i]] %*% V + 
       # then (add) harvested amount times discount
-       profit(x_grid, h_grid[i]) * (1 - delta) 
+       profit.grid(x_grid, h_grid[i]) * (1 - delta) 
     })
 
     # find havest, h that gives the maximum value
@@ -160,36 +159,148 @@ Sticking the pieces together,
 
 
 ```r
-M <- model_uncertainty(x_grid, p_grid)
-h_grid <- seq(0,5, length=4)
-opt <- dp_optim(M, x_grid, h_grid, OptTime=5, xT=0, profit=function(x,h) min(x,h), delta=0.05, reward=0, p_grid=p_grid) 
+require(pdgControl)
+h_grid <- x_grid-1 
+T <- 5
+xT <- 0
+profit <- profit_harvest(price=10, c0=30) 
+delta <- 0.05
+reward <- 0
+```
+
+
+
+
+Active Adaptive Mangement solution
+
+
+```r
+M <- model_uncertainty(x_grid, p_grid, h_grid)
+active <- dp_optim(M, x_grid, h_grid, T, xT=0, profit, delta, reward, p_grid=p_grid) 
+```
+
+
+
+
+Static solution
+
+
+```r
+bevholt <- function(x,h, p) p[1] * (x-h) / (1 - p[2] * (x-h))
+sdp <- determine_SDP_matrix(bevholt, c(1.5, 0.05), x_grid, h_grid, .2)
+static <- find_dp_optim(sdp, x_grid, h_grid, T, xT=0, profit, delta, reward)
+static$D
+```
+
+
+
+```
+      [,1] [,2] [,3] [,4] [,5]
+ [1,]    1    1    1    1    1
+ [2,]    1    1    1    1    1
+ [3,]    1    1    1    1    4
+ [4,]    1    1    1    1    5
+ [5,]    1    1    1    1    6
+ [6,]    2    2    2    2    7
+ [7,]    3    3    3    3    8
+ [8,]    4    4    4    4    9
+ [9,]    5    5    5    5   10
+[10,]    6    6    6    6   10
+```
+
+
+
+
+Utils
+
+
+```r
+indices_fixed_x <- function(x, np, nx) (1:np-1)*nx + x
+indices_fixed_p <- function(p, nx) (p-1)*nx + 1:nx
+extract_policy <- function(D, p_i, nx, np) D[(p_i-1)*nx + 1:nx,]
 ```
 
 
 
 
 
-Hmm, no errors, something looks strange with this policy.
+Confirm that the policy with high probability on model 1 matches the static solution for model 1:
+
+
+```r
+extract_policy(active$D, length(p_grid), length(x_grid), length(p_grid)) 
+```
 
 
 
-### Practice
-Before writing the method to create the transition matrix for each value of the control variable (harvest) over the belief grid, I tested this simple example. 
+```
+      [,1] [,2] [,3] [,4] [,5]
+ [1,]    1    1    1    1    1
+ [2,]    1    1    1    1    1
+ [3,]    1    1    1    1    3
+ [4,]    1    1    1    1    4
+ [5,]    1    1    1    1    5
+ [6,]    2    2    2    1    6
+ [7,]    3    3    3    2    7
+ [8,]    4    4    4    4    8
+ [9,]    5    5    5    5    9
+[10,]    6    6    6    6   10
+```
 
 
 
 ```r
-matrix_given_harvest = function(M, h, x_grid){
-  M_ <- M
-  zeros <- x_grid < h
-  if(sum(zeros) != 0){
-    harvest_all <- numeric(length(x_grid))
-    harvest_all[1] <- 1
-    M_[zeros,] <- matrix(rep(harvest_all, sum(zeros)), nrow=sum(zeros), byrow=T)
-    M_[!zeros,] <- M[1:sum(!zeros),]
-  }
-  M_
-}
+static$D
 ```
+
+
+
+```
+      [,1] [,2] [,3] [,4] [,5]
+ [1,]    1    1    1    1    1
+ [2,]    1    1    1    1    1
+ [3,]    1    1    1    1    4
+ [4,]    1    1    1    1    5
+ [5,]    1    1    1    1    6
+ [6,]    2    2    2    2    7
+ [7,]    3    3    3    3    8
+ [8,]    4    4    4    4    9
+ [9,]    5    5    5    5   10
+[10,]    6    6    6    6   10
+```
+
+
+
+
+
+
+
+
+
+
+
+
+Another sanity check
+
+
+```r
+np <- length(p_grid)
+nx <- length(x_grid)
+sdp2 <-
+lapply(1:length(M), function(i){
+  collapse_to <- sapply(1:nx, function(i) rowSums(M[[i]][,indices_fixed_x(i,np,nx)]))
+  collapse_to[(nx*np-nx+1):(np*nx),]
+})
+find_dp_optim(sdp2, x_grid, h_grid, T, xT=0, profit, delta, reward)$D
+```
+
+
+
+```
+Error: incorrect number of dimensions
+```
+
+
+
 
 
