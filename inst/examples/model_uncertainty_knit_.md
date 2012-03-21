@@ -36,8 +36,8 @@ end.rcode-->
 
 <!--begin.rcode f2
 f2 = function(x_t1, x_t0){
-  mu = 1.5 * x_t0^2/(1 + x_t0^2/10)  
-  # mu = 1.1 * x_t0 / (1 - 0.05 * x_t0)
+#  mu = 1.5 * x_t0^2/(1 + x_t0^2/10)  
+   mu = 0 * x_t0 / (1 - 0.05 * x_t0)
   (mu <= 0) * (x_t1 == 0) +
   (mu > 0) * dlnorm(x_t1, log(mu), sigma_g)
 }
