@@ -20,8 +20,7 @@ sigma_g = 0.2
 
 
 
-
-SO, this is NOT the same 
+Define the transition densities for two different models:
 
 
 ```r
@@ -41,12 +40,11 @@ f1 = function(x_t1, x_t0){
 
 ```r
 f2 = function(x_t1, x_t0){
-  A = 5
-  B = 0.4
+  A = 1.1
+  B = 0.05
   mu = A * x_t0 / (1 - B * x_t0)
   (mu <= 0) * (x_t1 == 0) +
   (mu > 0) * dlnorm(x_t1, log(mu), sigma_g)
-  
 }
 ```
 
@@ -80,33 +78,24 @@ f = function(x_t0, p_t0, x_t1, p_t1){
 
 
 
+A simple way to use this function to generate the matrix of all possible transitions (with thanks to [some SO folks](http://stackoverflow.com/questions/9652079/elegant-way-to-loop-over-a-function-for-a-transition-matrix-in-2-dimensions-in-r/9652497#9652497))
+
+
 
 ```r
-# f = function(a,b,c,d) sprintf("%.1f, %.1f, %.1f, %.1f", a,b,c,d)
-
 model_uncertainty <- function(x_grid, p_grid, h_grid){
-  Matrices <- lapply(h_grid, function(h){
+  lapply(h_grid, function(h){
     x_minus_h <- (x_grid-h) * as.integer( (x_grid-h)>0 )
-
     d = expand.grid(x_t0 = x_minus_h, p_t0 = p_grid, x_t1 = x_grid, p_t1 = p_grid)
     M = matrix(mapply(f, d$x_t0, d$p_t0, d$x_t1, d$p_t1), nrow = length(p_grid) * length(x_grid) )
-
-## old way
-#    M <- matrix(
-#    sapply(p_grid, function(p_t1)
-#      sapply(x_grid, function(x_t1)
-#        sapply(p_grid, function(p_t0)
-#          sapply(x_minus_h, function(x_t0)
-#            f(x_t0, p_t0, x_t1, p_t1) )))),
-#    nrow = length(p_grid) * length(x_grid))
-
-    
     for(i in 1:dim(M)[1]) # normalize
       M[i,] = M[i,]/sum(M[i,])
-    M })
-  Matrices
+    M
+  })
 }
 ```
+
+
 
 
 
@@ -189,29 +178,12 @@ Static solution
 bevholt <- function(x,h, p) p[1] * (x-h) / (1 - p[2] * (x-h))
 sdp <- determine_SDP_matrix(bevholt, c(1.5, 0.05), x_grid, h_grid, .2)
 static <- find_dp_optim(sdp, x_grid, h_grid, T, xT=0, profit, delta, reward)
-static$D
-```
-
-
-
-```
-      [,1] [,2] [,3] [,4] [,5]
- [1,]    1    1    1    1    1
- [2,]    1    1    1    1    1
- [3,]    1    1    1    1    4
- [4,]    1    1    1    1    5
- [5,]    1    1    1    1    6
- [6,]    2    2    2    2    7
- [7,]    3    3    3    3    8
- [8,]    4    4    4    4    9
- [9,]    5    5    5    5   10
-[10,]    6    6    6    6   10
 ```
 
 
 
 
-Utils
+Define some utilities to handle the combined state-space/belief-space, `(x,p)`. 
 
 
 ```r
@@ -272,32 +244,27 @@ static$D
 
 
 
-
-
-
-
-
-
-
-
-Another sanity check
+Is the policy any different if most of our belief is on model 2?
 
 
 ```r
-np <- length(p_grid)
-nx <- length(x_grid)
-sdp2 <-
-lapply(1:length(M), function(i){
-  collapse_to <- sapply(1:nx, function(i) rowSums(M[[i]][,indices_fixed_x(i,np,nx)]))
-  collapse_to[(nx*np-nx+1):(np*nx),]
-})
-find_dp_optim(sdp2, x_grid, h_grid, T, xT=0, profit, delta, reward)$D
+extract_policy(active$D, 1, length(x_grid), length(p_grid)) 
 ```
 
 
 
 ```
-Error: incorrect number of dimensions
+      [,1] [,2] [,3] [,4] [,5]
+ [1,]    1    1    1    1    1
+ [2,]    1    1    1    1    1
+ [3,]    1    1    1    1    3
+ [4,]    1    1    1    1    4
+ [5,]    1    1    1    1    5
+ [6,]    2    2    2    1    6
+ [7,]    3    3    3    2    7
+ [8,]    4    4    4    4    8
+ [9,]    5    5    5    5    9
+[10,]    6    6    6    6   10
 ```
 
 

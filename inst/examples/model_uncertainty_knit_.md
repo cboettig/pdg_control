@@ -66,30 +66,19 @@ f = function(x_t0, p_t0, x_t1, p_t1){
 
 end.rcode-->
 
+
+A simple way to use this function to generate the matrix of all possible transitions (with thanks to [some SO folks](http://stackoverflow.com/questions/9652079/elegant-way-to-loop-over-a-function-for-a-transition-matrix-in-2-dimensions-in-r/9652497#9652497))
+
 <!--begin.rcode matrix
-# f = function(a,b,c,d) sprintf("%.1f, %.1f, %.1f, %.1f", a,b,c,d)
-
 model_uncertainty <- function(x_grid, p_grid, h_grid){
-  Matrices <- lapply(h_grid, function(h){
+  lapply(h_grid, function(h){
     x_minus_h <- (x_grid-h) * as.integer( (x_grid-h)>0 )
-
     d = expand.grid(x_t0 = x_minus_h, p_t0 = p_grid, x_t1 = x_grid, p_t1 = p_grid)
     M = matrix(mapply(f, d$x_t0, d$p_t0, d$x_t1, d$p_t1), nrow = length(p_grid) * length(x_grid) )
-
-## old way
-#    M <- matrix(
-#    sapply(p_grid, function(p_t1)
-#      sapply(x_grid, function(x_t1)
-#        sapply(p_grid, function(p_t0)
-#          sapply(x_minus_h, function(x_t0)
-#            f(x_t0, p_t0, x_t1, p_t1) )))),
-#    nrow = length(p_grid) * length(x_grid))
-
-    
     for(i in 1:dim(M)[1]) # normalize
       M[i,] = M[i,]/sum(M[i,])
-    M })
-  Matrices
+    M
+  })
 }
 end.rcode-->
 
@@ -156,10 +145,9 @@ Static solution
 bevholt <- function(x,h, p) p[1] * (x-h) / (1 - p[2] * (x-h))
 sdp <- determine_SDP_matrix(bevholt, c(1.5, 0.05), x_grid, h_grid, .2)
 static <- find_dp_optim(sdp, x_grid, h_grid, T, xT=0, profit, delta, reward)
-static$D
 end.rcode-->
 
-Utils
+Define some utilities to handle the combined state-space/belief-space, `(x,p)`. 
 <!--begin.rcode utils
 indices_fixed_x <- function(x, np, nx) (1:np-1)*nx + x
 indices_fixed_p <- function(p, nx) (p-1)*nx + 1:nx
@@ -168,29 +156,14 @@ end.rcode-->
 
 
 Confirm that the policy with high probability on model 1 matches the static solution for model 1:
-<!--begin.rcode
+<!--begin.rcode f1_belief
 extract_policy(active$D, length(p_grid), length(x_grid), length(p_grid)) 
 static$D
 end.rcode-->
 
-
-
-
-
-
-
-
-
-Another sanity check
-<!--begin.rcode
-np <- length(p_grid)
-nx <- length(x_grid)
-sdp2 <-
-lapply(1:length(M), function(i){
-  collapse_to <- sapply(1:nx, function(i) rowSums(M[[i]][,indices_fixed_x(i,np,nx)]))
-  collapse_to[(nx*np-nx+1):(np*nx),]
-})
-find_dp_optim(sdp2, x_grid, h_grid, T, xT=0, profit, delta, reward)$D
+Is the policy any different if most of our belief is on model 2?
+<!--begin.rcode f2_belief
+extract_policy(active$D, 1, length(x_grid), length(p_grid)) 
 end.rcode-->
 
 
