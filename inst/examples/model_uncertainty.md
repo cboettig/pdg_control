@@ -40,9 +40,8 @@ f1 = function(x_t1, x_t0){
 
 ```r
 f2 = function(x_t1, x_t0){
-  A = 1.1
-  B = 0.05
-  mu = A * x_t0 / (1 - B * x_t0)
+  mu = 1.5 * x_t0^2/(1 + x_t0^2/10)  
+  # mu = 1.1 * x_t0 / (1 - 0.05 * x_t0)
   (mu <= 0) * (x_t1 == 0) +
   (mu > 0) * dlnorm(x_t1, log(mu), sigma_g)
 }
