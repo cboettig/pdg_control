@@ -19,7 +19,7 @@ Notes from my first attempt at coding the active adaptive management solution to
 Set a moderate example grid
 <!--begin.rcode grids
 p_grid = seq(0.01,.99, length=5) 
-x_grid = seq(1,10,length=10) 
+x_grid = seq(0,10,length=11) 
 sigma_g = 0.2
 end.rcode-->
 
