@@ -13,9 +13,24 @@ Set a moderate example grid
 
 ```r
 p_grid = seq(0.01,.99, length=5) 
-x_grid = seq(0,10,length=11) 
+x_grid = seq(1,10,length=10) 
 sigma_g = 0.2
 ```
+
+
+
+
+Define some utilities to handle the combined state-space/belief-space, `(x,p)`. 
+
+
+```r
+nx <- length(x_grid)
+np <- length(p_grid)
+indices_fixed_x <- function(x) (1:np-1)*nx + x
+indices_fixed_p <- function(p) (p-1)*nx + 1:nx
+extract_policy <- function(D, p_i, nx, np) D[(p_i-1)*nx + 1:nx,]
+```
+
 
 
 
@@ -40,7 +55,7 @@ f1 = function(x_t1, x_t0){
 
 ```r
 f2 = function(x_t1, x_t0){
-   mu = 10 * x_t0 / (1 - 0.05 * x_t0)
+   mu = 3 * x_t0 / (1 - 0.05 * x_t0)
   (mu <= 0) * (x_t1 == 0) +
   (mu > 0) * dlnorm(x_t1, log(mu), sigma_g)
 }
@@ -55,20 +70,19 @@ Define the transition probability function for going from any state `x_t0` and b
 
 ```r
 f = function(x_t0, p_t0, x_t1, p_t1){
-  y1 = f1(x_t1, x_t0)
-  y2 = f2(x_t1, x_t0)
-  P1 = p_t0 * y1
-  P1 = P1 / (P1 + (1 - p_t0) * y2)
-  if(is.na(P1))
+  y1 = p_t0 * f1(x_t1, x_t0)
+  y2 = (1-p_t0) * f2(x_t1, x_t0)
+  P1 = y1 / (y1 + y2)
+  if(is.na(P1) || x_t0 == 0)
     P1 = p_t0
   else{
-    i <- 1
-    np <- length(p_grid)
+    i = 1
+    np = length(p_grid)
     while(p_grid[i] < P1 & i < np)
-      i <- i+1
-    P1 <- p_grid[i]  
+      i = i+1
+    P1 = p_grid[i]  
  }
- y1 * ( p_t1 == P1)
+ (y1+y2) * ( p_t1 == P1)
 }
 ```
 
@@ -86,7 +100,7 @@ sapply(p_grid, function(p) f(1,.99,10,p))
 
 
 ```
-[1] 6.367e-20 0.000e+00 0.000e+00 0.000e+00 0.000e+00
+[1] 1.222e-10 0.000e+00 0.000e+00 0.000e+00 0.000e+00
 ```
 
 
@@ -101,7 +115,35 @@ sapply(p_grid, function(p) f(1,.01,2,p))
 
 
 ```
-[1] 0.000 0.000 0.000 0.000 0.496
+[1] 0.00000 0.07772 0.00000 0.00000 0.00000
+```
+
+
+
+
+But we want the amount you change your belief to depend on where you started.  These should be different:
+
+
+```r
+sapply(p_grid, function(p) f(1,.01,2,p))
+```
+
+
+
+```
+[1] 0.00000 0.07772 0.00000 0.00000 0.00000
+```
+
+
+
+```r
+sapply(p_grid, function(p) f(1,.99,2,p))
+```
+
+
+
+```
+[1] 0.0000 0.0000 0.0000 0.0000 0.4918
 ```
 
 
@@ -146,7 +188,7 @@ dp_optim <- function(M, x_grid, h_grid, OptTime, xT, profit,
     expand.grid(profit(x_grid, h_i), p_grid)[[1]]
 
   # give a fixed reward for having value larger than xT at the end. 
-  V[1+(x_grid-1)*length(p_grid) >= xT] <- reward # a "scrap value" for x(T) >= xT
+  V[sapply(x_grid[x_grid>xT], function(x) indices_fixed_x(x))] <- reward
 
   # loop through time  
   for(time in 1:OptTime){ 
@@ -173,20 +215,6 @@ dp_optim <- function(M, x_grid, h_grid, OptTime, xT, profit,
 }
 ```
 
-
-
-
-
-Define some utilities to handle the combined state-space/belief-space, `(x,p)`. 
-
-
-```r
-nx <- length(x_grid)
-np <- length(p_grid)
-indices_fixed_x <- function(x) (1:np-1)*nx + x
-indices_fixed_p <- function(p) (p-1)*nx + 1:nx
-extract_policy <- function(D, p_i, nx, np) D[(p_i-1)*nx + 1:nx,]
-```
 
 
 
@@ -220,7 +248,7 @@ active <- dp_optim(M, x_grid, h_grid, T, xT=0, profit, delta, reward, p_grid=p_g
 
 
 
-Let's make sure the matrix is working correctly.  Transitions from 1 to 2 should be going to the far right bins, representing model 1, while those from 1 to 10 should go to the far left, representing no faith in model 1.  
+Let's make sure the matrix is working correctly.  Transitions from 1 to 2 should be going to the far right bins, representing model 1, while those from 1 to 10 should go to the far left, representing no faith in model 1. 
 
 
 ```r
@@ -230,12 +258,12 @@ M[[1]][indices_fixed_x(1), indices_fixed_x(2)]
 
 
 ```
-     [,1] [,2] [,3] [,4]   [,5]
-[1,]    0    0    0    0 0.2272
-[2,]    0    0    0    0 0.2272
-[3,]    0    0    0    0 0.2272
-[4,]    0    0    0    0 0.2272
-[5,]    0    0    0    0 0.2272
+     [,1]    [,2] [,3]   [,4]   [,5]
+[1,]    0 0.07836    0 0.0000 0.0000
+[2,]    0 0.00000    0 0.1999 0.0000
+[3,]    0 0.00000    0 0.0000 0.3468
+[4,]    0 0.00000    0 0.0000 0.5277
+[5,]    0 0.00000    0 0.0000 0.7562
 ```
 
 
@@ -248,11 +276,11 @@ M[[1]][indices_fixed_x(1), indices_fixed_x(10)]
 
 ```
           [,1] [,2] [,3] [,4] [,5]
-[1,] 1.231e-17    0    0    0    0
-[2,] 1.231e-17    0    0    0    0
-[3,] 1.231e-17    0    0    0    0
-[4,] 1.231e-17    0    0    0    0
-[5,] 1.231e-17    0    0    0    0
+[1,] 1.219e-08    0    0    0    0
+[2,] 1.004e-08    0    0    0    0
+[3,] 7.439e-09    0    0    0    0
+[4,] 4.234e-09    0    0    0    0
+[5,] 1.878e-10    0    0    0    0
 ```
 
 
@@ -262,35 +290,35 @@ How about at higher harvest levels?
 
 
 ```r
-M[[4]][indices_fixed_x(1), indices_fixed_x(2)]
+M[[4]][indices_fixed_x(5), indices_fixed_x(6)]
 ```
 
 
 
 ```
-     [,1] [,2] [,3] [,4] [,5]
-[1,]    0    0    0    0    0
-[2,]    0    0    0    0    0
-[3,]    0    0    0    0    0
-[4,]    0    0    0    0    0
-[5,]    0    0    0    0    0
+       [,1]    [,2] [,3]     [,4] [,5]
+[1,] 0.2896 0.00000    0 0.000000    0
+[2,] 0.2184 0.00000    0 0.000000    0
+[3,] 0.0000 0.14756    0 0.000000    0
+[4,] 0.0000 0.07719    0 0.000000    0
+[5,] 0.0000 0.00000    0 0.007264    0
 ```
 
 
 
 ```r
-M[[4]][indices_fixed_x(1), indices_fixed_x(10)]
+M[[4]][indices_fixed_x(5), indices_fixed_x(10)]
 ```
 
 
 
 ```
-     [,1] [,2] [,3] [,4] [,5]
-[1,]    0    0    0    0    0
-[2,]    0    0    0    0    0
-[3,]    0    0    0    0    0
-[4,]    0    0    0    0    0
-[5,]    0    0    0    0    0
+          [,1] [,2] [,3] [,4] [,5]
+[1,] 0.0255697    0    0    0    0
+[2,] 0.0191809    0    0    0    0
+[3,] 0.0128325    0    0    0    0
+[4,] 0.0065240    0    0    0    0
+[5,] 0.0002551    0    0    0    0
 ```
 
 
@@ -323,16 +351,15 @@ static$D
 ```
       [,1] [,2] [,3] [,4] [,5]
  [1,]    1    1    1    1    1
- [2,]    3    3    3    3    1
- [3,]    4    4    4    4    1
- [4,]    5    5    5    5    5
- [5,]    6    6    6    6    6
- [6,]    7    7    7    7    7
- [7,]    8    8    8    8    8
- [8,]    9    9    9    9    9
- [9,]   10   10   10   10   10
-[10,]   11   11   11   11   11
-[11,]   11    8   11    7   11
+ [2,]    1    1    1    1    1
+ [3,]    1    1    1    1    4
+ [4,]    1    1    1    1    5
+ [5,]    1    1    1    1    6
+ [6,]    2    2    2    2    7
+ [7,]    3    3    3    3    8
+ [8,]    4    4    4    4    9
+ [9,]    5    5    5    5   10
+[10,]    6    6    6    6   10
 ```
 
 
@@ -350,16 +377,15 @@ extract_policy(active$D, length(p_grid), length(x_grid), length(p_grid))
 ```
       [,1] [,2] [,3] [,4] [,5]
  [1,]    1    1    1    1    1
- [2,]    3    3    3    3    1
- [3,]    4    4    4    4    1
- [4,]    5    5    5    5    5
- [5,]    6    6    6    6    6
- [6,]    7    7    7    7    7
- [7,]    8    8    8    8    8
- [8,]    9    9    9    9    9
- [9,]   10   10   10   10   10
-[10,]   11   11   11   11   11
-[11,]   11    8   11    7   11
+ [2,]    1    1    1    1    1
+ [3,]    1    1    1    1    3
+ [4,]    1    1    1    1    4
+ [5,]    1    1    1    1    5
+ [6,]    2    2    2    1    6
+ [7,]    3    3    3    2    7
+ [8,]    4    4    4    4    8
+ [9,]    5    5    5    5    9
+[10,]    6    6    6    6   10
 ```
 
 
@@ -373,19 +399,17 @@ extract_policy(active$D, 1, length(x_grid), length(p_grid))
 ```
       [,1] [,2] [,3] [,4] [,5]
  [1,]    1    1    1    1    1
- [2,]    3    3    3    3    1
- [3,]    4    4    4    4    1
- [4,]    5    5    5    5    5
- [5,]    6    6    6    6    6
- [6,]    7    7    7    7    7
- [7,]    8    8    8    8    8
- [8,]    9    9    9    9    9
- [9,]   10   10   10   10   10
-[10,]   11   11   11   11   11
-[11,]   11    8   11    7   11
+ [2,]    1    1    1    1    1
+ [3,]    1    1    1    1    3
+ [4,]    2    2    2    2    4
+ [5,]    3    3    3    3    5
+ [6,]    4    4    4    4    6
+ [7,]    5    5    5    5    7
+ [8,]    6    6    6    6    8
+ [9,]    7    7    7    7    9
+[10,]    8    8    8    8   10
 ```
+Fanstastic, these are different!
 
 
-
-Hmm, something is up. 
 
