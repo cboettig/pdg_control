@@ -46,7 +46,7 @@ bevholt <- function(x, h, p) max(p[1] * (x - h) / (1 - p[2] * (x - h)), 0)
 myers  <- function(x, h, p) max(p[1] * (x - h) ^ 2 / (1 - (x - h) ^ 2 / p[2]), 0)
 #f1 <- setmodel(myers, c(1.5, 10))
 f1 <- setmodel(bevholt, c(1.5, 0.05))
-f2 <- setmodel(bevholt, c(4, 0.05))
+f2 <- setmodel(bevholt, c(1.6, 0.05))
 
 M <- model_uncertainty(f1, f2, x_grid, p_grid, h_grid)
 active <- dp_optim(M, x_grid, h_grid, T, xT=0, profit, delta, reward, p_grid=p_grid) 
@@ -66,13 +66,13 @@ require(ggplot2)
 ggplot(sim) + geom_line(aes(time, fishstock)) + geom_line(aes(time, harvest), col="green") 
 ```
 
-![plot of chunk activeplots](http://farm8.staticflickr.com/7067/7018496791_a1c4687b3d_o.png) 
+![plot of chunk activeplots](http://farm8.staticflickr.com/7259/7018620247_384719f40d_o.png) 
 
 ```r
 ggplot(sim) + geom_line(aes(time, belief)) 
 ```
 
-![plot of chunk activeplots](http://farm8.staticflickr.com/7037/6872389354_47c5d1eeb8_o.png) 
+![plot of chunk activeplots](http://farm8.staticflickr.com/7082/6872513372_5b5479eca1_o.png) 
 
 
 

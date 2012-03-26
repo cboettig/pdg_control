@@ -42,7 +42,7 @@ bevholt <- function(x, h, p) max(p[1] * (x - h) / (1 - p[2] * (x - h)), 0)
 myers  <- function(x, h, p) max(p[1] * (x - h) ^ 2 / (1 - (x - h) ^ 2 / p[2]), 0)
 #f1 <- setmodel(myers, c(1.5, 10))
 f1 <- setmodel(bevholt, c(1.5, 0.05))
-f2 <- setmodel(bevholt, c(4, 0.05))
+f2 <- setmodel(bevholt, c(1.6, 0.05))
 
 M <- model_uncertainty(f1, f2, x_grid, p_grid, h_grid)
 active <- dp_optim(M, x_grid, h_grid, T, xT=0, profit, delta, reward, p_grid=p_grid) 
@@ -57,6 +57,17 @@ require(ggplot2)
 ggplot(sim) + geom_line(aes(time, fishstock)) + geom_line(aes(time, harvest), col="green") 
 ggplot(sim) + geom_line(aes(time, belief)) 
 end.rcode-->
+
+
+<!--begin.rcode activeplots
+sim <- active_adaptive_simulate(BevHolt, pars, x_grid, h_grid, p_grid, 
+                                K, p_grid[3], active$D,
+                                z_g, update_belief(f1,f2))
+require(ggplot2)
+ggplot(sim) + geom_line(aes(time, fishstock)) + geom_line(aes(time, harvest), col="green") 
+ggplot(sim) + geom_line(aes(time, belief)) 
+end.rcode-->
+
 
 
 
