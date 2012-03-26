@@ -40,18 +40,18 @@ Active Adaptive Mangement solution
 <!--begin.rcode active
 bevholt <- function(x, h, p) max(p[1] * (x - h) / (1 - p[2] * (x - h)), 0)
 myers  <- function(x, h, p) max(p[1] * (x - h) ^ 2 / (1 - (x - h) ^ 2 / p[2]), 0)
-#f1 <- setmodel(myers, c(1.1, 10))
-f1 <- setmodel(bevholt, c(1.5, 0.05))
-f2 <- setmodel(bevholt, c(1.6, 0.05))
+f1 <- setmodel(myers, c(1.1, 10))
+f2 <- setmodel(bevholt, c(1.5, 0.05))
+#f2 <- setmodel(bevholt, c(1.6, 0.05))
 
 M <- model_uncertainty(f1, f2, x_grid, p_grid, h_grid)
 active <- dp_optim(M, x_grid, h_grid, T, xT=0, profit, delta, reward, p_grid=p_grid) 
 end.rcode-->
 
-
+Begin with minimal belief in the true model. 
 <!--begin.rcode activeplots
 sims <- lapply(1:100, function(i){
-  active_adaptive_simulate(BevHolt, pars, x_grid, h_grid, p_grid, 
+  active_adaptive_simulate(Myers, c(1.1, 2, 10), x_grid, h_grid, p_grid, 
                                 K, p_grid[1], active$D,
                                 z_g, update_belief(f1,f2))
 })

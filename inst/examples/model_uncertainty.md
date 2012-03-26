@@ -44,9 +44,9 @@ Active Adaptive Mangement solution
 ```r
 bevholt <- function(x, h, p) max(p[1] * (x - h) / (1 - p[2] * (x - h)), 0)
 myers  <- function(x, h, p) max(p[1] * (x - h) ^ 2 / (1 - (x - h) ^ 2 / p[2]), 0)
-#f1 <- setmodel(myers, c(1.1, 10))
-f1 <- setmodel(bevholt, c(1.5, 0.05))
-f2 <- setmodel(bevholt, c(1.6, 0.05))
+f1 <- setmodel(myers, c(1.1, 10))
+f2 <- setmodel(bevholt, c(1.5, 0.05))
+#f2 <- setmodel(bevholt, c(1.6, 0.05))
 
 M <- model_uncertainty(f1, f2, x_grid, p_grid, h_grid)
 active <- dp_optim(M, x_grid, h_grid, T, xT=0, profit, delta, reward, p_grid=p_grid) 
@@ -55,12 +55,12 @@ active <- dp_optim(M, x_grid, h_grid, T, xT=0, profit, delta, reward, p_grid=p_g
 
 
 
-
+Begin with minimal belief in the true model. 
 
 
 ```r
 sims <- lapply(1:100, function(i){
-  active_adaptive_simulate(BevHolt, pars, x_grid, h_grid, p_grid, 
+  active_adaptive_simulate(Myers, c(1.1, 2, 10), x_grid, h_grid, p_grid, 
                                 K, p_grid[1], active$D,
                                 z_g, update_belief(f1,f2))
 })
@@ -74,20 +74,20 @@ ggplot(subset(dat,reps==1)) +
   geom_line(aes(time, belief), col="darkred")
 ```
 
-![plot of chunk activeplots](http://farm7.staticflickr.com/6118/7018812821_1a13ee7380_o.png) 
+![plot of chunk activeplots](http://farm8.staticflickr.com/7081/6872719126_d1df0ffd66_o.png) 
 
 ```r
 
 ggplot(dat) + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk activeplots](http://farm7.staticflickr.com/6119/7018813153_eb76e63ef2_o.png) 
+![plot of chunk activeplots](http://farm7.staticflickr.com/6031/7018825817_43381759c6_o.png) 
 
 ```r
 ggplot(dat) + geom_line(aes(time, belief, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk activeplots](http://farm7.staticflickr.com/6109/7018813563_d8ca8eb756_o.png) 
+![plot of chunk activeplots](http://farm8.staticflickr.com/7040/7018826047_263177a66f_o.png) 
 
 
 
