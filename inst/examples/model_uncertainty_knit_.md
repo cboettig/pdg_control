@@ -14,23 +14,24 @@ end.rcode-->
 System setup 
 <!--begin.rcode pars
 require(pdgControl)
-p_grid = seq(0.01,.99, length=5) 
-x_grid = seq(.01,2.5,length=15) 
-sigma_g = 0.2
-h_grid <- seq(0, 2, length=11)
 T <- 15
 xT <- 0
+reward <- 0
 z_g <- function() rlnorm(1,  0, sigma_g) 
 profit <- profit_harvest(price = 10, c0 = 1) 
 delta <- 0.05
-reward <- 0
-pars <- c(1.5, 0.25)
-K <- (pars[1]-1)/pars[2]
+sigma_g = 0.05
+m_pars <- c(1.5, 5)
+K <-  .5 * (m_pars[1] * m_pars[2] + sqrt((m_pars[1] * m_pars[2]) ^ 2 - 4 * m_pars[2])) 
+pars <- c(1.5, (1.5-1)/K)
+p_grid = seq(0.01,.99, length=5) 
+x_grid = seq(.01,K,length=15) 
+h_grid <- seq(0, K, length=11)
 end.rcode-->
 
 BevHolt Static solution
 <!--begin.rcode static2
-sdp <- determine_SDP_matrix(BevHolt, pars, x_grid, h_grid, .2)
+sdp <- determine_SDP_matrix(BevHolt, pars, x_grid, h_grid, sigma_g)
 static <- find_dp_optim(sdp, x_grid, h_grid, T, xT=0, profit, delta, reward)
 static_sim <- ForwardSimulate(BevHolt, pars, x_grid, h_grid, 
                               K, static$D, z_g)
@@ -39,13 +40,23 @@ static_sim
 end.rcode-->
 
 
+Myers Static solution
+<!--begin.rcode static
+sdp <- determine_SDP_matrix(Myers, c(m_pars[1], 2, m_pars[2]), x_grid, h_grid, sigma_g)
+static <- find_dp_optim(sdp, x_grid, h_grid, T, xT=0, profit, delta, reward)
+static_sim <- ForwardSimulate(Myers,  c(m_pars[1], 2, m_pars[2]), x_grid, h_grid, 
+                              K, static$D, z_g)
+static$D
+static_sim
+end.rcode-->
+
 
 
 Active Adaptive Mangement solution
 <!--begin.rcode active
 bevholt <- function(x, h, p) max(p[1] * (x - h) / (1 - p[2] * (x - h)), 0)
 myers  <- function(x, h, p) max(p[1] * (x - h) ^ 2 / (1 + (x - h) ^ 2 / p[2]), 0)
-f1 <- setmodel(myers, c(1.1, 2))
+f1 <- setmodel(myers, m_pars)
 f2 <- setmodel(bevholt, pars)
 
 M <- model_uncertainty(f1, f2, x_grid, p_grid, h_grid)
@@ -55,7 +66,7 @@ end.rcode-->
 
 <!--begin.rcode activeplots
 sims <- lapply(1:100, function(i){
-  active_adaptive_simulate(Myers, c(1.1, 2, 2), x_grid, h_grid, p_grid, 
+  active_adaptive_simulate(Myers, c(m_pars[1], 2, m_pars[2]), x_grid, h_grid, p_grid, 
                                 K, p_grid[1], active$D,
                                 z_g, update_belief(f1,f2))
 })
@@ -72,14 +83,4 @@ ggplot(dat) + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ggplot(dat) + geom_line(aes(time, belief, group = reps), alpha = 0.2)
 end.rcode-->
 
-
-Myers Static solution
-<!--begin.rcode static
-sdp <- determine_SDP_matrix(Myers, c(1.1, 2, 10), x_grid, h_grid, .2)
-static <- find_dp_optim(sdp, x_grid, h_grid, T, xT=0, profit, delta, reward)
-static_sim <- ForwardSimulate(Myers, c(1.1,2,10), x_grid, h_grid, 
-                              K, static$D, z_g)
-static$D
-static_sim
-end.rcode-->
 
