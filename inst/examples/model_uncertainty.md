@@ -75,21 +75,21 @@ static_sim
 
 ```
    time fishstock harvest unharvested escapement
-1     1   10.0000       6      10.000     4.0000
-2     2    8.0121       3      11.836     5.0121
-3     3    5.3367       0       6.964     5.3367
-4     4    8.2498       3       9.241     5.2498
-5     5    7.5536       3       9.215     4.5536
-6     6    6.8976       2       9.147     4.8976
-7     7    6.3917       1       8.090     5.3917
-8     8    5.5196       1       6.435     4.5196
-9     9    8.9194       5      10.702     3.9194
-10   10    5.8773       1       8.924     4.8773
-11   11    8.8304       5      11.143     3.8304
-12   12    5.7452       1       8.941     4.7452
-13   13    5.1690       0       6.635     5.1690
-14   14    4.3829       4       4.908     0.3829
-15   15    0.1168       0       5.715     0.0000
+1     1    10.000       6      10.000     4.0000
+2     2     8.413       3      12.428     5.4126
+3     3     8.342       3      10.509     5.3416
+4     4     8.526       5      10.558     3.5256
+5     5     6.405       1      10.607     5.4054
+6     6     6.387       1       7.874     5.3875
+7     7     7.415       2       8.585     5.4153
+8     8     7.455       2       8.802     5.4545
+9     9     7.126       2       8.433     5.1265
+10   10     6.932       2       8.390     4.9317
+11   11     7.483       2       9.247     5.4835
+12   12     4.110       0       4.904     4.1103
+13   13     8.388       3       9.431     5.3878
+14   14    10.965      10      13.253     0.9655
+15   15     1.107       0      12.281     0.0000
 ```
 
 
@@ -113,11 +113,13 @@ active <- dp_optim(M, x_grid, h_grid, T, xT=0, profit, delta, reward, p_grid=p_g
 
 
 
+What if we begin with great doubts about the allee model:
+
 
 ```r
 sims <- lapply(1:100, function(i){
   active_adaptive_simulate(Myers, c(1.1, 2, 10), x_grid, h_grid, p_grid, 
-                                K, p_grid[4], active$D,
+                                K, p_grid[1], active$D,
                                 z_g, update_belief(f1,f2))
 })
 require(reshape2)
@@ -130,20 +132,20 @@ ggplot(subset(dat,reps==1)) +
   geom_line(aes(time, belief), col="darkred")
 ```
 
-![plot of chunk activeplots](http://farm8.staticflickr.com/7243/6872765734_40fbbda7dd_o.png) 
+![plot of chunk activeplots](http://farm7.staticflickr.com/6092/6872772156_8d0ff58560_o.png) 
 
 ```r
 
 ggplot(dat) + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk activeplots](http://farm7.staticflickr.com/6114/6872766082_bcac37cbff_o.png) 
+![plot of chunk activeplots](http://farm8.staticflickr.com/7224/6872772468_f3798d7262_o.png) 
 
 ```r
 ggplot(dat) + geom_line(aes(time, belief, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk activeplots](http://farm7.staticflickr.com/6045/6872766372_13d87b7db4_o.png) 
+![plot of chunk activeplots](http://farm7.staticflickr.com/6111/7018879281_b2bc4ea6a2_o.png) 
 
 
 
@@ -197,21 +199,21 @@ static_sim
 
 ```
    time fishstock harvest unharvested escapement
-1     1    10.000       6      10.000     4.0000
-2     2     6.721       2       9.928     4.7208
-3     3     8.805       5      11.581     3.8050
-4     4     5.249       0       8.259     5.2495
-5     5     4.885       0       5.806     4.8848
-6     6     6.386       1       6.989     5.3856
-7     7     5.849       1       6.529     4.8494
-8     8    10.189       6      11.762     4.1885
-9     9     5.437       0       7.961     5.4370
-10   10     7.503       3       8.673     4.5034
-11   11     8.661       5      11.414     3.6609
-12   12     6.533       2      10.595     4.5333
-13   13     7.128       2       9.730     5.1284
-14   14     8.117       9      10.133    -0.8832
-15   15     0.000       0      15.811     0.0000
+1     1    10.000       6      10.000      4.000
+2     2     5.680       1       8.390      4.680
+3     3     6.334       1       8.079      5.334
+4     4     7.011       2       8.216      5.011
+5     5    10.374       6      12.634      4.374
+6     6     7.957       3      11.402      4.957
+7     7     6.607       2       8.633      4.607
+8     8    11.262       6      14.608      5.262
+9     9     6.597       2       8.577      4.597
+10   10     6.275       1       8.138      5.275
+11   11     6.943       2       8.200      4.943
+12   12     6.403       1       7.856      5.403
+13   13     8.490       3       9.809      5.490
+14   14     7.567       9       9.129     -1.433
+15   15     0.000       0       8.970      0.000
 ```
 
 
