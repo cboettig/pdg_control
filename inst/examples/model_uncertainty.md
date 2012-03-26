@@ -60,7 +60,7 @@ active <- dp_optim(M, x_grid, h_grid, T, xT=0, profit, delta, reward, p_grid=p_g
 
 ```r
 sims <- lapply(1:100, function(i){
-  active_adaptive_simulate(BevHolt, c(1.5,10), x_grid, h_grid, p_grid, 
+  active_adaptive_simulate(BevHolt, pars, x_grid, h_grid, p_grid, 
                                 K, p_grid[1], active$D,
                                 z_g, update_belief(f1,f2))
 })
@@ -74,20 +74,20 @@ ggplot(subset(dat,reps==1)) +
   geom_line(aes(time, belief), col="darkred")
 ```
 
-![plot of chunk activeplots](http://farm7.staticflickr.com/6093/6872697396_304a460c21_o.png) 
+![plot of chunk activeplots](http://farm7.staticflickr.com/6118/7018812821_1a13ee7380_o.png) 
 
 ```r
 
 ggplot(dat) + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk activeplots](http://farm8.staticflickr.com/7137/6872697752_11f5a26f7f_o.png) 
+![plot of chunk activeplots](http://farm7.staticflickr.com/6119/7018813153_eb76e63ef2_o.png) 
 
 ```r
 ggplot(dat) + geom_line(aes(time, belief, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk activeplots](http://farm8.staticflickr.com/7276/7018804187_e153b4e053_o.png) 
+![plot of chunk activeplots](http://farm7.staticflickr.com/6109/7018813563_d8ca8eb756_o.png) 
 
 
 

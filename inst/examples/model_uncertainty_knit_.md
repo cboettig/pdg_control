@@ -51,7 +51,7 @@ end.rcode-->
 
 <!--begin.rcode activeplots
 sims <- lapply(1:100, function(i){
-  active_adaptive_simulate(BevHolt, c(1.5,10), x_grid, h_grid, p_grid, 
+  active_adaptive_simulate(BevHolt, pars, x_grid, h_grid, p_grid, 
                                 K, p_grid[1], active$D,
                                 z_g, update_belief(f1,f2))
 })
