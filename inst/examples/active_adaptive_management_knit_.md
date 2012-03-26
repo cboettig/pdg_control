@@ -246,7 +246,7 @@ active_adaptive_simulate <- function(f, pars, x_grid, h_grid, p_grid, x0,
     x_h[t+1] <- z * f(x_h[t], h[t], pars) # with havest
     s[t]     <- x_h[t] - h[t] # anticipated escapement
     x[t+1]   <- z * f(x[t], 0, pars) # havest-free dynamics
-    p[t+1]   <- update_belief(x[t+1], p[t], x[t]) 
+    p[t+1]   <- update_belief(x[t], p[t], x[t+1]) 
   }
   # formats output 
   data.frame(time = 1:OptTime, fishstock = x_h, harvest = h,

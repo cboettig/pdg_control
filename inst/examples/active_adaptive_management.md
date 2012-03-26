@@ -460,7 +460,7 @@ active_adaptive_simulate <- function(f, pars, x_grid, h_grid, p_grid, x0,
     x_h[t+1] <- z * f(x_h[t], h[t], pars) # with havest
     s[t]     <- x_h[t] - h[t] # anticipated escapement
     x[t+1]   <- z * f(x[t], 0, pars) # havest-free dynamics
-    p[t+1]   <- update_belief(x[t+1], p[t], x[t]) 
+    p[t+1]   <- update_belief(x[t], p[t], x[t+1]) 
   }
   # formats output 
   data.frame(time = 1:OptTime, fishstock = x_h, harvest = h,
@@ -481,12 +481,12 @@ require(ggplot2)
 ggplot(sim) + geom_line(aes(time, fishstock)) + geom_line(aes(time, harvest), col="green") 
 ```
 
-![plot of chunk unnamed-chunk-5](http://farm8.staticflickr.com/7209/6870442654_47e6fd987b_n.jpg) 
+![plot of chunk unnamed-chunk-5](http://farm8.staticflickr.com/7133/6870486764_583c6e8b84_n.jpg) 
 
 ```r
 ggplot(sim) + geom_line(aes(time, belief)) 
 ```
 
-![plot of chunk unnamed-chunk-5](http://farm8.staticflickr.com/7217/7016551421_150373a9fa_n.jpg) 
+![plot of chunk unnamed-chunk-5](http://farm8.staticflickr.com/7202/6870486890_b32b7b23f9_n.jpg) 
 
 
