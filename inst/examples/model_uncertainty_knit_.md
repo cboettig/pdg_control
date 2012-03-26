@@ -15,7 +15,7 @@ System setup
 <!--begin.rcode pars
 require(pdgControl)
 p_grid = seq(0.01,.99, length=5) 
-x_grid = seq(1,10,length=10) 
+x_grid = seq(.01,10,length=11) 
 sigma_g = 0.2
 h_grid <- seq(0, 10, length=11)
 T <- 15
@@ -40,7 +40,7 @@ Active Adaptive Mangement solution
 <!--begin.rcode active
 bevholt <- function(x, h, p) max(p[1] * (x - h) / (1 - p[2] * (x - h)), 0)
 myers  <- function(x, h, p) max(p[1] * (x - h) ^ 2 / (1 - (x - h) ^ 2 / p[2]), 0)
-#f1 <- setmodel(myers, c(1.5, 10))
+#f1 <- setmodel(myers, c(1.1, 10))
 f1 <- setmodel(bevholt, c(1.5, 0.05))
 f2 <- setmodel(bevholt, c(1.6, 0.05))
 
@@ -50,24 +50,22 @@ end.rcode-->
 
 
 <!--begin.rcode activeplots
-sim <- active_adaptive_simulate(BevHolt, pars, x_grid, h_grid, p_grid, 
+sims <- lapply(1:100, function(i){
+  active_adaptive_simulate(BevHolt, c(1.5,10), x_grid, h_grid, p_grid, 
                                 K, p_grid[1], active$D,
                                 z_g, update_belief(f1,f2))
+})
+require(reshape2)
+dat <- melt(sims, id=names(sims[[1]])) 
+names(dat)[7] <- "reps"
 require(ggplot2)
-ggplot(sim) + geom_line(aes(time, fishstock)) + geom_line(aes(time, harvest), col="green") 
-ggplot(sim) + geom_line(aes(time, belief)) 
+ggplot(subset(dat,reps==1)) +
+  geom_line(aes(time, fishstock)) +
+  geom_line(aes(time, harvest), col="darkgreen") +  
+  geom_line(aes(time, belief), col="darkred")
+
+ggplot(dat) + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
+ggplot(dat) + geom_line(aes(time, belief, group = reps), alpha = 0.2)
 end.rcode-->
-
-
-<!--begin.rcode activeplots
-sim <- active_adaptive_simulate(BevHolt, pars, x_grid, h_grid, p_grid, 
-                                K, p_grid[3], active$D,
-                                z_g, update_belief(f1,f2))
-require(ggplot2)
-ggplot(sim) + geom_line(aes(time, fishstock)) + geom_line(aes(time, harvest), col="green") 
-ggplot(sim) + geom_line(aes(time, belief)) 
-end.rcode-->
-
-
 
 

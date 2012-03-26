@@ -79,8 +79,8 @@ BevHolt_effort <- function(x, h, p){
 #' 
 #'   Consider updating to be a function of x-h, instead?
 #' @export
-Myer <- function(x, h, p){
-   max(0, p[1] * x ^ p[2] / (1 + x ^ p[2] / p[3])  - h * x)
+Myers <- function(x, h, p){
+   sapply(x, function(x) max(0, p[1] * x ^ p[2] / (1 + x ^ p[2] / p[3])  - h * x))
 }
 
 #' Discrete-time model with an allee effect for alpha > 1 with harvest control
@@ -95,7 +95,7 @@ Myer <- function(x, h, p){
 #'   x = p[1] * p[3] / 2 - sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2 
 #' @export
 Myer_harvest <- function(x, h, p){
-   max(0, p[1] * x ^ p[2] / (1 + x ^ p[2] / p[3])  - h)
+   sapply(x, function(x) max(0, p[1] * x ^ p[2] / (1 + x ^ p[2] / p[3])  - h))
 }
 
 
@@ -110,8 +110,10 @@ Myer_harvest <- function(x, h, p){
 #' @return the population level in the next timestep
 #' @export
 RickerAllee <- function(x, h, p){
+  sapply(x, function(x){ 
     x <- max(0,x-h)
     x * exp(p[1] * (1 - x / p[2]) * (x - p[3]) / p[2] ) 
+  })
 }
 
 
@@ -122,8 +124,10 @@ RickerAllee <- function(x, h, p){
 #' @return the population level in the next timestep
 #' @export
 Ricker <- function(x,h,p){
-  x <- max(0, x-h) 
-  max(0, x * exp(p[1] * (1 - x / p[2] )) )
+  sapply(x, function(x){ 
+    x <- max(0, x-h) 
+    max(0, x * exp(p[1] * (1 - x / p[2] )) )
+  })
 }
 
 
