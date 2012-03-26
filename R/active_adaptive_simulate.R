@@ -64,7 +64,9 @@ model_uncertainty <- function(f1, f2, x_grid, p_grid, h_grid){
 #' @export
 dp_optim <- function(M, x_grid, h_grid, OptTime, xT, profit, 
                           delta, reward=0, p_grid){
-  gridsize <- length(x_grid) * length(p_grid)
+  nx <- length(x_grid)
+  np <- length(p_grid)
+  gridsize <- np * nx 
   HL <- length(h_grid)
   D <- matrix(NA, nrow=gridsize, ncol=OptTime)
   V <- rep(0,gridsize) # initialize BC,
@@ -73,6 +75,7 @@ dp_optim <- function(M, x_grid, h_grid, OptTime, xT, profit,
     expand.grid(profit(x_grid, h_i), p_grid)[[1]]
 
   # give a fixed reward for having value larger than xT at the end. 
+  indices_fixed_x <- function(x) (1:np-1)*nx + x
   V[sapply(x_grid[x_grid>xT], function(x) indices_fixed_x(x))] <- reward
 
   # loop through time  

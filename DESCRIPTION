@@ -20,3 +20,4 @@ Collate:
     'find_dp_optim.R'
     'policy_costs.R'
     'profit_functions.R'
+    'active_adaptive_simulate.R'
