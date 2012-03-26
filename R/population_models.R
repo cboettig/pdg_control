@@ -67,10 +67,7 @@ BevHolt_effort <- function(x, h, p){
 #' @param h harvest effort
 #' @param p vector of parameters c(r, alpha, K) 
 #' @return the population level in the next timestep
-#' @details A Beverton-Holt style model with Allee effect.
-#'   note that as written, h is fishing EFFORT, not harvest.
-#'   Effort above a certain value introduces a fold bifurcation. 
-#'   Unharvested carrying capacity is:
+#' @details Unharvested carrying capacity is:
 #'   K <- p[1] * p[3] / 2 + sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2
 #'   The (unharvested) allee theshold is given by:
 #'   x = p[1] * p[3] / 2 - sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2 
@@ -80,7 +77,10 @@ BevHolt_effort <- function(x, h, p){
 #'   Consider updating to be a function of x-h, instead?
 #' @export
 Myers <- function(x, h, p){
-   sapply(x, function(x) max(0, p[1] * x ^ p[2] / (1 + x ^ p[2] / p[3])  - h * x))
+ sapply(x, function(x){
+   x <- max(0, x - h) 
+  max(0, p[1] * x ^ p[2] / (1 + x ^ p[2] / p[3]) )
+ })
 }
 
 #' Discrete-time model with an allee effect for alpha > 1 with harvest control

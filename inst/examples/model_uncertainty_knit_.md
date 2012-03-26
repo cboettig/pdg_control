@@ -34,12 +34,14 @@ sdp <- determine_SDP_matrix(BevHolt, pars, x_grid, h_grid, .2)
 static <- find_dp_optim(sdp, x_grid, h_grid, T, xT=0, profit, delta, reward)
 static_sim <- ForwardSimulate(BevHolt, pars, x_grid, h_grid, 
                               K, static$D, z_g)
+static$D
+static_sim
 end.rcode-->
 
 Active Adaptive Mangement solution
 <!--begin.rcode active
 bevholt <- function(x, h, p) max(p[1] * (x - h) / (1 - p[2] * (x - h)), 0)
-myers  <- function(x, h, p) max(p[1] * (x - h) ^ 2 / (1 - (x - h) ^ 2 / p[2]), 0)
+myers  <- function(x, h, p) max(p[1] * (x - h) ^ 2 / (1 + (x - h) ^ 2 / p[2]), 0)
 f1 <- setmodel(myers, c(1.1, 10))
 f2 <- setmodel(bevholt, c(1.5, 0.05))
 #f2 <- setmodel(bevholt, c(1.6, 0.05))
@@ -48,11 +50,10 @@ M <- model_uncertainty(f1, f2, x_grid, p_grid, h_grid)
 active <- dp_optim(M, x_grid, h_grid, T, xT=0, profit, delta, reward, p_grid=p_grid) 
 end.rcode-->
 
-Begin with minimal belief in the true model. 
 <!--begin.rcode activeplots
 sims <- lapply(1:100, function(i){
   active_adaptive_simulate(Myers, c(1.1, 2, 10), x_grid, h_grid, p_grid, 
-                                K, p_grid[1], active$D,
+                                K, p_grid[4], active$D,
                                 z_g, update_belief(f1,f2))
 })
 require(reshape2)
@@ -68,4 +69,14 @@ ggplot(dat) + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ggplot(dat) + geom_line(aes(time, belief, group = reps), alpha = 0.2)
 end.rcode-->
 
+
+Myers Static solution
+<!--begin.rcode static
+sdp <- determine_SDP_matrix(Myers, c(1.1, 2, 10), x_grid, h_grid, .2)
+static <- find_dp_optim(sdp, x_grid, h_grid, T, xT=0, profit, delta, reward)
+static_sim <- ForwardSimulate(Myers, c(1.1,2,10), x_grid, h_grid, 
+                              K, static$D, z_g)
+static$D
+static_sim
+end.rcode-->
 
