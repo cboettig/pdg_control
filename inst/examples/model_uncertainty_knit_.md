@@ -50,10 +50,12 @@ M <- model_uncertainty(f1, f2, x_grid, p_grid, h_grid)
 active <- dp_optim(M, x_grid, h_grid, T, xT=0, profit, delta, reward, p_grid=p_grid) 
 end.rcode-->
 
+
+What if we begin with great doubts about the allee model:
 <!--begin.rcode activeplots
 sims <- lapply(1:100, function(i){
   active_adaptive_simulate(Myers, c(1.1, 2, 10), x_grid, h_grid, p_grid, 
-                                K, p_grid[4], active$D,
+                                K, p_grid[1], active$D,
                                 z_g, update_belief(f1,f2))
 })
 require(reshape2)
