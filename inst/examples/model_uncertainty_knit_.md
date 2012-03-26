@@ -24,8 +24,8 @@ z_g <- function() rlnorm(1,  0, sigma_g)
 profit <- profit_harvest(price=10, c0=30) 
 delta <- 0.05
 reward <- 0
-bevholt <- function(x,h, p) p[1] * (x - h) / (1 - p[2] * (x - h))
-myers  <- function(x,h,p) p[1] * (x - h) ^ 2 / (1 - (x - h) ^ 2 / p[2])
+bevholt <- function(x,h, p) max(p[1] * (x - h) / (1 - p[2] * (x - h)), 0)
+myers  <- function(x,h,p) max(p[1] * (x - h) ^ 2 / (1 - (x - h) ^ 2 / p[2]), 0)
 end.rcode-->
 
 Static solution
