@@ -7,6 +7,16 @@ setmodel <- function(f, pars){
   }
 }
 
+# internal function
+bin <- function(v, v_grid){
+  v_grid[which.min(abs(v_grid - v))]
+#  i = 1
+#  n = length(v_grid)
+#  while(v_grid[i] < v & i < n)
+#    i = i+1
+#  v_grid[i]  
+}
+
 #' @export
 update_belief = function(f1,f2){
   function(x_t0, p_t0, x_t1, p_grid){
@@ -16,11 +26,7 @@ update_belief = function(f1,f2){
     if(is.na(P1) || x_t0 == 0)
       P1 = p_t0
     else{
-      i = 1
-      np = length(p_grid)
-      while(p_grid[i] < P1 & i < np)
-        i = i+1
-      P1 = p_grid[i]  
+      P1 = bin(P1, p_grid)
    }
    P1
   }
@@ -36,13 +42,8 @@ transition = function(p_grid, f1, f2){
     P1 = y1 / (y1 + y2)
     if(is.na(P1) || x_t0 == 0)
       P1 = p_t0
-    else{
-      i = 1
-      np = length(p_grid)
-      while(p_grid[i] < P1 & i < np)
-        i = i+1
-      P1 = p_grid[i]  
-   }
+    else
+      P1 = bin(P1, p_grid)
    (y1+y2) * ( p_t1 == P1)
   }
 }
@@ -134,12 +135,15 @@ active_adaptive_simulate <- function(f, pars, x_grid, h_grid, p_grid, x0,
   x <- x_h                # What would happen with no havest
   nx <- length(x_grid)
   np <- length(p_grid)
-  getpolicy <- function(p,x, time) D[x + (p-1)*nx, time]
+  getpolicy <- function(p,x, time){ 
+    i_x = which.min(abs(x_grid-x))
+    i_p = which.min(abs(p_grid-p))
+    D[i_x + (i_p-1)*nx, time]
+  }
   ## Simulate through time ##
   for(t in 1:(OptTime-1)){
     # Current state (is closest to which grid posititon) 
-    St <- which.min(abs(x_grid - x_h[t])) 
-    h[t] <- h_grid[getpolicy(p[t], St, t)] 
+    h[t] <- h_grid[getpolicy(p[t], x_h[t], t)] 
     # Implement harvest/(effort) based on quota with noise 
     # Noise in growth 
     z <- z_g() 
@@ -151,7 +155,7 @@ active_adaptive_simulate <- function(f, pars, x_grid, h_grid, p_grid, x0,
   }
   # formats output 
   data.frame(time = 1:OptTime, fishstock = x_h, harvest = h,
-             unharvested = x, escapement = s) 
+             unharvested = x, escapement = s, belief=p) 
 }
 
 
