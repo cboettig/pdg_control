@@ -67,7 +67,7 @@ end.rcode-->
 <!--begin.rcode activeplots
 sims <- lapply(1:100, function(i){
   active_adaptive_simulate(Myers, c(m_pars[1], 2, m_pars[2]), x_grid, h_grid, p_grid, 
-                                K, p_grid[1], active$D,
+                                K, p_grid[5], active$D,
                                 z_g, update_belief(f1,f2))
 })
 require(reshape2)
