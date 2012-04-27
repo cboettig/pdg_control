@@ -8,10 +8,6 @@
  * license: CC0
 
  Implements a numerical version of the SDP described in:
- 
-   Sethi, G., Costello, C., Fisher, A., Hanemann, M., and Karp, L. (2005). 
-   Fishery management under multiple uncertainty. Journal of Environmental
-   Economics and Management, 50(2), 300-318. doi:10.1016/j.jeem.2004.11.005
 
    Reed, W.J., 1979. Optimal Escapement Levels in Stochastic
    and Deterministic Harvesting Models. Journal of Environmental 
@@ -39,7 +35,9 @@ reward <- 1       # bonus for satisfying the boundary condition
 
 
 
-we'll use log normal noise functions
+we'll use log normal noise functions. 
+For Reed, only `z_g` will be random.
+Sethi et al will add the other forms
 
 
 ```r
@@ -53,32 +51,14 @@ z_i <- function() rlnorm(1,  0, sigma_i) # mean 1
 
 
 Chose the state equation / population dynamics function
-
-
-```r
-f <- BevHolt                # Select the state equation
-pars <- c(2, 4)             # parameters for the state equation
-K <- (pars[1] - 1)/pars[2]  # Carrying capacity 
-xT <- 0                     # boundary conditions
-control = "harvest"         # control variable is total harvest, h = e * x
-price <- 1
-cost <- .12
-```
-
-
-
-
 And a state equation with an allee effect
 
 
 ```r
-f <- Myer_harvest
-pars <- c(1, 2, 6) 
-p <- pars # shorthand 
-K <- p[1] * p[3] / 2 + sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2
-xT <- p[1] * p[3] / 2 - sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2 # allee threshold
-e_star <- (p[1] * sqrt(p[3]) - 2) / 2 ## Bifurcation point 
-control <- "harvest"          # control variable can be harvest or effort 
+f <- BevHolt
+pars <- c(1.5, 5)
+K <- pars[2]/(1-pars[1])
+xT <- 0
 price <- 1
 cost <- .01
 ```
@@ -102,7 +82,7 @@ and we use a harvest-based profit function with default parameters
 
 
 ```r
-profit <- profit_harvest(p=price, c = cost) 
+profit <- profit_harvest(price=price, c0 = cost) 
 ```
 
 
@@ -134,15 +114,6 @@ SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g )
 
 
 
-
-
-
-```r
-# calculate the transition matrix by simulation, generic to types of noise
-require(snowfall) 
-sfInit(parallel=TRUE, cpu=4)
-SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=999)
-```
 
 
 
@@ -193,6 +164,7 @@ setnames(dt, "L1", "reps") # names are nice
 Let's begin by looking at the dynamics of a single replicate. The line shows Reed's S, the level above which the stock should be harvested (where catch should be the difference between stock and S).  To confirm that this policy is being followed, note that harvesting only occurs when the stock is above this line, and harvest is proportional to the amount by which it is above. 
 
 
+
 ```r
 ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, fishstock)) +
@@ -200,11 +172,12 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest), col="darkgreen") 
 ```
 
-![plot of chunk unnamed-chunk-11](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-unnamed-chunk-112.png) 
+![plot of chunk p0](http://farm9.staticflickr.com/8159/7119500241_e1241d7f8c_o.png) 
 
 
 
 This plot summarizes the stock dynamics by visualizing the replicates. Reed's S shown again, along with the dotted line showing the allee threshold, below which the stock will go to zero (unless rescued stochastically). 
+
 
 
 ```r
@@ -213,7 +186,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk unnamed-chunk-12](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-unnamed-chunk-121.png) 
+![plot of chunk p1](http://farm9.staticflickr.com/8166/6973419732_a1fda3586a_o.png) 
 
 
 We can also look at the harvest dynamics:
@@ -223,17 +196,18 @@ We can also look at the harvest dynamics:
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 ```
 
-![plot of chunk unnamed-chunk-13](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-unnamed-chunk-131.png) 
+![plot of chunk p2](http://farm8.staticflickr.com/7247/6973419936_78d08c4540_o.png) 
 
 
 This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement: 
+
 
 
 ```r
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 ```
 
-![plot of chunk unnamed-chunk-14](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-unnamed-chunk-141.png) 
+![plot of chunk p3](http://farm8.staticflickr.com/7230/6973420146_cf3e503215_o.png) 
 
 
 
@@ -252,57 +226,44 @@ rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
 
 
 
-Let's compute the profits at each time-step for each replicate. 
-Using `data.table` to evaluate our profit function over the stock and harvest levels requires indexing our data:
-
-
-
-```r
-dt <- data.table(dt, id=1:dim(dt)[1])
-profits <- dt[, profit(fishstock, harvest), by=id]
-```
-
-
-
-
-Merging this calculation back into our data table using fast join (needs to define 'id' as a key on which to match things up though). 
-
-
-```r
-setkey(dt, id)
-setkey(profits, id)
-dt <- dt[profits]
-setnames(dt, "V1", "profits")
-setkey(dt, reps)
-```
-
-
-
-
-Compute total profit by summing over each timeseries (including the reward for satisfying the terminal boundary condition, if any). 
-
-
-
-```r
-total_profit <- dt[,sum(profits), by=reps]
-total_profit <- total_profit + rewarded$V1 * reward 
-```
-
-
-
-
 
 Add these three columns to the data.table (fast join and re-label):
 
 
 ```r
-setkey(total_profit, reps)
 setkey(crashed, reps)
 setkey(rewarded, reps)
-dt <- dt[total_profit]
 dt <- dt[crashed]
+```
+
+
+
+```
+Error: When i is a data.table (or character vector), x must be keyed (i.e. sorted, and, marked as sorted) so data.table knows which columns to join to and take advantage of x being sorted. Call setkey(x,...) first, see ?setkey.
+```
+
+
+
+```r
 dt <- dt[rewarded]
-setnames(dt, c("V1", "V1.1", "V1.2"), c("total.profit", "crashed", "rewarded"))
+```
+
+
+
+```
+Error: When i is a data.table (or character vector), x must be keyed (i.e. sorted, and, marked as sorted) so data.table knows which columns to join to and take advantage of x being sorted. Call setkey(x,...) first, see ?setkey.
+```
+
+
+
+```r
+setnames(dt, c("V1.1", "V1.2"), c("crashed", "rewarded"))
+```
+
+
+
+```
+Error: Items of 'old' not found in column names: V1.1,V1.2
 ```
 
 
@@ -316,12 +277,29 @@ Since the optimal strategy maximizes expected profit, it may be more useful to l
 
 ```r
 stats <- dt[ , mean_sdl(profits), by = time]
+```
+
+
+
+```
+Error: object 'profits' not found
+```
+
+
+
+```r
 p1 + geom_line(dat=stats, aes(x=time, y=y), col="lightgrey") + 
   geom_ribbon(aes(x = time, ymin = ymin, ymax = ymax),
               fill = "darkred", alpha = 0.2, dat=stats)
 ```
 
-![plot of chunk unnamed-chunk-20](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-unnamed-chunk-20.png) 
+
+
+```
+Error: object 'stats' not found
+```
+
+
 
 
 
@@ -332,7 +310,13 @@ Total profits
 ggplot(dt, aes(total.profit, fill=crashed)) + geom_histogram(alpha=.8)
 ```
 
-![plot of chunk unnamed-chunk-21](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-unnamed-chunk-21.png) 
+
+
+```
+Error: object 'total.profit' not found
+```
+
+
 
 
 
@@ -350,8 +334,36 @@ quantile_me <- function(x, ...){
   class
 }
 q <- data.table(reps=total_profit$reps, quantile=quantile_me(total_profit$V1))
+```
+
+
+
+```
+Error: object 'total_profit' not found
+```
+
+
+
+```r
 setkey(q, reps)
+```
+
+
+
+```
+Error: x is not a data.table
+```
+
+
+
+```r
 dt <- dt[q]
+```
+
+
+
+```
+Error: i has not evaluated to logical, integer or double
 ```
 
 
@@ -365,7 +377,13 @@ ggplot(subset(dt, quantile %in% c(1,4))) +
   geom_line(aes(time, fishstock, group = reps, color=quantile), alpha = 0.6) 
 ```
 
-![plot of chunk unnamed-chunk-23](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-unnamed-chunk-23.png) 
+
+
+```
+Error: 'match' requires vector arguments
+```
+
+
 
 
 
@@ -373,6 +391,7 @@ ggplot(subset(dt, quantile %in% c(1,4))) +
 Note that when the boundary is sufficiently far away, i.e. for the first couple timesteps, the optimal policy is stationary.  The optimal policy is shown here over time, where the color indicates the harvest recommended for each possible stock value at that time (shown on the vertical axis).  Note that below a certain stock value, harvesting is not recommended and the dots turn red (Reed's constant escapement rule!)  However, at very low values, harvesting starts again (orange dots), because of the allee effect - these populations are doomed anyway, so may as well fish all that remains.
 
 Note that interestingly, populations just below the allee threshold are given the chance to be rescued stochastically early on - that small chance that they recover is worth the expected loss.  The "no-harvest" zones stand out clearly in the red areas of this graph.
+
 
 
 ```r
@@ -387,11 +406,11 @@ p5 <- ggplot(policy_zoom) +
 p5
 ```
 
-![plot of chunk policy](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-policy.png) 
+![plot of chunk policy](http://farm9.staticflickr.com/8005/7119501577_43bda404d9_o.png) 
 
 
-The harvest intensity is limited by the stock size.  If instead we look at the difference between proposed harvest intensity and stock,
-then the red zones correspond to places where harvest equals stock, i.e. we slam the population. The allee band is clearly seen. Just for fun, we overlay the replicate dynamics on this plot 
+The harvest intensity is limited by the stock size.
+
 
 
 
@@ -405,6 +424,6 @@ p6 <- ggplot(policy_zoom) +
 p6 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1, data=dt)
 ```
 
-![plot of chunk policy2](http://www.carlboettiger.info/wp-content/uploads/2012/03/wpid-ex-out-policy2.png) 
+![plot of chunk policy2](http://farm8.staticflickr.com/7084/6973420604_c50feea98b_o.png) 
 
 
