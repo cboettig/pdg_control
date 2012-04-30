@@ -172,7 +172,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest), col="darkgreen") 
 ```
 
-![plot of chunk p0](http://farm9.staticflickr.com/8159/7119500241_e1241d7f8c_o.png) 
+![plot of chunk p0](http://farm8.staticflickr.com/7204/7129795211_8cc3668a7d_o.png) 
 
 
 
@@ -186,7 +186,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk p1](http://farm9.staticflickr.com/8166/6973419732_a1fda3586a_o.png) 
+![plot of chunk p1](http://farm8.staticflickr.com/7105/6983711838_133da125b6_o.png) 
 
 
 We can also look at the harvest dynamics:
@@ -196,7 +196,7 @@ We can also look at the harvest dynamics:
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 ```
 
-![plot of chunk p2](http://farm8.staticflickr.com/7247/6973419936_78d08c4540_o.png) 
+![plot of chunk p2](http://farm8.staticflickr.com/7249/7129797107_f57f0d91fb_o.png) 
 
 
 This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement: 
@@ -207,7 +207,7 @@ This strategy is supposed to be a constant-escapement strategy. We can visualize
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 ```
 
-![plot of chunk p3](http://farm8.staticflickr.com/7230/6973420146_cf3e503215_o.png) 
+![plot of chunk p3](http://farm8.staticflickr.com/7231/6983713058_8bbec5a0c3_o.png) 
 
 
 
@@ -406,7 +406,7 @@ p5 <- ggplot(policy_zoom) +
 p5
 ```
 
-![plot of chunk policy](http://farm9.staticflickr.com/8005/7119501577_43bda404d9_o.png) 
+![plot of chunk policy](http://farm9.staticflickr.com/8001/6983713598_5365d53a48_o.png) 
 
 
 The harvest intensity is limited by the stock size.
@@ -424,6 +424,6 @@ p6 <- ggplot(policy_zoom) +
 p6 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1, data=dt)
 ```
 
-![plot of chunk policy2](http://farm8.staticflickr.com/7084/6973420604_c50feea98b_o.png) 
+![plot of chunk policy2](http://farm8.staticflickr.com/7220/7129798545_7b9cefabbc_o.png) 
 
 
