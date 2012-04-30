@@ -92,13 +92,13 @@ That is, \( f(x,h) = \frac{A x}{1 + B x} \)
 Of course we could pass in any custom function of stocksize `x`, harvest `h` and parameter vector `p` in place of `BevHolt`.  Note that we would need to write this function explicitly so that it can take vector values of `x` (i.e. uses `sapply`), an annoying feature of `R` for users comming from Matlab.  
 
 
-We must now define parameters for the function.  Note that the positive stationary root of the model is given by \( B/(A-1) \), which we'll store for future reference as `K`.  
+We must now define parameters for the function.  Note that the positive stationary root of the model is given by \( (A-1)/B \), which we'll store for future reference as `K`.  
 
 
 
 ```r
-pars <- c(1.5, 5)
-K <- pars[2]/(pars[1] - 1)
+pars <- c(1.5, 0.05)
+K <- (pars[1] - 1)/pars[2]
 ```
 
 
@@ -213,7 +213,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest), col="darkgreen") 
 ```
 
-![plot of chunk p0](http://farm8.staticflickr.com/7181/6983787168_26547d87ca_o.png) 
+![plot of chunk p0](http://farm8.staticflickr.com/7047/6983802282_7bceb5cd87_o.png) 
 
 
 
@@ -227,7 +227,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk p1](http://farm9.staticflickr.com/8165/7129871259_4d052864d2_o.png) 
+![plot of chunk p1](http://farm8.staticflickr.com/7193/7129886257_51bb453c13_o.png) 
 
 
 We can also look at the harvest dynamics:
@@ -238,7 +238,7 @@ We can also look at the harvest dynamics:
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 ```
 
-![plot of chunk p2](http://farm8.staticflickr.com/7254/7129871677_7f9122154a_o.png) 
+![plot of chunk p2](http://farm9.staticflickr.com/8167/6983803634_7699492b79_o.png) 
 
 
 This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement: 
@@ -249,185 +249,8 @@ This strategy is supposed to be a constant-escapement strategy. We can visualize
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 ```
 
-![plot of chunk p3](http://farm8.staticflickr.com/7041/6983788936_4ecd862c9b_o.png) 
+![plot of chunk p3](http://farm8.staticflickr.com/7050/7129887427_4f690c5d65_o.png) 
 
-
-
-
-### Computing additional statistics about the data
-In this section we add some additional information to our data.table on the profits obtained by each replicate.  The algorithm has supposedly maximized the expected profit, so it is useful to look at both the mean total profit and the distribution.  Despite this maximization, the distribution can be rather lop-sided or even bimodal. 
-
-Which replicates crashed?  Which met the boundary requirment and recieved the reward value at the end?
-
-
-
-```r
-crashed <- dt[time==OptTime, fishstock == 0, by=reps]
-rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
-```
-
-
-
-
-
-Add these three columns to the data.table (fast join and re-label):
-
-
-
-```r
-setkey(crashed, reps)
-```
-
-
-
-```
-Error: x is not a data.table
-```
-
-
-
-```r
-setkey(rewarded, reps)
-```
-
-
-
-```
-Error: x is not a data.table
-```
-
-
-
-```r
-dt <- dt[crashed]
-dt <- dt[rewarded]
-setnames(dt, c("V1.1", "V1.2"), c("crashed", "rewarded"))
-```
-
-
-
-```
-Error: Items of 'old' not found in column names: V1.1,V1.2
-```
-
-
-
-
-
-
-#### Profit plots
-Since the optimal strategy maximizes expected profit, it may be more useful to look at the distribution statistics of profit over time:
-
-
-
-```r
-stats <- dt[ , mean_sdl(profits), by = time]
-```
-
-
-
-```
-Error: object 'profits' not found
-```
-
-
-
-```r
-p1 + geom_line(dat=stats, aes(x=time, y=y), col="lightgrey") + 
-  geom_ribbon(aes(x = time, ymin = ymin, ymax = ymax),
-              fill = "darkred", alpha = 0.2, dat=stats)
-```
-
-
-
-```
-Error: object 'stats' not found
-```
-
-
-
-
-
-Total profits
-
-
-```r
-ggplot(dt, aes(total.profit, fill=crashed)) + geom_histogram(alpha=.8)
-```
-
-
-
-```
-Error: object 'total.profit' not found
-```
-
-
-
-
-
-#### Add discrete classes by total profit
-
-Sometimes I'd like to color code the replicates by profit, to see if there are particular patterns in stock dynamics of the most profitable and least profitable lines.  Adding discrete profit classes to the data table makes this possible:
-
-
-```r
-quantile_me <- function(x, ...){
-  q <- quantile(x, ...)
-  class <- character(length(x))
-  for(i in 1:length(q))
-    class[x > q[i] ] <- i
-  class
-}
-q <- data.table(reps=total_profit$reps, quantile=quantile_me(total_profit$V1))
-```
-
-
-
-```
-Error: object 'total_profit' not found
-```
-
-
-
-```r
-setkey(q, reps)
-```
-
-
-
-```
-Error: x is not a data.table
-```
-
-
-
-```r
-dt <- dt[q]
-```
-
-
-
-```
-Error: i has not evaluated to logical, integer or double
-```
-
-
-
-
-Then we can plot the fishstock trajectories, indicating which derive the highest and smallest profits by color code: 
-
-
-
-```r
-ggplot(subset(dt, quantile %in% c(1,4))) + 
-  geom_line(aes(time, fishstock, group = reps, color=quantile), alpha = 0.6) 
-```
-
-
-
-```
-Error: 'match' requires vector arguments
-```
 
 
 
@@ -452,13 +275,7 @@ p5 <- ggplot(policy_zoom) +
 p5
 ```
 
-
-
-```
-Error: object 'Var2' not found
-```
-
-
+![plot of chunk policy](http://farm8.staticflickr.com/7188/7129887821_5430106a9f_o.png) 
 
 
 The harvest intensity is limited by the stock size.
@@ -476,12 +293,6 @@ p6 <- ggplot(policy_zoom) +
 p6 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1, data=dt)
 ```
 
-
-
-```
-Error: object 'Var2' not found
-```
-
-
+![plot of chunk policy2](http://farm8.staticflickr.com/7108/7129888199_255a56ecb2_o.png) 
 
 

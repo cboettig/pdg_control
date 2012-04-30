@@ -1,4 +1,4 @@
-`ro cache=TRUE, tidy=FALSE, warning=FALSE, comment=NA, message=FALSE or`
+`ro cache=TRUE, tidy=FALSE, warning=FALSE, comment=NA, message=FALSE, refresh=1 or`
 
 ``` {r  echo=FALSE }
 opts_knit$set(upload.fun = socialR::flickr.url)
@@ -65,11 +65,11 @@ That is, \( f(x,h) = \frac{A x}{1 + B x} \)
 Of course we could pass in any custom function of stocksize `x`, harvest `h` and parameter vector `p` in place of `BevHolt`.  Note that we would need to write this function explicitly so that it can take vector values of `x` (i.e. uses `sapply`), an annoying feature of `R` for users comming from Matlab.  
 
 
-We must now define parameters for the function.  Note that the positive stationary root of the model is given by \( B/(A-1) \), which we'll store for future reference as `K`.  
+We must now define parameters for the function.  Note that the positive stationary root of the model is given by \( (A-1)/B \), which we'll store for future reference as `K`.  
 
 ``` {r }
-pars <- c(1.5, 5)
-K <- pars[2]/(pars[1] - 1)
+pars <- c(1.5, 0.05)
+K <- (pars[1] - 1)/pars[2]
 ````
 
 
@@ -175,68 +175,6 @@ p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 
 
 
-### Computing additional statistics about the data
-In this section we add some additional information to our data.table on the profits obtained by each replicate.  The algorithm has supposedly maximized the expected profit, so it is useful to look at both the mean total profit and the distribution.  Despite this maximization, the distribution can be rather lop-sided or even bimodal. 
-
-Which replicates crashed?  Which met the boundary requirment and recieved the reward value at the end?
-
-``` {r  crashed}
-crashed <- dt[time==OptTime, fishstock == 0, by=reps]
-rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
-````
-
-
-Add these three columns to the data.table (fast join and re-label):
-
-``` {r }
-setkey(crashed, reps)
-setkey(rewarded, reps)
-dt <- dt[crashed]
-dt <- dt[rewarded]
-setnames(dt, c("V1.1", "V1.2"), c("crashed", "rewarded"))
-````
-
-
-
-#### Profit plots
-Since the optimal strategy maximizes expected profit, it may be more useful to look at the distribution statistics of profit over time:
-
-``` {r  profitplot}
-stats <- dt[ , mean_sdl(profits), by = time]
-p1 + geom_line(dat=stats, aes(x=time, y=y), col="lightgrey") + 
-  geom_ribbon(aes(x = time, ymin = ymin, ymax = ymax),
-              fill = "darkred", alpha = 0.2, dat=stats)
-````
-
-
-Total profits
-``` {r  totalprofit}
-ggplot(dt, aes(total.profit, fill=crashed)) + geom_histogram(alpha=.8)
-````
-
-
-#### Add discrete classes by total profit
-
-Sometimes I'd like to color code the replicates by profit, to see if there are particular patterns in stock dynamics of the most profitable and least profitable lines.  Adding discrete profit classes to the data table makes this possible:
-``` {r  quantiles}
-quantile_me <- function(x, ...){
-  q <- quantile(x, ...)
-  class <- character(length(x))
-  for(i in 1:length(q))
-    class[x > q[i] ] <- i
-  class
-}
-q <- data.table(reps=total_profit$reps, quantile=quantile_me(total_profit$V1))
-setkey(q, reps)
-dt <- dt[q]
-````
-
-Then we can plot the fishstock trajectories, indicating which derive the highest and smallest profits by color code: 
-
-``` {r  colorquantiles}
-ggplot(subset(dt, quantile %in% c(1,4))) + 
-  geom_line(aes(time, fishstock, group = reps, color=quantile), alpha = 0.6) 
-````
 
 
 ### Visualizing the optimal policy
