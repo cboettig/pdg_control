@@ -19,17 +19,15 @@ Clear the workspace and load package dependencies:
 
 
 
-### Define all parameters 
+### Define parameters 
+
 
 
 ```r
-delta <- 0.1      # economic discounting rate
-OptTime <- 50     # stopping time
 gridsize <- 100   # gridsize (discretized population)
 sigma_g <- 0.2    # Noise in population growth
 sigma_m <- 0.     # noise in stock assessment measurement
 sigma_i <- 0.     # noise in implementation of the quota
-reward <- 1       # bonus for satisfying the boundary condition
 ```
 
 
@@ -38,6 +36,7 @@ reward <- 1       # bonus for satisfying the boundary condition
 we'll use log normal noise functions. 
 For Reed, only `z_g` will be random.
 Sethi et al will add the other forms
+
 
 
 ```r
@@ -51,29 +50,58 @@ z_i <- function() rlnorm(1,  0, sigma_i) # mean 1
 
 
 Chose the state equation / population dynamics function
-And a state equation with an allee effect
+
 
 
 ```r
 f <- BevHolt
-pars <- c(1.5, 5)
-K <- pars[2]/(1-pars[1])
-xT <- 0
-price <- 1
-cost <- .01
 ```
 
 
 
 
+Note that the `pdg_control` pacakge already has a definition for the `BevHolt` function, (typing the function name prints the function)
 
-
-Our initial condition is the equilibrium size (note the stochastic deflation of mean)
 
 
 ```r
-x0 <- K - sigma_g ^ 2 / 2 
+BevHolt
 ```
+
+
+
+```
+function (x, h, p) 
+{
+    x <- max(0, x - h)
+    A <- p[1]
+    B <- p[2]
+    sapply(x, function(x) {
+        x <- max(0, x)
+        max(0, A * x/(1 + B * x))
+    })
+}
+<environment: namespace:pdgControl>
+```
+
+
+
+
+That is, \( f(x,h) = \frac{A x}{1 + B x} \)
+
+Of course we could pass in any custom function of stocksize `x`, harvest `h` and parameter vector `p` in place of `BevHolt`.  Note that we would need to write this function explicitly so that it can take vector values of `x` (i.e. uses `sapply`), an annoying feature of `R` for users comming from Matlab.  
+
+
+We must now define parameters for the function.  Note that the positive stationary root of the model is given by \( B/(A-1) \), which we'll store for future reference as `K`.  
+
+
+
+```r
+pars <- c(1.5, 5)
+K <- pars[2]/(pars[1] - 1)
+```
+
+
 
 
 
@@ -81,20 +109,23 @@ x0 <- K - sigma_g ^ 2 / 2
 and we use a harvest-based profit function with default parameters
 
 
+
 ```r
-profit <- profit_harvest(price=price, c0 = cost) 
+profit <- profit_harvest(price=1, c0 = 0.01) 
 ```
 
 
 
 
+The profit_harvest function has the form \( \Pi = h - \left( c_0  + c_1 \frac{h}{x} \right) \frac{h}{x} \), conditioned on \( h > x \) and \(x > 0 \).  Note that the R code defines a function from another function using a trick known as a _closure_.  Again we could write a custom profit function as long as it can take a vector stock size `x` and a scalar harvest level `h`.  Details for provided functions can be found in the manual, i.e. `?profit_harvest`. 
 
-Set up the discrete grids for stock size and havest levels (which will use same resolution as for stock). 
+
+Now we must set up the discrete grids for stock size and havest levels (which will use same resolution as for stock), in order to calculate the SDP solution.   Here we set the gridsize to 100.  
 
 
 
 ```r
-x_grid <- seq(0, 2 * K, length = gridsize)  
+x_grid <- seq(0, 2 * K, length = 100)  
 h_grid <- x_grid  
 ```
 
@@ -103,7 +134,7 @@ h_grid <- x_grid
 
 
 ### Calculate the transition matrix (with noise in growth only)      
-We calculate the stochastic transition matrix for the probability of going from any state \(x_t \) to any other state \(x_{t+1}\) the following year, for each possible choice of harvest \( h_t \).  This provides a look-up table for the dynamic programming calculations. 
+We calculate the stochastic transition matrix for the probability of going from any state \(x_t \) to any other state \(x_{t+1}\) the following year, for each possible choice of harvest \( h_t \).  This provides a look-up table for the dynamic programming calculations.  Take a look at the R code and the documentation for `determine_SDP_matrix` to see what this function is actually doing.  The implementation is quite simple.   
 
 
 
@@ -115,39 +146,49 @@ SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g )
 
 
 
+### Find the optimum by dynamic programming
 
-
-
-### Find the optimum by dynamic programming 
 Bellman's algorithm to compute the optimal solution for all possible trajectories.
 
 
+
 ```r
-opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                     profit, delta, reward=reward)
+opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0, 
+                     profit, delta=0.05, reward=0)
 ```
 
 
 
 
+Note that `SDP_Mat` is specified from the calculation above, as are our grids and our profit function. `OptTime` is the stopping time.  `xT` specifies a boundary condition at the stopping time. A reward for meeting this boundary must be specified for it to make any difference.  `delta` indicates the economic discount rate. Again, details are in the function documentation.   
+
+
+In the Sethi case, computing the distribution over multiple sources of noise is actually quite difficult.  Simulation turns out to be more efficient than numerically integrating over each distribution.  This code parallelizes the operation over four cores, but can be scaled to an arbitrary cluster. Since we're focused on the Reed example for the moment, we can ignore this step.   
+
+
+
+
 ### Simulate 
-Now we'll simulate 100 replicates of this stochastic process under the optimal harvest policy determined above.
+Now we'll simulate 100 replicates of this stochastic process under the Reed optimal harvest policy determined above.
+
 
 
 ```r
 sims <- lapply(1:100, function(i){
-  ForwardSimulate(f, pars, x_grid, h_grid, x0, opt$D, z_g, z_m, z_i)
+  ForwardSimulate(f, pars, x_grid, h_grid, x0=K, opt$D, z_g, z_m, z_i)
 })
 ```
 
 
 
 
-
+The forward simulation algorithm needs an initial condition `x0` which we set equal to the carrying capacity, as well as our population dynamics `f`, parameters `pars`, grids, and noise coefficients.  Recall in the Reed case only `z_g`, growth, is stochastic.  
 
 
 ## Summarize and plot the results                                                   
-Make data tidy (melt), fast (data.tables), and nicely labeled.
+
+R makes it easy to work with this big replicate data set.  We make data tidy (melt), fast (data.tables), and nicely labeled.
+
 
 
 ```r
@@ -161,7 +202,7 @@ setnames(dt, "L1", "reps") # names are nice
 
 ### Plots 
 
-Let's begin by looking at the dynamics of a single replicate. The line shows Reed's S, the level above which the stock should be harvested (where catch should be the difference between stock and S).  To confirm that this policy is being followed, note that harvesting only occurs when the stock is above this line, and harvest is proportional to the amount by which it is above. 
+Let's begin by looking at the dynamics of a single replicate. The line shows Reed's S, the level above which the stock should be harvested (where catch should be the difference between stock and S).  To confirm that this policy is being followed, note that harvesting only occurs when the stock is above this line, and harvest is proportional to the amount by which it is above.  Change the replicate `reps==` to see the results from a different replicate.  
 
 
 
@@ -172,7 +213,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest), col="darkgreen") 
 ```
 
-![plot of chunk p0](http://farm8.staticflickr.com/7204/7129795211_8cc3668a7d_o.png) 
+![plot of chunk p0](http://farm8.staticflickr.com/7181/6983787168_26547d87ca_o.png) 
 
 
 
@@ -186,17 +227,18 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk p1](http://farm8.staticflickr.com/7105/6983711838_133da125b6_o.png) 
+![plot of chunk p1](http://farm9.staticflickr.com/8165/7129871259_4d052864d2_o.png) 
 
 
 We can also look at the harvest dynamics:
+
 
 
 ```r
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 ```
 
-![plot of chunk p2](http://farm8.staticflickr.com/7249/7129797107_f57f0d91fb_o.png) 
+![plot of chunk p2](http://farm8.staticflickr.com/7254/7129871677_7f9122154a_o.png) 
 
 
 This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement: 
@@ -207,7 +249,7 @@ This strategy is supposed to be a constant-escapement strategy. We can visualize
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 ```
 
-![plot of chunk p3](http://farm8.staticflickr.com/7231/6983713058_8bbec5a0c3_o.png) 
+![plot of chunk p3](http://farm8.staticflickr.com/7041/6983788936_4ecd862c9b_o.png) 
 
 
 
@@ -216,6 +258,7 @@ p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 In this section we add some additional information to our data.table on the profits obtained by each replicate.  The algorithm has supposedly maximized the expected profit, so it is useful to look at both the mean total profit and the distribution.  Despite this maximization, the distribution can be rather lop-sided or even bimodal. 
 
 Which replicates crashed?  Which met the boundary requirment and recieved the reward value at the end?
+
 
 
 ```r
@@ -230,33 +273,34 @@ rewarded <- dt[time==OptTime, fishstock > xT, by=reps]
 Add these three columns to the data.table (fast join and re-label):
 
 
+
 ```r
 setkey(crashed, reps)
+```
+
+
+
+```
+Error: x is not a data.table
+```
+
+
+
+```r
 setkey(rewarded, reps)
+```
+
+
+
+```
+Error: x is not a data.table
+```
+
+
+
+```r
 dt <- dt[crashed]
-```
-
-
-
-```
-Error: When i is a data.table (or character vector), x must be keyed (i.e. sorted, and, marked as sorted) so data.table knows which columns to join to and take advantage of x being sorted. Call setkey(x,...) first, see ?setkey.
-```
-
-
-
-```r
 dt <- dt[rewarded]
-```
-
-
-
-```
-Error: When i is a data.table (or character vector), x must be keyed (i.e. sorted, and, marked as sorted) so data.table knows which columns to join to and take advantage of x being sorted. Call setkey(x,...) first, see ?setkey.
-```
-
-
-
-```r
 setnames(dt, c("V1.1", "V1.2"), c("crashed", "rewarded"))
 ```
 
@@ -273,6 +317,7 @@ Error: Items of 'old' not found in column names: V1.1,V1.2
 
 #### Profit plots
 Since the optimal strategy maximizes expected profit, it may be more useful to look at the distribution statistics of profit over time:
+
 
 
 ```r
@@ -372,6 +417,7 @@ Error: i has not evaluated to logical, integer or double
 Then we can plot the fishstock trajectories, indicating which derive the highest and smallest profits by color code: 
 
 
+
 ```r
 ggplot(subset(dt, quantile %in% c(1,4))) + 
   geom_line(aes(time, fishstock, group = reps, color=quantile), alpha = 0.6) 
@@ -406,7 +452,13 @@ p5 <- ggplot(policy_zoom) +
 p5
 ```
 
-![plot of chunk policy](http://farm9.staticflickr.com/8001/6983713598_5365d53a48_o.png) 
+
+
+```
+Error: object 'Var2' not found
+```
+
+
 
 
 The harvest intensity is limited by the stock size.
@@ -424,6 +476,12 @@ p6 <- ggplot(policy_zoom) +
 p6 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1, data=dt)
 ```
 
-![plot of chunk policy2](http://farm8.staticflickr.com/7220/7129798545_7b9cefabbc_o.png) 
+
+
+```
+Error: object 'Var2' not found
+```
+
+
 
 
