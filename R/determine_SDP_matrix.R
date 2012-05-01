@@ -119,7 +119,7 @@ SDP_by_simulation <- function(f, p, x_grid, h_grid, z_g, z_m, z_i, reps = 999){
 
   bw <- x_grid[2] - x_grid[1]
   lower <-x_grid[1]
-  upper <- x_grid[length(x_grid)-1]
+  upper <- x_grid[length(x_grid)] + bw
 
   SDP_Mat <- sfLapply(h_grid, function(h){ 
     mat <- sapply(x_grid, function(x){
@@ -140,7 +140,7 @@ SDP_by_simulation <- function(f, p, x_grid, h_grid, z_g, z_m, z_i, reps = 999){
 # This function powers \code{\link{stat_bin}}R
 #
 # @keyword internal
-bin <- function(x, weight=NULL, binwidth=NULL, origin=NULL, breaks=NULL, range=NULL, width=0.9, drop = FALSE) {
+mybin <- function(x, weight=NULL, binwidth=NULL, origin=NULL, breaks=NULL, range=NULL, width=0.9, drop = FALSE) {
   
   if (is.null(weight))  weight <- rep(1, length(x))
   weight[is.na(weight)] <- 0
@@ -195,8 +195,8 @@ bin <- function(x, weight=NULL, binwidth=NULL, origin=NULL, breaks=NULL, range=N
 # @seealso \code{\link{reshape}{round_any}}
 fullseq <- function(range, size) {
   seq(
-    round_any(range[1], size, floor), 
-    round_any(range[2], size, ceiling), 
+    plyr::round_any(range[1], size, floor), 
+    plyr::round_any(range[2], size, ceiling), 
     by=size
   )
 }

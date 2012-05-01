@@ -15,15 +15,14 @@ Clear the workspace and load package dependencies:
 
 
 
-### Define parameters 
+Define noise parameters 
 
 
 
 ```r
-gridsize <- 100   # gridsize (discretized population)
-sigma_g <- 0.2    # Noise in population growth
-sigma_m <- 0.2     # noise in stock assessment measurement
-sigma_i <- 0.2     # noise in implementation of the quota
+sigma_g <- 0.1    # Noise in population growth
+sigma_m <- 0.1     # noise in stock assessment measurement
+sigma_i <- 0.1     # noise in implementation of the quota
 ```
 
 
@@ -31,7 +30,7 @@ sigma_i <- 0.2     # noise in implementation of the quota
 
 we'll use log normal noise functions. 
 For Reed, only `z_g` will be random.
-Sethi et al will add the other forms
+Sethi et al will add the other forms of noise: 
 
 
 
@@ -134,7 +133,7 @@ h_grid <- x_grid
 We calculate the stochastic transition matrix for the probability of going from any state \(x_t \) to any other state \(x_{t+1}\) the following year, for each possible choice of harvest \( h_t \).  This provides a look-up table for the dynamic programming calculations.  
 
 
-In the Sethi case, computing the distribution over multiple sources of noise is actually quite difficult.  Simulation turns out to be more efficient than numerically integrating over each distribution.  This code parallelizes the operation over four cores, but can be scaled to an arbitrary cluster. Since we're focused on the Reed example for the moment, we can ignore this step.   
+In the Sethi case, computing the distribution over multiple sources of noise is actually quite difficult.  Simulation turns out to be more efficient than numerically integrating over each distribution.  This code parallelizes the operation over four cores, but can be scaled to an arbitrary cluster. 
 
 
 
@@ -148,12 +147,6 @@ SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=999)
 
 ```
 Library ggplot2 loaded.
-```
-
-
-
-```
-Error: 4 nodes produced errors; first error: could not find function "mybin"
 ```
 
 
@@ -178,7 +171,7 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0,
 
 ### Simulate 
 
-Now we'll simulate 100 replicates of this stochastic process under the Reed optimal harvest policy determined above.
+Now we'll simulate 100 replicates of this stochastic process under the optimal harvest policy determined above.
 
 
 
@@ -191,7 +184,7 @@ sims <- lapply(1:100, function(i){
 
 
 
-The forward simulation algorithm needs an initial condition `x0` which we set equal to the carrying capacity, as well as our population dynamics `f`, parameters `pars`, grids, and noise coefficients.  Recall in the Reed case only `z_g`, growth, is stochastic.  
+The forward simulation algorithm needs an initial condition `x0` which we set equal to the carrying capacity, as well as our population dynamics `f`, parameters `pars`, grids, and noise coefficients.  Recall in the Reed case only `z_g`, growth, is stochastic, while in the Sethi example we now have three forms of stochasticity -- growth, measurement, and implementation.   
 
 
 ## Summarize and plot the results                                                   
@@ -222,21 +215,20 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest), col="darkgreen") 
 ```
 
-![plot of chunk p0](http://farm8.staticflickr.com/7270/6983857826_45144fe1c9_o.png) 
+![plot of chunk onerep](http://farm9.staticflickr.com/8007/7130135757_09c23e3e5a_o.png) 
 
 
 
-This plot summarizes the stock dynamics by visualizing the replicates. Reed's S shown again, along with the dotted line showing the allee threshold, below which the stock will go to zero (unless rescued stochastically). 
+This plot summarizes the stock dynamics by visualizing the replicates. Reed's S shown again.
 
 
 
 ```r
-p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) + 
-  geom_abline(intercept=xT, slope = 0, lty=2) 
+p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) 
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk p1](http://farm8.staticflickr.com/7074/6983858530_dbea39e95c_o.png) 
+![plot of chunk all](http://farm9.staticflickr.com/8148/6984061776_d15e7d073f_o.png) 
 
 
 We can also look at the harvest dynamics:
@@ -247,7 +239,7 @@ We can also look at the harvest dynamics:
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 ```
 
-![plot of chunk p2](http://farm9.staticflickr.com/8144/6983859096_f00b663c9a_o.png) 
+![plot of chunk harvestplot](http://farm8.staticflickr.com/7188/6984052718_6e932cedf8_o.png) 
 
 
 This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement: 
@@ -258,7 +250,7 @@ This strategy is supposed to be a constant-escapement strategy. We can visualize
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 ```
 
-![plot of chunk p3](http://farm9.staticflickr.com/8027/7129942871_1e09be478e_o.png) 
+![plot of chunk escapement](http://farm8.staticflickr.com/7096/6984052922_b4ab50f14b_o.png) 
 
 
 
@@ -279,12 +271,11 @@ p5 <- ggplot(policy_zoom) +
   geom_point(aes(Var2, (x_grid[Var1]), col=h_grid[value])) + 
   labs(x = "time", y = "fishstock") +
   scale_colour_gradientn(colours = rainbow(4)) +
-  geom_abline(intercept=opt$S, slope = 0) +
-  geom_abline(intercept=xT, slope=0, lty=2)
+  geom_abline(intercept=opt$S, slope = 0) 
 p5
 ```
 
-![plot of chunk policy](http://farm9.staticflickr.com/8153/6983860906_a0d9114ed4_o.png) 
+![plot of chunk policy](http://farm8.staticflickr.com/7198/7130146133_bf7083f9d2_o.png) 
 
 
 The harvest intensity is limited by the stock size.
@@ -297,14 +288,23 @@ p6 <- ggplot(policy_zoom) +
   geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
   labs(x = "time", y = "fishstock") +
   scale_colour_gradientn(colours = rainbow(4)) +
-  geom_abline(intercept=opt$S, slope = 0) +
-  geom_abline(intercept=xT, slope=0, lty=2)
+  geom_abline(intercept=opt$S, slope = 0) 
 p6 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1, data=dt)
 ```
 
-![plot of chunk policy2](http://farm8.staticflickr.com/7099/7129944825_6d4b14112f_o.png) 
+![plot of chunk policy2](http://farm9.staticflickr.com/8007/6984063036_ea9d9ac47d_o.png) 
 
 
+# References
+
+
+
+```
+Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005).
+"Fishery management under multiple uncertainty." _Journal of
+Environmental Economics and Management_, *50*. ISSN 00950696,
+<URL: http://dx.doi.org/10.1016/j.jeem.2004.11.005>.
+```
 
 
 
