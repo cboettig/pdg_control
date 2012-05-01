@@ -5,6 +5,7 @@ opts_knit$set(upload.fun = socialR::flickr.url)
 options(device = function(width = 5, height = 5) {
     pdf(NULL, width = width, height = height)
 })
+knitcitations::cleanbib()
 ````
 
 # Sethi Model

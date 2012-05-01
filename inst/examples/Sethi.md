@@ -301,19 +301,3 @@ Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005).
 Environmental Economics and Management_, *50*. ISSN 00950696,
 <URL: http://dx.doi.org/10.1016/j.jeem.2004.11.005>.
 
-Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005).
-"Fishery management under multiple uncertainty." _Journal of
-Environmental Economics and Management_, *50*. ISSN 00950696,
-<URL: http://dx.doi.org/10.1016/j.jeem.2004.11.005>.
-
-Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005).
-"Fishery management under multiple uncertainty." _Journal of
-Environmental Economics and Management_, *50*. ISSN 00950696,
-<URL: http://dx.doi.org/10.1016/j.jeem.2004.11.005>.
-
-Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005).
-"Fishery management under multiple uncertainty." _Journal of
-Environmental Economics and Management_, *50*. ISSN 00950696,
-<URL: http://dx.doi.org/10.1016/j.jeem.2004.11.005>.
-
-
