@@ -82,12 +82,12 @@ function (x, h, p)
 
 
 
-That is, \( f(x,h) = \frac{A x}{1 + B x} \)
+That is, \\( f(x,h) = \frac{A x}{1 + B x} \\)
 
 Of course we could pass in any custom function of stocksize `x`, harvest `h` and parameter vector `p` in place of `BevHolt`.  Note that we would need to write this function explicitly so that it can take vector values of `x` (i.e. uses `sapply`), an annoying feature of `R` for users comming from Matlab.  
 
 
-We must now define parameters for the function.  Note that the positive stationary root of the model is given by \( (A-1)/B \), which we'll store for future reference as `K`.  
+We must now define parameters for the function.  Note that the positive stationary root of the model is given by \\( \frac{A-1}{B} \\), which we'll store for future reference as `K`.  
 
 
 
@@ -112,7 +112,7 @@ profit <- profit_harvest(price=1, c0 = 0.01)
 
 
 
-The profit_harvest function has the form \( \Pi = h - \left( c_0  + c_1 \frac{h}{x} \right) \frac{h}{x} \), conditioned on \( h > x \) and \(x > 0 \).  Note that the R code defines a function from another function using a trick known as a _closure_.  Again we could write a custom profit function as long as it can take a vector stock size `x` and a scalar harvest level `h`.  Details for provided functions can be found in the manual, i.e. `?profit_harvest`. 
+The `profit_harvest` function has the form \\( \Pi = h - \left( c_0  + c_1 \frac{h}{x} \right) \frac{h}{x} \\), conditioned on \\( h > x \\) and \\(x > 0 \\).  Note that the R code defines a function from another function using a trick known as a _closure_.  Again we could write a custom profit function as long as it can take a vector stock size `x` and a scalar harvest level `h`.  Details for provided functions can be found in the manual, i.e. `?profit_harvest`. 
 
 
 Now we must set up the discrete grids for stock size and havest levels (which will use same resolution as for stock), in order to calculate the SDP solution.   Here we set the gridsize to 100.  
@@ -130,7 +130,7 @@ h_grid <- x_grid
 
 ### Calculate the transition matrix (with noise in growth only)      
 
-We calculate the stochastic transition matrix for the probability of going from any state \(x_t \) to any other state \(x_{t+1}\) the following year, for each possible choice of harvest \( h_t \).  This provides a look-up table for the dynamic programming calculations.  
+We calculate the stochastic transition matrix for the probability of going from any state \\(x_t \\) to any other state \\(x_{t+1}\\) the following year, for each possible choice of harvest \\( h_t \\).  This provides a look-up table for the dynamic programming calculations.  
 
 
 In the Sethi case, computing the distribution over multiple sources of noise is actually quite difficult.  Simulation turns out to be more efficient than numerically integrating over each distribution.  This code parallelizes the operation over four cores, but can be scaled to an arbitrary cluster. 
@@ -258,9 +258,8 @@ p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 
 
 ### Visualizing the optimal policy
-Note that when the boundary is sufficiently far away, i.e. for the first couple timesteps, the optimal policy is stationary.  The optimal policy is shown here over time, where the color indicates the harvest recommended for each possible stock value at that time (shown on the vertical axis).  Note that below a certain stock value, harvesting is not recommended and the dots turn red (Reed's constant escapement rule!)  However, at very low values, harvesting starts again (orange dots), because of the allee effect - these populations are doomed anyway, so may as well fish all that remains.
 
-Note that interestingly, populations just below the allee threshold are given the chance to be rescued stochastically early on - that small chance that they recover is worth the expected loss.  The "no-harvest" zones stand out clearly in the red areas of this graph.
+Note that when the boundary is sufficiently far away, i.e. for the first couple timesteps, the optimal policy is stationary.  The optimal policy is shown here over time, where the color indicates the harvest recommended for each possible stock value at that time (shown on the vertical axis). Observe that the solution does not correspond to a simple Reed-style rule.  
 
 
 
@@ -297,14 +296,24 @@ p6 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1, data=dt)
 
 # References
 
-
-
-```
 Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005).
 "Fishery management under multiple uncertainty." _Journal of
 Environmental Economics and Management_, *50*. ISSN 00950696,
 <URL: http://dx.doi.org/10.1016/j.jeem.2004.11.005>.
-```
 
+Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005).
+"Fishery management under multiple uncertainty." _Journal of
+Environmental Economics and Management_, *50*. ISSN 00950696,
+<URL: http://dx.doi.org/10.1016/j.jeem.2004.11.005>.
+
+Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005).
+"Fishery management under multiple uncertainty." _Journal of
+Environmental Economics and Management_, *50*. ISSN 00950696,
+<URL: http://dx.doi.org/10.1016/j.jeem.2004.11.005>.
+
+Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005).
+"Fishery management under multiple uncertainty." _Journal of
+Environmental Economics and Management_, *50*. ISSN 00950696,
+<URL: http://dx.doi.org/10.1016/j.jeem.2004.11.005>.
 
 
