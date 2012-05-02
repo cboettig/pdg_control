@@ -1,12 +1,7 @@
-<!--roptions dev='png', fig.width=10, fig.height=7, tidy=FALSE, warning=FALSE, message=FALSE, comment=NA, cache.path="policycost/", cache=FALSE-->
+<!--roptions dev='png', fig.width=10, fig.height=7, tidy=FALSE, warning=FALSE, message=FALSE, comment=NA, cache=TRUE, refresh=1-->
 <!--begin.rcode setup, include=FALSE
-render_gfm()  
-opts_knit$set(upload = TRUE)   
-require(socialR)
-options(flickrOptions=list(
-  description="https://github.com/cboettig/pdg_control/blob/master/inst/examples/policycost.md",
-  tags="stochpop, pdg_control"))
-opts_knit$set(upload.fun = flickr.url)
+opts_knit$set(upload.fun = socialR::flickr.url)
+options(device = function(width=5, height=5) pdf(NULL, width = width, height = height))
 read_chunk("policycosts.R")
 end.rcode-->
 
@@ -54,9 +49,10 @@ end.rcode-->
 
 I've updated the algorithm to allow an arbitrary penalty function. Must be a function of the harvest and previous harvest. 
 <!--begin.rcode policycost_optim_
+c2 <- 4
 L1 <- function(c2) function(h, h_prev)  c2 * abs(h - h_prev) 
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                    profit, delta, reward, penalty = L1(.5))
+                    profit, delta, reward, penalty = L1(c2))
 end.rcode-->
 
 
@@ -65,7 +61,7 @@ Now we'll simulate 100 replicates of this stochastic process under the optimal h
 
 <!--begin.rcode simulate_policy_
 sims <- lapply(1:100, function(i)
-  simulate_optim(f, pars, x_grid, h_grid, x0, policycost$D, z_g, z_m, z_i, opt$D, profit=profit, penalty=L1(.5))
+  simulate_optim(f, pars, x_grid, h_grid, x0, policycost$D, z_g, z_m, z_i, opt$D, profit=profit, penalty=L1(c2))
   )
 end.rcode-->
 
@@ -82,6 +78,16 @@ end.rcode-->
 A single replicate, alternate dynamics should show the Reed optimum, while harvest/fishstock should show the impact of having policy costs. 
 <!--begin.rcode rep1
 ggplot(subset(dt,reps==1)) +
+  geom_line(aes(time, alternate)) +
+  geom_line(aes(time, fishstock), col="darkblue") +
+  geom_line(aes(time, harvest), col="purple") + 
+  geom_line(aes(time, harvest_alt), col="darkgreen") 
+end.rcode-->
+
+A second replicate
+
+<!--begin.rcode rep2
+ggplot(subset(dt,reps==2)) +
   geom_line(aes(time, alternate)) +
   geom_line(aes(time, fishstock), col="darkblue") +
   geom_line(aes(time, harvest), col="purple") + 

@@ -3,21 +3,11 @@
 
 
 
-# Asymmetric L1 Policy Costs 
+# Asymmetric Policy Costs 
  * author Carl Boettiger, <cboettig@gmail.com>
  * license: CC0
 
 ## Setup the system
-
-
-
-```r
-rm(list=ls())   
-require(pdgControl)
-require(reshape2)
-require(ggplot2)
-require(data.table)
-```
 
 
 
@@ -26,28 +16,8 @@ This example illustrates the impact of adding a cost to changing the harvest lev
 ### Define all parameters 
 
 
-```r
-delta <- 0.01     # SMALLER economic discounting rate
-OptTime <- 50     # stopping time
-gridsize <- 100   # gridsize (discretized population)
-sigma_g <- 0.2    # Noise in population growth
-sigma_m <- 0.     # noise in stock assessment measurement
-sigma_i <- 0.     # noise in implementation of the quota
-reward <- 0       # bonus for satisfying the boundary condition
-```
-
-
-
 
 we'll use log normal noise functions
-
-
-```r
-z_g <- function() rlnorm(1,  0, sigma_g) # mean 1
-z_m <- function() rlnorm(1,  0, sigma_m) # mean 1
-z_i <- function() rlnorm(1,  0, sigma_i) # mean 1
-```
-
 
 
 
@@ -55,44 +25,12 @@ z_i <- function() rlnorm(1,  0, sigma_i) # mean 1
 Chose the state equation / population dynamics function
 
 
-```r
-f <- BevHolt                # Select the state equation
-pars <- c(2, 4)             # parameters for the state equation
-K <- (pars[1] - 1)/pars[2]  # Carrying capacity 
-xT <- 0                     # boundary conditions
-```
-
-
-
-
-Our initial condition is the equilibrium size (note the stochastic deflation of mean)
-
-
-```r
-x0 <- K - sigma_g ^ 2 / 2 
-```
-
-
-
 
 and we use a harvest-based profit function with default parameters
 
 
-```r
-profit <- profit_harvest(price_fish = 1, cost_stock_effect = 0,
- operating_cost = 0.1)
-```
-
-
-
 
 Set up the discrete grids for stock size and havest levels
-
-
-```r
-x_grid <- seq(0, 1.2 * K, length = gridsize)  
-h_grid <- seq(0, 0.8 * K, length = gridsize)  
-```
 
 
 
@@ -100,208 +38,109 @@ h_grid <- seq(0, 0.8 * K, length = gridsize)
 ### Calculate the stochastic transition matrix
 We calculate the stochastic transition matrix for the probability of going from any state \(x_t \) to any other state \(x_{t+1}\) the following year, for each possible choice of harvest \( h_t \).  This provides a look-up table for the dynamic programming calculations. Note that this only includes uncertainty in the growth rate (projected stock next year). 
 
-
-```r
-SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g )
-```
-
+<pre class="knitr"><div class="source">    <span class="symbol">SDP_Mat</span> <span class="assignement">&lt;-</span> <span class="functioncall">determine_SDP_matrix</span><span class="keyword">(</span><span class="symbol">f</span><span class="keyword">,</span> <span class="symbol">pars</span><span class="keyword">,</span> <span class="symbol">x_grid</span><span class="keyword">,</span> <span class="symbol">h_grid</span><span class="keyword">,</span> <span class="symbol">sigma_g</span> <span class="keyword">)</span>
+    <span class="symbol">opt</span> <span class="assignement">&lt;-</span> <span class="functioncall">find_dp_optim</span><span class="keyword">(</span><span class="symbol">SDP_Mat</span><span class="keyword">,</span> <span class="symbol">x_grid</span><span class="keyword">,</span> <span class="symbol">h_grid</span><span class="keyword">,</span> <span class="symbol">OptTime</span><span class="keyword">,</span> <span class="symbol">xT</span><span class="keyword">,</span>
+                     <span class="symbol">profit</span><span class="keyword">,</span> <span class="symbol">delta</span><span class="keyword">,</span> <span class="argument">reward</span><span class="argument">=</span><span class="symbol">reward</span><span class="keyword">)</span>
+</div></pre>
 
 
 ### Find the optimum by dynamic programming 
-We use Bellman's dynamic programming algorithm to compute the optimal solution for all possible trajectories, ignoring potential policy costs as before.  We will later use this solution to compare against the optimal solution with policy costs.
 
+I've updated the algorithm to allow an arbitrary penalty function. Must be a function of the harvest and previous harvest. 
 
-```r
-opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                     profit, delta, reward=reward)
-```
-
-
-
-
-A modified algorithm lets us include a penalty of magnitude `P` and a functional form that can be an `L1` norm, `L2`  norm, `asymmetric` L1 norm (costly to lower harvest rates), fixed cost, or `none` (no cost).  Here is an asymmetric norm example.  Note that this calculation is considerably slower. 
-
-
-```r
-policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                    profit, delta, reward, P = 0.5, penalty = "asym")
-```
-
-
+<pre class="knitr"><div class="source"><span class="symbol">c2</span> <span class="assignement">&lt;-</span> <span class="number">4</span>
+<span class="symbol">asym</span> <span class="assignement">&lt;-</span> <span class="keyword">function</span><span class="keyword">(</span><span class="formalargs">c2</span><span class="keyword">)</span> <span class="keyword">function</span><span class="keyword">(</span><span class="formalargs">h</span><span class="keyword">,</span> <span class="formalargs">h_prev</span><span class="keyword">)</span>  <span class="symbol">c2</span> <span class="keyword">*</span> <span class="functioncall">abs</span><span class="keyword">(</span><span class="functioncall">min</span><span class="keyword">(</span><span class="symbol">h</span> <span class="keyword">-</span> <span class="symbol">h_prev</span><span class="keyword">,</span><span class="number">0</span><span class="keyword">)</span><span class="keyword">)</span> <span class="comment"># increasing harvest is free </span>
+<span class="symbol">policycost</span> <span class="assignement">&lt;-</span> <span class="functioncall">optim_policy</span><span class="keyword">(</span><span class="symbol">SDP_Mat</span><span class="keyword">,</span> <span class="symbol">x_grid</span><span class="keyword">,</span> <span class="symbol">h_grid</span><span class="keyword">,</span> <span class="symbol">OptTime</span><span class="keyword">,</span> <span class="symbol">xT</span><span class="keyword">,</span>
+                    <span class="symbol">profit</span><span class="keyword">,</span> <span class="symbol">delta</span><span class="keyword">,</span> <span class="symbol">reward</span><span class="keyword">,</span> <span class="argument">penalty</span> <span class="argument">=</span> <span class="functioncall">asym</span><span class="keyword">(</span><span class="symbol">c2</span><span class="keyword">)</span><span class="keyword">)</span>
+</div></pre>
 
 
 
 ### Simulate 
 Now we'll simulate 100 replicates of this stochastic process under the optimal harvest policy determined above.  We use a modified simulation function that can simulate an alternate policy (the Reed optimum, where policy costs are zero, `opt$D` ) and a focal policy, `policycost$D`
 
-
-
-```r
-sims <- lapply(1:100, function(i)
-  simulate_optim(f, pars, x_grid, h_grid, x0, policycost$D, z_g, z_m, z_i, opt$D)
-  )
-```
-
-
+<pre class="knitr"><div class="source"><span class="symbol">sims</span> <span class="assignement">&lt;-</span> <span class="functioncall">lapply</span><span class="keyword">(</span><span class="number">1</span><span class="keyword">:</span><span class="number">100</span><span class="keyword">,</span> <span class="keyword">function</span><span class="keyword">(</span><span class="formalargs">i</span><span class="keyword">)</span>
+  <span class="functioncall">simulate_optim</span><span class="keyword">(</span><span class="symbol">f</span><span class="keyword">,</span> <span class="symbol">pars</span><span class="keyword">,</span> <span class="symbol">x_grid</span><span class="keyword">,</span> <span class="symbol">h_grid</span><span class="keyword">,</span> <span class="symbol">x0</span><span class="keyword">,</span> <span class="symbol">policycost</span><span class="keyword">$</span><span class="symbol">D</span><span class="keyword">,</span> <span class="symbol">z_g</span><span class="keyword">,</span> <span class="symbol">z_m</span><span class="keyword">,</span> <span class="symbol">z_i</span><span class="keyword">,</span> <span class="symbol">opt</span><span class="keyword">$</span><span class="symbol">D</span><span class="keyword">,</span> <span class="argument">profit</span><span class="argument">=</span><span class="symbol">profit</span><span class="keyword">,</span> <span class="argument">penalty</span><span class="argument">=</span><span class="functioncall">asym</span><span class="keyword">(</span><span class="symbol">c2</span><span class="keyword">)</span><span class="keyword">)</span>
+  <span class="keyword">)</span>
+</div></pre>
 
 
 
 Make data tidy (melt), fast (data.tables), and nicely labeled.
-
-
-```r
-dat <- melt(sims, id=names(sims[[1]]))  
-dt <- data.table(dat)
-setnames(dt, "L1", "reps") # names are nice
-```
-
-
+<pre class="knitr"><div class="source"><span class="symbol">dat</span> <span class="assignement">&lt;-</span> <span class="functioncall">melt</span><span class="keyword">(</span><span class="symbol">sims</span><span class="keyword">,</span> <span class="argument">id</span><span class="argument">=</span><span class="functioncall">names</span><span class="keyword">(</span><span class="symbol">sims</span><span class="keyword">[[</span><span class="number">1</span><span class="keyword">]</span><span class="keyword">]</span><span class="keyword">)</span><span class="keyword">)</span>
+<span class="symbol">dt</span> <span class="assignement">&lt;-</span> <span class="functioncall">data.table</span><span class="keyword">(</span><span class="symbol">dat</span><span class="keyword">)</span>
+<span class="functioncall">setnames</span><span class="keyword">(</span><span class="symbol">dt</span><span class="keyword">,</span> <span class="string">"L1"</span><span class="keyword">,</span> <span class="string">"reps"</span><span class="keyword">)</span> <span class="comment"># names are nice</span>
+</div></pre>
 
 
 ### Plots 
 
 A single replicate, alternate dynamics should show the Reed optimum, while harvest/fishstock should show the impact of having policy costs. 
-
-
-```r
-ggplot(subset(dt,reps==1)) +
-  geom_line(aes(time, alternate)) +
-  geom_line(aes(time, fishstock), col="darkblue") +
-  geom_abline(intercept=opt$S, slope = 0) +
-  geom_line(aes(time, harvest), col="purple") + 
-  geom_line(aes(time, harvest_alt), col="darkgreen") 
-```
-
-![plot of chunk rep1](http://farm8.staticflickr.com/7061/6836641004_fa059a7b8b_o.png) 
+<pre class="knitr"><div class="source"><span class="functioncall">ggplot</span><span class="keyword">(</span><span class="functioncall">subset</span><span class="keyword">(</span><span class="symbol">dt</span><span class="keyword">,</span><span class="symbol">reps</span>==<span class="number">1</span><span class="keyword">)</span><span class="keyword">)</span> <span class="keyword">+</span>
+  <span class="functioncall">geom_line</span><span class="keyword">(</span><span class="functioncall">aes</span><span class="keyword">(</span><span class="symbol">time</span><span class="keyword">,</span> <span class="symbol">alternate</span><span class="keyword">)</span><span class="keyword">)</span> <span class="keyword">+</span>
+  <span class="functioncall">geom_line</span><span class="keyword">(</span><span class="functioncall">aes</span><span class="keyword">(</span><span class="symbol">time</span><span class="keyword">,</span> <span class="symbol">fishstock</span><span class="keyword">)</span><span class="keyword">,</span> <span class="argument">col</span><span class="argument">=</span><span class="string">"darkblue"</span><span class="keyword">)</span> <span class="keyword">+</span>
+  <span class="functioncall">geom_line</span><span class="keyword">(</span><span class="functioncall">aes</span><span class="keyword">(</span><span class="symbol">time</span><span class="keyword">,</span> <span class="symbol">harvest</span><span class="keyword">)</span><span class="keyword">,</span> <span class="argument">col</span><span class="argument">=</span><span class="string">"purple"</span><span class="keyword">)</span> <span class="keyword">+</span>
+  <span class="functioncall">geom_line</span><span class="keyword">(</span><span class="functioncall">aes</span><span class="keyword">(</span><span class="symbol">time</span><span class="keyword">,</span> <span class="symbol">harvest_alt</span><span class="keyword">)</span><span class="keyword">,</span> <span class="argument">col</span><span class="argument">=</span><span class="string">"darkgreen"</span><span class="keyword">)</span>
+</div><img src="figure/rep1.png" class="plot" />
+</pre>
 
 
 
-We can visualize the equilibrium policy for each possible harvest, colored by the change in harvest level.
+A second replicate
+
+<pre class="knitr"><div class="source"><span class="functioncall">ggplot</span><span class="keyword">(</span><span class="functioncall">subset</span><span class="keyword">(</span><span class="symbol">dt</span><span class="keyword">,</span><span class="symbol">reps</span>==<span class="number">2</span><span class="keyword">)</span><span class="keyword">)</span> <span class="keyword">+</span>
+  <span class="functioncall">geom_line</span><span class="keyword">(</span><span class="functioncall">aes</span><span class="keyword">(</span><span class="symbol">time</span><span class="keyword">,</span> <span class="symbol">alternate</span><span class="keyword">)</span><span class="keyword">)</span> <span class="keyword">+</span>
+  <span class="functioncall">geom_line</span><span class="keyword">(</span><span class="functioncall">aes</span><span class="keyword">(</span><span class="symbol">time</span><span class="keyword">,</span> <span class="symbol">fishstock</span><span class="keyword">)</span><span class="keyword">,</span> <span class="argument">col</span><span class="argument">=</span><span class="string">"darkblue"</span><span class="keyword">)</span> <span class="keyword">+</span>
+  <span class="functioncall">geom_line</span><span class="keyword">(</span><span class="functioncall">aes</span><span class="keyword">(</span><span class="symbol">time</span><span class="keyword">,</span> <span class="symbol">harvest</span><span class="keyword">)</span><span class="keyword">,</span> <span class="argument">col</span><span class="argument">=</span><span class="string">"purple"</span><span class="keyword">)</span> <span class="keyword">+</span>
+  <span class="functioncall">geom_line</span><span class="keyword">(</span><span class="functioncall">aes</span><span class="keyword">(</span><span class="symbol">time</span><span class="keyword">,</span> <span class="symbol">harvest_alt</span><span class="keyword">)</span><span class="keyword">,</span> <span class="argument">col</span><span class="argument">=</span><span class="string">"darkgreen"</span><span class="keyword">)</span>
+</div><img src="figure/rep2.png" class="plot" />
+</pre>
 
 
 
-```r
-policy <- sapply(1:length(h_grid), function(i) policycost$D[[i]][,1])
-ggplot(melt(policy)) + 
-  geom_point(aes(h_grid[Var2], (x_grid[Var1]), col=h_grid[value] - h_grid[Var2])) + 
-    labs(x = "prev harvest", y = "fishstock") +
-      scale_colour_gradientn(colours = rainbow(4)) 
-```
 
-![plot of chunk unnamed-chunk-2](http://farm8.staticflickr.com/7191/6836641294_05934e3b81_o.png) 
+We can visualize the equilibrium policy for each possible harvest:
+
+<pre class="knitr"><div class="source"><span class="symbol">policy</span> <span class="assignement">&lt;-</span> <span class="functioncall">sapply</span><span class="keyword">(</span><span class="number">1</span><span class="keyword">:</span><span class="functioncall">length</span><span class="keyword">(</span><span class="symbol">h_grid</span><span class="keyword">)</span><span class="keyword">,</span> <span class="keyword">function</span><span class="keyword">(</span><span class="formalargs">i</span><span class="keyword">)</span> <span class="symbol">policycost</span><span class="keyword">$</span><span class="symbol">D</span><span class="keyword">[[</span><span class="symbol">i</span><span class="keyword">]</span><span class="keyword">]</span><span class="keyword">[</span><span class="keyword">,</span><span class="number">1</span><span class="keyword">]</span><span class="keyword">)</span>
+<span class="functioncall">ggplot</span><span class="keyword">(</span><span class="functioncall">melt</span><span class="keyword">(</span><span class="symbol">policy</span><span class="keyword">)</span><span class="keyword">)</span> <span class="keyword">+</span>
+  <span class="functioncall">geom_point</span><span class="keyword">(</span><span class="functioncall">aes</span><span class="keyword">(</span><span class="symbol">h_grid</span><span class="keyword">[</span><span class="symbol">Var2</span><span class="keyword">]</span><span class="keyword">,</span> <span class="keyword">(</span><span class="symbol">x_grid</span><span class="keyword">[</span><span class="symbol">Var1</span><span class="keyword">]</span><span class="keyword">)</span><span class="keyword">,</span> <span class="argument">col</span><span class="argument">=</span><span class="symbol">h_grid</span><span class="keyword">[</span><span class="symbol">value</span><span class="keyword">]</span><span class="keyword">-</span><span class="symbol">h_grid</span><span class="keyword">[</span><span class="symbol">Var2</span><span class="keyword">]</span><span class="keyword">)</span><span class="keyword">)</span> <span class="keyword">+</span>
+    <span class="functioncall">labs</span><span class="keyword">(</span><span class="argument">x</span> <span class="argument">=</span> <span class="string">"prev harvest"</span><span class="keyword">,</span> <span class="argument">y</span> <span class="argument">=</span> <span class="string">"fishstock"</span><span class="keyword">)</span> <span class="keyword">+</span>
+      <span class="functioncall">scale_colour_gradientn</span><span class="keyword">(</span><span class="argument">colours</span> <span class="argument">=</span> <span class="functioncall">rainbow</span><span class="keyword">(</span><span class="number">4</span><span class="keyword">)</span><span class="keyword">)</span>
+</div><img src="figure/policyplot.png" class="plot" />
+</pre>
 
 
 Here we plot previous harvest against the recommended harvest, coloring by stocksize.  Note this swaps the y axis from above with the color density.  Hence each x-axis value has all possible colors, but they map down onto a subset of optimal harvest values (depending on their stock). 
 
-
-```r
-policy <- sapply(1:length(h_grid), function(i) policycost$D[[i]][,1])
-ggplot(melt(policy)) + 
-  geom_point(aes(h_grid[Var2], (h_grid[value]), col = x_grid[Var1]), position=position_jitter(w=.005,h=.005), alpha=.5) + 
-    labs(x = "prev harvest", y = "harvest") +
-      scale_colour_gradientn(colours = rainbow(4)) 
-```
-
-![plot of chunk unnamed-chunk-3](http://farm8.staticflickr.com/7177/6836641580_3b9c9385f2_o.png) 
-
-
-
-Against the policy with no cost (shown over time) 
-
-
-```r
-policy <- melt(opt$D)
-policy_zoom <- subset(policy, x_grid[Var1] < max(dt$alternate) )
-ggplot(policy_zoom) + 
-  geom_point(aes(Var2, (x_grid[Var1]), col= h_grid[value])) + 
-  labs(x = "time", y = "fishstock") +
-  scale_colour_gradientn(colours = rainbow(4)) + 
-  geom_abline(intercept=opt$S, slope = 0) 
-```
-
-![plot of chunk no_policy_cost_vis](http://farm8.staticflickr.com/7065/6982767977_d42dcc2a3f_o.png) 
-
-
-### Profits
-
-
-
-```r
-dt <- data.table(dt, id=1:dim(dt)[1])
-profits <- dt[, profit(fishstock, harvest), by=id]
-```
+<pre class="knitr"><div class="source"><span class="symbol">policy</span> <span class="assignement">&lt;-</span> <span class="functioncall">sapply</span><span class="keyword">(</span><span class="number">1</span><span class="keyword">:</span><span class="functioncall">length</span><span class="keyword">(</span><span class="symbol">h_grid</span><span class="keyword">)</span><span class="keyword">,</span> <span class="keyword">function</span><span class="keyword">(</span><span class="formalargs">i</span><span class="keyword">)</span> <span class="symbol">policycost</span><span class="keyword">$</span><span class="symbol">D</span><span class="keyword">[[</span><span class="symbol">i</span><span class="keyword">]</span><span class="keyword">]</span><span class="keyword">[</span><span class="keyword">,</span><span class="number">1</span><span class="keyword">]</span><span class="keyword">)</span>
+<span class="functioncall">ggplot</span><span class="keyword">(</span><span class="functioncall">melt</span><span class="keyword">(</span><span class="symbol">policy</span><span class="keyword">)</span><span class="keyword">)</span> <span class="keyword">+</span>
+  <span class="functioncall">geom_point</span><span class="keyword">(</span><span class="functioncall">aes</span><span class="keyword">(</span><span class="symbol">h_grid</span><span class="keyword">[</span><span class="symbol">Var2</span><span class="keyword">]</span><span class="keyword">,</span> <span class="keyword">(</span><span class="symbol">h_grid</span><span class="keyword">[</span><span class="symbol">value</span><span class="keyword">]</span><span class="keyword">)</span><span class="keyword">,</span> <span class="argument">col</span> <span class="argument">=</span> <span class="symbol">x_grid</span><span class="keyword">[</span><span class="symbol">Var1</span><span class="keyword">]</span><span class="keyword">)</span><span class="keyword">,</span> <span class="argument">position</span><span class="argument">=</span><span class="functioncall">position_jitter</span><span class="keyword">(</span><span class="argument">w</span><span class="argument">=</span><span class="number">.005</span><span class="keyword">,</span><span class="argument">h</span><span class="argument">=</span><span class="number">.005</span><span class="keyword">)</span><span class="keyword">,</span> <span class="argument">alpha</span><span class="argument">=</span><span class="number">.5</span><span class="keyword">)</span> <span class="keyword">+</span>
+    <span class="functioncall">labs</span><span class="keyword">(</span><span class="argument">x</span> <span class="argument">=</span> <span class="string">"prev harvest"</span><span class="keyword">,</span> <span class="argument">y</span> <span class="argument">=</span> <span class="string">"harvest"</span><span class="keyword">)</span> <span class="keyword">+</span>
+      <span class="functioncall">scale_colour_gradientn</span><span class="keyword">(</span><span class="argument">colours</span> <span class="argument">=</span> <span class="functioncall">rainbow</span><span class="keyword">(</span><span class="number">4</span><span class="keyword">)</span><span class="keyword">)</span>
+</div><img src="figure/policyplot2.png" class="plot" />
+</pre>
 
 
 
 
-Merge in profits to data.table (should be a way to avoid having to do these joins?)
-
-
-```r
-setkey(dt, id)
-setkey(profits, id)
-dt <- dt[profits]
-setnames(dt, "V1", "profits")
-```
-
-
-
-
-merge in total profits to data.table
-
-
-```r
-total_profit <- dt[,sum(profits), by=reps]
-setkey(total_profit, reps)
-setkey(dt, reps)
-dt <- dt[total_profit]
-setnames(dt, "V1", "total.profit")
-```
-
-
-
-
-
-
-```r
-ggplot(dt, aes(total.profit)) + geom_histogram(alpha=.8)
-```
-
-![plot of chunk unnamed-chunk-7](http://farm8.staticflickr.com/7187/6836642176_221365918b_o.png) 
-
-
-
-
-```r
-save(list=ls(), file="asym.rda")
-```
-
-
+<pre class="knitr"><div class="source"><span class="functioncall">save</span><span class="keyword">(</span><span class="argument">list</span><span class="argument">=</span><span class="functioncall">ls</span><span class="keyword">(</span><span class="keyword">)</span><span class="keyword">,</span> <span class="argument">file</span><span class="argument">=</span><span class="string">"L1.rda"</span><span class="keyword">)</span>
+</div></pre>
 
 
 The mean dynamics of the state
-
-
-```r
-stats <- dt[ , mean_sdl(fishstock), by = time]
-ggplot(stats) +   geom_ribbon(aes(x = time, ymin = ymin, ymax = ymax),
-                fill = "darkblue", alpha = 0.2, dat=stats) +
-                geom_line(aes(x=time, y=y), lwd=1) 
-```
-
-![plot of chunk unnamed-chunk-9](http://farm8.staticflickr.com/7043/6982768609_c10316000b_o.png) 
+<pre class="knitr"><div class="source"><span class="symbol">stats</span> <span class="assignement">&lt;-</span> <span class="symbol">dt</span><span class="keyword">[</span> <span class="keyword">,</span> <span class="functioncall">mean_sdl</span><span class="keyword">(</span><span class="symbol">fishstock</span><span class="keyword">)</span><span class="keyword">,</span> <span class="argument">by</span> <span class="argument">=</span> <span class="symbol">time</span><span class="keyword">]</span>
+<span class="functioncall">ggplot</span><span class="keyword">(</span><span class="symbol">stats</span><span class="keyword">)</span> <span class="keyword">+</span>   <span class="functioncall">geom_ribbon</span><span class="keyword">(</span><span class="functioncall">aes</span><span class="keyword">(</span><span class="argument">x</span> <span class="argument">=</span> <span class="symbol">time</span><span class="keyword">,</span> <span class="argument">ymin</span> <span class="argument">=</span> <span class="symbol">ymin</span><span class="keyword">,</span> <span class="argument">ymax</span> <span class="argument">=</span> <span class="symbol">ymax</span><span class="keyword">)</span><span class="keyword">,</span>
+                <span class="argument">fill</span> <span class="argument">=</span> <span class="string">"darkblue"</span><span class="keyword">,</span> <span class="argument">alpha</span> <span class="argument">=</span> <span class="number">0.2</span><span class="keyword">,</span> <span class="argument">dat</span><span class="argument">=</span><span class="symbol">stats</span><span class="keyword">)</span> <span class="keyword">+</span>
+                <span class="functioncall">geom_line</span><span class="keyword">(</span><span class="functioncall">aes</span><span class="keyword">(</span><span class="argument">x</span><span class="argument">=</span><span class="symbol">time</span><span class="keyword">,</span> <span class="argument">y</span><span class="argument">=</span><span class="symbol">y</span><span class="keyword">)</span><span class="keyword">,</span> <span class="argument">lwd</span><span class="argument">=</span><span class="number">1</span><span class="keyword">)</span>
+</div><img src="figure/unnamed-chunk-1.png" class="plot" />
+</pre>
 
 
 The mean dynamics of the control
-
-
-```r
-stats <- dt[ , mean_sdl(harvest), by = time]
-ggplot(stats) +   geom_ribbon(aes(x = time, ymin = ymin, ymax = ymax),
-                fill = "darkblue", alpha = 0.2, dat=stats) +
-                geom_line(aes(x=time, y=y), lwd=1) 
-```
-
-![plot of chunk unnamed-chunk-10](http://farm8.staticflickr.com/7193/6836642650_8238496917_o.png) 
-
+<pre class="knitr"><div class="source"><span class="symbol">stats</span> <span class="assignement">&lt;-</span> <span class="symbol">dt</span><span class="keyword">[</span> <span class="keyword">,</span> <span class="functioncall">mean_sdl</span><span class="keyword">(</span><span class="symbol">harvest</span><span class="keyword">)</span><span class="keyword">,</span> <span class="argument">by</span> <span class="argument">=</span> <span class="symbol">time</span><span class="keyword">]</span>
+<span class="functioncall">ggplot</span><span class="keyword">(</span><span class="symbol">stats</span><span class="keyword">)</span> <span class="keyword">+</span>  <span class="functioncall">geom_ribbon</span><span class="keyword">(</span><span class="functioncall">aes</span><span class="keyword">(</span><span class="argument">x</span> <span class="argument">=</span> <span class="symbol">time</span><span class="keyword">,</span> <span class="argument">ymin</span> <span class="argument">=</span> <span class="symbol">ymin</span><span class="keyword">,</span> <span class="argument">ymax</span> <span class="argument">=</span> <span class="symbol">ymax</span><span class="keyword">)</span><span class="keyword">,</span>
+                <span class="argument">fill</span> <span class="argument">=</span> <span class="string">"darkblue"</span><span class="keyword">,</span> <span class="argument">alpha</span> <span class="argument">=</span> <span class="number">0.2</span><span class="keyword">)</span> <span class="keyword">+</span>
+                <span class="functioncall">geom_line</span><span class="keyword">(</span><span class="functioncall">aes</span><span class="keyword">(</span><span class="argument">x</span><span class="argument">=</span><span class="symbol">time</span><span class="keyword">,</span> <span class="argument">y</span><span class="argument">=</span><span class="symbol">y</span><span class="keyword">)</span><span class="keyword">,</span> <span class="argument">lwd</span><span class="argument">=</span><span class="number">1</span><span class="keyword">)</span>
+</div><img src="figure/meanharvest.png" class="plot" />
+</pre>
 
