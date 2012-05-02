@@ -133,7 +133,7 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time, alternate)) +
     harvest), col = "purple") + geom_line(aes(time, harvest_alt), col = "darkgreen")
 ```
 
-![plot of chunk rep1](http://farm8.staticflickr.com/7248/7134159931_5961e807e2_o.png) 
+![plot of chunk rep1](http://farm8.staticflickr.com/7180/7134220977_051ede5c10_o.png) 
 
 
 A second replicate
@@ -146,7 +146,20 @@ ggplot(subset(dt, reps == 2)) + geom_line(aes(time, alternate)) +
     harvest), col = "purple") + geom_line(aes(time, harvest_alt), col = "darkgreen")
 ```
 
-![plot of chunk rep2](http://farm8.staticflickr.com/7074/7134160135_3e99d91052_o.png) 
+![plot of chunk rep2](http://farm8.staticflickr.com/7222/6988136712_46787f0178_o.png) 
+
+
+Profits 
+
+
+
+```r
+ggplot(subset(dt, reps == 1)) + geom_line(aes(time, profit_fishing)) + 
+    geom_line(aes(time, policy_cost), col = "darkblue")
+```
+
+![plot of chunk rep1profit](http://farm8.staticflickr.com/7231/6988136948_16739cc8fd_o.png) 
+
 
 
 We can visualize the equilibrium policy for each possible harvest:
@@ -161,7 +174,7 @@ ggplot(melt(policy)) + geom_point(aes(h_grid[Var2], (x_grid[Var1]),
     scale_colour_gradientn(colours = rainbow(4))
 ```
 
-![plot of chunk policy](http://farm8.staticflickr.com/7127/7134160557_37c5469f6a_o.png) 
+![plot of chunk policy](http://farm9.staticflickr.com/8160/6988137200_d77028ba9b_o.png) 
 
 
 Here we plot previous harvest against the recommended harvest, coloring by stocksize.  Note this swaps the y axis from above with the color density.  Hence each x-axis value has all possible colors, but they map down onto a subset of optimal harvest values (depending on their stock). 
@@ -176,16 +189,6 @@ ggplot(melt(policy)) + geom_point(aes(h_grid[Var2], (h_grid[value]),
     labs(x = "prev harvest", y = "harvest") + scale_colour_gradientn(colours = rainbow(4))
 ```
 
-![plot of chunk harvestchanges](http://farm8.staticflickr.com/7276/7134161121_ee2030ee41_o.png) 
-
-
-## Profits
-
-
-
-```r
-save(list = ls(), file = "stochastic_norms.rda")
-```
-
+![plot of chunk harvestchanges](http://farm8.staticflickr.com/7223/7134222193_11605e10db_o.png) 
 
 
