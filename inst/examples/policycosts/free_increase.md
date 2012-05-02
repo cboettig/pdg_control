@@ -84,7 +84,7 @@ Solve the policy cost for the specified penalty function
 
 ```r
 c2 <- 4
-penalty <- L1(c2)
+penalty <- free_increase(c2)
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
     profit, delta, reward, penalty = penalty)
 cache = FALSE
@@ -133,7 +133,7 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time, alternate)) +
     harvest), col = "purple") + geom_line(aes(time, harvest_alt), col = "darkgreen")
 ```
 
-![plot of chunk rep1](http://farm8.staticflickr.com/7044/6988077252_e01d8668b0_o.png) 
+![plot of chunk rep1](http://farm8.staticflickr.com/7248/7134159931_5961e807e2_o.png) 
 
 
 A second replicate
@@ -146,7 +146,7 @@ ggplot(subset(dt, reps == 2)) + geom_line(aes(time, alternate)) +
     harvest), col = "purple") + geom_line(aes(time, harvest_alt), col = "darkgreen")
 ```
 
-![plot of chunk rep2](http://farm8.staticflickr.com/7179/6988077446_3b3ecab0e8_o.png) 
+![plot of chunk rep2](http://farm8.staticflickr.com/7074/7134160135_3e99d91052_o.png) 
 
 
 We can visualize the equilibrium policy for each possible harvest:
@@ -161,7 +161,7 @@ ggplot(melt(policy)) + geom_point(aes(h_grid[Var2], (x_grid[Var1]),
     scale_colour_gradientn(colours = rainbow(4))
 ```
 
-![plot of chunk policy](http://farm9.staticflickr.com/8007/6988077710_4e196162ae_o.png) 
+![plot of chunk policy](http://farm8.staticflickr.com/7127/7134160557_37c5469f6a_o.png) 
 
 
 Here we plot previous harvest against the recommended harvest, coloring by stocksize.  Note this swaps the y axis from above with the color density.  Hence each x-axis value has all possible colors, but they map down onto a subset of optimal harvest values (depending on their stock). 
@@ -176,7 +176,7 @@ ggplot(melt(policy)) + geom_point(aes(h_grid[Var2], (h_grid[value]),
     labs(x = "prev harvest", y = "harvest") + scale_colour_gradientn(colours = rainbow(4))
 ```
 
-![plot of chunk harvestchanges](http://farm8.staticflickr.com/7253/6988078020_88ec1e6a0e_o.png) 
+![plot of chunk harvestchanges](http://farm8.staticflickr.com/7276/7134161121_ee2030ee41_o.png) 
 
 
 ## Profits
