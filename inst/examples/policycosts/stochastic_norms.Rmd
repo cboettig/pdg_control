@@ -134,7 +134,7 @@ profits <-dt[ , sum(profit_fishing), by=reps]
 
 qplot(costs$V1)
 qplot(profits$V1)
-qplot(profits-costs$V1)
+qplot(profits$V1-costs$V1)
 ````
 
 
