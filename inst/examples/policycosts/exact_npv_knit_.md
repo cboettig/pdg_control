@@ -1,4 +1,4 @@
-<!--roptions dev='png', fig.width=10, fig.height=7, tidy=FALSE, warning=FALSE, message=FALSE, comment=NA, cache.path="policycost/", cache=FALSE-->
+<!--roptions fig.width=10, fig.height=7, tidy=FALSE, warning=FALSE, message=FALSE, comment=NA-->
 <!--begin.rcode setup, include=FALSE
 render_gfm()  
 opts_knit$set(upload = TRUE)   
@@ -51,7 +51,7 @@ x0 <- K
 end.rcode-->
 
 <!--begin.rcode profit_
-profit <- profit_harvest(price = 10, c0 = 30, c1 = 10)
+profit <- profit_harvest(price = 10, c0 = 30, c1 = 0)
 end.rcode-->
 
 <!--begin.rcode create_grid_
@@ -64,14 +64,15 @@ end.rcode-->
 <!--begin.rcode fees
 L1 <- function(c2) function(h, h_prev)  c2 * abs(h - h_prev) 
 asymmetric <- function(c2) function(h, h_prev)  c2 * max(h - h_prev, 0)
-fixed <-  function(c2) function(h, h_prev) c2
+fixed <-  function(c2) function(h, h_prev) c2 * as.numeric( !(h == h_prev) )
 L2 <- function(c2) function(h, h_prev)  c2 * (h - h_prev) ^ 2
+free_increase <- function(c2) function(h, h_prev)  c2 * abs(min(h - h_prev, 0)) # increasing harvest is free
 end.rcode-->
 
 Calculate the transition matrix and intialize the the list of penalty functions and cost levels we will be looping over.
 <!--begin.rcode 
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g )
-penaltyfns <- list(L2=L2, L1=L1, asy=asymmetric, fixed=fixed)
+penaltyfns <- list(L2=L2, L1=L1, asy=asymmetric, fixed=fixed, asy2=free_increase)
 c2 <- seq(0, 30, length.out = 31)
 end.rcode-->
 
@@ -104,7 +105,7 @@ quad <-
   sapply(c2, function(c2){
   effort_penalty = function(x,h) .1*c2*h/x
   policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                        profit, delta, reward, penalty = fixed(0),     
+                        profit, delta, reward, penalty = fixed(0), 
                         effort_penalty)
       i <- which(x_grid > K)[1]
       max(policycost$penalty_free_V[i,]) # chooses the most sensible harvest in t=1

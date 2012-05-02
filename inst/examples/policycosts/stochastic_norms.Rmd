@@ -44,7 +44,7 @@ x0 <- K
 
 
 ## @knitr profit_
-profit <- profit_harvest(price = 10, c0 = 30, c1 = 10)
+profit <- profit_harvest(price = 10, c0 = 30, c1 = 0)
 
 
 ## @knitr create_grid_
@@ -64,14 +64,14 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT,
 L1 <- function(c2) function(h, h_prev)  c2 * abs(h - h_prev) 
 free_increase <- function(c2) function(h, h_prev)  c2 * abs(min(h - h_prev, 0)) # increasing harvest is free
 free_decrease <- function(c2) function(h, h_prev)  c2 * max(h - h_prev, 0) # decreasing harvest is free
-fixed <-  function(c2) function(h, h_prev) c2
+fixed <-  function(c2) function(h, h_prev) c2 * as.numeric( !(h == h_prev) )
 L2 <- function(c2) function(h, h_prev)  c2 * (h - h_prev) ^ 2
 ````
 
 Solve the policy cost for the specified penalty function
 
-``` {r policycost_optim}
-c2 <- 4
+``` {r policycost_optim }
+c2 <- 4.0
 penalty <- fixed(c2)
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
                     profit, delta, reward, penalty = penalty)

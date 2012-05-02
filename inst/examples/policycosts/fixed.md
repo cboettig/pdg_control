@@ -44,7 +44,7 @@ x0 <- K
 
 
 ## @knitr profit_
-profit <- profit_harvest(price = 10, c0 = 30, c1 = 10)
+profit <- profit_harvest(price = 10, c0 = 30, c1 = 0)
 
 
 ## @knitr create_grid_
@@ -71,7 +71,8 @@ free_increase <- function(c2) function(h, h_prev) c2 * abs(min(h -
     h_prev, 0))  # increasing harvest is free
 free_decrease <- function(c2) function(h, h_prev) c2 * max(h - h_prev, 
     0)  # decreasing harvest is free
-fixed <- function(c2) function(h, h_prev) c2
+fixed <- function(c2) function(h, h_prev) c2 * as.numeric(!(h == 
+    h_prev))
 L2 <- function(c2) function(h, h_prev) c2 * (h - h_prev)^2
 ```
 
@@ -133,7 +134,7 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time, alternate)) +
     harvest), col = "purple") + geom_line(aes(time, harvest_alt), col = "darkgreen")
 ```
 
-![plot of chunk rep1](http://farm8.staticflickr.com/7221/6988168584_1d94f55204_o.png) 
+![plot of chunk rep1](http://farm9.staticflickr.com/8146/7137008193_368e3cc077_o.png) 
 
 
 A second replicate
@@ -146,7 +147,7 @@ ggplot(subset(dt, reps == 2)) + geom_line(aes(time, alternate)) +
     harvest), col = "purple") + geom_line(aes(time, harvest_alt), col = "darkgreen")
 ```
 
-![plot of chunk rep2](http://farm8.staticflickr.com/7183/6988168894_a56f7d02f7_o.png) 
+![plot of chunk rep2](http://farm8.staticflickr.com/7050/7137008387_6e827ca111_o.png) 
 
 
 ## Profits 
@@ -158,7 +159,7 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time, profit_fishing)) +
     geom_line(aes(time, policy_cost), col = "darkblue")
 ```
 
-![plot of chunk rep1profit](http://farm8.staticflickr.com/7096/7134253365_9dc0d8ec02_o.png) 
+![plot of chunk rep1profit](http://farm8.staticflickr.com/7220/6990923268_1f4ffa1ebd_o.png) 
 
 
 
@@ -170,25 +171,19 @@ profits <- dt[, sum(profit_fishing), by = reps]
 qplot(costs$V1)
 ```
 
-![plot of chunk policycost](http://farm9.staticflickr.com/8160/6988169362_877e64308a_o.png) 
+![plot of chunk policycost](http://farm8.staticflickr.com/7112/6990923496_b042cae981_o.png) 
 
 ```r
 qplot(profits$V1)
 ```
 
-![plot of chunk policycost](http://farm8.staticflickr.com/7235/6988169500_6449845d39_o.png) 
+![plot of chunk policycost](http://farm8.staticflickr.com/7177/6990923832_e5bcc627df_o.png) 
 
 ```r
-qplot(profits - costs$V1)
+qplot(profits$V1 - costs$V1)
 ```
 
-
-
-```
-Error: stat_bin requires the following missing aesthetics: x
-```
-
-
+![plot of chunk policycost](http://farm9.staticflickr.com/8012/7137009345_dcaf391eb7_o.png) 
 
 
 
@@ -205,7 +200,7 @@ ggplot(melt(policy)) + geom_point(aes(h_grid[Var2], (x_grid[Var1]),
     scale_colour_gradientn(colours = rainbow(4))
 ```
 
-![plot of chunk policy](http://farm8.staticflickr.com/7194/7134253923_589b6803aa_o.png) 
+![plot of chunk policy](http://farm9.staticflickr.com/8167/7137009565_f84c7f62f6_o.png) 
 
 
 Here we plot previous harvest against the recommended harvest, coloring by stocksize.  Note this swaps the y axis from above with the color density.  Hence each x-axis value has all possible colors, but they map down onto a subset of optimal harvest values (depending on their stock). 
@@ -220,6 +215,6 @@ ggplot(melt(policy)) + geom_point(aes(h_grid[Var2], (h_grid[value]),
     labs(x = "prev harvest", y = "harvest") + scale_colour_gradientn(colours = rainbow(4))
 ```
 
-![plot of chunk harvestchanges](http://farm8.staticflickr.com/7215/7134254371_a740e3bf6b_o.png) 
+![plot of chunk harvestchanges](http://farm8.staticflickr.com/7257/6990924426_e861b0e759_o.png) 
 
 

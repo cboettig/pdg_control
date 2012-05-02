@@ -62,7 +62,7 @@ optim_policy <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit,
       out <- sapply(1:gridsize, function(j){
         value <- max(V1[j,], na.rm = T) # each col is a diff h, max over these
         index <- which.max(V1[j,])  # store index so we can recover h's
-        penalty_free <- V0[j, index]
+        penalty_free <- V0[j, index] # The profit from fishing before adjustment costs are paid
         c(value, index, penalty_free) # returns both profit value & index of optimal h.  
       })
       # Sets V[t+1] = max_h V[t] at each possible state value, x
