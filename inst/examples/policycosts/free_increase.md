@@ -5,7 +5,7 @@
 
 
 
-# Asymmetric Policy Costs 
+# Policy Costs 
  * author Carl Boettiger, <cboettig@gmail.com>
  * license: CC0
 
@@ -121,7 +121,7 @@ setnames(dt, "L1", "reps")  # names are nice
 
 
 
-### Plots 
+# Plots 
 
 A single replicate, alternate dynamics show the Reed optimum, while harvest/fishstock show the impact of having policy costs. 
 
@@ -133,7 +133,7 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time, alternate)) +
     harvest), col = "purple") + geom_line(aes(time, harvest_alt), col = "darkgreen")
 ```
 
-![plot of chunk rep1](http://farm8.staticflickr.com/7180/7134220977_051ede5c10_o.png) 
+![plot of chunk rep1](http://farm9.staticflickr.com/8168/6988167816_774c61a698_o.png) 
 
 
 A second replicate
@@ -146,10 +146,10 @@ ggplot(subset(dt, reps == 2)) + geom_line(aes(time, alternate)) +
     harvest), col = "purple") + geom_line(aes(time, harvest_alt), col = "darkgreen")
 ```
 
-![plot of chunk rep2](http://farm8.staticflickr.com/7222/6988136712_46787f0178_o.png) 
+![plot of chunk rep2](http://farm8.staticflickr.com/7101/6988168046_cccf41c005_o.png) 
 
 
-Profits 
+## Profits 
 
 
 
@@ -158,7 +158,38 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time, profit_fishing)) +
     geom_line(aes(time, policy_cost), col = "darkblue")
 ```
 
-![plot of chunk rep1profit](http://farm8.staticflickr.com/7231/6988136948_16739cc8fd_o.png) 
+![plot of chunk rep1profit](http://farm8.staticflickr.com/7089/7134252495_854dd13722_o.png) 
+
+
+
+
+```r
+costs <- dt[, sum(policy_cost), by = reps]
+profits <- dt[, sum(profit_fishing), by = reps]
+
+qplot(costs$V1)
+```
+
+![plot of chunk policycost](http://farm8.staticflickr.com/7253/7134252713_deaac2fca4_o.png) 
+
+```r
+qplot(profits$V1)
+```
+
+![plot of chunk policycost](http://farm8.staticflickr.com/7275/7134252855_39168d0f34_o.png) 
+
+```r
+qplot(profits - costs$V1)
+```
+
+
+
+```
+Error: stat_bin requires the following missing aesthetics: x
+```
+
+
+
 
 
 
@@ -174,7 +205,7 @@ ggplot(melt(policy)) + geom_point(aes(h_grid[Var2], (x_grid[Var1]),
     scale_colour_gradientn(colours = rainbow(4))
 ```
 
-![plot of chunk policy](http://farm9.staticflickr.com/8160/6988137200_d77028ba9b_o.png) 
+![plot of chunk policy](http://farm8.staticflickr.com/7271/7134253079_15015ffae9_o.png) 
 
 
 Here we plot previous harvest against the recommended harvest, coloring by stocksize.  Note this swaps the y axis from above with the color density.  Hence each x-axis value has all possible colors, but they map down onto a subset of optimal harvest values (depending on their stock). 
@@ -189,6 +220,6 @@ ggplot(melt(policy)) + geom_point(aes(h_grid[Var2], (h_grid[value]),
     labs(x = "prev harvest", y = "harvest") + scale_colour_gradientn(colours = rainbow(4))
 ```
 
-![plot of chunk harvestchanges](http://farm8.staticflickr.com/7223/7134222193_11605e10db_o.png) 
+![plot of chunk harvestchanges](http://farm8.staticflickr.com/7116/6988169062_a8be7d6295_o.png) 
 
 

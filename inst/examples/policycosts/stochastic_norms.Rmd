@@ -7,7 +7,7 @@ options(device = function(width=5, height=5) pdf(NULL, width = width, height = h
 ````
 
 
-# Asymmetric Policy Costs 
+# Policy Costs 
  * author Carl Boettiger, <cboettig@gmail.com>
  * license: CC0
 
@@ -72,7 +72,7 @@ Solve the policy cost for the specified penalty function
 
 ``` {r policycost_optim}
 c2 <- 4
-penalty <- free_decrease(c2)
+penalty <- fixed(c2)
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
                     profit, delta, reward, penalty = penalty)
 cache=FALSE
@@ -97,7 +97,7 @@ dt <- data.table(dat)
 setnames(dt, "L1", "reps") # names are nice
 ````
 
-### Plots 
+# Plots 
 
 A single replicate, alternate dynamics show the Reed optimum, while harvest/fishstock show the impact of having policy costs. 
 
@@ -119,13 +119,24 @@ ggplot(subset(dt,reps==2)) +
   geom_line(aes(time, harvest_alt), col="darkgreen") 
 ````
 
-Profits 
+## Profits 
 
 ``` {r rep1profit, cache=cache}
 ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, profit_fishing)) +
-  geom_line(aes(time, policy_cost), col="darkblue") 
+  geom_line(aes(time, policy_cost), col="darkblue")
+
 ````
+
+``` {r policycost, cache=cache}
+costs <- dt[ , sum(policy_cost), by=reps]
+profits <-dt[ , sum(profit_fishing), by=reps] 
+
+qplot(costs$V1)
+qplot(profits$V1)
+qplot(profits-costs$V1)
+````
+
 
 
 We can visualize the equilibrium policy for each possible harvest:
