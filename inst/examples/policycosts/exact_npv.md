@@ -66,7 +66,7 @@ x0 <- K
 
 
 ```r
-profit <- profit_harvest(price = 10, c0 = 30, c1 = 10)
+profit <- profit_harvest(price = 10, c0 = 30, c1 = 0)
 ```
 
 
@@ -89,8 +89,9 @@ h_grid <- seq(0.01, 0.8 * K, length = gridsize)
 ```r
 L1 <- function(c2) function(h, h_prev)  c2 * abs(h - h_prev) 
 asymmetric <- function(c2) function(h, h_prev)  c2 * max(h - h_prev, 0)
-fixed <-  function(c2) function(h, h_prev) c2
+fixed <-  function(c2) function(h, h_prev) c2 * as.numeric( !(h == h_prev) )
 L2 <- function(c2) function(h, h_prev)  c2 * (h - h_prev) ^ 2
+free_increase <- function(c2) function(h, h_prev)  c2 * abs(min(h - h_prev, 0)) # increasing harvest is free
 ```
 
 
@@ -101,7 +102,7 @@ Calculate the transition matrix and intialize the the list of penalty functions 
 
 ```r
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g )
-penaltyfns <- list(L2=L2, L1=L1, asy=asymmetric, fixed=fixed)
+penaltyfns <- list(L2=L2, L1=L1, asy=asymmetric, fixed=fixed, asy2=free_increase)
 c2 <- seq(0, 30, length.out = 31)
 ```
 
@@ -119,7 +120,7 @@ sfInit(cpu=4, parallel=T)
 
 
 ```
-R Version:  R version 2.14.2 (2012-02-29) 
+R Version:  R version 2.15.0 (2012-03-30) 
 
 ```
 
@@ -163,6 +164,12 @@ sfSapply(penaltyfns, function(penalty){
 
 
 
+```
+Error: error reading from connection
+```
+
+
+
 
 Quadratic costs on fishing effort have to be done separately,
 
@@ -182,18 +189,63 @@ dat <- cbind(policies, quad)
 
 
 
+```
+Error: object 'policies' not found
+```
+
+
+
 
 Tidy up the data and plot the net present value (before the penalty has been paid) relative to that achieved when managed without a penalty.  
 
 
 ```r
 npv0 <- dat[1,3] 
+```
+
+
+
+```
+Error: object 'dat' not found
+```
+
+
+
+```r
 dat <- data.frame(c2=c2,dat)
+```
+
+
+
+```
+Error: object 'dat' not found
+```
+
+
+
+```r
 dat <- melt(dat, id="c2")
+```
+
+
+
+```
+Error: object 'dat' not found
+```
+
+
+
+```r
 ggplot(dat, aes(c2, (npv0-value)/npv0, col=variable)) + geom_point() + geom_line()
 ```
 
-![plot of chunk unnamed-chunk-5](http://farm7.staticflickr.com/6233/6996636029_7e6a5a208d_o.png) 
+
+
+```
+Error: object 'dat' not found
+```
+
+
 
 
 
