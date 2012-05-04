@@ -12,104 +12,9 @@
 ```r
 rm(list = ls())
 require(pdgControl)
-```
-
-
-
-```
-## Loading required package: pdgControl
-```
-
-
-
-```r
 require(reshape2)
-```
-
-
-
-```
-## Loading required package: reshape2
-```
-
-
-
-```r
 require(ggplot2)
-```
-
-
-
-```
-## Loading required package: ggplot2
-```
-
-
-
-```
-## Loading required package: reshape
-```
-
-
-
-```
-## Loading required package: plyr
-```
-
-
-
-```
-## 
-## Attaching package: 'reshape'
-## 
-```
-
-
-
-```
-## The following object(s) are masked from 'package:plyr':
-## 
-##     rename, round_any
-## 
-```
-
-
-
-```
-## The following object(s) are masked from 'package:reshape2':
-## 
-##     colsplit, melt, recast
-## 
-```
-
-
-
-```
-## Loading required package: grid
-```
-
-
-
-```
-## Loading required package: proto
-```
-
-
-
-```r
 require(data.table)
-```
-
-
-
-```
-## Loading required package: data.table
-```
-
-
-
-```
-## data.table 1.7.10  For help type: help("data.table")
 ```
 
 
@@ -206,7 +111,7 @@ SDP_Mat <- determine_SDP_matrix(f, pars, x_grid,
     h_grid, sigma_g)
 penaltyfns <- list(L2 = L2, L1 = L1, asy = asymmetric, 
     fixed = fixed, asy2 = free_increase)
-c2 <- seq(0, 8, length.out = 9)
+c2 <- seq(0, 22, length.out = 30)
 ```
 
 
@@ -217,30 +122,20 @@ This can take a while, so we use explicit parallelization,
 
 ```r
 require(snowfall)
-```
-
-
-
-```
-## Loading required package: snowfall
-```
-
-
-
-```
-## Loading required package: snow
-```
-
-
-
-```r
 sfInit(cpu = 5, parallel = T)
 ```
 
 
 
 ```
-## R Version:  R version 2.14.1 (2011-12-22) 
+## Explicit sfStop() is missing: stop now.
+```
+
+
+
+```
+## 
+## Stopping cluster
 ## 
 ```
 
@@ -336,7 +231,7 @@ ggplot(dat, aes(c2, (npv0 - value)/npv0, col = variable)) +
     geom_point() + geom_line()
 ```
 
-![plot of chunk unnamed-chunk-5](http://farm8.staticflickr.com/7178/7137541039_77a4e27708_o.png) 
+![plot of chunk unnamed-chunk-5](http://farm8.staticflickr.com/7258/7140833241_7dc73790ac_o.png) 
 
 
 
