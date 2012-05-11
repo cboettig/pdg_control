@@ -1,4 +1,4 @@
-`ro cache=TRUE, tidy=FALSE, warning=FALSE, comment=NA, message=FALSE, refresh=2 fig.width=10, fig.height=10 or`
+`ro cache=TRUE, tidy=FALSE, warning=FALSE, comment=NA, message=FALSE, fig.width=10, fig.height=10 or`
 
 ``` {r  echo=FALSE, cache=FALSE }
 render_jekyll()
