@@ -258,8 +258,7 @@ p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 
 ``` {r }
 ggplot(subset(dt,reps==1)) +
-  geom_line(aes(time, profit_fishing)) +
-  geom_line(aes(time, policy_cost), col="darkblue") + facet_wrap(~uncertainty)
+  geom_line(aes(time, profit))  + facet_wrap(~uncertainty)
 
 ````
 

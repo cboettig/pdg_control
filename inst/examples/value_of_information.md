@@ -21,9 +21,9 @@ Chose the state equation / population dynamics function
 
 
 
-{% highlight r %}
+```r
 f <- BevHolt
-{% endhighlight %}
+```
 
 
 
@@ -32,13 +32,13 @@ Note that the `pdg_control` pacakge already has a definition for the `BevHolt` f
 
 
 
-{% highlight r %}
+```r
 BevHolt
-{% endhighlight %}
+```
 
 
 
-{% highlight text %}
+```
 function (x, h, p) 
 {
     x <- max(0, x - h)
@@ -50,7 +50,7 @@ function (x, h, p)
     })
 }
 <environment: namespace:pdgControl>
-{% endhighlight %}
+```
 
 
 
@@ -64,10 +64,10 @@ We must now define parameters for the function.  Note that the positive stationa
 
 
 
-{% highlight r %}
+```r
 pars <- c(1.5, 0.05)
 K <- (pars[1] - 1)/pars[2]
-{% endhighlight %}
+```
 
 
 
@@ -78,9 +78,9 @@ and we use a harvest-based profit function with default parameters
 
 
 
-{% highlight r %}
+```r
 profit <- profit_harvest(price=1, c0 = 0.01) 
-{% endhighlight %}
+```
 
 
 
@@ -92,10 +92,10 @@ Now we must set up the discrete grids for stock size and havest levels (which wi
 
 
 
-{% highlight r %}
+```r
 x_grid <- seq(0, 2 * K, length = 100)  
 h_grid <- x_grid  
-{% endhighlight %}
+```
 
 
 
@@ -114,14 +114,14 @@ In the Sethi case, computing the distribution over multiple sources of noise is 
 
 
 
-{% highlight r %}
+```r
 sigma_g <- 0.01    # Noise in population growth
 sigma_m <- 0.0     # noise in stock assessment measurement
 sigma_i <- 0.0     # noise in implementation of the quota
 z_g <- function() rlnorm(1,  0, sigma_g) # mean 1
 z_m <- function() rlnorm(1,  0, sigma_m) # mean 1
 z_i <- function() rlnorm(1,  0, sigma_i) # mean 1
-{% endhighlight %}
+```
 
 
 
@@ -129,9 +129,9 @@ Find the transition matrix
 
 
 
-{% highlight r %}
+```r
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g )
-{% endhighlight %}
+```
 
 
 
@@ -140,10 +140,10 @@ Find the optimum solution
 
 
 
-{% highlight r %}
+```r
 opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0, 
                      profit, delta=0.05, reward=0)
-{% endhighlight %}
+```
 
 
 
@@ -152,11 +152,11 @@ Simulate
 
 
 
-{% highlight r %}
+```r
 sims_known <- lapply(1:100, function(i){
   ForwardSimulate(f, pars, x_grid, h_grid, x0=K, opt$D, z_g, z_m, z_i, profit)
 })
-{% endhighlight %}
+```
 
 
 
@@ -166,14 +166,14 @@ sims_known <- lapply(1:100, function(i){
 
 
 
-{% highlight r %}
+```r
 sigma_g <- 0.15    # Noise in population growth
 sigma_m <- 0.0     # noise in stock assessment measurement
 sigma_i <- 0.0     # noise in implementation of the quota
 z_g <- function() rlnorm(1,  0, sigma_g) # mean 1
 z_m <- function() rlnorm(1,  0, sigma_m) # mean 1
 z_i <- function() rlnorm(1,  0, sigma_i) # mean 1
-{% endhighlight %}
+```
 
 
 
@@ -181,9 +181,9 @@ Find the transition matrix
 
 
 
-{% highlight r %}
+```r
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g )
-{% endhighlight %}
+```
 
 
 
@@ -192,10 +192,10 @@ Find the optimum solution
 
 
 
-{% highlight r %}
+```r
 opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0, 
                      profit, delta=0.05, reward=0)
-{% endhighlight %}
+```
 
 
 
@@ -204,11 +204,11 @@ Simulate
 
 
 
-{% highlight r %}
+```r
 sims_g <- lapply(1:100, function(i){
   ForwardSimulate(f, pars, x_grid, h_grid, x0=K, opt$D, z_g, z_m, z_i, profit)
 })
-{% endhighlight %}
+```
 
 
 
@@ -219,10 +219,10 @@ sims_g <- lapply(1:100, function(i){
 
 
 
-{% highlight r %}
+```r
 sigma_m <- 0.15     # noise in stock assessment measurement
 z_m <- function() rlnorm(1,  0, sigma_m) # mean 1
-{% endhighlight %}
+```
 
 
 
@@ -231,29 +231,29 @@ Find the transition matrix.  Use the simulation method to account for the extra 
 
 
 
-{% highlight r %}
+```r
 require(snowfall) 
 sfInit(parallel=TRUE, cpu=16)
-{% endhighlight %}
+```
 
 
 
-{% highlight text %}
+```
 R Version:  R version 2.14.1 (2011-12-22) 
 
-{% endhighlight %}
+```
 
 
 
-{% highlight r %}
+```r
 SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=999)
-{% endhighlight %}
+```
 
 
 
-{% highlight text %}
+```
 Library ggplot2 loaded.
-{% endhighlight %}
+```
 
 
 
@@ -262,10 +262,10 @@ Find the optimum solution
 
 
 
-{% highlight r %}
+```r
 opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0, 
                      profit, delta=0.05, reward=0)
-{% endhighlight %}
+```
 
 
 
@@ -274,11 +274,11 @@ Simulate
 
 
 
-{% highlight r %}
+```r
 sims_gm <- lapply(1:100, function(i){
   ForwardSimulate(f, pars, x_grid, h_grid, x0=K, opt$D, z_g, z_m, z_i, profit)
 })
-{% endhighlight %}
+```
 
 
 
@@ -291,10 +291,10 @@ sims_gm <- lapply(1:100, function(i){
 
 
 
-{% highlight r %}
+```r
 sigma_i <- 0.15     # noise in implementation of the quota
 z_i <- function() rlnorm(1,  0, sigma_i) # mean 1
-{% endhighlight %}
+```
 
 
 
@@ -303,15 +303,15 @@ Find the transition matrix.  Use the simulation method to account for the extra 
 
 
 
-{% highlight r %}
+```r
 SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=999)
-{% endhighlight %}
+```
 
 
 
-{% highlight text %}
+```
 Library ggplot2 loaded.
-{% endhighlight %}
+```
 
 
 
@@ -320,10 +320,10 @@ Find the optimum solution
 
 
 
-{% highlight r %}
+```r
 opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0, 
                      profit, delta=0.05, reward=0)
-{% endhighlight %}
+```
 
 
 
@@ -332,11 +332,11 @@ Simulate
 
 
 
-{% highlight r %}
+```r
 sims_gmi <- lapply(1:100, function(i){
   ForwardSimulate(f, pars, x_grid, h_grid, x0=K, opt$D, z_g, z_m, z_i, profit)
 })
-{% endhighlight %}
+```
 
 
 
@@ -349,14 +349,14 @@ R makes it easy to work with this big replicate data set.  We make data tidy (me
 
 
 
-{% highlight r %}
+```r
 
 sims <- list(known = sims_known, growth = sims_g, growth_stock = sims_gm, growth_stock_harvest = sims_gmi)
 
 dat <- melt(sims, id=names(sims_known[[1]]))  
 dt <- data.table(dat)
 setnames(dt, c("L2", "L1"), c("reps", "uncertainty")) # names are nice
-{% endhighlight %}
+```
 
 
 
@@ -367,13 +367,13 @@ Let's begin by looking at the dynamics of a single replicate. The line shows Ree
 
 
 
-{% highlight r %}
+```r
 ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, fishstock)) +
   geom_abline(intercept=opt$S, slope = 0) +
   geom_line(aes(time, harvest), col="darkgreen") + 
   facet_wrap(~uncertainty) 
-{% endhighlight %}
+```
 
 ![plot of chunk onerep](http://farm8.staticflickr.com/7082/7178259848_6a75c990c5_o.png) 
 
@@ -383,10 +383,10 @@ This plot summarizes the stock dynamics by visualizing the replicates. Reed's S 
 
 
 
-{% highlight r %}
+```r
 p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) 
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2) + facet_wrap(~uncertainty)
-{% endhighlight %}
+```
 
 ![plot of chunk all](http://farm8.staticflickr.com/7097/7178260484_19f3a06f8d_o.png) 
 
@@ -395,9 +395,9 @@ We can also look at the harvest dynamics:
 
 
 
-{% highlight r %}
+```r
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen") + facet_wrap(~uncertainty)
-{% endhighlight %}
+```
 
 ![plot of chunk harvestplot](http://farm8.staticflickr.com/7081/7178261354_c65de40ee2_o.png) 
 
@@ -406,9 +406,9 @@ This strategy is supposed to be a constant-escapement strategy. We can visualize
 
 
 
-{% highlight r %}
+```r
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey") + facet_wrap(~uncertainty)
-{% endhighlight %}
+```
 
 ![plot of chunk escapement](http://farm8.staticflickr.com/7083/7178262020_bf2c43beba_o.png) 
 
@@ -416,27 +416,10 @@ p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 
 
 
-{% highlight r %}
-ggplot(subset(dt,reps==1)) +
-  geom_line(aes(time, profit_fishing)) +
-  geom_line(aes(time, policy_cost), col="darkblue") + facet_wrap(~uncertainty)
-{% endhighlight %}
-
-
-
-{% highlight text %}
-Error: object 'profit_fishing' not found
-{% endhighlight %}
-
-
-
-
-
-
-{% highlight r %}
+```r
 profits <-dt[ , sum(profit), by=c("reps", "uncertainty")] 
 ggplot(profits) + geom_histogram(aes(V1)) + facet_wrap(~uncertainty)
-{% endhighlight %}
+```
 
 ![plot of chunk unnamed-chunk-18](http://farm8.staticflickr.com/7225/7178262532_4456c37861_o.png) 
 
@@ -445,35 +428,35 @@ Summary stats
 
 
 
-{% highlight r %}
+```r
 profits[, mean(V1), by=uncertainty]
-{% endhighlight %}
+```
 
 
 
-{% highlight text %}
+```
               uncertainty    V1
 [1,]                known 33.11
 [2,]               growth 34.89
 [3,]         growth_stock 33.78
 [4,] growth_stock_harvest 32.74
-{% endhighlight %}
+```
 
 
 
-{% highlight r %}
+```r
 profits[, sd(V1), by=uncertainty]
-{% endhighlight %}
+```
 
 
 
-{% highlight text %}
+```
               uncertainty     V1
 [1,]                known 0.2821
 [2,]               growth 4.4879
 [3,]         growth_stock 4.6689
 [4,] growth_stock_harvest 4.1575
-{% endhighlight %}
+```
 
 
 
