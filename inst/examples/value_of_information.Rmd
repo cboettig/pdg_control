@@ -198,8 +198,6 @@ z_i <- function() rlnorm(1,  0, sigma_i) # mean 1
 Find the transition matrix.  Use the simulation method to account for the extra uncertainties 
 
 ``` {r }
-require(snowfall) 
-sfInit(parallel=TRUE, cpu=4)
 SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=999)
 ````
 
