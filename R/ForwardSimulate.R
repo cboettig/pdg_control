@@ -15,11 +15,13 @@
 #'  assessment of stock size
 #' @param z_i a function which returns a random number from a distribution 
 #' for the implementation uncertainty in quotas 
+#' @param profit function, if known
 #' @return a data frame with the time, fishstock, harvested amount,
 #'  and what the escapement ("unharvested"). 
 #' @export
 ForwardSimulate <- function(f, pars, x_grid, h_grid, x0, D, z_g,
-                            z_m=function(x) 1, z_i = function(x) 1){
+                            z_m=function(x) 1, z_i = function(x) 1, 
+                            profit=NULL){
   # initialize variables with initial conditions
   OptTime <- dim(D)[2]    # Stopping time
   x_h <- numeric(OptTime) # population dynamics with harvest
@@ -28,7 +30,8 @@ ForwardSimulate <- function(f, pars, x_grid, h_grid, x0, D, z_g,
   
   s <- x_h # also track escapement
   x <- x_h # What would happen with no havest
-  
+  p <- numeric(OptTime)
+ 
     
   ## Simulate through time ##
   for(t in 1:(OptTime-1)){
@@ -43,12 +46,13 @@ ForwardSimulate <- function(f, pars, x_grid, h_grid, x0, D, z_g,
     z <- z_g() 
     # population grows
     x_h[t+1] <- z * f(x_h[t], h[t], pars) # with havest
-    s[t]   <- x_h[t] - q_t # anticipated escapement
+    s[t+1]   <- x_h[t] - q_t # anticipated escapement
     x[t+1]   <- z * f(x[t], 0, pars) # havest-free dynamics
-  }
+    p[t] <- profit(x_h[t], h[t])
+}
   # formats output 
   data.frame(time = 1:OptTime, fishstock = x_h, harvest = h,
-             unharvested = x, escapement = s) 
+             unharvested = x, escapement = s, profit = p) 
 }
 
 

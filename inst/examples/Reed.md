@@ -213,7 +213,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest), col="darkgreen") 
 ```
 
-![plot of chunk p0](http://farm8.staticflickr.com/7047/6983802282_7bceb5cd87_o.png) 
+![plot of chunk p0](http://farm9.staticflickr.com/8015/7178088946_4ab62a1ed1_o.png) 
 
 
 
@@ -224,10 +224,27 @@ This plot summarizes the stock dynamics by visualizing the replicates. Reed's S 
 ```r
 p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) + 
   geom_abline(intercept=xT, slope = 0, lty=2) 
+```
+
+
+
+```
+Error: object 'xT' not found
+```
+
+
+
+```r
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk p1](http://farm8.staticflickr.com/7193/7129886257_51bb453c13_o.png) 
+
+
+```
+Error: object 'p1' not found
+```
+
+
 
 
 We can also look at the harvest dynamics:
@@ -238,7 +255,13 @@ We can also look at the harvest dynamics:
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 ```
 
-![plot of chunk p2](http://farm9.staticflickr.com/8167/6983803634_7699492b79_o.png) 
+
+
+```
+Error: object 'p1' not found
+```
+
+
 
 
 This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement: 
@@ -249,7 +272,13 @@ This strategy is supposed to be a constant-escapement strategy. We can visualize
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 ```
 
-![plot of chunk p3](http://farm8.staticflickr.com/7050/7129887427_4f690c5d65_o.png) 
+
+
+```
+Error: object 'p1' not found
+```
+
+
 
 
 
@@ -272,10 +301,27 @@ p5 <- ggplot(policy_zoom) +
   scale_colour_gradientn(colours = rainbow(4)) +
   geom_abline(intercept=opt$S, slope = 0) +
   geom_abline(intercept=xT, slope=0, lty=2)
+```
+
+
+
+```
+Error: object 'xT' not found
+```
+
+
+
+```r
 p5
 ```
 
-![plot of chunk policy](http://farm8.staticflickr.com/7188/7129887821_5430106a9f_o.png) 
+
+
+```
+Error: object 'p5' not found
+```
+
+
 
 
 The harvest intensity is limited by the stock size.
@@ -290,9 +336,26 @@ p6 <- ggplot(policy_zoom) +
   scale_colour_gradientn(colours = rainbow(4)) +
   geom_abline(intercept=opt$S, slope = 0) +
   geom_abline(intercept=xT, slope=0, lty=2)
+```
+
+
+
+```
+Error: object 'xT' not found
+```
+
+
+
+```r
 p6 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1, data=dt)
 ```
 
-![plot of chunk policy2](http://farm8.staticflickr.com/7108/7129888199_255a56ecb2_o.png) 
+
+
+```
+Error: object 'p6' not found
+```
+
+
 
 
