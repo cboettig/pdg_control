@@ -7,7 +7,16 @@
  * author Carl Boettiger, <cboettig@gmail.com>
  * license: CC0
 
- Implements a numerical version of the SDP described in (Sethi _et. al._ 2005).
+ Implements a numerical version of the SDP described in 
+
+```
+
+Error in bibentry1(bibtype = "Article", textVersion = NULL, header = NULL,  : 
+  A bibentry of bibtype 'Article' has to correctly specify the field(s): author
+
+```
+
+.
  Compute the optimal solution under different forms of uncertainty.  The true uncertainty is much smaller than that assumed, just a small uncertainty in growth.  We compare the case where the uncertainty is equal to this tiny growth uncertainty to policies derived under much greater uncertainty assumptions, and see how the resulting profit varies.   
 
 
@@ -25,7 +34,7 @@ Chose the state equation / population dynamics function
 f <- Myer_harvest
 pars <- c(1, 2, 6) 
 p <- pars # shorthand 
-K <- p[1] * p[3] / 2 + sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2
+K <- p[1] * p[3] / 2 + sqrt( (p[1] * p[3]) ^ 2 -0.5 * p[3] ) / 2
 x0 <- K - sigma_g ^ 2 / 2 
 ```
 
@@ -148,7 +157,7 @@ sims_known <- lapply(1:100, function(i){
 
 
 ```r
-sigma_g <- 0.15    # Noise in population growth
+sigma_g <- 0.5    # Noise in population growth
 z_g <- function() rlnorm(1,  0, sigma_g) # mean 1
 ```
 
@@ -199,8 +208,8 @@ sims_g <- lapply(1:100, function(i){
 
 
 ```r
-sigma_g <- 0.15    # Noise in population growth
-sigma_m <- 0.15     # noise in stock assessment measurement
+sigma_g <- 0.5    # Noise in population growth
+sigma_m <- 0.5     # noise in stock assessment measurement
 z_g <- function() rlnorm(1,  0, sigma_g) # mean 1
 z_m <- function() rlnorm(1,  0, sigma_m) # mean 1
 z_i <- function() 1
@@ -278,9 +287,9 @@ sims_gm <- lapply(1:100, function(i){
 
 
 ```r
-sigma_g <- 0.15    # Noise in population growth
-sigma_m <- 0.15     # noise in stock assessment measurement
-sigma_i <- 0.15     # noise in implementation of the quota
+sigma_g <- 0.5    # Noise in population growth
+sigma_m <- 0.5     # noise in stock assessment measurement
+sigma_i <- 0.5     # noise in implementation of the quota
 z_g <- function() rlnorm(1,  0, sigma_g) # mean 1
 z_m <- function() rlnorm(1,  0, sigma_m) # mean 1
 z_i <- function() rlnorm(1,  0, sigma_i) # mean 1
@@ -369,7 +378,7 @@ ggplot(subset(dt,reps==1)) +
   facet_wrap(~uncertainty) 
 ```
 
-![plot of chunk onerep](http://farm8.staticflickr.com/7091/7179266526_0306ca6dea_o.png) 
+![plot of chunk onerep](http://farm6.staticflickr.com/5315/7179301258_23234a0a86_o.png) 
 
 
 
@@ -382,7 +391,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0)
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2) + facet_wrap(~uncertainty)
 ```
 
-![plot of chunk all](http://farm8.staticflickr.com/7243/7179266964_b2115dee07_o.png) 
+![plot of chunk all](http://farm8.staticflickr.com/7096/7179301716_89b6b82f12_o.png) 
 
 
 We can also look at the harvest dynamics:
@@ -393,7 +402,7 @@ We can also look at the harvest dynamics:
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen") + facet_wrap(~uncertainty)
 ```
 
-![plot of chunk harvestplot](http://farm9.staticflickr.com/8025/7179267406_bc5f9a590b_o.png) 
+![plot of chunk harvestplot](http://farm6.staticflickr.com/5323/7179302154_18a509be99_o.png) 
 
 
 This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement: 
@@ -404,7 +413,7 @@ This strategy is supposed to be a constant-escapement strategy. We can visualize
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey") + facet_wrap(~uncertainty)
 ```
 
-![plot of chunk escapement](http://farm8.staticflickr.com/7084/7179267830_b9c09176ea_o.png) 
+![plot of chunk escapement](http://farm6.staticflickr.com/5152/7179302548_bb0f02526a_o.png) 
 
 
 
@@ -415,7 +424,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, profit))  + facet_wrap(~uncertainty)
 ```
 
-![plot of chunk unnamed-chunk-16](http://farm6.staticflickr.com/5346/7179268142_53cf8e33c8_o.png) 
+![plot of chunk unnamed-chunk-16](http://farm6.staticflickr.com/5076/7179303004_1195348c77_o.png) 
 
 
 
@@ -425,7 +434,7 @@ profits <-dt[ , sum(profit), by=c("reps", "uncertainty")]
 ggplot(profits) + geom_histogram(aes(V1)) + facet_wrap(~uncertainty)
 ```
 
-![plot of chunk unnamed-chunk-17](http://farm9.staticflickr.com/8150/7179268486_aa8929b9f0_o.png) 
+![plot of chunk unnamed-chunk-17](http://farm8.staticflickr.com/7099/7179303326_df650d1727_o.png) 
 
 
 Summary stats
@@ -440,10 +449,10 @@ profits[, mean(V1), by=uncertainty]
 
 ```
               uncertainty    V1
-[1,]                known 17.85
-[2,]               growth 17.90
-[3,]         growth_stock 17.65
-[4,] growth_stock_harvest 17.66
+[1,]                known 18.07
+[2,]               growth 17.87
+[3,]         growth_stock 14.93
+[4,] growth_stock_harvest 16.92
 ```
 
 
@@ -456,10 +465,10 @@ profits[, sd(V1), by=uncertainty]
 
 ```
               uncertainty     V1
-[1,]                known 0.1482
-[2,]               growth 0.6418
-[3,]         growth_stock 0.6873
-[4,] growth_stock_harvest 0.7507
+[1,]                known 0.1282
+[2,]               growth 0.7367
+[3,]         growth_stock 0.5289
+[4,] growth_stock_harvest 0.6541
 ```
 
 
@@ -469,9 +478,6 @@ profits[, sd(V1), by=uncertainty]
 
 # References
 
-Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005). "Fishery
-management under multiple uncertainty." _Journal of Environmental
-Economics and Management_, *50*. ISSN 00950696, <URL:
-http://dx.doi.org/10.1016/j.jeem.2004.11.005>.
+
 
 
