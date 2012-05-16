@@ -388,7 +388,7 @@ ggplot(subset(dt,reps==1)) +
   facet_wrap(~uncertainty) 
 ```
 
-![plot of chunk onerep](http://farm8.staticflickr.com/7245/7178641830_a838f6aa00_o.png) 
+![plot of chunk onerep](http://farm8.staticflickr.com/7217/7211205964_78e003f6b6_o.png) 
 
 
 
@@ -401,7 +401,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0)
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2) + facet_wrap(~uncertainty)
 ```
 
-![plot of chunk all](http://farm8.staticflickr.com/7072/7178642374_26a4b95c0a_o.png) 
+![plot of chunk all](http://farm6.staticflickr.com/5462/7211206684_98d3e4ea10_o.png) 
 
 
 We can also look at the harvest dynamics:
@@ -412,7 +412,7 @@ We can also look at the harvest dynamics:
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen") + facet_wrap(~uncertainty)
 ```
 
-![plot of chunk harvestplot](http://farm6.staticflickr.com/5326/7178642998_61844d1df9_o.png) 
+![plot of chunk harvestplot](http://farm9.staticflickr.com/8160/7211207386_04f67fef59_o.png) 
 
 
 This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement: 
@@ -423,7 +423,7 @@ This strategy is supposed to be a constant-escapement strategy. We can visualize
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey") + facet_wrap(~uncertainty)
 ```
 
-![plot of chunk escapement](http://farm8.staticflickr.com/7083/7178643688_74cf0540d7_o.png) 
+![plot of chunk escapement](http://farm9.staticflickr.com/8146/7211208216_e28b0ff5b8_o.png) 
 
 
 
@@ -434,7 +434,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, profit))  + facet_wrap(~uncertainty)
 ```
 
-![plot of chunk unnamed-chunk-17](http://farm8.staticflickr.com/7096/7178644124_47971e1b94_o.png) 
+![plot of chunk unnamed-chunk-17](http://farm9.staticflickr.com/8004/7211208968_44f6063635_o.png) 
 
 
 
@@ -444,7 +444,7 @@ profits <-dt[ , sum(profit), by=c("reps", "uncertainty")]
 ggplot(profits) + geom_histogram(aes(V1)) + facet_wrap(~uncertainty)
 ```
 
-![plot of chunk unnamed-chunk-18](http://farm8.staticflickr.com/7230/7178644626_5484054b83_o.png) 
+![plot of chunk unnamed-chunk-18](http://farm8.staticflickr.com/7100/7211209712_58ac838fca_o.png) 
 
 
 Summary stats
@@ -459,10 +459,10 @@ profits[, mean(V1), by=uncertainty]
 
 ```
               uncertainty    V1
-[1,]                known 33.08
-[2,]               growth 33.10
+[1,]                known 33.11
+[2,]               growth 33.38
 [3,]         growth_stock 33.01
-[4,] growth_stock_harvest 32.71
+[4,] growth_stock_harvest 32.93
 ```
 
 
@@ -475,10 +475,10 @@ profits[, sd(V1), by=uncertainty]
 
 ```
               uncertainty     V1
-[1,]                known 0.2774
-[2,]               growth 1.5381
-[3,]         growth_stock 1.5536
-[4,] growth_stock_harvest 1.5173
+[1,]                known 0.2686
+[2,]               growth 1.4163
+[3,]         growth_stock 1.5444
+[4,] growth_stock_harvest 1.4234
 ```
 
 

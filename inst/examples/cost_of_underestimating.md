@@ -3,7 +3,10 @@
 
 
 
-# Calculating the value of information
+# Calculating the value of information: Cost of underestimating
+
+A scenario where the real world is stochastic in three dimensions (growth, measurement, implementation) and the uncertainty considered by the manager increases to include all.  
+
  * author Carl Boettiger, <cboettig@gmail.com>
  * license: CC0
 
@@ -243,18 +246,6 @@ Find the transition matrix.  Use the simulation method to account for the extra 
 ```r
 require(snowfall) 
 sfInit(parallel=TRUE, cpu=16)
-```
-
-
-
-```
-R Version:  R version 2.14.1 (2011-12-22) 
-
-```
-
-
-
-```r
 SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=999)
 ```
 
@@ -400,7 +391,7 @@ ggplot(subset(dt,reps==1)) +
   facet_wrap(~uncertainty) 
 ```
 
-![plot of chunk onerep](http://farm9.staticflickr.com/8013/7179191910_d269692a63_o.png) 
+![plot of chunk onerep](http://farm8.staticflickr.com/7233/7211251458_c725154568_o.png) 
 
 
 
@@ -413,7 +404,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0)
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2) + facet_wrap(~uncertainty)
 ```
 
-![plot of chunk all](http://farm8.staticflickr.com/7088/7179192318_04dc38cacf_o.png) 
+![plot of chunk all](http://farm8.staticflickr.com/7219/7211252270_cb37650e13_o.png) 
 
 
 We can also look at the harvest dynamics:
@@ -424,7 +415,7 @@ We can also look at the harvest dynamics:
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen") + facet_wrap(~uncertainty)
 ```
 
-![plot of chunk harvestplot](http://farm6.staticflickr.com/5035/7179192804_0093fdcd49_o.png) 
+![plot of chunk harvestplot](http://farm9.staticflickr.com/8015/7211253322_9572e18a3b_o.png) 
 
 
 This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement: 
@@ -435,7 +426,7 @@ This strategy is supposed to be a constant-escapement strategy. We can visualize
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey") + facet_wrap(~uncertainty)
 ```
 
-![plot of chunk escapement](http://farm8.staticflickr.com/7233/7179193188_763c6566e3_o.png) 
+![plot of chunk escapement](http://farm8.staticflickr.com/7101/7211254306_86c0acf1ca_o.png) 
 
 
 
@@ -446,7 +437,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, profit))  + facet_wrap(~uncertainty)
 ```
 
-![plot of chunk unnamed-chunk-17](http://farm6.staticflickr.com/5116/7179193498_aaf950a116_o.png) 
+![plot of chunk unnamed-chunk-17](http://farm8.staticflickr.com/7219/7211254978_728b624b34_o.png) 
 
 
 
@@ -456,7 +447,7 @@ profits <-dt[ , sum(profit), by=c("reps", "uncertainty")]
 ggplot(profits) + geom_histogram(aes(V1)) + facet_wrap(~uncertainty)
 ```
 
-![plot of chunk unnamed-chunk-18](http://farm8.staticflickr.com/7072/7179193788_f4e279e305_o.png) 
+![plot of chunk unnamed-chunk-18](http://farm6.staticflickr.com/5456/7211255712_5f757598c7_o.png) 
 
 
 Summary stats
@@ -471,10 +462,10 @@ profits[, mean(V1), by=uncertainty]
 
 ```
               uncertainty    V1
-[1,]                known 30.44
-[2,]               growth 33.72
-[3,]         growth_stock 33.00
-[4,] growth_stock_harvest 32.66
+[1,]                known 30.57
+[2,]               growth 32.58
+[3,]         growth_stock 32.63
+[4,] growth_stock_harvest 33.05
 ```
 
 
@@ -487,10 +478,10 @@ profits[, sd(V1), by=uncertainty]
 
 ```
               uncertainty    V1
-[1,]                known 7.660
-[2,]               growth 4.677
-[3,]         growth_stock 4.580
-[4,] growth_stock_harvest 4.890
+[1,]                known 6.015
+[2,]               growth 4.474
+[3,]         growth_stock 4.394
+[4,] growth_stock_harvest 4.711
 ```
 
 
