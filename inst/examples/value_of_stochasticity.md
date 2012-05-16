@@ -234,18 +234,6 @@ Find the transition matrix.  Use the simulation method to account for the extra 
 ```r
 require(snowfall) 
 sfInit(parallel=TRUE, cpu=16)
-```
-
-
-
-```
-R Version:  R version 2.14.1 (2011-12-22) 
-
-```
-
-
-
-```r
 SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=999)
 ```
 
@@ -375,7 +363,7 @@ ggplot(subset(dt,reps==1)) +
   facet_wrap(~uncertainty) 
 ```
 
-![plot of chunk onerep](http://farm8.staticflickr.com/7082/7178259848_6a75c990c5_o.png) 
+![plot of chunk onerep](http://farm6.staticflickr.com/5238/7211228518_c756c3e830_o.png) 
 
 
 
@@ -388,7 +376,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0)
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2) + facet_wrap(~uncertainty)
 ```
 
-![plot of chunk all](http://farm8.staticflickr.com/7097/7178260484_19f3a06f8d_o.png) 
+![plot of chunk all](http://farm8.staticflickr.com/7235/7211229380_b97d4c8fb8_o.png) 
 
 
 We can also look at the harvest dynamics:
@@ -399,7 +387,7 @@ We can also look at the harvest dynamics:
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen") + facet_wrap(~uncertainty)
 ```
 
-![plot of chunk harvestplot](http://farm8.staticflickr.com/7081/7178261354_c65de40ee2_o.png) 
+![plot of chunk harvestplot](http://farm8.staticflickr.com/7231/7211230100_714f0c6ba3_o.png) 
 
 
 This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement: 
@@ -410,8 +398,18 @@ This strategy is supposed to be a constant-escapement strategy. We can visualize
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey") + facet_wrap(~uncertainty)
 ```
 
-![plot of chunk escapement](http://farm8.staticflickr.com/7083/7178262020_bf2c43beba_o.png) 
+![plot of chunk escapement](http://farm8.staticflickr.com/7234/7211230780_9e3bdce79e_o.png) 
 
+
+
+
+
+```r
+ggplot(subset(dt,reps==1)) +
+  geom_line(aes(time, profit))  + facet_wrap(~uncertainty)
+```
+
+![plot of chunk unnamed-chunk-17](http://farm6.staticflickr.com/5448/7211231392_d3336123b0_o.png) 
 
 
 
@@ -421,7 +419,7 @@ profits <-dt[ , sum(profit), by=c("reps", "uncertainty")]
 ggplot(profits) + geom_histogram(aes(V1)) + facet_wrap(~uncertainty)
 ```
 
-![plot of chunk unnamed-chunk-18](http://farm8.staticflickr.com/7225/7178262532_4456c37861_o.png) 
+![plot of chunk unnamed-chunk-18](http://farm6.staticflickr.com/5333/7211231974_a46bcf58a2_o.png) 
 
 
 Summary stats
@@ -436,10 +434,10 @@ profits[, mean(V1), by=uncertainty]
 
 ```
               uncertainty    V1
-[1,]                known 33.11
-[2,]               growth 34.89
-[3,]         growth_stock 33.78
-[4,] growth_stock_harvest 32.74
+[1,]                known 33.09
+[2,]               growth 35.40
+[3,]         growth_stock 33.42
+[4,] growth_stock_harvest 32.91
 ```
 
 
@@ -452,10 +450,10 @@ profits[, sd(V1), by=uncertainty]
 
 ```
               uncertainty     V1
-[1,]                known 0.2821
-[2,]               growth 4.4879
-[3,]         growth_stock 4.6689
-[4,] growth_stock_harvest 4.1575
+[1,]                known 0.2617
+[2,]               growth 4.0028
+[3,]         growth_stock 3.4708
+[4,] growth_stock_harvest 4.2624
 ```
 
 
