@@ -114,7 +114,7 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0,
 
 As before, we simulate 100 replicates using the same random number sequence, now under this case where the noise in growth is intrinsic and is being accounted for by the management.  
 
-```{r }
+```{r}
 set.seed(42)
 sims_two <- lapply(1:100, function(i){
   ForwardSimulate(f, pars, x_grid, h_grid, x0=K, opt$D, z_g, z_m, z_i, profit)
@@ -124,14 +124,14 @@ sims_two <- lapply(1:100, function(i){
 ### Growth uncertainty & bias  
 
 
-`` {r }
+```{r}
 est_pars <- pars
 par_var <- .1
 ````
 
 This time we consider the same optimization under uncertainty as before, but the simulations introduce bias through a random estimate of the growth rate parameter A, drawn from a normal with mean equal to the true value `r pars[1]` and variance `r par_var`.   Since A is a constant multiplier in the growth dynamics, this is equivalent to a random estimate of mean of the noise process `z_g`.  Our estimate of the parameter is drawn from the distribution and then held fixed for that replicate.  Each replicate draws its own value, so average parameter estimate across the replicates should be close to the true value.  _Isn't this equivalent to the standard parameter uncertainty?_
 
-```{r }
+```{r}
 set.seed(42)
 sims_three <- lapply(1:100, function(i){
   est_pars[1] <- rnorm(1, pars[1], par_var)
@@ -142,7 +142,7 @@ sims_three <- lapply(1:100, function(i){
 
 ## Unbiased error in growth estimate
 
-```{r }
+```{r}
 sigma_g <- sqrt(0.15^2 + par_var^2)   # Noise in population growth
 z_g <- function() rlnorm(1,  0, sigma_g) # mean 1
 z_m <- function() 1 
@@ -152,7 +152,7 @@ z_i <- function() 1
 We will compare this result to the situation of underestimating the uncertainty in the growth rate, but knowning the parameter exactly.  We use the deterministic optimum solution under a reality that has log-normal growth noise equal to the sum of the variances in the previous example, \( \sigma_g = \)  `r sigma_g`.  
 
 
-```{r }
+```{r}
 set.seed(42)
 sims_four <- lapply(1:100, function(i){
   ForwardSimulate(f, pars, x_grid, h_grid, x0=K, det_opt$D, z_g, z_m, z_i, profit)
