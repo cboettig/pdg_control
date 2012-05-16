@@ -1,4 +1,4 @@
-`ro cache=TRUE, tidy=FALSE, warning=FALSE, comment=NA, message=FALSE, fig.width=10, fig.height=10, refresh=5 or`
+`ro cache=TRUE, tidy=FALSE, warning=FALSE, comment=NA, message=FALSE, fig.width=10, fig.height=10, cache.path="value_of_information/" or`
 
 ``` {r  echo=FALSE, cache=FALSE }
 opts_knit$set(upload.fun = socialR::flickr.url)
