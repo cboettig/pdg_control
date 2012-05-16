@@ -1,4 +1,4 @@
-`ro cache=TRUE, tidy=FALSE, warning=FALSE, comment=NA, message=FALSE, fig.width=6, fig.height=6, cache.path="cost_of_bias/", include=FALSE or`
+`ro cache=TRUE, tidy=FALSE, warning=FALSE, comment=NA, message=FALSE, fig.width=6, fig.height=6, cache.path="cost_of_bias/", echo=FALSE or`
 
 ```{r echo=FALSE, cache=FALSE }
 opts_knit$set(upload.fun = socialR::flickr.url)
@@ -15,8 +15,8 @@ knitcitations::cleanbib()
  * license: CC0
 
 
- * knitr-formatted [source code](#)
- * [Cached data](#)
+ * knitr-formatted [source code](https://github.com/cboettig/pdg_control/blob/master/inst/examples/cost_of_bias.Rmd)
+ * [Cached data](http://two.ucdavis.edu/cboettig/data/cost_of_bias/)
 
 Implements a numerical version of the SDP described in `r knitcitations::citep("10.1016/j.jeem.2004.11.005")`.  Then compute the optimal solution under different forms of uncertainty and compare the results.  
 
@@ -129,7 +129,7 @@ est_pars <- pars
 par_var <- .1
 ````
 
-This time we consider the same optimization under uncertainty as before, but the simulations introduce bias through a random estimate of the growth rate parameter A, drawn from a normal with mean equal to the true value `pars[1]` and variance `r par_var`.   Since A is a constant multiplier in the growth dynamics, this is equivalent to a random estimate of mean of the noise process `z_g`.  Our estimate of the parameter is drawn from the distribution and then held fixed for that replicate.  Each replicate draws its own value, so average parameter estimate across the replicates should be close to the true value.  _Isn't this equivalent to the standard parameter uncertainty?_
+This time we consider the same optimization under uncertainty as before, but the simulations introduce bias through a random estimate of the growth rate parameter A, drawn from a normal with mean equal to the true value `r pars[1]` and variance `r par_var`.   Since A is a constant multiplier in the growth dynamics, this is equivalent to a random estimate of mean of the noise process `z_g`.  Our estimate of the parameter is drawn from the distribution and then held fixed for that replicate.  Each replicate draws its own value, so average parameter estimate across the replicates should be close to the true value.  _Isn't this equivalent to the standard parameter uncertainty?_
 
 ```{r }
 set.seed(42)
