@@ -85,8 +85,27 @@ As before, we simulate 100 replicates using the same random number sequence, now
 
 
 
-This time we consider the same optimization under uncertainty as before, but the simulations introduce bias through a random estimate of the growth rate parameter A, drawn from a normal with mean equal to the true value `1.5` and variance `0.1`.   Since A is a constant multiplier in the growth dynamics, this is equivalent to a random estimate of mean of the noise process `z_g`.  Our estimate of the parameter is drawn from the distribution and then held fixed for that replicate.  Each replicate draws its own value, so average parameter estimate across the replicates should be close to the true value.  _Isn't this equivalent to the standard parameter uncertainty?_
+This time we consider the same optimization under uncertainty as before, but the simulations introduce bias through a random estimate of the growth rate parameter A, drawn from a normal with mean equal to the true value `1.5` and variance `0.2`.   Since A is a constant multiplier in the growth dynamics, this is equivalent to a random estimate of mean of the noise process `z_g`.  Our estimate of the parameter is drawn from the distribution and then held fixed for that replicate.  Each replicate draws its own value, so average parameter estimate across the replicates should be close to the true value.  _Isn't this equivalent to the standard parameter uncertainty?_
 
+
+
+
+For the record, the biases by index number are:
+
+
+
+```
+  [1] 1.766 1.380 1.511 1.394 1.484 1.532 1.480 1.429 1.406 1.507 1.460
+ [12] 1.391 1.575 1.581 1.534 1.280 1.580 1.585 1.443 1.611 1.753 1.566
+ [23] 1.653 1.757 1.832 1.404 1.418 1.434 1.720 1.616 1.692 1.560 1.442
+ [34] 1.209 1.159 1.902 1.501 1.612 1.639 1.789 1.627 1.505 1.649 1.569
+ [45] 1.374 1.692 1.533 1.493 1.316 1.730 1.422 1.480 1.494 1.489 1.611
+ [56] 1.680 1.607 1.206 1.018 1.427 1.464 1.470 1.221 1.364 1.136 2.028
+ [67] 1.609 1.499 1.122 1.447 1.664 1.656 1.591 1.782 1.138 1.280 1.496
+ [78] 1.530 1.394 1.740 1.091 1.297 1.821 1.678 1.196 1.665 1.573 1.234
+ [89] 1.572 1.679 1.301 1.604 1.253 1.606 1.303 1.425 1.292 1.640 1.471
+[100] 1.600
+```
 
 
 
@@ -95,19 +114,6 @@ This time we consider the same optimization under uncertainty as before, but the
 
 The correct baseline comparison against the above scenario, Mike points out to me, still includes the bias, but solves for the optimal solution of that random draw.  This is much slower since it requires solving a new optimum each time, but parallelizes well.   
 
-
-
-
-```
-R Version:  R version 2.14.1 (2011-12-22) 
-
-```
-
-
-
-```
-Library pdgControl loaded.
-```
 
 
 
@@ -124,21 +130,21 @@ Library pdgControl loaded.
 
 Let's begin by looking at the dynamics of a single replicate. The line shows Reed's S, the level above which the stock should be harvested (where catch should be the difference between stock and S).  To confirm that this policy is being followed, note that harvesting only occurs when the stock is above this line, and harvest is proportional to the amount by which it is above.  Change the replicate `reps==` to see the results from a different replicate.  
 
-![plot of chunk onerep](http://farm9.staticflickr.com/8016/7223092804_9ef9492b06_o.png) 
+![plot of chunk onerep](http://farm8.staticflickr.com/7241/7223268132_a05f71a08f_o.png) 
 
 
 
 This plot summarizes the stock dynamics by visualizing the replicates. Reed's S shown again.
 
-![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm8.staticflickr.com/7228/7223093476_421cb98440_o.png) 
+![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm8.staticflickr.com/7227/7223268766_182021509e_o.png) 
 
 
 
-![The profits made in each time interval of a single replicate, by scenario](http://farm6.staticflickr.com/5470/7223094000_419a639c96_o.png) 
+![The profits made in each time interval of a single replicate, by scenario](http://farm8.staticflickr.com/7100/7223269436_3e762aa435_o.png) 
 
 
 
-![the distribution of profits by scenario](http://farm8.staticflickr.com/7241/7223094524_2463b1a39a_o.png) 
+![the distribution of profits by scenario](http://farm9.staticflickr.com/8146/7223269932_f557f2b5e4_o.png) 
 
 
 Summary statistics 
@@ -149,18 +155,18 @@ Summary statistics
      uncertainty    V1
 [1,]       known 33.08
 [2,]      Growth 34.34
-[3,]  RandomBias 34.66
-[4,]   KnownBias 34.86
+[3,]  RandomBias 35.47
+[4,]   KnownBias 35.47
 ```
 
 
 
 ```
-     uncertainty    V1
-[1,]       known 0.000
-[2,]      Growth 3.963
-[3,]  RandomBias 9.497
-[4,]   KnownBias 9.648
+     uncertainty     V1
+[1,]       known  0.000
+[2,]      Growth  3.963
+[3,]  RandomBias 15.403
+[4,]   KnownBias 15.403
 ```
 
 
@@ -183,21 +189,9 @@ cost_of_bias
 
 
 ```
-  [1]  11.6827   2.5336  -4.3163   3.8347  -0.8089  -2.0183   1.2863
-  [8]  -4.1427  -4.3798   4.4432   3.4784 -11.2389  -1.7576   8.8768
- [15]  -0.2049   3.5902   0.1604  -5.5709  -6.2378  15.6252   5.0021
- [22]   1.1942   3.9689   1.2102   6.0537  -1.8033   4.9185   1.4861
- [29]   5.4467   0.1510   9.4859  -3.8346  -6.8022  -5.0448  -0.8049
- [36]  -3.0257  -0.7626  -5.3635   3.6319   5.7558   4.0046  -1.8527
- [43]  -8.9348   0.6039  -1.6645   6.9408   1.2359  -6.3933   6.6986
- [50] -10.2909   0.4047   2.3933   0.7641  -2.7136   0.8972   5.6496
- [57]   8.6733   4.0855   0.7901  -3.0276   6.0774  -4.7135 -12.3060
- [64]   0.6089  -2.6245  -7.3993  -2.8139  11.9580   9.6845  -6.0542
- [71]   9.9349  -7.8665   1.2105 -10.3859  -3.0245  -2.6540   8.6623
- [78] -14.0362  -0.7954  -0.5253  -5.3299  -0.4057   7.8684  10.2892
- [85]  -3.6322  -3.8366  -3.8148   1.4110  -5.7724   9.6865   2.6215
- [92]  -4.9402  -1.5327  -7.9145  -1.0575   4.0332  -2.1267  -4.6049
- [99]   9.0792   2.7995
+  [1] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ [36] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ [71] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 ```
 
 
@@ -209,7 +203,7 @@ mean(cost_of_bias)
 
 
 ```
-[1] 0.1972
+[1] 0
 ```
 
 
@@ -221,7 +215,7 @@ sd(cost_of_bias)
 
 
 ```
-[1] 5.849
+[1] 0
 ```
 
 
