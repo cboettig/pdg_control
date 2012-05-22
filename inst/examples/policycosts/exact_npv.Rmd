@@ -94,11 +94,13 @@ sfSapply(penaltyfns, function(penalty){
   })
 })
 ````
+
 Note that `optim_policy` has been updated to return the equilibrium value of profits from fish harvests before the adjustment costs have been paid, `penalty_free_V`.  This containst the values for all possible states, we simply evaluate it at the carrying capacity (which is our initial condition.)  The index in `x_grid` that corresponds to the carrying capacity (initial condition) `i` indicates this.  
 
 
 
 Quadratic costs on fishing effort have to be done separately,
+
 ``` {r  quadcosts}
 quad <- 
   sapply(c2, function(c2){
@@ -113,11 +115,20 @@ dat <- cbind(policies, quad)
 ````
 
 Tidy up the data and plot the net present value (before the penalty has been paid) relative to that achieved when managed without a penalty.  
+
 ``` {r npv-plot}
 npv0 <- dat[1,3] 
 dat <- data.frame(c2=c2,dat)
 dat <- melt(dat, id="c2")
 ggplot(dat, aes(c2, (npv0-value)/npv0, col=variable)) + geom_point() + geom_line()
 ````
+
+Find the value of `c2` that brings each penalty closest to 75% of the cost-free adjustment value:
+
+```{r }
+dat <- data.table(dat)
+dat[,findInterval(.75*npv0, (npv0-value)/value), by="variable"]
+````
+
 
 
