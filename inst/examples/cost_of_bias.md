@@ -41,8 +41,7 @@ and solve the problem on a discrete grid of `100` for stock size and range `0`, 
 
 ## Scenarios 
 
-We calculate the stochastic transition matrix for the probability of going from any state \\(x_t \\) to any other state \\(x_{t+1}\\) the following year, for each possible choice of harvest \\( h_t \\).  This provides a look-up table for the dynamic programming calculations. In the Sethi case, computing the distribution over multiple sources of noise is actually quite difficult.  Simulation turns out to be more efficient than numerically integrating over each distribution.  We use this matrix to compute the optimum strategy for all possible states of the world by dynamic programming, and then simulate replicates while applying this rule.   
-
+We calculate the stochastic transition matrix for the probability of going from any state \\(x_t \\) to any other state \\(x_{t+1}\\) the following year, for each possible choice of harvest \\( h_t \\).  This provides a look-up table for the dynamic programming calculations.
 
 ### No Uncertainty 
 
@@ -86,18 +85,34 @@ As before, we simulate 100 replicates using the same random number sequence, now
 
 
 
-This time we consider the same optimization under uncertainty as before, but the simulations introduce bias through a random estimate of the growth rate parameter A, drawn from a normal with mean equal to the true value `1.5` and variance `0.1`.   Since A is a constant multiplier in the growth dynamics, this is equivalent to a random estimate of mean of the noise process `z_g`.  Our estimate of the parameter is drawn from the distribution and then held fixed for that replicate.  Each replicate draws its own value, so average parameter estimate across the replicates should be close to the true value.  _Isn't this equivalent to the standard parameter uncertainty?_
+This time we consider the same optimization under uncertainty as before, but the simulations introduce bias through a random estimate of the growth rate parameter A, drawn from a normal with mean equal to the true value `1.5` and variance `0.2`.   Since A is a constant multiplier in the growth dynamics, this is equivalent to a random estimate of mean of the noise process `z_g`.  Our estimate of the parameter is drawn from the distribution and then held fixed for that replicate.  Each replicate draws its own value, so average parameter estimate across the replicates should be close to the true value.  _Isn't this equivalent to the standard parameter uncertainty?_
 
 
 
 
-
-## Unbiased error in growth estimate
-
+For the record, the biases by index number are:
 
 
 
-We will compare this result to the situation of underestimating the uncertainty in the growth rate, but knowning the parameter exactly.  We use the deterministic optimum solution under a reality that has log-normal growth noise equal to the sum of the variances in the previous example, \( \sigma_g = \)  `0.1803`.  
+```
+  [1] 1.766 1.380 1.511 1.394 1.484 1.532 1.480 1.429 1.406 1.507 1.460
+ [12] 1.391 1.575 1.581 1.534 1.280 1.580 1.585 1.443 1.611 1.753 1.566
+ [23] 1.653 1.757 1.832 1.404 1.418 1.434 1.720 1.616 1.692 1.560 1.442
+ [34] 1.209 1.159 1.902 1.501 1.612 1.639 1.789 1.627 1.505 1.649 1.569
+ [45] 1.374 1.692 1.533 1.493 1.316 1.730 1.422 1.480 1.494 1.489 1.611
+ [56] 1.680 1.607 1.206 1.018 1.427 1.464 1.470 1.221 1.364 1.136 2.028
+ [67] 1.609 1.499 1.122 1.447 1.664 1.656 1.591 1.782 1.138 1.280 1.496
+ [78] 1.530 1.394 1.740 1.091 1.297 1.821 1.678 1.196 1.665 1.573 1.234
+ [89] 1.572 1.679 1.301 1.604 1.253 1.606 1.303 1.425 1.292 1.640 1.471
+[100] 1.600
+```
+
+
+
+
+## Known bias
+
+The correct baseline comparison against the above scenario, Mike points out to me, still includes the bias, but solves for the optimal solution of that random draw.  This is much slower since it requires solving a new optimum each time, but parallelizes well.   
 
 
 
@@ -115,55 +130,102 @@ We will compare this result to the situation of underestimating the uncertainty 
 
 Let's begin by looking at the dynamics of a single replicate. The line shows Reed's S, the level above which the stock should be harvested (where catch should be the difference between stock and S).  To confirm that this policy is being followed, note that harvesting only occurs when the stock is above this line, and harvest is proportional to the amount by which it is above.  Change the replicate `reps==` to see the results from a different replicate.  
 
-![plot of chunk onerep](http://farm8.staticflickr.com/7225/7212202628_7bb3dd53f8_o.png) 
+![plot of chunk onerep](http://farm8.staticflickr.com/7241/7223268132_a05f71a08f_o.png) 
 
 
 
 This plot summarizes the stock dynamics by visualizing the replicates. Reed's S shown again.
 
-![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm8.staticflickr.com/7212/7212203002_18118a7ae0_o.png) 
+![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm8.staticflickr.com/7227/7223268766_182021509e_o.png) 
 
 
 
-![The profits made in each time interval of a single replicate, by scenario](http://farm8.staticflickr.com/7211/7212203360_0aa32ff0ea_o.png) 
+![The profits made in each time interval of a single replicate, by scenario](http://farm8.staticflickr.com/7100/7223269436_3e762aa435_o.png) 
 
 
 
-![the distribution of profits by scenario](http://farm8.staticflickr.com/7237/7212203732_d1d414beaf_o.png) 
+![the distribution of profits by scenario](http://farm9.staticflickr.com/8146/7223269932_f557f2b5e4_o.png) 
 
 
-Summary statistics tell the final story:
-
-
-
-```
-       uncertainty    V1
-[1,]         known 33.06
-[2,]        Growth 34.34
-[3,]          Bias 35.38
-[4,] Underestimate 34.92
-```
+Summary statistics 
 
 
 
 ```
-       uncertainty    V1
-[1,]         known 0.000
-[2,]        Growth 3.963
-[3,]          Bias 8.680
-[4,] Underestimate 4.912
+     uncertainty    V1
+[1,]       known 33.08
+[2,]      Growth 34.34
+[3,]  RandomBias 35.47
+[4,]   KnownBias 35.47
 ```
 
 
+
+```
+     uncertainty     V1
+[1,]       known  0.000
+[2,]      Growth  3.963
+[3,]  RandomBias 15.403
+[4,]   KnownBias 15.403
+```
+
+
+
+
+
+
+
+
+Direct comparisons: 
+
+
+
+```r
+setkey(dt, uncertainty)
+cost_of_bias = dt[uncertainty=="KnownBias", sum(profit), by=reps]$V1 - dt[uncertainty=="RandomBias", sum(profit), by=reps]$V1
+cost_of_bias
+```
+
+
+
+```
+  [1] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ [36] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ [71] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+```
+
+
+
+```r
+mean(cost_of_bias)
+```
+
+
+
+```
+[1] 0
+```
+
+
+
+```r
+sd(cost_of_bias)
+```
+
+
+
+```
+[1] 0
+```
 
 
 
 
 # References
 
-Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005).
-"Fishery management under multiple uncertainty." _Journal of
-Environmental Economics and Management_, *50*. ISSN 00950696,
-<URL: http://dx.doi.org/10.1016/j.jeem.2004.11.005>.
+Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005). "Fishery
+management under multiple uncertainty." _Journal of Environmental
+Economics and Management_, *50*. ISSN 00950696, <URL:
+http://dx.doi.org/10.1016/j.jeem.2004.11.005>.
 
 
