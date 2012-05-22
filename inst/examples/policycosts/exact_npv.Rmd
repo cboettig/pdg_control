@@ -1,4 +1,5 @@
-`ro warning=FALSE, message=FALSE, comment=NA, cache=TRUE, cache.path="exact.npv/"-->
+`ro warning=FALSE, message=FALSE, comment=NA, cache=TRUE, cache.path="exact.npv/" or`
+
 ``` {r setup, include=FALSE }
 opts_knit$set(upload.fun = socialR::flickr.url)
 ````
@@ -125,9 +126,10 @@ ggplot(dat, aes(c2, (npv0-value)/npv0, col=variable)) + geom_point() + geom_line
 
 Find the value of `c2` that brings each penalty closest to 75% of the cost-free adjustment value:
 
-```{r }
+```{r comparison}
 dat <- data.table(dat)
-dat[,findInterval(.75*npv0, (npv0-value)/value), by="variable"]
+int <- dat[,findInterval(.75*npv0, (npv0-value)/value), by="variable"]$V1
+dat$c2[int]
 ````
 
 
