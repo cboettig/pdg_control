@@ -1,4 +1,4 @@
-# Introduction
+## Introduction
 
 Optimal management of ecosystems and natural resources often involves frequent adjustment of a control variable in response to the observed state of a system.  When this control is set in a policy-making process, such as determining a fishing quota, it may be more costly to change the policy in response to new information than to continue with the status quo @Bohm1974. 
 
@@ -6,20 +6,13 @@ Optimal management of ecosystems and natural resources often involves frequent a
 
 * Capital adjustment costs, smoothing @Singh2006
 
-### The stochastic context
+### Stochastic fisheries model 
 
-Model of @Reed1979
+* Model of @Reed1979
 
-Contrast steady-state results to dynamic solutions under stochastic shocks. 
+## Methods 
 
-L2 is smoothing. L1 is less smoothing.  Fixed costs are more volatile than cost-free adjustment. 
-
-Asymmetric costs
-
-
-# Methods 
-
-## Model setup
+### Model setup
 
 * Fish population dynamics / state equation 
 * Fishing profit function
@@ -28,11 +21,11 @@ Asymmetric costs
 * Discounting
 * Model Parameters
 
-## Solution method: Value iteration SDP
+### Solution method: Value iteration SDP
 
 * Finite time horizon
 
-## Formulating the penalty functions
+### Formulating the penalty functions
 
 * [L1](https://github.com/cboettig/pdg_control/blob/master/inst/examples/policycosts/L1.md)
 * [L2](https://github.com/cboettig/pdg_control/blob/master/inst/examples/policycosts/L2.md)
@@ -40,26 +33,26 @@ Asymmetric costs
 * [fixed costs](https://github.com/cboettig/pdg_control/blob/master/inst/examples/policycosts/fixed.md)
 * quadratic smoothing
 
-## Apples to Apples comparisons
+### Apples to Apples comparisons
 
 We compare the impact of the different functional forms for the penalty function at a value of the penalty scaling parameter in each model that induces an equivalent net present value to the stock when optimally managed under this penalty.  This value represents the expected net present value before the costs of policy adjustment are paid. 
 
 ![plot of chunk comparison_plot](http://farm8.staticflickr.com/7217/7258601130_c2fc0bcfa4_o.png) 
 
 
-# Results 
+## Results 
 
-## L1
+### L1
 
 ![plot of chunk rep1](http://farm8.staticflickr.com/7096/7258516896_5c89f034d5_o.png) 
 
 
-## L2
+### L2
 
 ![plot of chunk rep1](http://farm8.staticflickr.com/7214/7258563112_2f5f9ffecd_o.png) 
 
 
-## Fixed
+### Fixed fee
 
 ![plot of chunk rep1](http://farm8.staticflickr.com/7093/7258506664_d6235e5f8e_o.png) 
 
@@ -84,10 +77,7 @@ We compare the impact of the different functional forms for the penalty function
 * mean/sd cost of changing policies (Direct costs) 
 
 
-# Discussion 
-
-* Comparison of the optimal policy solution to the Reed model
-* Comparison between the different functional forms -- smoothing (L2) non-smoothing (L1), and destablizing (fixed). 
+### Other comparisons
 
 Plot of variance vs magnitude of penalty, by penalty function.
 
@@ -97,22 +87,14 @@ Plot of autocorrelation vs magnitude of penalty, by penalty function.
 
 ![autocorrelation trends](http://farm8.staticflickr.com/7248/6996165783_41c9894bdb_o.png) 
 
+
+### Discussion 
+
+* Comparison of the optimal policy solution to the Reed model
+* Comparison between the different functional forms -- smoothing (L2) non-smoothing (L1), and destablizing (fixed). 
 * Induced costs (relative to free adjustment) vs direct costs -- why are the induced costs much larger?
 * Impact of symmetric vs assymetric costs
 * Comparison to deterministic results
-
-
-Intro
-   Costs of changing policy are usually ignored
-   Policy costs make a dramatic difference. 
-
-Results:
-  Examples of policy costs making a big difference, via Reed (stochastic) and Clark (deterministic) models.
-
-Conclusions:
-  Modelers shouldn't ignore policy.
-  Policy makers should consider the costs implicit in being inflexible (as well as costs to change)
-
-
+* Contrast steady-state results to dynamic solutions under stochastic shocks. 
 
 
