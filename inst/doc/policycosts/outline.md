@@ -6,15 +6,16 @@ frequent adjustment of a control variable in response to the observed
 state of a system. When this control is set in a policy-making process,
 such as determining a fishing quota, it may be more costly to change the
 policy in response to new information than to continue with the status
-quo [@Bohm1974, @Xepapadeas1992].
+quo (Bohm 1974) (Xepapadeas 1992).
 
 ### Types of real world policy costs
 
--   Capital adjustment costs, smoothing @Singh2006
+-   Capital adjustment costs, smoothing Singh, Weninger, and Doyle
+    (2006)
 
 ### Stochastic fisheries model
 
--   Model of @Reed1979
+-   Model of Reed (1979)
 
 Methods
 -------
@@ -119,3 +120,24 @@ Discussion
 
 References
 ==========
+
+Bohm, Peter. 1974. “On the Effects of Policy Costs.” *The Swedish
+Journal of Economics* 76 (mar): 104. doi:10.2307/3439361.
+[http://www.jstor.org/stable/10.2307/3439361](http://www.jstor.org/stable/10.2307/3439361 "http://www.jstor.org/stable/10.2307/3439361").
+
+Reed, William J. 1979. “Optimal escapement levels in stochastic and
+deterministic harvesting models.” *Journal of Environmental Economics
+and Management* 6 (dec): 350–363. doi:10.1016/0095-0696(79)90014-7.
+[http://www.sciencedirect.com/science/article/pii/0095069679900147
+http://linkinghub.elsevier.com/retrieve/pii/0095069679900147](http://www.sciencedirect.com/science/article/pii/0095069679900147 http://linkinghub.elsevier.com/retrieve/pii/0095069679900147 "http://www.sciencedirect.com/science/article/pii/0095069679900147 http://linkinghub.elsevier.com/retrieve/pii/0095069679900147").
+
+Singh, R., Q. Weninger, and M. Doyle. 2006. “Fisheries management with
+stock growth uncertainty and costly capital adjustment.” *Journal of
+Environmental Economics and Management* 52 (sep): 582–599.
+doi:10.1016/j.jeem.2006.02.006.
+[http://linkinghub.elsevier.com/retrieve/pii/S009506960600043X](http://linkinghub.elsevier.com/retrieve/pii/S009506960600043X "http://linkinghub.elsevier.com/retrieve/pii/S009506960600043X").
+
+Xepapadeas, A. P. 1992. “Environmental policy, adjustment costs, and
+behavior of the firm.” *Journal of Environmental Economics and
+Management*: 258–275.
+[http://www.sciencedirect.com/science/article/pii/009506969290004G](http://www.sciencedirect.com/science/article/pii/009506969290004G "http://www.sciencedirect.com/science/article/pii/009506969290004G").

@@ -1,6 +1,6 @@
 ## Introduction
 
-Optimal management of ecosystems and natural resources often involves frequent adjustment of a control variable in response to the observed state of a system.  When this control is set in a policy-making process, such as determining a fishing quota, it may be more costly to change the policy in response to new information than to continue with the status quo [@Bohm1974, @Xepapadeas1992]. 
+Optimal management of ecosystems and natural resources often involves frequent adjustment of a control variable in response to the observed state of a system.  When this control is set in a policy-making process, such as determining a fishing quota, it may be more costly to change the policy in response to new information than to continue with the status quo [@Bohm1974] [@Xepapadeas1992]. 
 
 ### Types of real world policy costs
 
