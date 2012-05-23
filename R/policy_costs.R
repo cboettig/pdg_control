@@ -136,7 +136,7 @@ simulate_optim <- function(f, pars, x_grid, h_grid, x0, D, z_g,
     q_t <- h_grid[D[[h_prev]][St, (t + 1) ]] 
     # Implement harvest/(effort) based on quota with noise
     h[t] <- q_t * zi
-    # Store last years quota
+    # Store index to last years quota
     h_prev <- which.min(abs(h_grid - q_t)) 
     # population grows
     x_h[t+1] <- zg * f(x_h[t], h[t], pars) # with havest
@@ -144,7 +144,7 @@ simulate_optim <- function(f, pars, x_grid, h_grid, x0, D, z_g,
     x[t+1]   <- zg * f(x[t], 0, pars) # havest-free dynamics
 
     p[t] <- profit(x_h[t],h[t])
-    fee[t] <- penalty(h[t+1],h[t]) 
+    fee[t] <- penalty(h[t],h_grid[h_prev]) 
     ## Comparison solution
     if(!is.null(alt_D)){
       m_alt <- x_alt[t] * zm
