@@ -123,7 +123,7 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time, alternate)) +
     harvest), col = "purple") + geom_line(aes(time, harvest_alt), col = "darkgreen")
 ```
 
-![plot of chunk rep1](http://farm9.staticflickr.com/8152/7257923930_65eeb3b5bc_o.png) 
+![plot of chunk rep1](http://farm8.staticflickr.com/7076/7258432026_d6f8179f54_o.png) 
 
 
 A second replicate
@@ -136,7 +136,7 @@ ggplot(subset(dt, reps == 2)) + geom_line(aes(time, alternate)) +
     harvest), col = "purple") + geom_line(aes(time, harvest_alt), col = "darkgreen")
 ```
 
-![plot of chunk rep2](http://farm9.staticflickr.com/8160/7257924576_a18439404d_o.png) 
+![plot of chunk rep2](http://farm8.staticflickr.com/7224/7258432390_a341fe6039_o.png) 
 
 
 ## Profits 
@@ -148,7 +148,7 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time, profit_fishing)) +
     geom_line(aes(time, policy_cost), col = "darkblue")
 ```
 
-![plot of chunk rep1profit](http://farm8.staticflickr.com/7093/7257925002_0ef82b28f6_o.png) 
+![plot of chunk rep1profit](http://farm9.staticflickr.com/8016/7258432684_da9f65089a_o.png) 
 
 
 These need to be discounted!
@@ -162,19 +162,19 @@ profits <- dt[, sum(profit_fishing * (1 - delta)^(time - 1)), by = reps]
 qplot(costs$V1)
 ```
 
-![plot of chunk policycost](http://farm8.staticflickr.com/7235/7257925414_bcc41b8484_o.png) 
+![plot of chunk policycost](http://farm9.staticflickr.com/8167/7258433006_69f3949df9_o.png) 
 
 ```r
 qplot(profits$V1)
 ```
 
-![plot of chunk policycost](http://farm8.staticflickr.com/7217/7257925934_c3fa8819ce_o.png) 
+![plot of chunk policycost](http://farm8.staticflickr.com/7212/7258433274_a078104588_o.png) 
 
 ```r
 qplot(profits$V1 - costs$V1)
 ```
 
-![plot of chunk policycost](http://farm9.staticflickr.com/8021/7257926266_5edba4091e_o.png) 
+![plot of chunk policycost](http://farm8.staticflickr.com/7232/7258433550_daee259fd8_o.png) 
 
 
 
@@ -191,7 +191,7 @@ ggplot(melt(policy)) + geom_point(aes(h_grid[Var2], (x_grid[Var1]),
     scale_colour_gradientn(colours = rainbow(4))
 ```
 
-![plot of chunk policy](http://farm8.staticflickr.com/7104/7257926718_8c7b2a4aae_o.png) 
+![plot of chunk policy](http://farm8.staticflickr.com/7226/7258433882_394951d395_o.png) 
 
 
 Here we plot previous harvest against the recommended harvest, coloring by stocksize.  Note this swaps the y axis from above with the color density.  Hence each x-axis value has all possible colors, but they map down onto a subset of optimal harvest values (depending on their stock). 
@@ -206,7 +206,7 @@ ggplot(melt(policy)) + geom_point(aes(h_grid[Var2], (h_grid[value]),
     labs(x = "prev harvest", y = "harvest") + scale_colour_gradientn(colours = rainbow(4))
 ```
 
-![plot of chunk harvestchanges](http://farm8.staticflickr.com/7095/7257927398_65a1dc52a9_o.png) 
+![plot of chunk harvestchanges](http://farm9.staticflickr.com/8016/7258434360_4e446d4db8_o.png) 
 
 
 ## Results
@@ -224,7 +224,7 @@ mean(profits$V1)
 
 
 ```
-[1] 153
+[1] 147.5
 ```
 
 
@@ -236,7 +236,7 @@ sd(profits$V1)
 
 
 ```
-[1] 25.24
+[1] 28.29
 ```
 
 
@@ -254,7 +254,7 @@ mean(costs$V1)
 
 
 ```
-[1] 0
+[1] 26.01
 ```
 
 
@@ -266,7 +266,7 @@ sd(costs$V1)
 
 
 ```
-[1] 0
+[1] 5.197
 ```
 
 
@@ -283,7 +283,7 @@ Induced costs:
 
 
 ```
-[1] 227.4
+[1] 232.9
 ```
 
 
