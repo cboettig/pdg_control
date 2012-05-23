@@ -116,9 +116,12 @@ ggplot(subset(dt,reps==1)) +
 
 ````
 
+
+These need to be discounted!
+
 ``` {r policycost}
-costs <- dt[ , sum(policy_cost), by=reps]
-profits <-dt[ , sum(profit_fishing), by=reps] 
+costs <- dt[ , sum(policy_cost * (1-delta)^(time-1)), by=reps]
+profits <-dt[ , sum(profit_fishing * (1-delta)^(time-1)), by=reps] 
 
 qplot(costs$V1)
 qplot(profits$V1)
@@ -146,4 +149,34 @@ ggplot(melt(policy)) +
     labs(x = "prev harvest", y = "harvest") +
       scale_colour_gradientn(colours = rainbow(4)) 
 ````
+
+
+## Results
+
+Parameters have been chosen to achieve a 25% reduction in the net present value of the stock induced by the policy cost.
+The net present value is 380.4 according the the exact calculation (see npv0 in [exact_npv.md](https://github.com/cboettig/pdg_control/blob/master/inst/examples/policycosts/exact_npv.md)) which looks close to the average in the stochastic realizations [baseline.md](https://github.com/cboettig/pdg_control/blob/master/inst/examples/policycosts/baseline.md).  
+
+
+```{r}
+mean(profits$V1)
+sd(profits$V1)
+````
+
+
+Compare these induced costs to the costs of actual adjustment.  Direct costs:
+
+```{r}
+mean(costs$V1)
+sd(costs$V1)
+````
+
+Induced costs: 
+
+```{r}
+380.4 - mean(profits$V1)
+````
+
+
+
+
 
