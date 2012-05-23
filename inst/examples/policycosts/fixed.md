@@ -4,7 +4,7 @@
 
 
 
-# Policy Costs (fixed) 
+# Policy Costs fixed fee 
  * author Carl Boettiger, <cboettig@gmail.com>
  * license: CC0
 
@@ -123,7 +123,7 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time, alternate)) +
     harvest), col = "purple") + geom_line(aes(time, harvest_alt), col = "darkgreen")
 ```
 
-![plot of chunk rep1](http://farm8.staticflickr.com/7215/7252979872_4b1da600d9_o.png) 
+![plot of chunk rep1](http://farm8.staticflickr.com/7100/7253144964_6f2dcd6c93_o.png) 
 
 
 A second replicate
@@ -136,7 +136,7 @@ ggplot(subset(dt, reps == 2)) + geom_line(aes(time, alternate)) +
     harvest), col = "purple") + geom_line(aes(time, harvest_alt), col = "darkgreen")
 ```
 
-![plot of chunk rep2](http://farm8.staticflickr.com/7230/7252980232_99470d93e1_o.png) 
+![plot of chunk rep2](http://farm8.staticflickr.com/7212/7253145562_e9f9c2dbaa_o.png) 
 
 
 ## Profits 
@@ -148,7 +148,7 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time, profit_fishing)) +
     geom_line(aes(time, policy_cost), col = "darkblue")
 ```
 
-![plot of chunk rep1profit](http://farm8.staticflickr.com/7228/7252981012_5eaa4b7ab9_o.png) 
+![plot of chunk rep1profit](http://farm9.staticflickr.com/8153/7253145890_d400249b8e_o.png) 
 
 
 
@@ -160,19 +160,19 @@ profits <- dt[, sum(profit_fishing), by = reps]
 qplot(costs$V1)
 ```
 
-![plot of chunk policycost](http://farm8.staticflickr.com/7211/7252981390_31cec1af6f_o.png) 
+![plot of chunk policycost](http://farm9.staticflickr.com/8153/7253146290_66b66c8d5a_o.png) 
 
 ```r
 qplot(profits$V1)
 ```
 
-![plot of chunk policycost](http://farm9.staticflickr.com/8153/7252981700_652209fb60_o.png) 
+![plot of chunk policycost](http://farm8.staticflickr.com/7091/7253146626_8469654821_o.png) 
 
 ```r
 qplot(profits$V1 - costs$V1)
 ```
 
-![plot of chunk policycost](http://farm8.staticflickr.com/7229/7252982008_3369c47aa7_o.png) 
+![plot of chunk policycost](http://farm8.staticflickr.com/7245/7253146924_92f0314d90_o.png) 
 
 
 
@@ -189,7 +189,7 @@ ggplot(melt(policy)) + geom_point(aes(h_grid[Var2], (x_grid[Var1]),
     scale_colour_gradientn(colours = rainbow(4))
 ```
 
-![plot of chunk policy](http://farm8.staticflickr.com/7076/7252982554_9bacfd1ba6_o.png) 
+![plot of chunk policy](http://farm8.staticflickr.com/7093/7253147292_c1975b2b51_o.png) 
 
 
 Here we plot previous harvest against the recommended harvest, coloring by stocksize.  Note this swaps the y axis from above with the color density.  Hence each x-axis value has all possible colors, but they map down onto a subset of optimal harvest values (depending on their stock). 
@@ -204,6 +204,6 @@ ggplot(melt(policy)) + geom_point(aes(h_grid[Var2], (h_grid[value]),
     labs(x = "prev harvest", y = "harvest") + scale_colour_gradientn(colours = rainbow(4))
 ```
 
-![plot of chunk harvestchanges](http://farm8.staticflickr.com/7098/7252983096_2acc6a61dc_o.png) 
+![plot of chunk harvestchanges](http://farm9.staticflickr.com/8023/7253147656_53fa29f7b3_o.png) 
 
 
