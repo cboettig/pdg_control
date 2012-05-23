@@ -1,4 +1,4 @@
-`ro fig.width=10, fig.height=7, message=FALSE, comment=NA, cache=FALSE, verbose=TRUE, cache.path="fixed/" or`
+`ro fig.width=10, fig.height=7, message=FALSE, comment=NA, cache=TRUE, verbose=TRUE, cache.path="fixed/" or`
 
 ``` {r setup, include=FALSE, cache=FALSE}
 opts_knit$set(upload.fun = socialR::flickr.url)
@@ -6,7 +6,7 @@ options(device = function(width=5, height=5) pdf(NULL, width = width, height = h
 ````
 
 
-# Policy Costs L2
+# Policy Costs fixed fee 
  * author Carl Boettiger, <cboettig@gmail.com>
  * license: CC0
 
