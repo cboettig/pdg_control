@@ -127,12 +127,14 @@ ggplot(dat, aes(c2, value, col=variable)) + geom_point() + geom_line()
 
 Find the value of `c2` that brings each penalty closest to 75% of the cost-free adjustment value:
 
-```{r comparison}
+```{r comparison_plot}
+ggplot(dat, aes(c2, (npv0-value)/npv0, col=variable)) + geom_point() + geom_line()
+````
+
+```{r numeric_value}
 closest <- function(x, v){
 	which.min(abs(v-x))
 }
-
-ggplot(dat, aes(c2, (npv0-value)/npv0, col=variable)) + geom_point() + geom_line()
 dt <- data.table(dat)
 index <- dt[,closest(.25, (npv0-value)/value), by=variable]
 cbind(index, c2=c2[index$V1])
