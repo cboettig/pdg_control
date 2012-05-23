@@ -1,4 +1,5 @@
-`ro warning=FALSE, message=FALSE, comment=NA, cache=TRUE-->
+
+
 
 
 
@@ -66,8 +67,7 @@ x0 <- K
 
 
 ```r
-profit <- profit_harvest(price = 10, c0 = 30, 
-    c1 = 0)
+profit <- profit_harvest(price = 10, c0 = 30, c1 = 0)
 ```
 
 
@@ -88,16 +88,14 @@ h_grid <- seq(0.01, 0.8 * K, length = gridsize)
 
 
 ```r
-L1 <- function(c2) function(h, h_prev) c2 * abs(h - 
-    h_prev)
-asymmetric <- function(c2) function(h, h_prev) c2 * 
-    max(h - h_prev, 0)
-fixed <- function(c2) function(h, h_prev) c2 * 
-    as.numeric(!(h == h_prev))
-L2 <- function(c2) function(h, h_prev) c2 * (h - 
-    h_prev)^2
-free_increase <- function(c2) function(h, h_prev) c2 * 
-    abs(min(h - h_prev, 0))  # increasing harvest is free
+L1 <- function(c2) function(h, h_prev) c2 * abs(h - h_prev)
+asymmetric <- function(c2) function(h, h_prev) c2 * max(h - h_prev, 
+    0)
+fixed <- function(c2) function(h, h_prev) c2 * as.numeric(!(h == 
+    h_prev))
+L2 <- function(c2) function(h, h_prev) c2 * (h - h_prev)^2
+free_increase <- function(c2) function(h, h_prev) c2 * abs(min(h - 
+    h_prev, 0))  # increasing harvest is free
 ```
 
 
@@ -106,11 +104,11 @@ free_increase <- function(c2) function(h, h_prev) c2 *
 Calculate the transition matrix and intialize the the list of penalty functions and cost levels we will be looping over.
 
 
+
 ```r
-SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, 
-    h_grid, sigma_g)
-penaltyfns <- list(L2 = L2, L1 = L1, asy = asymmetric, 
-    fixed = fixed, asy2 = free_increase)
+SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
+penaltyfns <- list(L2 = L2, L1 = L1, asy = asymmetric, fixed = fixed, 
+    asy2 = free_increase)
 c2 <- seq(0, 22, length.out = 30)
 ```
 
@@ -122,28 +120,14 @@ This can take a while, so we use explicit parallelization,
 
 ```r
 require(snowfall)
-sfInit(cpu = 5, parallel = T)
+sfInit(cpu = 16, parallel = T)
 ```
 
 
 
 ```
-## Explicit sfStop() is missing: stop now.
-```
+R Version:  R version 2.15.0 (2012-03-30) 
 
-
-
-```
-## 
-## Stopping cluster
-## 
-```
-
-
-
-```
-## snowfall 1.84 initialized (using snow 0.3-8): parallel execution on 5 CPUs.
-## 
 ```
 
 
@@ -155,20 +139,7 @@ sfLibrary(pdgControl)
 
 
 ```
-## Library pdgControl loaded.
-```
-
-
-
-```
-## Library pdgControl loaded in cluster.
-## 
-```
-
-
-
-```
-## Warning message: 'keep.source' is deprecated and will be ignored
+Library pdgControl loaded.
 ```
 
 
@@ -185,17 +156,17 @@ sfExportAll()
 
 
 
-
 ```r
 policies <- sfSapply(penaltyfns, function(penalty) {
     policies <- sapply(c2, function(c2) {
-        policycost <- optim_policy(SDP_Mat, x_grid, h_grid, 
-            OptTime, xT, profit, delta, reward, penalty = penalty(c2))
+        policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, 
+            delta, reward, penalty = penalty(c2))
         i <- which(x_grid > K)[1]
         max(policycost$penalty_free_V[i, ])
     })
 })
 ```
+
 
 
 
@@ -206,11 +177,12 @@ Note that `optim_policy` has been updated to return the equilibrium value of pro
 Quadratic costs on fishing effort have to be done separately,
 
 
+
 ```r
 quad <- sapply(c2, function(c2) {
     effort_penalty = function(x, h) 0.1 * c2 * h/x
-    policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, 
-        xT, profit, delta, reward, penalty = fixed(0), effort_penalty)
+    policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, 
+        delta, reward, penalty = fixed(0), effort_penalty)
     i <- which(x_grid > K)[1]
     max(policycost$penalty_free_V[i, ])  # chooses the most sensible harvest in t=1
 })
@@ -223,15 +195,65 @@ dat <- cbind(policies, quad)
 Tidy up the data and plot the net present value (before the penalty has been paid) relative to that achieved when managed without a penalty.  
 
 
+
 ```r
 npv0 <- dat[1, 3]
-dat <- data.frame(c2 = c2, dat)
-dat <- melt(dat, id = "c2")
-ggplot(dat, aes(c2, (npv0 - value)/npv0, col = variable)) + 
-    geom_point() + geom_line()
+npv0
 ```
 
-![plot of chunk unnamed-chunk-5](http://farm8.staticflickr.com/7258/7140833241_7dc73790ac_o.png) 
+
+
+```
+  asy 
+380.4 
+```
+
+
+
+```r
+dat <- data.frame(c2 = c2, dat)
+dat <- melt(dat, id = "c2")
+ggplot(dat, aes(c2, value, col = variable)) + geom_point() + geom_line()
+```
+
+![plot of chunk npv-plot](http://farm8.staticflickr.com/7219/7252902880_407608df69_o.png) 
+
+
+Find the value of `c2` that brings each penalty closest to 75% of the cost-free adjustment value:
+
+
+
+```r
+closest <- function(x, v) {
+    which.min(abs(v - x))
+}
+
+ggplot(dat, aes(c2, (npv0 - value)/npv0, col = variable)) + geom_point() + 
+    geom_line()
+```
+
+![plot of chunk comparison](http://farm8.staticflickr.com/7099/7252903148_4f075f4292_o.png) 
+
+```r
+dt <- data.table(dat)
+index <- dt[, closest(0.25, (npv0 - value)/value), by = variable]
+cbind(index, c2 = c2[index$V1])
+```
+
+
+
+```
+     variable V1     c2
+[1,]       L2  2 0.7586
+[2,]       L1  3 1.5172
+[3,]      asy  1 0.0000
+[4,]    fixed 13 9.1034
+[5,]     asy2  1 0.0000
+[6,]     quad  3 1.5172
+```
+
+
+
 
 
 

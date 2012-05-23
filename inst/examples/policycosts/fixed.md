@@ -4,8 +4,7 @@
 
 
 
-
-# Policy Costs 
+# Policy Costs fixed fee 
  * author Carl Boettiger, <cboettig@gmail.com>
  * license: CC0
 
@@ -24,17 +23,11 @@ delta <- 0.05  # economic discounting rate
 OptTime <- 50  # stopping time
 gridsize <- 50  # gridsize (discretized population)
 sigma_g <- 0.2  # Noise in population growth
-sigma_m <- 0  # noise in stock assessment measurement
-sigma_i <- 0  # noise in implementation of the quota
 reward <- 0  # bonus for satisfying the boundary condition
 
-
-## @knitr noise_dists
 z_g <- function() rlnorm(1, 0, sigma_g)  # mean 1
-z_m <- function() rlnorm(1, 0, sigma_m)  # mean 1
-z_i <- function() rlnorm(1, 0, sigma_i)  # mean 1
-
-
+z_m <- function() 1
+z_i <- function() 1
 
 f <- BevHolt  # Select the state equation
 pars <- c(1.5, 0.05)  # parameters for the state equation
@@ -43,16 +36,12 @@ xT <- 0  # boundary conditions
 x0 <- K
 
 
-## @knitr profit_
 profit <- profit_harvest(price = 10, c0 = 30, c1 = 0)
 
-
-## @knitr create_grid_
 x_grid <- seq(0.01, 1.2 * K, length = gridsize)
 h_grid <- seq(0.01, 0.8 * K, length = gridsize)
 
 
-## @knitr reed_sdp
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
 opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, 
     delta, reward = reward)
@@ -84,7 +73,7 @@ Solve the policy cost for the specified penalty function
 
 
 ```r
-c2 <- 4
+c2 <- 9.103
 penalty <- fixed(c2)
 policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
     profit, delta, reward, penalty = penalty)
@@ -134,7 +123,7 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time, alternate)) +
     harvest), col = "purple") + geom_line(aes(time, harvest_alt), col = "darkgreen")
 ```
 
-![plot of chunk rep1](http://farm9.staticflickr.com/8146/7137008193_368e3cc077_o.png) 
+![plot of chunk rep1](http://farm8.staticflickr.com/7216/7253369988_f92bb29997_o.png) 
 
 
 A second replicate
@@ -147,7 +136,7 @@ ggplot(subset(dt, reps == 2)) + geom_line(aes(time, alternate)) +
     harvest), col = "purple") + geom_line(aes(time, harvest_alt), col = "darkgreen")
 ```
 
-![plot of chunk rep2](http://farm8.staticflickr.com/7050/7137008387_6e827ca111_o.png) 
+![plot of chunk rep2](http://farm9.staticflickr.com/8016/7253370498_0dedc497a1_o.png) 
 
 
 ## Profits 
@@ -159,31 +148,35 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time, profit_fishing)) +
     geom_line(aes(time, policy_cost), col = "darkblue")
 ```
 
-![plot of chunk rep1profit](http://farm8.staticflickr.com/7220/6990923268_1f4ffa1ebd_o.png) 
+![plot of chunk rep1profit](http://farm8.staticflickr.com/7084/7253370840_0b22e62a0c_o.png) 
 
+
+These need to be discounted!
 
 
 
 ```r
-costs <- dt[, sum(policy_cost), by = reps]
-profits <- dt[, sum(profit_fishing), by = reps]
+costs <- dt[, sum(policy_cost * (1 - delta)^(time - 1)), by = reps]
+profits <- dt[, sum(profit_fishing * (1 - delta)^(time - 1)), by = reps]
 
 qplot(costs$V1)
 ```
 
-![plot of chunk policycost](http://farm8.staticflickr.com/7112/6990923496_b042cae981_o.png) 
+![plot of chunk policycost](http://farm8.staticflickr.com/7215/7253371360_4edc349d17_o.png) 
 
 ```r
 qplot(profits$V1)
 ```
 
-![plot of chunk policycost](http://farm8.staticflickr.com/7177/6990923832_e5bcc627df_o.png) 
+![plot of chunk policycost](http://farm8.staticflickr.com/7090/7253371698_45094906b7_o.png) 
 
 ```r
 qplot(profits$V1 - costs$V1)
 ```
 
-![plot of chunk policycost](http://farm9.staticflickr.com/8012/7137009345_dcaf391eb7_o.png) 
+![plot of chunk policycost](http://farm8.staticflickr.com/7094/7253371998_f44031f01d_o.png) 
+
+
 
 
 
@@ -200,7 +193,7 @@ ggplot(melt(policy)) + geom_point(aes(h_grid[Var2], (x_grid[Var1]),
     scale_colour_gradientn(colours = rainbow(4))
 ```
 
-![plot of chunk policy](http://farm9.staticflickr.com/8167/7137009565_f84c7f62f6_o.png) 
+![plot of chunk policy](http://farm9.staticflickr.com/8013/7253372344_fd3726044b_o.png) 
 
 
 Here we plot previous harvest against the recommended harvest, coloring by stocksize.  Note this swaps the y axis from above with the color density.  Hence each x-axis value has all possible colors, but they map down onto a subset of optimal harvest values (depending on their stock). 
@@ -215,6 +208,89 @@ ggplot(melt(policy)) + geom_point(aes(h_grid[Var2], (h_grid[value]),
     labs(x = "prev harvest", y = "harvest") + scale_colour_gradientn(colours = rainbow(4))
 ```
 
-![plot of chunk harvestchanges](http://farm8.staticflickr.com/7257/6990924426_e861b0e759_o.png) 
+![plot of chunk harvestchanges](http://farm8.staticflickr.com/7240/7253372904_9f48e5e204_o.png) 
+
+
+## Results
+
+Parameters have been chosen to achieve a 25% reduction in the net present value of the stock induced by the policy cost.
+The net present value is 380.4 according the the exact calculation (see npv0 in [exact_npv.md](https://github.com/cboettig/pdg_control/blob/master/inst/examples/policycosts/exact_npv.md)) which looks close to the average in the stochastic realizations [baseline.md](https://github.com/cboettig/pdg_control/blob/master/inst/examples/policycosts/baseline.md).  
+
+
+
+
+```r
+mean(profits$V1)
+```
+
+
+
+```
+[1] 157.5
+```
+
+
+
+```r
+sd(profits$V1)
+```
+
+
+
+```
+[1] 24.37
+```
+
+
+
+
+
+Compare these induced costs to the costs of actual adjustment.  Direct costs:
+
+
+
+```r
+mean(costs$V1)
+```
+
+
+
+```
+[1] 167.3
+```
+
+
+
+```r
+sd(costs$V1)
+```
+
+
+
+```
+[1] 0
+```
+
+
+
+
+Induced costs: 
+
+
+
+```r
+380.4 - mean(profits$V1)
+```
+
+
+
+```
+[1] 222.9
+```
+
+
+
+
+
 
 
