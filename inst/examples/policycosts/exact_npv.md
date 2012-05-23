@@ -219,7 +219,18 @@ ggplot(dat, aes(c2, value, col = variable)) + geom_point() + geom_line()
 ![plot of chunk npv-plot](http://farm8.staticflickr.com/7219/7252902880_407608df69_o.png) 
 
 
+
 Find the value of `c2` that brings each penalty closest to 75% of the cost-free adjustment value:
+
+
+
+```r
+ggplot(dat, aes(c2, (npv0 - value)/npv0, col = variable)) + geom_point() + 
+    geom_line()
+```
+
+![plot of chunk comparison_plot](http://farm8.staticflickr.com/7217/7258601130_c2fc0bcfa4_o.png) 
+
 
 
 
@@ -227,14 +238,6 @@ Find the value of `c2` that brings each penalty closest to 75% of the cost-free 
 closest <- function(x, v) {
     which.min(abs(v - x))
 }
-
-ggplot(dat, aes(c2, (npv0 - value)/npv0, col = variable)) + geom_point() + 
-    geom_line()
-```
-
-![plot of chunk comparison](http://farm8.staticflickr.com/7099/7252903148_4f075f4292_o.png) 
-
-```r
 dt <- data.table(dat)
 index <- dt[, closest(0.25, (npv0 - value)/value), by = variable]
 cbind(index, c2 = c2[index$V1])
