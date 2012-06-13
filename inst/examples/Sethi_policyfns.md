@@ -98,6 +98,9 @@ R Version:  R version 2.14.1 (2011-12-22)
 
 
 
+
+
+
 ```r
 SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=19999)
 ```
@@ -121,37 +124,9 @@ Bellman's algorithm to compute the optimal solution for all possible trajectorie
 
 
 ```r
-opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0, 
+measure <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0, 
                      profit, delta=0.05, reward=0)
 ```
-
-
-
-
-
-Plot the policy function:
-
-
-
-```r
-qplot(x_grid, x_grid - x_grid[opt$D[,1]], xlab="stock size", ylab="escapement")
-```
-
-![plot of chunk policyfn_plot](http://farm9.staticflickr.com/8023/7184657097_3fcb8d3470_o.png) 
-
-
-and the value function:
-
-
-
-```r
-qplot(x_grid, opt$V, xlab="stock size", ylab="value")
-```
-
-![plot of chunk valuefn_plot](http://farm9.staticflickr.com/8154/7184657301_dc79a38b99_o.png) 
-
-
-
 
 
 
@@ -187,7 +162,45 @@ Library ggplot2 loaded.
 
 
 ```r
-opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0, 
+growth <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0, 
+                     profit, delta=0.05, reward=0)
+```
+
+
+
+
+### Large implementation error
+
+
+
+```r
+sigma_g <- 0.01    # Noise in population growth
+sigma_m <- 0.01     # noise in stock assessment measurement
+sigma_i <- 0.25     # noise in implementation of the quota
+z_g <- function() rlnorm(1,  0, sigma_g) # mean 1
+z_m <- function() rlnorm(1,  0, sigma_m) # mean 1
+z_i <- function() rlnorm(1,  0, sigma_i) # mean 1
+```
+
+
+
+
+
+
+```r
+SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=19999)
+```
+
+
+
+```
+Library ggplot2 loaded.
+```
+
+
+
+```r
+imp <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0, 
                      profit, delta=0.05, reward=0)
 ```
 
@@ -195,25 +208,34 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0,
 
 
 
-Plot the policy function:
-
-
-
-```r
-qplot(x_grid, x_grid - x_grid[opt$D[,1]], xlab="stock size", ylab="escapement")
-```
-
-![plot of chunk policyfn_plot2](http://farm8.staticflickr.com/7071/7184723753_5e94866431_o.png) 
-
-
-and the value function:
-
 
 
 ```r
-qplot(x_grid, opt$V, xlab="stock size", ylab="value")
+require(reshape2)
+policy <- melt( data.frame(stock=x_grid, implementation = x_grid[imp$D[,1]], measurement = x_grid[measure$D[,1]], growth = x_grid[growth$D[,1]]), id="stock")
+value <-  melt(data.frame(stock=x_grid, implementation = imp$V, measurement = measure$V, growth = growth$V), id="stock")
+ggplot(policy) + geom_point(aes(stock, value, color=variable))
 ```
 
-![plot of chunk valuefn_plot2](http://farm8.staticflickr.com/7215/7184723971_85608f5899_o.png) 
+![plot of chunk plots](http://farm9.staticflickr.com/8149/7184985623_46aafc2004_o.png) 
+
+```r
+ggplot(value) + geom_point(aes(stock, value, color=variable))
+```
+
+![plot of chunk plots](http://farm8.staticflickr.com/7215/7184985767_616ec418c0_o.png) 
+
+```r
+ggplot(policy) + geom_smooth(aes(stock, value, color=variable))
+```
+
+![plot of chunk plots](http://farm8.staticflickr.com/7242/7370219282_92e8c7cec0_o.png) 
+
+```r
+ggplot(value) + geom_smooth(aes(stock, value, color=variable))
+```
+
+![plot of chunk plots](http://farm8.staticflickr.com/7232/7370219428_99d3798419_o.png) 
+
 
 
