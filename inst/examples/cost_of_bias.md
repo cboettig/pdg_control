@@ -25,13 +25,37 @@ We will assume a Beverton-Holt state equation / population dynamics function, <s
 
 
 
+```r
+f <- BevHolt
+pars <- c(1.5, 0.05)
+K <- (pars[1] - 1)/pars[2]
+```
+
+
+
 with parameters A = `1.5` and B = `0.05`.  The positive stationary root of the model is given by <span>\( \frac{A-1}{B} \)</span>, `10`.   
+
+
+
+```r
+p <- 1
+c0 <- 0.01
+c1 <- 0
+profit <- profit_harvest(price=p, c0 = c0, c1 = c1) 
+```
 
 
 
 
 We also assume a profit function of the form <span>\( \Pi = p h - \left( c_0  + c_1 \frac{h}{x} \right) \frac{h}{x} \)</span>, conditioned on <span>\( h > x \)</span> and <span>\(x > 0 \)</span>, with price p = `1`, c0 = `0.01`, and c1 = `0`.  
 
+
+
+
+```r
+x_grid <- seq(0, 2 * K, length = 100)  
+h_grid <- x_grid  
+```
 
 
 
@@ -49,9 +73,31 @@ The first scenario considers the completely deterministic case.
 
 
 
+```r
+sigma_g <- 0.0    # Noise in population growth
+z_g <- function() 1 
+z_m <- function() 1 
+z_i <- function() 1 
+```
 
 
 
+
+
+
+```r
+deterministic_SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g )
+```
+
+
+
+
+
+
+```r
+det_opt <- find_dp_optim(deterministic_SDP_Mat, x_grid, h_grid, OptTime=25, xT=0, 
+                     profit, delta=0.05, reward=0)
+```
 
 
 
@@ -60,7 +106,25 @@ We simulate 100 replicates of this system.  We will used a fixed seed so that we
 
 
 
+```r
+set.seed(42)
+sims_one <- lapply(1:100, function(i){
+  ForwardSimulate(f, pars, x_grid, h_grid, x0=K, det_opt$D, z_g, z_m, z_i, profit)
+})
+```
+
+
+
 ### Growth uncertainty 
+
+
+
+```r
+sigma_g <- 0.15    # Noise in population growth
+z_g <- function() rlnorm(1,  0, sigma_g) # mean 1
+z_m <- function() 1 
+z_i <- function() 1 
+```
 
 
 
@@ -69,6 +133,19 @@ The next scenario introduces growth uncertainty into the model, <span> \( x_{t+1
 
 
 
+```r
+SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g )
+```
+
+
+
+
+
+
+```r
+opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0, 
+                     profit, delta=0.05, reward=0)
+```
 
 
 
@@ -78,9 +155,25 @@ As before, we simulate 100 replicates using the same random number sequence, now
 
 
 
+```r
+set.seed(42)
+sims_two <- lapply(1:100, function(i){
+  ForwardSimulate(f, pars, x_grid, h_grid, x0=K, opt$D, z_g, z_m, z_i, profit)
+})
+```
+
+
+
 
 ### Growth uncertainty & bias  
 
+
+
+
+```r
+est_pars <- pars
+par_var <- .2
+```
 
 
 
@@ -89,8 +182,25 @@ This time we consider the same optimization under uncertainty as before, but the
 
 
 
+```r
+bias <- rnorm(100, pars[1], par_var)
+set.seed(42)
+sims_three <- lapply(1:100, function(i){
+  est_pars[1] <- bias[i]
+  ForwardSimulate(f, est_pars, x_grid, h_grid, x0=K, opt$D, z_g, z_m, z_i, profit)
+})
+```
+
+
+
 
 For the record, the biases by index number are:
+
+
+
+```r
+bias
+```
 
 
 
@@ -117,6 +227,23 @@ The correct baseline comparison against the above scenario, Mike points out to m
 
 
 
+```r
+#require(snowfall)
+#sfInit(parallel=T, cpu=16)
+#sfLibrary(pdgControl)
+#sfExportAll()
+set.seed(42)
+sims_four <- lapply(1:100, function(i){
+  est_pars[1] <- bias[i] 
+  SDP_Mat <- determine_SDP_matrix(f, est_pars, x_grid, h_grid, sigma_g )
+  opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0, 
+                     profit, delta=0.05, reward=0)
+  ForwardSimulate(f, est_pars, x_grid, h_grid, x0=K, opt$D, z_g, z_m, z_i, profit)
+})
+```
+
+
+
 
 
 
@@ -125,38 +252,91 @@ The correct baseline comparison against the above scenario, Mike points out to m
 
 
 
+```r
+sims <- list(known = sims_one, Growth = sims_two, RandomBias = sims_three, KnownBias = sims_four)
+
+dat <- melt(sims, id=names(sims_one[[1]]))  
+dt <- data.table(dat)
+setnames(dt, c("L2", "L1"), c("reps", "uncertainty")) # names are nice
+```
+
+
+
 
 ### Plots 
 
 Let's begin by looking at the dynamics of a single replicate. The line shows Reed's S, the level above which the stock should be harvested (where catch should be the difference between stock and S).  To confirm that this policy is being followed, note that harvesting only occurs when the stock is above this line, and harvest is proportional to the amount by which it is above.  Change the replicate `reps==` to see the results from a different replicate.  
 
-![plot of chunk onerep](http://farm8.staticflickr.com/7241/7223268132_a05f71a08f_o.png) 
+
+
+```r
+ggplot(subset(dt,reps==1)) +
+  geom_line(aes(time, fishstock)) +
+  geom_abline(intercept=opt$S, slope = 0) +
+  geom_line(aes(time, harvest), col="darkgreen") + 
+  facet_wrap(~uncertainty) 
+```
+
+![plot of chunk onerep](http://farm6.staticflickr.com/5458/7369777722_55b5fa6bf0_o.png) 
 
 
 
 This plot summarizes the stock dynamics by visualizing the replicates. Reed's S shown again.
 
-![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm8.staticflickr.com/7227/7223268766_182021509e_o.png) 
+
+
+```r
+p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) 
+p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1) + facet_wrap(~uncertainty)
+```
+
+![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm8.staticflickr.com/7236/7369777992_356a9f072d_o.png) 
 
 
 
-![The profits made in each time interval of a single replicate, by scenario](http://farm8.staticflickr.com/7100/7223269436_3e762aa435_o.png) 
+
+
+```r
+ggplot(subset(dt,reps==1)) +
+  geom_line(aes(time, profit))  + facet_wrap(~uncertainty)
+```
+
+![The profits made in each time interval of a single replicate, by scenario](http://farm8.staticflickr.com/7071/7369778252_efae97d0bb_o.png) 
 
 
 
-![the distribution of profits by scenario](http://farm9.staticflickr.com/8146/7223269932_f557f2b5e4_o.png) 
+
+
+```r
+profits <-dt[ , sum(profit), by=c("reps", "uncertainty")] 
+ggplot(profits) + geom_histogram(aes(V1)) + facet_wrap(~uncertainty)
+```
+
+![the distribution of profits by scenario](http://farm8.staticflickr.com/7102/7369778494_efb1f776fa_o.png) 
 
 
 Summary statistics 
 
 
 
+```r
+profits[, mean(V1), by=uncertainty]
+```
+
+
+
 ```
      uncertainty    V1
-[1,]       known 33.08
+[1,]       known 10.03
 [2,]      Growth 34.34
 [3,]  RandomBias 35.47
-[4,]   KnownBias 35.47
+[4,]   KnownBias 36.98
+```
+
+
+
+```r
+profits[, sd(V1), by=uncertainty]
 ```
 
 
@@ -166,12 +346,18 @@ Summary statistics
 [1,]       known  0.000
 [2,]      Growth  3.963
 [3,]  RandomBias 15.403
-[4,]   KnownBias 15.403
+[4,]   KnownBias 16.346
 ```
 
 
 
 
+
+
+
+```r
+save(list="dt", file="bias.rda")
+```
 
 
 
@@ -189,9 +375,21 @@ cost_of_bias
 
 
 ```
-  [1] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
- [36] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
- [71] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+  [1]  4.805109  1.440203  0.348876  0.537600  0.108679 -0.030362  0.200340
+  [8]  0.264686  0.310560  0.000000 -0.003407  0.134247  0.245258  0.242225
+ [15]  0.001675  1.805395  0.625988  0.022581  0.311775  0.814401  2.470442
+ [22]  0.848399  1.321014  2.034869  5.069526 -0.005955  0.799331 -0.005131
+ [29]  0.216308 -0.125269  2.434977 -0.131973  0.400451  3.928943  3.021026
+ [36]  7.311024  0.000000  1.557760  1.473729  4.662718  1.781252  0.000000
+ [43]  0.992867 -0.203316  1.204456  1.022335  0.176032  0.000000  1.118997
+ [50]  2.387117  0.157296 -0.001755  0.000000  0.000000  0.953200  1.116970
+ [57]  0.208433  4.279790  3.942975  0.383384  0.028547  0.111130  3.012619
+ [64]  0.678308  3.364385 19.830527  1.105768  0.000000  3.762469 -0.205451
+ [71]  3.300783  1.577274 -0.675260  4.864242  3.611919  1.381712  0.000000
+ [78]  0.405626  0.348840  2.235865  3.563851  2.994397  5.828749  0.262359
+ [85]  2.191019  1.614311 -0.197514  2.931595 -0.372816  3.644167  1.783823
+ [92] -0.161279  2.616421 -0.060540  1.433780 -0.011975  2.655753  2.166332
+ [99] -0.001685  0.106752
 ```
 
 
@@ -203,7 +401,7 @@ mean(cost_of_bias)
 
 
 ```
-[1] 0
+[1] 1.507
 ```
 
 
@@ -215,7 +413,7 @@ sd(cost_of_bias)
 
 
 ```
-[1] 0
+[1] 2.46
 ```
 
 
@@ -223,9 +421,9 @@ sd(cost_of_bias)
 
 # References
 
-Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005). "Fishery
-management under multiple uncertainty." _Journal of Environmental
-Economics and Management_, *50*. ISSN 00950696, <URL:
-http://dx.doi.org/10.1016/j.jeem.2004.11.005>.
+Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005).
+"Fishery Management Under Multiple Uncertainty." _Journal of
+Environmental Economics And Management_, *50*. ISSN 00950696,
+<URL: http://dx.doi.org/10.1016/j.jeem.2004.11.005>.
 
 
