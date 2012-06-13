@@ -140,19 +140,7 @@ In the Sethi case, computing the distribution over multiple sources of noise is 
 ```r
 require(snowfall) 
 sfInit(parallel=TRUE, cpu=4)
-```
-
-
-
-```
-R Version:  R version 2.15.0 (2012-03-30) 
-
-```
-
-
-
-```r
-SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=999)
+SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=99)
 ```
 
 
@@ -190,7 +178,7 @@ Plot the policy function:
 qplot(x_grid, x_grid - x_grid[opt$D[,1]], xlab="stock size", ylab="escapement")
 ```
 
-![plot of chunk policyfn_plot](http://farm6.staticflickr.com/5339/7184364471_a7e1929ea7_o.png) 
+![plot of chunk policyfn_plot](http://farm8.staticflickr.com/7086/7369739422_689487debf_o.png) 
 
 
 and the value function:
@@ -201,7 +189,7 @@ and the value function:
 qplot(x_grid, opt$V, xlab="stock size", ylab="value")
 ```
 
-![plot of chunk valuefn_plot](http://farm8.staticflickr.com/7223/7369599644_bee406ea27_o.png) 
+![plot of chunk valuefn_plot](http://farm6.staticflickr.com/5276/7184504589_afc1ee7b6e_o.png) 
 
 
 
@@ -253,7 +241,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest), col="darkgreen") 
 ```
 
-![plot of chunk onerep](http://farm8.staticflickr.com/7218/7369600040_ed29d6c979_o.png) 
+![plot of chunk onerep](http://farm8.staticflickr.com/7215/7184504939_900ec29156_o.png) 
 
 
 
@@ -266,7 +254,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0)
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk all](http://farm8.staticflickr.com/7214/7184365359_98699d9915_o.png) 
+![plot of chunk all](http://farm8.staticflickr.com/7092/7184505309_efd7dc2d2a_o.png) 
 
 
 We can also look at the harvest dynamics:
@@ -277,7 +265,7 @@ We can also look at the harvest dynamics:
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 ```
 
-![plot of chunk harvestplot](http://farm8.staticflickr.com/7080/7369600620_f98035c426_o.png) 
+![plot of chunk harvestplot](http://farm8.staticflickr.com/7234/7184505577_ea69089f7e_o.png) 
 
 
 This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement: 
@@ -288,7 +276,7 @@ This strategy is supposed to be a constant-escapement strategy. We can visualize
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 ```
 
-![plot of chunk escapement](http://farm6.staticflickr.com/5032/7369600872_d459c81e02_o.png) 
+![plot of chunk escapement](http://farm8.staticflickr.com/7239/7184506107_8d2c86fb25_o.png) 
 
 
 
@@ -312,7 +300,7 @@ p5 <- ggplot(policy_zoom) +
 p5
 ```
 
-![plot of chunk policy](http://farm9.staticflickr.com/8150/7184366241_4284b15a00_o.png) 
+![plot of chunk policy](http://farm8.staticflickr.com/7235/7184506325_fe5941cb99_o.png) 
 
 
 The harvest intensity is limited by the stock size.
@@ -329,7 +317,7 @@ p6 <- ggplot(policy_zoom) +
 p6 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1, data=dt)
 ```
 
-![plot of chunk policy2](http://farm8.staticflickr.com/7093/7369601628_a234ea02cd_o.png) 
+![plot of chunk policy2](http://farm9.staticflickr.com/8155/7184506617_bc9c0d52a1_o.png) 
 
 
 # References
