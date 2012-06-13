@@ -28,7 +28,7 @@ f <- BevHolt
 
 
 
-Note that the `pdg_control` pacakge already has a definition for the `BevHolt` function, (typing the function name prints the function)
+Note that the `pdg_control` package already has a definition for the `BevHolt` function, (typing the function name prints the function)
 
 
 
@@ -57,7 +57,7 @@ function (x, h, p)
 
 That is, \\( f(x,h) = \frac{A x}{1 + B x} \\)
 
-Of course we could pass in any custom function of stocksize `x`, harvest `h` and parameter vector `p` in place of `BevHolt`.  Note that we would need to write this function explicitly so that it can take vector values of `x` (i.e. uses `sapply`), an annoying feature of `R` for users comming from Matlab.  
+Of course we could pass in any custom function of stocksize `x`, harvest `h` and parameter vector `p` in place of `BevHolt`.  Note that we would need to write this function explicitly so that it can take vector values of `x` (i.e. uses `sapply`), an annoying feature of `R` for users coming from Matlab.  
 
 
 We must now define parameters for the function.  Note that the positive stationary root of the model is given by \\( \frac{A-1}{B} \\), which we'll store for future reference as `K`.  
@@ -118,9 +118,9 @@ In the Sethi case, computing the distribution over multiple sources of noise is 
 sigma_g <- 0.01    # Noise in population growth
 sigma_m <- 0.0     # noise in stock assessment measurement
 sigma_i <- 0.0     # noise in implementation of the quota
-z_g <- function() rlnorm(1,  0, sigma_g) # mean 1
-z_m <- function() rlnorm(1,  0, sigma_m) # mean 1
-z_i <- function() rlnorm(1,  0, sigma_i) # mean 1
+z_g <- function() 1 
+z_m <- function() 1
+z_i <- function() 1 
 ```
 
 
@@ -240,7 +240,7 @@ sfInit(parallel=TRUE, cpu=16)
 
 
 ```
-R Version:  R version 2.14.1 (2011-12-22) 
+R Version:  R version 2.15.0 (2012-03-30) 
 
 ```
 
@@ -388,7 +388,7 @@ ggplot(subset(dt,reps==1)) +
   facet_wrap(~uncertainty) 
 ```
 
-![plot of chunk onerep](http://farm8.staticflickr.com/7217/7211205964_78e003f6b6_o.png) 
+![plot of chunk onerep](http://farm8.staticflickr.com/7211/7369476032_89a1e17ca4_o.png) 
 
 
 
@@ -401,7 +401,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0)
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2) + facet_wrap(~uncertainty)
 ```
 
-![plot of chunk all](http://farm6.staticflickr.com/5462/7211206684_98d3e4ea10_o.png) 
+![plot of chunk all](http://farm6.staticflickr.com/5342/7184242613_d784a6ac0a_o.png) 
 
 
 We can also look at the harvest dynamics:
@@ -412,7 +412,7 @@ We can also look at the harvest dynamics:
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen") + facet_wrap(~uncertainty)
 ```
 
-![plot of chunk harvestplot](http://farm9.staticflickr.com/8160/7211207386_04f67fef59_o.png) 
+![plot of chunk harvestplot](http://farm8.staticflickr.com/7230/7369476946_86a73f9256_o.png) 
 
 
 This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement: 
@@ -423,7 +423,7 @@ This strategy is supposed to be a constant-escapement strategy. We can visualize
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey") + facet_wrap(~uncertainty)
 ```
 
-![plot of chunk escapement](http://farm9.staticflickr.com/8146/7211208216_e28b0ff5b8_o.png) 
+![plot of chunk escapement](http://farm9.staticflickr.com/8025/7369477338_4561037fa1_o.png) 
 
 
 
@@ -434,7 +434,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, profit))  + facet_wrap(~uncertainty)
 ```
 
-![plot of chunk unnamed-chunk-17](http://farm9.staticflickr.com/8004/7211208968_44f6063635_o.png) 
+![plot of chunk unnamed-chunk-17](http://farm8.staticflickr.com/7224/7184243803_2cabaa9b52_o.png) 
 
 
 
@@ -444,7 +444,7 @@ profits <-dt[ , sum(profit), by=c("reps", "uncertainty")]
 ggplot(profits) + geom_histogram(aes(V1)) + facet_wrap(~uncertainty)
 ```
 
-![plot of chunk unnamed-chunk-18](http://farm8.staticflickr.com/7100/7211209712_58ac838fca_o.png) 
+![plot of chunk unnamed-chunk-18](http://farm6.staticflickr.com/5464/7184244177_04cd6309a0_o.png) 
 
 
 Summary stats
@@ -459,10 +459,10 @@ profits[, mean(V1), by=uncertainty]
 
 ```
               uncertainty    V1
-[1,]                known 33.11
-[2,]               growth 33.38
-[3,]         growth_stock 33.01
-[4,] growth_stock_harvest 32.93
+[1,]                known 33.08
+[2,]               growth 33.25
+[3,]         growth_stock 33.23
+[4,] growth_stock_harvest 33.20
 ```
 
 
@@ -474,11 +474,11 @@ profits[, sd(V1), by=uncertainty]
 
 
 ```
-              uncertainty     V1
-[1,]                known 0.2686
-[2,]               growth 1.4163
-[3,]         growth_stock 1.5444
-[4,] growth_stock_harvest 1.4234
+              uncertainty    V1
+[1,]                known 0.000
+[2,]               growth 1.295
+[3,]         growth_stock 1.513
+[4,] growth_stock_harvest 1.537
 ```
 
 
@@ -488,9 +488,9 @@ profits[, sd(V1), by=uncertainty]
 
 # References
 
-Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005). "Fishery
-management under multiple uncertainty." _Journal of Environmental
-Economics and Management_, *50*. ISSN 00950696, <URL:
-http://dx.doi.org/10.1016/j.jeem.2004.11.005>.
+Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005).
+"Fishery Management Under Multiple Uncertainty." _Journal of
+Environmental Economics And Management_, *50*. ISSN 00950696,
+<URL: http://dx.doi.org/10.1016/j.jeem.2004.11.005>.
 
 

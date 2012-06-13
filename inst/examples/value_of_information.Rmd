@@ -1,4 +1,4 @@
-`ro cache=TRUE, tidy=FALSE, warning=FALSE, comment=NA, message=FALSE, fig.width=10, fig.height=10, cache.path="value_of_information/" or`
+`ro cache=FALSE, tidy=FALSE, warning=FALSE, comment=NA, message=FALSE, fig.width=10, fig.height=10, cache.path="value_of_information/", verbose=TRUE or`
 
 ``` {r  echo=FALSE, cache=FALSE }
 opts_knit$set(upload.fun = socialR::flickr.url)
@@ -15,7 +15,7 @@ knitcitations::cleanbib()
  Implements a numerical version of the SDP described in `r knitcitations::citep("10.1016/j.jeem.2004.11.005")`.
  Compute the optimal solution under different forms of uncertainty.  The true uncertainty is much smaller than that assumed, just a small uncertainty in growth.  We compare the case where the uncertainty is equal to this tiny growth uncertainty to policies derived under much greater uncertainty assumptions, and see how the resulting profit varies.   
 
-``` {r  setup, echo=FALSE}
+``` {r  setup, echo=FALSE, cache=FALSE}
 rm(list=ls())   
 require(pdgControl)
 require(reshape2)
@@ -34,7 +34,7 @@ Chose the state equation / population dynamics function
 f <- BevHolt
 ````
 
-Note that the `pdg_control` pacakge already has a definition for the `BevHolt` function, (typing the function name prints the function)
+Note that the `pdg_control` package already has a definition for the `BevHolt` function, (typing the function name prints the function)
 
 ``` {r }
 BevHolt
@@ -42,7 +42,7 @@ BevHolt
 
 That is, \\( f(x,h) = \frac{A x}{1 + B x} \\)
 
-Of course we could pass in any custom function of stocksize `x`, harvest `h` and parameter vector `p` in place of `BevHolt`.  Note that we would need to write this function explicitly so that it can take vector values of `x` (i.e. uses `sapply`), an annoying feature of `R` for users comming from Matlab.  
+Of course we could pass in any custom function of stocksize `x`, harvest `h` and parameter vector `p` in place of `BevHolt`.  Note that we would need to write this function explicitly so that it can take vector values of `x` (i.e. uses `sapply`), an annoying feature of `R` for users coming from Matlab.  
 
 
 We must now define parameters for the function.  Note that the positive stationary root of the model is given by \\( \frac{A-1}{B} \\), which we'll store for future reference as `K`.  
@@ -86,9 +86,9 @@ In the Sethi case, computing the distribution over multiple sources of noise is 
 sigma_g <- 0.01    # Noise in population growth
 sigma_m <- 0.0     # noise in stock assessment measurement
 sigma_i <- 0.0     # noise in implementation of the quota
-z_g <- function() rlnorm(1,  0, sigma_g) # mean 1
-z_m <- function() rlnorm(1,  0, sigma_m) # mean 1
-z_i <- function() rlnorm(1,  0, sigma_i) # mean 1
+z_g <- function() 1 
+z_m <- function() 1
+z_i <- function() 1 
 ````
 Find the transition matrix 
 
