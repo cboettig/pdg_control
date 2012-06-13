@@ -67,7 +67,7 @@ We calculate the stochastic transition matrix for the probability of going from 
 The first scenario considers the completely deterministic case.  
 
 ```{r }
-sigma_g <- 0.0    # Noise in population growth
+sigma_g <- 0.0001    # Noise in population growth
 z_g <- function() 1 
 z_m <- function() 1 
 z_i <- function() 1 
