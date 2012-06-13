@@ -111,7 +111,7 @@ and we use a harvest-based profit function with default parameters
 
 
 ```r
-profit <- profit_harvest(price=1, c0 = 0.01) 
+profit <- profit_harvest(price=1, c0 = 0.0001) 
 ```
 
 
@@ -125,7 +125,7 @@ Now we must set up the discrete grids for stock size and havest levels (which wi
 
 
 ```r
-x_grid <- seq(0, 1.5 * K, length = 100)  
+x_grid <- seq(0, 2 * K, length = 100)  
 h_grid <- x_grid  
 ```
 
@@ -163,26 +163,25 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0,
 Note that `SDP_Mat` is specified from the calculation above, as are our grids and our profit function. `OptTime` is the stopping time.  `xT` specifies a boundary condition at the stopping time. A reward for meeting this boundary must be specified for it to make any difference.  `delta` indicates the economic discount rate. Again, details are in the function documentation.   
 
 
-Plot the policy function (in terms of escapement, `x-h`, rather than harvest `h`) at equilibrium (first time-step):
+We can take a look at the policy function, 
 
+
+
+```r
+qplot(x_grid, x_grid[opt$D[,1]], xlab="stock size", ylab="harvest")
+```
+
+![plot of chunk unnamed-chunk-6](http://farm6.staticflickr.com/5117/7369542450_8ff4d65ae5_o.png) 
+
+
+Note that this corresponds to constant optimal escapement, 
 
 
 ```r
 qplot(x_grid, x_grid - x_grid[opt$D[,1]], xlab="stock size", ylab="escapement")
 ```
 
-![plot of chunk policyfn_plot](http://farm6.staticflickr.com/5195/7184328341_75e3d3e218_o.png) 
-
-
-and the value function (at equilibrium):
-
-
-
-```r
-qplot(x_grid, opt$V, xlab="stock size", ylab="value")
-```
-
-![plot of chunk valuefn_plot](http://farm8.staticflickr.com/7072/7369563458_7142e0a9bb_o.png) 
+![plot of chunk unnamed-chunk-7](http://farm8.staticflickr.com/7219/7369542678_67a4c1634b_o.png) 
 
 
 
@@ -249,7 +248,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest), col="darkgreen") 
 ```
 
-![plot of chunk p0](http://farm8.staticflickr.com/7100/7184328965_cd99d8c2e0_o.png) 
+![plot of chunk p0](http://farm8.staticflickr.com/7096/7184308797_7040e1ae4b_o.png) 
 
 
 

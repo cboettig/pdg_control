@@ -1,4 +1,4 @@
-`ro cache=FALSE, tidy=FALSE, warning=FALSE, comment=NA, message=FALSE, fig.width=6, fig.height=6, cache.path="cost_of_bias/", verbose=TRUE  or`
+`ro cache=TRUE, tidy=FALSE, warning=FALSE, comment=NA, message=FALSE, fig.width=6, fig.height=6, cache.path="cost_of_bias/", echo=FALSE or`
 
 ```{r echo=FALSE, cache=FALSE }
 opts_knit$set(upload.fun = socialR::flickr.url)
@@ -10,7 +10,7 @@ knitcitations::cleanbib()
 
 
 
-# Calculating the cost of bias  
+# Calculating if information costs are essentially addititve or not.   
  * author Carl Boettiger, <cboettig@gmail.com>
  * license: CC0
 
@@ -20,12 +20,13 @@ knitcitations::cleanbib()
 
 Implements a numerical version of the SDP described in `r knitcitations::citep("10.1016/j.jeem.2004.11.005")`.  Then compute the optimal solution under different forms of uncertainty and compare the results.  
 
-``` {r setup, echo=FALSE, cache=FALSE}
+``` {r setup, echo=FALSE}
 rm(list=ls())   
 require(pdgControl)
 require(reshape2)
 require(ggplot2)
 require(data.table)
+rm(list=ls())
 ````
 
 
@@ -64,10 +65,9 @@ We calculate the stochastic transition matrix for the probability of going from 
 
 ### No Uncertainty 
 
-The first scenario considers the completely deterministic case.  
+The first scenario considers managing with the completely deterministic rules when in fact both measurement and growth are stochastic.  
 
 ```{r }
-sigma_g <- 0.0    # Noise in population growth
 z_g <- function() 1 
 z_m <- function() 1 
 z_i <- function() 1 
@@ -82,14 +82,18 @@ det_opt <- find_dp_optim(deterministic_SDP_Mat, x_grid, h_grid, OptTime=25, xT=0
                      profit, delta=0.05, reward=0)
 ````
 
-We simulate 100 replicates of this system.  We will used a fixed seed so that we can compare these replicates to simulations under different conditions.  (Of course the seed is irrelevant at this stage since this is actually deterministic).  
+We simulate 100 replicates of this system in which measurement and growth are actually stochastic.  We will used a fixed seed so that we can compare these replicates to simulations under different conditions.    
 
 ```{r }
+z_g <- function() rlnorm(1,  0, 0.15) 
+z_m <- function() rlnorm(1,  0, 0.15) 
+z_i <- function() 1 
 set.seed(42)
 sims_one <- lapply(1:100, function(i){
   ForwardSimulate(f, pars, x_grid, h_grid, x0=K, det_opt$D, z_g, z_m, z_i, profit)
 })
 ````
+
 ### Growth uncertainty 
 
 ```{r }
@@ -111,59 +115,82 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0,
 ````
 
 
-As before, we simulate 100 replicates using the same random number sequence, now under this case where the noise in growth is intrinsic and is being accounted for by the management.  
+As before, we simulate 100 replicates using the same random number sequence, now under this case where the noise in growth is being accounted for by the management, but not the measurement noise.  
 
 ```{r}
+z_g <- function() rlnorm(1,  0, 0.15) 
+z_m <- function() rlnorm(1,  0, 0.15) 
+z_i <- function() 1 
 set.seed(42)
 sims_two <- lapply(1:100, function(i){
   ForwardSimulate(f, pars, x_grid, h_grid, x0=K, opt$D, z_g, z_m, z_i, profit)
 })
 ````
 
-### Growth uncertainty & bias  
-
-
-```{r}
-est_pars <- pars
-par_var <- .2
-````
-
-This time we consider the same optimization under uncertainty as before, but the simulations introduce bias through a random estimate of the growth rate parameter A, drawn from a normal with mean equal to the true value `r pars[1]` and variance `r par_var`.   Since A is a constant multiplier in the growth dynamics, this is equivalent to a random estimate of mean of the noise process `z_g`.  Our estimate of the parameter is drawn from the distribution and then held fixed for that replicate.  Each replicate draws its own value, so average parameter estimate across the replicates should be close to the true value.  _Isn't this equivalent to the standard parameter uncertainty?_
-
-```{r}
-bias <- rnorm(100, pars[1], par_var)
-set.seed(42)
-sims_three <- lapply(1:100, function(i){
-  est_pars[1] <- bias[i]
-  ForwardSimulate(f, est_pars, x_grid, h_grid, x0=K, opt$D, z_g, z_m, z_i, profit)
-})
-````
-
-For the record, the biases by index number are:
+### Measurement uncertainty 
 
 ```{r }
-bias
+sigma_m <- 0.15    # Noise in population growth
+z_g <- function() 1
+z_m <- function() rlnorm(1,  0, sigma_m)  
+z_i <- function() 1 
 ````
 
-## Known bias
+The next scenario introduces growth uncertainty into the model, <span> \( x_{t+1} = f( z_m x_t) \) </span>, where `z_m` is lognormal with logmean 0 and logsd of `r sigma_m`. We solve the SDP this time using the simulation approach 
 
-The correct baseline comparison against the above scenario, Mike points out to me, still includes the bias, but solves for the optimal solution of that random draw.  This is much slower since it requires solving a new optimum each time, but parallelizes well.   
+```{r }
+SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=999)
+````
 
+```{r }
+opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0, 
+                     profit, delta=0.05, reward=0)
+````
+
+
+As before, we simulate 100 replicates using the same random number sequence, now under this case where the noise comes from measurement and is accounted for by the management, but not the growth noise.   
 
 ```{r}
-#require(snowfall)
-#sfInit(parallel=T, cpu=16)
-#sfLibrary(pdgControl)
-#sfExportAll()
+z_g <- function() rlnorm(1,  0, 0.15) 
+z_m <- function() rlnorm(1,  0, 0.15) 
+z_i <- function() 1 
 set.seed(42)
-sims_four <- lapply(1:100, function(i){
-  est_pars[1] <- bias[i] 
-  SDP_Mat <- determine_SDP_matrix(f, est_pars, x_grid, h_grid, sigma_g )
-  opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0, 
-                     profit, delta=0.05, reward=0)
-  ForwardSimulate(f, est_pars, x_grid, h_grid, x0=K, opt$D, z_g, z_m, z_i, profit)
+sims_three <- lapply(1:100, function(i){
+  ForwardSimulate(f, pars, x_grid, h_grid, x0=K, opt$D, z_g, z_m, z_i, profit)
 })
 ````
+
+### Both types of uncertainty 
+
+```{r }
+sigma_m <- 0.15    # Noise in population growth
+z_g <- function() rlnorm(1,  0, sigma_m)
+z_m <- function() rlnorm(1,  0, sigma_m)  
+z_i <- function() 1 
+````
+
+```{r }
+SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=999)
+````
+
+```{r }
+opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0, 
+                     profit, delta=0.05, reward=0)
+````
+
+
+As before, we simulate 100 replicates using the same random number sequence, now under this case where the noise comes from measurement and is accounted for by the management, but not the growth noise.   
+
+```{r}
+z_g <- function() rlnorm(1,  0, 0.15) 
+z_m <- function() rlnorm(1,  0, 0.15) 
+z_i <- function() 1 
+set.seed(42)
+sims_three <- lapply(1:100, function(i){
+  ForwardSimulate(f, pars, x_grid, h_grid, x0=K, opt$D, z_g, z_m, z_i, profit)
+})
+````
+
 
 
 

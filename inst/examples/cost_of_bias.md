@@ -130,21 +130,21 @@ The correct baseline comparison against the above scenario, Mike points out to m
 
 Let's begin by looking at the dynamics of a single replicate. The line shows Reed's S, the level above which the stock should be harvested (where catch should be the difference between stock and S).  To confirm that this policy is being followed, note that harvesting only occurs when the stock is above this line, and harvest is proportional to the amount by which it is above.  Change the replicate `reps==` to see the results from a different replicate.  
 
-![plot of chunk onerep](http://farm6.staticflickr.com/5443/7224119970_99eaffb513_o.png) 
+![plot of chunk onerep](http://farm8.staticflickr.com/7241/7223268132_a05f71a08f_o.png) 
 
 
 
 This plot summarizes the stock dynamics by visualizing the replicates. Reed's S shown again.
 
-![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm8.staticflickr.com/7237/7224120372_2f7a1a0daf_o.png) 
+![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm8.staticflickr.com/7227/7223268766_182021509e_o.png) 
 
 
 
-![The profits made in each time interval of a single replicate, by scenario](http://farm6.staticflickr.com/5338/7224120662_2ffb71738a_o.png) 
+![The profits made in each time interval of a single replicate, by scenario](http://farm8.staticflickr.com/7100/7223269436_3e762aa435_o.png) 
 
 
 
-![the distribution of profits by scenario](http://farm8.staticflickr.com/7081/7224120880_5dce51f218_o.png) 
+![the distribution of profits by scenario](http://farm9.staticflickr.com/8146/7223269932_f557f2b5e4_o.png) 
 
 
 Summary statistics 
@@ -156,7 +156,7 @@ Summary statistics
 [1,]       known 33.08
 [2,]      Growth 34.34
 [3,]  RandomBias 35.47
-[4,]   KnownBias 36.98
+[4,]   KnownBias 35.47
 ```
 
 
@@ -166,7 +166,7 @@ Summary statistics
 [1,]       known  0.000
 [2,]      Growth  3.963
 [3,]  RandomBias 15.403
-[4,]   KnownBias 16.346
+[4,]   KnownBias 15.403
 ```
 
 
@@ -189,21 +189,9 @@ cost_of_bias
 
 
 ```
-  [1]  4.805109  1.440203  0.348876  0.537600  0.108679 -0.030362  0.200340
-  [8]  0.264686  0.310560  0.000000 -0.003407  0.134247  0.245258  0.242225
- [15]  0.001675  1.805395  0.625988  0.022581  0.311775  0.814401  2.470442
- [22]  0.848399  1.321014  2.034869  5.069526 -0.005955  0.799331 -0.005131
- [29]  0.216308 -0.125269  2.434977 -0.131973  0.400451  3.928943  3.021026
- [36]  7.311024  0.000000  1.557760  1.473729  4.662718  1.781252  0.000000
- [43]  0.992867 -0.203316  1.204456  1.022335  0.176032  0.000000  1.118997
- [50]  2.387117  0.157296 -0.001755  0.000000  0.000000  0.953200  1.116970
- [57]  0.208433  4.279790  3.942975  0.383384  0.028547  0.111130  3.012619
- [64]  0.678308  3.364385 19.830527  1.105768  0.000000  3.762469 -0.205451
- [71]  3.300783  1.577274 -0.675260  4.864242  3.611919  1.381712  0.000000
- [78]  0.405626  0.348840  2.235865  3.563851  2.994397  5.828749  0.262359
- [85]  2.191019  1.614311 -0.197514  2.931595 -0.372816  3.644167  1.783823
- [92] -0.161279  2.616421 -0.060540  1.433780 -0.011975  2.655753  2.166332
- [99] -0.001685  0.106752
+  [1] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ [36] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ [71] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 ```
 
 
@@ -215,7 +203,7 @@ mean(cost_of_bias)
 
 
 ```
-[1] 1.507
+[1] 0
 ```
 
 
@@ -227,7 +215,7 @@ sd(cost_of_bias)
 
 
 ```
-[1] 2.46
+[1] 0
 ```
 
 
