@@ -74,7 +74,7 @@ The first scenario considers the completely deterministic case.
 
 
 ```r
-sigma_g <- 0.0    # Noise in population growth
+sigma_g <- 0.0001    # Noise in population growth
 z_g <- function() 1 
 z_m <- function() 1 
 z_i <- function() 1 
@@ -277,7 +277,7 @@ ggplot(subset(dt,reps==1)) +
   facet_wrap(~uncertainty) 
 ```
 
-![plot of chunk onerep](http://farm6.staticflickr.com/5458/7369777722_55b5fa6bf0_o.png) 
+![plot of chunk onerep](http://farm8.staticflickr.com/7079/7369822478_d53d7db9c6_o.png) 
 
 
 
@@ -290,7 +290,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0)
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1) + facet_wrap(~uncertainty)
 ```
 
-![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm8.staticflickr.com/7236/7369777992_356a9f072d_o.png) 
+![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm8.staticflickr.com/7098/7369822864_441df2d76b_o.png) 
 
 
 
@@ -301,7 +301,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, profit))  + facet_wrap(~uncertainty)
 ```
 
-![The profits made in each time interval of a single replicate, by scenario](http://farm8.staticflickr.com/7071/7369778252_efae97d0bb_o.png) 
+![The profits made in each time interval of a single replicate, by scenario](http://farm8.staticflickr.com/7080/7369823126_07205d9e7e_o.png) 
 
 
 
@@ -312,7 +312,7 @@ profits <-dt[ , sum(profit), by=c("reps", "uncertainty")]
 ggplot(profits) + geom_histogram(aes(V1)) + facet_wrap(~uncertainty)
 ```
 
-![the distribution of profits by scenario](http://farm8.staticflickr.com/7102/7369778494_efb1f776fa_o.png) 
+![the distribution of profits by scenario](http://farm6.staticflickr.com/5113/7369823486_c489c1bdd5_o.png) 
 
 
 Summary statistics 
@@ -327,7 +327,7 @@ profits[, mean(V1), by=uncertainty]
 
 ```
      uncertainty    V1
-[1,]       known 10.03
+[1,]       known 32.68
 [2,]      Growth 34.34
 [3,]  RandomBias 35.47
 [4,]   KnownBias 36.98
