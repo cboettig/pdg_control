@@ -111,7 +111,7 @@ and we use a harvest-based profit function with default parameters
 
 
 ```r
-profit <- profit_harvest(price=1, c0 = 0.1) 
+profit <- profit_harvest(price=1, c0 = 0.0001) 
 ```
 
 
@@ -168,20 +168,20 @@ We can take a look at the policy function,
 
 
 ```r
-qplot(x_grid, opt$D[,1], xlab="stock size", ylab="harvest")
+qplot(x_grid, x_grid[opt$D[,1]], xlab="stock size", ylab="harvest")
 ```
 
-![plot of chunk unnamed-chunk-6](http://farm8.staticflickr.com/7237/7369532308_d69e23a143_o.png) 
+![plot of chunk unnamed-chunk-6](http://farm6.staticflickr.com/5117/7369542450_8ff4d65ae5_o.png) 
 
 
 Note that this corresponds to constant optimal escapement, 
 
 
 ```r
-qplot(x_grid, x_grid - opt$D[,1], xlab="stock size", ylab="escapement")
+qplot(x_grid, x_grid - x_grid[opt$D[,1]], xlab="stock size", ylab="escapement")
 ```
 
-![plot of chunk unnamed-chunk-7](http://farm9.staticflickr.com/8156/7369532606_43ec139841_o.png) 
+![plot of chunk unnamed-chunk-7](http://farm8.staticflickr.com/7219/7369542678_67a4c1634b_o.png) 
 
 
 
@@ -248,7 +248,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest), col="darkgreen") 
 ```
 
-![plot of chunk p0](http://farm8.staticflickr.com/7239/7369533426_641882ab9a_o.png) 
+![plot of chunk p0](http://farm8.staticflickr.com/7096/7184308797_7040e1ae4b_o.png) 
 
 
 

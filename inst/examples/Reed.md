@@ -111,7 +111,7 @@ and we use a harvest-based profit function with default parameters
 
 
 ```r
-profit <- profit_harvest(price=1, c0 = 0.01) 
+profit <- profit_harvest(price=1, c0 = 0.1) 
 ```
 
 
@@ -163,7 +163,66 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0,
 Note that `SDP_Mat` is specified from the calculation above, as are our grids and our profit function. `OptTime` is the stopping time.  `xT` specifies a boundary condition at the stopping time. A reward for meeting this boundary must be specified for it to make any difference.  `delta` indicates the economic discount rate. Again, details are in the function documentation.   
 
 
+We can take a look at the policy function, 
+
+
+
+```r
+qplot(x_grid, opt$D[,1], xlab="stock size", ylab="harvest")
+```
+
+![plot of chunk unnamed-chunk-6](http://farm8.staticflickr.com/7088/7369506334_fe7c9c5c3a_o.png) 
+
+
+
+
 In the Sethi case, computing the distribution over multiple sources of noise is actually quite difficult.  Simulation turns out to be more efficient than numerically integrating over each distribution.  This code parallelizes the operation over four cores, but can be scaled to an arbitrary cluster. Since we're focused on the Reed example for the moment, we can ignore this step.   
+
+
+
+```r
+require(snowfall) 
+sfInit(parallel=TRUE, cpu=4)
+```
+
+
+
+```
+R Version:  R version 2.15.0 (2012-03-30) 
+
+```
+
+
+
+```r
+sethi_SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=999)
+```
+
+
+
+```
+Library ggplot2 loaded.
+```
+
+
+
+```r
+sethi_opt <- find_dp_optim(sethi_SDP_Mat, x_grid, h_grid, OptTime=25, xT=0, 
+                     profit, delta=0.05, reward=0)
+```
+
+
+
+
+We can take a look at the stochastically estimated policy function, 
+
+
+
+```r
+qplot(x_grid, sethi_opt$D[,1], xlab="stock size", ylab="harvest")
+```
+
+![plot of chunk unnamed-chunk-7](http://farm8.staticflickr.com/7095/7369540522_80da2d926f_o.png) 
 
 
 
@@ -213,7 +272,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest), col="darkgreen") 
 ```
 
-![plot of chunk p0](http://farm9.staticflickr.com/8015/7178088946_4ab62a1ed1_o.png) 
+![plot of chunk p0](http://farm6.staticflickr.com/5238/7184306541_ce5cb1e721_o.png) 
 
 
 

@@ -77,7 +77,7 @@ K <- (pars[1] - 1)/pars[2]
 and we use a harvest-based profit function with default parameters
 
 ``` {r  profit}
-profit <- profit_harvest(price=1, c0 = 0.1) 
+profit <- profit_harvest(price=1, c0 = 0.0001) 
 ````
 
 The profit_harvest function has the form \( \Pi = h - \left( c_0  + c_1 \frac{h}{x} \right) \frac{h}{x} \), conditioned on \( h > x \) and \(x > 0 \).  Note that the R code defines a function from another function using a trick known as a _closure_.  Again we could write a custom profit function as long as it can take a vector stock size `x` and a scalar harvest level `h`.  Details for provided functions can be found in the manual, i.e. `?profit_harvest`. 
@@ -114,12 +114,12 @@ Note that `SDP_Mat` is specified from the calculation above, as are our grids an
 We can take a look at the policy function, 
 
 ``` {r }
-qplot(x_grid, opt$D[,1], xlab="stock size", ylab="harvest")
+qplot(x_grid, x_grid[opt$D[,1]], xlab="stock size", ylab="harvest")
 ````
 
 Note that this corresponds to constant optimal escapement, 
 ``` {r }
-qplot(x_grid, x_grid - opt$D[,1], xlab="stock size", ylab="escapement")
+qplot(x_grid, x_grid - x_grid[opt$D[,1]], xlab="stock size", ylab="escapement")
 ````
 
 
