@@ -214,28 +214,28 @@ imp <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0,
 require(reshape2)
 policy <- melt( data.frame(stock=x_grid, implementation = x_grid[imp$D[,1]], measurement = x_grid[measure$D[,1]], growth = x_grid[growth$D[,1]]), id="stock")
 value <-  melt(data.frame(stock=x_grid, implementation = imp$V, measurement = measure$V, growth = growth$V), id="stock")
-ggplot(policy) + geom_point(aes(stock, value, color=variable))
+ggplot(policy) + geom_point(aes(stock, stock-value, color=variable)) + ylab("escapement") 
 ```
 
-![plot of chunk plots](http://farm9.staticflickr.com/8149/7184985623_46aafc2004_o.png) 
+![plot of chunk plots](http://farm8.staticflickr.com/7224/7185008871_55559287aa_o.png) 
 
 ```r
-ggplot(value) + geom_point(aes(stock, value, color=variable))
+ggplot(value) + geom_point(aes(stock, value, color=variable)) + ylab("Net Present Value")
 ```
 
-![plot of chunk plots](http://farm8.staticflickr.com/7215/7184985767_616ec418c0_o.png) 
+![plot of chunk plots](http://farm8.staticflickr.com/7224/7370242670_1dbfa79562_o.png) 
 
 ```r
-ggplot(policy) + geom_smooth(aes(stock, value, color=variable))
+ggplot(policy) + geom_smooth(aes(stock, stock-value, color=variable))+ ylab("escapement") 
 ```
 
-![plot of chunk plots](http://farm8.staticflickr.com/7242/7370219282_92e8c7cec0_o.png) 
+![plot of chunk plots](http://farm8.staticflickr.com/7219/7370242828_d2b08f341c_o.png) 
 
 ```r
-ggplot(value) + geom_smooth(aes(stock, value, color=variable))
+ggplot(value) + geom_smooth(aes(stock, value, color=variable)) + ylab("Net Present Value")
 ```
 
-![plot of chunk plots](http://farm8.staticflickr.com/7232/7370219428_99d3798419_o.png) 
+![plot of chunk plots](http://farm8.staticflickr.com/7244/7185009297_2b5ef566ef_o.png) 
 
 
 

@@ -124,14 +124,14 @@ imp <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0,
 ```
 
 
-``` {r plots}
+``` {r plots, fig.width=7}
 require(reshape2)
 policy <- melt( data.frame(stock=x_grid, implementation = x_grid[imp$D[,1]], measurement = x_grid[measure$D[,1]], growth = x_grid[growth$D[,1]]), id="stock")
 value <-  melt(data.frame(stock=x_grid, implementation = imp$V, measurement = measure$V, growth = growth$V), id="stock")
-ggplot(policy) + geom_point(aes(stock, stock-value, color=variable))
-ggplot(value) + geom_point(aes(stock, stock-value, color=variable))
-ggplot(policy) + geom_smooth(aes(stock, stock-value, color=variable))
-ggplot(value) + geom_smooth(aes(stock, stock-value, color=variable))
+ggplot(policy) + geom_point(aes(stock, stock-value, color=variable)) + ylab("escapement") 
+ggplot(value) + geom_point(aes(stock, value, color=variable)) + ylab("Net Present Value")
+ggplot(policy) + geom_smooth(aes(stock, stock-value, color=variable))+ ylab("escapement") 
+ggplot(value) + geom_smooth(aes(stock, value, color=variable)) + ylab("Net Present Value")
 ````
 
 
