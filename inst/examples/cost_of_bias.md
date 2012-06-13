@@ -277,7 +277,7 @@ ggplot(subset(dt,reps==1)) +
   facet_wrap(~uncertainty) 
 ```
 
-![plot of chunk onerep](http://farm8.staticflickr.com/7079/7369822478_d53d7db9c6_o.png) 
+![plot of chunk onerep](http://farm6.staticflickr.com/5159/7184627767_4d25b2be40_o.png) 
 
 
 
@@ -290,7 +290,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0)
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1) + facet_wrap(~uncertainty)
 ```
 
-![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm8.staticflickr.com/7098/7369822864_441df2d76b_o.png) 
+![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm9.staticflickr.com/8159/7184628095_c118d60203_o.png) 
 
 
 
@@ -301,7 +301,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, profit))  + facet_wrap(~uncertainty)
 ```
 
-![The profits made in each time interval of a single replicate, by scenario](http://farm8.staticflickr.com/7080/7369823126_07205d9e7e_o.png) 
+![The profits made in each time interval of a single replicate, by scenario](http://farm8.staticflickr.com/7230/7184628309_dce1ff4c5e_o.png) 
 
 
 
@@ -312,7 +312,7 @@ profits <-dt[ , sum(profit), by=c("reps", "uncertainty")]
 ggplot(profits) + geom_histogram(aes(V1)) + facet_wrap(~uncertainty)
 ```
 
-![the distribution of profits by scenario](http://farm6.staticflickr.com/5113/7369823486_c489c1bdd5_o.png) 
+![the distribution of profits by scenario](http://farm6.staticflickr.com/5327/7369863530_2662e80ca0_o.png) 
 
 
 Summary statistics 

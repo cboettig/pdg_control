@@ -139,8 +139,20 @@ In the Sethi case, computing the distribution over multiple sources of noise is 
 
 ```r
 require(snowfall) 
-sfInit(parallel=TRUE, cpu=4)
-SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=99)
+sfInit(parallel=TRUE, cpu=16)
+```
+
+
+
+```
+R Version:  R version 2.14.1 (2011-12-22) 
+
+```
+
+
+
+```r
+SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=9999)
 ```
 
 
@@ -178,7 +190,7 @@ Plot the policy function:
 qplot(x_grid, x_grid - x_grid[opt$D[,1]], xlab="stock size", ylab="escapement")
 ```
 
-![plot of chunk policyfn_plot](http://farm8.staticflickr.com/7086/7369739422_689487debf_o.png) 
+![plot of chunk policyfn_plot](http://farm9.staticflickr.com/8001/7369782410_fcd0c89e70_o.png) 
 
 
 and the value function:
@@ -189,7 +201,7 @@ and the value function:
 qplot(x_grid, opt$V, xlab="stock size", ylab="value")
 ```
 
-![plot of chunk valuefn_plot](http://farm6.staticflickr.com/5276/7184504589_afc1ee7b6e_o.png) 
+![plot of chunk valuefn_plot](http://farm8.staticflickr.com/7081/7184547429_570c4d3563_o.png) 
 
 
 
@@ -241,7 +253,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest), col="darkgreen") 
 ```
 
-![plot of chunk onerep](http://farm8.staticflickr.com/7215/7184504939_900ec29156_o.png) 
+![plot of chunk onerep](http://farm8.staticflickr.com/7103/7184547779_f174e92d33_o.png) 
 
 
 
@@ -254,7 +266,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0)
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk all](http://farm8.staticflickr.com/7092/7184505309_efd7dc2d2a_o.png) 
+![plot of chunk all](http://farm9.staticflickr.com/8156/7369783520_7971a89ae2_o.png) 
 
 
 We can also look at the harvest dynamics:
@@ -265,7 +277,7 @@ We can also look at the harvest dynamics:
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 ```
 
-![plot of chunk harvestplot](http://farm8.staticflickr.com/7234/7184505577_ea69089f7e_o.png) 
+![plot of chunk harvestplot](http://farm8.staticflickr.com/7101/7184548555_62c8770dc3_o.png) 
 
 
 This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement: 
@@ -276,7 +288,7 @@ This strategy is supposed to be a constant-escapement strategy. We can visualize
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 ```
 
-![plot of chunk escapement](http://farm8.staticflickr.com/7239/7184506107_8d2c86fb25_o.png) 
+![plot of chunk escapement](http://farm8.staticflickr.com/7235/7184548809_e5a60191bc_o.png) 
 
 
 
@@ -292,15 +304,43 @@ Note that when the boundary is sufficiently far away, i.e. for the first couple 
 ```r
 policy <- melt(opt$D)
 policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
+```
+
+
+
+```
+Error: object 'Var1' not found
+```
+
+
+
+```r
 p5 <- ggplot(policy_zoom) + 
   geom_point(aes(Var2, (x_grid[Var1]), col=h_grid[value])) + 
   labs(x = "time", y = "fishstock") +
   scale_colour_gradientn(colours = rainbow(4)) +
   geom_abline(intercept=opt$S, slope = 0) 
+```
+
+
+
+```
+Error: object 'policy_zoom' not found
+```
+
+
+
+```r
 p5
 ```
 
-![plot of chunk policy](http://farm8.staticflickr.com/7235/7184506325_fe5941cb99_o.png) 
+
+
+```
+Error: object 'p5' not found
+```
+
+
 
 
 The harvest intensity is limited by the stock size.
@@ -314,17 +354,34 @@ p6 <- ggplot(policy_zoom) +
   labs(x = "time", y = "fishstock") +
   scale_colour_gradientn(colours = rainbow(4)) +
   geom_abline(intercept=opt$S, slope = 0) 
+```
+
+
+
+```
+Error: object 'policy_zoom' not found
+```
+
+
+
+```r
 p6 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1, data=dt)
 ```
 
-![plot of chunk policy2](http://farm9.staticflickr.com/8155/7184506617_bc9c0d52a1_o.png) 
+
+
+```
+Error: object 'p6' not found
+```
+
+
 
 
 # References
 
-Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005).
-"Fishery Management Under Multiple Uncertainty." _Journal of
-Environmental Economics And Management_, *50*. ISSN 00950696,
-<URL: http://dx.doi.org/10.1016/j.jeem.2004.11.005>.
+Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005). "Fishery
+management under multiple uncertainty." _Journal of Environmental
+Economics and Management_, *50*. ISSN 00950696, <URL:
+http://dx.doi.org/10.1016/j.jeem.2004.11.005>.
 
 
