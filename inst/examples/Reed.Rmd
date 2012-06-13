@@ -77,7 +77,7 @@ K <- (pars[1] - 1)/pars[2]
 and we use a harvest-based profit function with default parameters
 
 ``` {r  profit}
-profit <- profit_harvest(price=1, c0 = 0.0001) 
+profit <- profit_harvest(price=1, c0 = 0.01) 
 ````
 
 The profit_harvest function has the form \( \Pi = h - \left( c_0  + c_1 \frac{h}{x} \right) \frac{h}{x} \), conditioned on \( h > x \) and \(x > 0 \).  Note that the R code defines a function from another function using a trick known as a _closure_.  Again we could write a custom profit function as long as it can take a vector stock size `x` and a scalar harvest level `h`.  Details for provided functions can be found in the manual, i.e. `?profit_harvest`. 
@@ -86,7 +86,7 @@ The profit_harvest function has the form \( \Pi = h - \left( c_0  + c_1 \frac{h}
 Now we must set up the discrete grids for stock size and havest levels (which will use same resolution as for stock), in order to calculate the SDP solution.   Here we set the gridsize to 100.  
 
 ``` {r  grid}
-x_grid <- seq(0, 2 * K, length = 100)  
+x_grid <- seq(0, 1.5 * K, length = 100)  
 h_grid <- x_grid  
 ````
 
@@ -111,15 +111,16 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0,
 Note that `SDP_Mat` is specified from the calculation above, as are our grids and our profit function. `OptTime` is the stopping time.  `xT` specifies a boundary condition at the stopping time. A reward for meeting this boundary must be specified for it to make any difference.  `delta` indicates the economic discount rate. Again, details are in the function documentation.   
 
 
-We can take a look at the policy function, 
+Plot the policy function (in terms of escapement, `x-h`, rather than harvest `h`) at equilibrium (first time-step):
 
-``` {r }
-qplot(x_grid, x_grid[opt$D[,1]], xlab="stock size", ylab="harvest")
+``` {r policyfn_plot}
+qplot(x_grid, x_grid - x_grid[opt$D[,1]], xlab="stock size", ylab="escapement")
 ````
 
-Note that this corresponds to constant optimal escapement, 
-``` {r }
-qplot(x_grid, x_grid - x_grid[opt$D[,1]], xlab="stock size", ylab="escapement")
+and the value function (at equilibrium):
+
+``` {r valuefn_plot}
+qplot(x_grid, opt$V, xlab="stock size", ylab="value")
 ````
 
 
