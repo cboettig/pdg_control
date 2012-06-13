@@ -120,7 +120,7 @@ Now we must set up the discrete grids for stock size and havest levels (which wi
 
 
 ```r
-x_grid <- seq(0, 2 * K, length = 100)  
+x_grid <- seq(0, 1.5 * K, length = 100)  
 h_grid <- x_grid  
 ```
 
@@ -140,6 +140,18 @@ In the Sethi case, computing the distribution over multiple sources of noise is 
 ```r
 require(snowfall) 
 sfInit(parallel=TRUE, cpu=4)
+```
+
+
+
+```
+R Version:  R version 2.15.0 (2012-03-30) 
+
+```
+
+
+
+```r
 SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=999)
 ```
 
@@ -165,6 +177,32 @@ Bellman's algorithm to compute the optimal solution for all possible trajectorie
 opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0, 
                      profit, delta=0.05, reward=0)
 ```
+
+
+
+
+
+Plot the policy function:
+
+
+
+```r
+qplot(x_grid, x_grid - x_grid[opt$D[,1]], xlab="stock size", ylab="escapement")
+```
+
+![plot of chunk policyfn_plot](http://farm6.staticflickr.com/5339/7184364471_a7e1929ea7_o.png) 
+
+
+and the value function:
+
+
+
+```r
+qplot(x_grid, opt$V, xlab="stock size", ylab="value")
+```
+
+![plot of chunk valuefn_plot](http://farm8.staticflickr.com/7223/7369599644_bee406ea27_o.png) 
+
 
 
 
@@ -215,7 +253,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest), col="darkgreen") 
 ```
 
-![plot of chunk onerep](http://farm9.staticflickr.com/8007/7130135757_09c23e3e5a_o.png) 
+![plot of chunk onerep](http://farm8.staticflickr.com/7218/7369600040_ed29d6c979_o.png) 
 
 
 
@@ -228,7 +266,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0)
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk all](http://farm9.staticflickr.com/8148/6984061776_d15e7d073f_o.png) 
+![plot of chunk all](http://farm8.staticflickr.com/7214/7184365359_98699d9915_o.png) 
 
 
 We can also look at the harvest dynamics:
@@ -239,7 +277,7 @@ We can also look at the harvest dynamics:
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 ```
 
-![plot of chunk harvestplot](http://farm8.staticflickr.com/7188/6984052718_6e932cedf8_o.png) 
+![plot of chunk harvestplot](http://farm8.staticflickr.com/7080/7369600620_f98035c426_o.png) 
 
 
 This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement: 
@@ -250,7 +288,7 @@ This strategy is supposed to be a constant-escapement strategy. We can visualize
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 ```
 
-![plot of chunk escapement](http://farm8.staticflickr.com/7096/6984052922_b4ab50f14b_o.png) 
+![plot of chunk escapement](http://farm6.staticflickr.com/5032/7369600872_d459c81e02_o.png) 
 
 
 
@@ -274,7 +312,7 @@ p5 <- ggplot(policy_zoom) +
 p5
 ```
 
-![plot of chunk policy](http://farm8.staticflickr.com/7198/7130146133_bf7083f9d2_o.png) 
+![plot of chunk policy](http://farm9.staticflickr.com/8150/7184366241_4284b15a00_o.png) 
 
 
 The harvest intensity is limited by the stock size.
@@ -291,29 +329,14 @@ p6 <- ggplot(policy_zoom) +
 p6 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1, data=dt)
 ```
 
-![plot of chunk policy2](http://farm9.staticflickr.com/8007/6984063036_ea9d9ac47d_o.png) 
+![plot of chunk policy2](http://farm8.staticflickr.com/7093/7369601628_a234ea02cd_o.png) 
 
 
 # References
 
 Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005).
-"Fishery management under multiple uncertainty." _Journal of
-Environmental Economics and Management_, *50*. ISSN 00950696,
-<URL: http://dx.doi.org/10.1016/j.jeem.2004.11.005>.
-
-Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005).
-"Fishery management under multiple uncertainty." _Journal of
-Environmental Economics and Management_, *50*. ISSN 00950696,
-<URL: http://dx.doi.org/10.1016/j.jeem.2004.11.005>.
-
-Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005).
-"Fishery management under multiple uncertainty." _Journal of
-Environmental Economics and Management_, *50*. ISSN 00950696,
-<URL: http://dx.doi.org/10.1016/j.jeem.2004.11.005>.
-
-Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005).
-"Fishery management under multiple uncertainty." _Journal of
-Environmental Economics and Management_, *50*. ISSN 00950696,
+"Fishery Management Under Multiple Uncertainty." _Journal of
+Environmental Economics And Management_, *50*. ISSN 00950696,
 <URL: http://dx.doi.org/10.1016/j.jeem.2004.11.005>.
 
 
