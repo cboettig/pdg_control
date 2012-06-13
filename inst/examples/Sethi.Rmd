@@ -97,8 +97,8 @@ In the Sethi case, computing the distribution over multiple sources of noise is 
 
 ``` {r  parallel}
 require(snowfall) 
-sfInit(parallel=TRUE, cpu=4)
-SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=99)
+sfInit(parallel=TRUE, cpu=16)
+SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=9999)
 ````
 Note that `SDP_Mat` is specified from the calculation above, as are our grids and our profit function. `OptTime` is the stopping time.  `xT` specifies a boundary condition at the stopping time. A reward for meeting this boundary must be specified for it to make any difference.  `delta` indicates the economic discount rate. Again, details are in the function documentation.   
 
