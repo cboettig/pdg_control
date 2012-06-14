@@ -15,8 +15,8 @@ knitcitations::cleanbib()
 Implements a numerical version of the SDP described in `r knitcitations::citep("10.1016/j.jeem.2004.11.005")`.
 
 
-Clear the workspace and load package dependencies: 
 ``` {r  setup, cache=FALSE}
+## Clear the workspace and load package dependencies: 
 rm(list=ls())   
 require(pdgControl)
 require(reshape2)
@@ -24,34 +24,57 @@ require(ggplot2)
 require(data.table)
 ````
 
+We consider a Beverton Holt state equation governing population dynamics, \\( f(x,h) = \frac{A x}{1 + B x} \\)
 
-Chose the state equation / population dynamics function
 
 ``` {r }
 f <- BevHolt
 ````
 
-That is, \\( f(x,h) = \frac{A x}{1 + B x} \\)
-
-We must now define parameters for the function.  Note that the positive stationary root of the model is given by \\( \frac{A-1}{B} \\), which we'll store for future reference as `K`.  
+With parameters `A` = `r A <- 1.5` and `B` = `r B <- 0.05`.
 
 ``` {r }
 pars <- c(1.5, 0.05)
 K <- (pars[1] - 1)/pars[2]
 ````
 
-and we use a harvest-based profit function with default parameters
+Note that the positive stationary root of the model is given by \\( \frac{A-1}{B} \\), or carring capacity `K` = `r K`.  
+We consider a profits from fishing to be a function of harvest `h` and stock size `x`,  \\( \Pi(x,h) = h - \left( c_0  + c_1 \frac{h}{x} \right) \frac{h}{x} \\), conditioned on \\( h > x \\) and \\(x > 0 \\),
 
 ``` {r  profit}
-profit <- profit_harvest(price=1, c0 = 0.01) 
+price <- 1
+c0 <- 0.01
+c1 <- 0
+profit <- profit_harvest(price=price, c0 = c0, c1=c1) 
 ````
 
-The `profit_harvest` function has the form \\( \Pi = h - \left( c_0  + c_1 \frac{h}{x} \right) \frac{h}{x} \\), conditioned on \\( h > x \\) and \\(x > 0 \\). We set up the discrete grids for stock size and havest levels (which will use same resolution as for stock), in order to calculate the SDP solution.   Here we set the gridsize to 100.  
+with price `r price`, `c0` `r c0` and `c1` `r c1`. 
+
+
+``` {r }
+xmin <- 0
+xmax <- 1.5 * K
+grid_n <- 100
+````
+
+We seek a harvest policy which maximizes the discounted profit from the fishery using a stochastic dynamic programming approach over a discrete grid of stock sizes from `r xmin` to `r xmax` on a grid of `r grid_n` points, and over an identical discrete grid of possible harvest values.  
+
 
 ``` {r  grid}
-x_grid <- seq(0, 1.5 * K, length = 100)  
+x_grid <- seq(xmin, xmax, length = grid_n)  
 h_grid <- x_grid  
 ````
+
+
+``` {r miscpars}
+delta <- 0.05
+xT <- 0
+OptTime <- 25
+````
+
+We will determine the optimal solution over a `r OptTime` time step window with boundary condition for stock at `r xT` and discounting rate of `r delta`.  Different scenarios introduce different assumptions about the sources of noise.  Unlike `r knitcitations::citep("10.1016/j.jeem.2004.11.005")`, we use log normal insead of uniform noise, which requires Monte Carlo integration to estimate the transition matrix.  Note that we also have a Beverton-Holt recruitment function instead of the logistic map, and differ in the precise choice of parameters for the state equation, noise, discounting, profit function, etc.  
+
+
 
 
 ## Scenarios
@@ -75,13 +98,9 @@ sfInit(parallel=TRUE, cpu=16)
 ``` {r sdp1}
 SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=19999)
 ````
-Note that `SDP_Mat` is specified from the calculation above, as are our grids and our profit function. `OptTime` is the stopping time.  `xT` specifies a boundary condition at the stopping time. A reward for meeting this boundary must be specified for it to make any difference.  `delta` indicates the economic discount rate. Again, details are in the function documentation.   
-
 
 
 ### Find the optimum by dynamic programming
-
-Bellman's algorithm to compute the optimal solution for all possible trajectories. 
 
 ``` {r  find_dp_opt }
 measure <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0, 
@@ -133,4 +152,4 @@ ggplot(policy) + geom_smooth(aes(stock, stock-value, color=variable))+ ylab("esc
 ggplot(value) + geom_smooth(aes(stock, value, color=variable)) + ylab("Net Present Value")
 ````
 
-
+Note that growth noise gives the constant escapement solution, as expected, but large measurement noise results in raising the maximum escapement, particularly at large stock sizes.  If the measured population was unusually high you might assume it was a measurement error and not increase your target harvest immediately, so this makes some intuitive sense.   

@@ -10,10 +10,10 @@
 Implements a numerical version of the SDP described in (Sethi _et. al._ 2005).
 
 
-Clear the workspace and load package dependencies: 
 
 
 ```r
+## Clear the workspace and load package dependencies: 
 rm(list=ls())   
 require(pdgControl)
 require(reshape2)
@@ -24,8 +24,8 @@ require(data.table)
 
 
 
+We consider a Beverton Holt state equation governing population dynamics, \\( f(x,h) = \frac{A x}{1 + B x} \\)
 
-Chose the state equation / population dynamics function
 
 
 
@@ -36,9 +36,7 @@ f <- BevHolt
 
 
 
-That is, \\( f(x,h) = \frac{A x}{1 + B x} \\)
-
-We must now define parameters for the function.  Note that the positive stationary root of the model is given by \\( \frac{A-1}{B} \\), which we'll store for future reference as `K`.  
+With parameters `A` = `1.5` and `B` = `0.05`.
 
 
 
@@ -50,26 +48,61 @@ K <- (pars[1] - 1)/pars[2]
 
 
 
-and we use a harvest-based profit function with default parameters
+Note that the positive stationary root of the model is given by \\( \frac{A-1}{B} \\), or carring capacity `K` = `10`.  
+We consider a profits from fishing to be a function of harvest `h` and stock size `x`,  \\( \Pi(x,h) = h - \left( c_0  + c_1 \frac{h}{x} \right) \frac{h}{x} \\), conditioned on \\( h > x \\) and \\(x > 0 \\),
 
 
 
 ```r
-profit <- profit_harvest(price=1, c0 = 0.01) 
+price <- 1
+c0 <- 0.01
+c1 <- 0
+profit <- profit_harvest(price=price, c0 = c0, c1=c1) 
 ```
 
 
 
 
-The `profit_harvest` function has the form \\( \Pi = h - \left( c_0  + c_1 \frac{h}{x} \right) \frac{h}{x} \\), conditioned on \\( h > x \\) and \\(x > 0 \\). We set up the discrete grids for stock size and havest levels (which will use same resolution as for stock), in order to calculate the SDP solution.   Here we set the gridsize to 100.  
+with price `1`, `c0` `0.01` and `c1` `0`. 
+
 
 
 
 ```r
-x_grid <- seq(0, 1.5 * K, length = 100)  
+xmin <- 0
+xmax <- 1.5 * K
+grid_n <- 100
+```
+
+
+
+
+We seek a harvest policy which maximizes the discounted profit from the fishery using a stochastic dynamic programming approach over a discrete grid of stock sizes from `0` to `15` on a grid of `100` points, and over an identical discrete grid of possible harvest values.  
+
+
+
+
+```r
+x_grid <- seq(xmin, xmax, length = grid_n)  
 h_grid <- x_grid  
 ```
 
+
+
+
+
+
+
+```r
+delta <- 0.05
+xT <- 0
+OptTime <- 25
+```
+
+
+
+
+We will determine the optimal solution over a `25` time step window with boundary condition for stock at `0` and discounting rate of `0.05`.  Different scenarios introduce different assumptions about the sources of noise.  Unlike (Sethi _et. al._ 2005), we use log normal insead of uniform noise, which requires Monte Carlo integration to estimate the transition matrix.  Note that we also have a Beverton-Holt recruitment function instead of the logistic map, and differ in the precise choice of parameters for the state equation, noise, discounting, profit function, etc.  
 
 
 
@@ -99,8 +132,6 @@ require(snowfall)
 sfInit(parallel=TRUE, cpu=16)
 ```
 
-
-
 ```
 R Version:  R version 2.14.1 (2011-12-22) 
 
@@ -115,21 +146,15 @@ R Version:  R version 2.14.1 (2011-12-22)
 SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=19999)
 ```
 
-
-
 ```
 Library ggplot2 loaded.
 ```
 
 
 
-Note that `SDP_Mat` is specified from the calculation above, as are our grids and our profit function. `OptTime` is the stopping time.  `xT` specifies a boundary condition at the stopping time. A reward for meeting this boundary must be specified for it to make any difference.  `delta` indicates the economic discount rate. Again, details are in the function documentation.   
-
 
 
 ### Find the optimum by dynamic programming
-
-Bellman's algorithm to compute the optimal solution for all possible trajectories. 
 
 
 
@@ -163,13 +188,9 @@ z_i <- function() rlnorm(1,  0, sigma_i) # mean 1
 SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=19999)
 ```
 
-
-
 ```
 Library ggplot2 loaded.
 ```
-
-
 
 ```r
 growth <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0, 
@@ -201,13 +222,9 @@ z_i <- function() rlnorm(1,  0, sigma_i) # mean 1
 SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=19999)
 ```
 
-
-
 ```
 Library ggplot2 loaded.
 ```
-
-
 
 ```r
 imp <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0, 
@@ -227,25 +244,25 @@ value <-  melt(data.frame(stock=x_grid, implementation = imp$V, measurement = me
 ggplot(policy) + geom_point(aes(stock, stock-value, color=variable)) + ylab("escapement") 
 ```
 
-![plot of chunk plots](http://farm8.staticflickr.com/7224/7185008871_55559287aa_o.png) 
+![plot of chunk plots](http://farm9.staticflickr.com/8151/7372557232_fe14154278_o.png) 
 
 ```r
 ggplot(value) + geom_point(aes(stock, value, color=variable)) + ylab("Net Present Value")
 ```
 
-![plot of chunk plots](http://farm8.staticflickr.com/7224/7370242670_1dbfa79562_o.png) 
+![plot of chunk plots](http://farm8.staticflickr.com/7239/7187327439_cf08db1492_o.png) 
 
 ```r
 ggplot(policy) + geom_smooth(aes(stock, stock-value, color=variable))+ ylab("escapement") 
 ```
 
-![plot of chunk plots](http://farm8.staticflickr.com/7219/7370242828_d2b08f341c_o.png) 
+![plot of chunk plots](http://farm8.staticflickr.com/7089/7372557594_d689df38d1_o.png) 
 
 ```r
 ggplot(value) + geom_smooth(aes(stock, value, color=variable)) + ylab("Net Present Value")
 ```
 
-![plot of chunk plots](http://farm8.staticflickr.com/7244/7185009297_2b5ef566ef_o.png) 
+![plot of chunk plots](http://farm9.staticflickr.com/8014/7187327805_62635271fa_o.png) 
 
 
-
+Note that growth noise gives the constant escapement solution, as expected, but large measurement noise results in raising the maximum escapement, particularly at large stock sizes.  If the measured population was unusually high you might assume it was a measurement error and not increase your target harvest immediately, so this makes some intuitive sense.   

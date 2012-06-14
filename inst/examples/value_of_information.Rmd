@@ -64,7 +64,7 @@ h_grid <- x_grid
 ````
 
 
-``` {r pars}
+``` {r miscpars}
 delta <- 0.05
 xT <- 0
 OptTime <- 25
@@ -76,9 +76,9 @@ We will determine the optimal solution over a `r OptTime` time step window with 
 
 We use Monte Carlo integration over the noise processes to determine the transition matrix.  
 
-```{r beparallel, cache=FALSE}
+``` {r beparallel, cache=FALSE}
+require(snowfall)
 sfInit(parallel=TRUE, cpu=16)
-sfExportAll()
 ````
 
 
@@ -108,7 +108,7 @@ gmi <- scenario(0.2, 0.2, 0.2)
 
 ### plots
 
-``` {r }
+``` {r sethiplots}
 require(reshape2)
 policy <- melt(data.frame(stock = x_grid, det = det$D[,1], g = g$D[,1], m = m$D[,1], gm = gm$D[,1], gi = gi$D[,1], gmi = gmi$D[,1]), id = "stock")
 ggplot(policy) + geom_point(aes(stock, stock-x_grid[value], color=variable)) + ylab("escapement") 
