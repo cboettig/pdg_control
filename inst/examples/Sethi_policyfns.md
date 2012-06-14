@@ -13,6 +13,16 @@ Implements a numerical version of the SDP described in (Sethi _et. al._ 2005).
 Clear the workspace and load package dependencies: 
 
 
+```r
+rm(list=ls())   
+require(pdgControl)
+require(reshape2)
+require(ggplot2)
+require(data.table)
+```
+
+
+
 
 
 Chose the state equation / population dynamics function

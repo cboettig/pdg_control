@@ -16,13 +16,12 @@ Implements a numerical version of the SDP described in `r knitcitations::citep("
 
 
 Clear the workspace and load package dependencies: 
-``` {r  setup, echo=FALSE, cache=FALSE}
+``` {r  setup, cache=FALSE}
 rm(list=ls())   
 require(pdgControl)
 require(reshape2)
 require(ggplot2)
 require(data.table)
-rm(list=ls())
 ````
 
 
