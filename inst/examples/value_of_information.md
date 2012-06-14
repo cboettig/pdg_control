@@ -197,9 +197,116 @@ Library ggplot2 loaded.
 
 
 
+```r
+require(reshape2)
+policy <- melt(data.frame(stock = x_grid, det = det$D[, 
+    1], g = g$D[, 1], m = m$D[, 1], gm = gm$D[, 1], gi = gi$D[, 
+    1], gmi = gmi$D[, 1]), id = "stock")
+ggplot(policy) + geom_point(aes(stock, stock - 
+    x_grid[value], color = variable)) + ylab("escapement")
+```
+
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7219/7188046297_813a8f4b82_o.png) 
+
+```r
+ggplot(policy) + geom_smooth(aes(stock, stock - 
+    x_grid[value], color = variable)) + ylab("escapement")
+```
+
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7092/7188046455_8a38aec9e8_o.png) 
+
+```r
+
+
+value <- melt(data.frame(stock = x_grid, det = det$V, 
+    g = g$V, m = m$V, gm = gm$V, gi = gi$V, gmi = gmi$V), 
+    id = "stock")
+ggplot(value) + geom_point(aes(stock, value, color = variable)) + 
+    ylab("Net Present Value")
+```
+
+![plot of chunk sethiplots](http://farm6.staticflickr.com/5320/7373278166_0f896e3ecf_o.png) 
+
+```r
+ggplot(value) + geom_smooth(aes(stock, value, 
+    color = variable)) + ylab("Net Present Value")
+```
+
+![plot of chunk sethiplots](http://farm6.staticflickr.com/5312/7373278314_48bb11a65e_o.png) 
+
+
+## Simulations
+
+
+
+```r
+simulatereps <- function(opt, true_g, true_m, 
+    true_i) {
+    z_g <- function() rlnorm(1, 0, true_g)
+    z_m <- function() rlnorm(1, 0, true_m)
+    z_i <- function() rlnorm(1, 0, true_i)
+    
+    sims <- lapply(1:100, function(i) {
+        ForwardSimulate(f, pars, x_grid, h_grid, x0 = K, 
+            opt$D, z_g, z_m, z_i, profit)
+    })
+    
+    list(sims = sims, opt = opt, policy_uncertainty = c(policy_g, 
+        policy_m, policy_i), true_stochasticity = c(true_g, 
+        true_m, true_i))
+}
+```
 
 
 
 
+
+Corner cases 
+
+
+
+```r
+base <- simulatereps(det, 0, 0, 0)
+```
+
+```
+Error: object 'policy_g' not found```
+
+```r
+full <- simulatereps(gmi, 0.2, 0.2, 0.2)
+```
+
+```
+Error: object 'policy_g' not found```
+
+```r
+cautious <- simulatereps(gmi, 0, 0, 0)
+```
+
+```
+Error: object 'policy_g' not found```
+
+```r
+reckless <- simulatereps(det, 0.2, 0.2, 0.2)
+```
+
+```
+Error: object 'policy_g' not found```
+
+
+
+
+
+
+# References
+
+<p>Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005).
+&ldquo;Fishery management under multiple uncertainty.&rdquo;
+<EM>Journal of Environmental Economics and Management</EM>, <B>50</B>.
+ISSN 00950696, <a href="http://dx.doi.org/10.1016/j.jeem.2004.11.005">http://dx.doi.org/10.1016/j.jeem.2004.11.005</a>.
+Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005). "Fishery
+management under multiple uncertainty." _Journal of Environmental
+Economics and Management_, *50*. ISSN 00950696, <URL:
+http://dx.doi.org/10.1016/j.jeem.2004.11.005>.
 
 

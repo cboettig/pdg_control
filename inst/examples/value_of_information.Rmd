@@ -115,7 +115,7 @@ ggplot(policy) + geom_point(aes(stock, stock-x_grid[value], color=variable)) + y
 ggplot(policy) + geom_smooth(aes(stock, stock-x_grid[value], color=variable))+ ylab("escapement") 
 
 
-value <- melt(data.frame(stock = x_grid, det=det$V g = g$V, m = m$V, gm = gm$V, gi = gi$V, gmi = gmi$V), id = "stock")
+value <- melt(data.frame(stock = x_grid, det=det$V, g = g$V, m = m$V, gm = gm$V, gi = gi$V, gmi = gmi$V), id = "stock")
 ggplot(value) + geom_point(aes(stock, value, color=variable)) + ylab("Net Present Value")
 ggplot(value) + geom_smooth(aes(stock, value, color=variable)) + ylab("Net Present Value")
 ````
@@ -142,9 +142,12 @@ Corner cases
 
 ```{r }
 base <- simulatereps(det, 0, 0, 0)
+reckless <- simulatereps(det, .2, .2, .2)
+````
+
+```{r }
 full <- simulatereps(gmi, .2, .2, .2)
 cautious <- simulatereps(gmi, 0, 0, 0)
-reckless <- simulatereps(det, .2, .2, .2)
 ````
 
 
