@@ -152,5 +152,5 @@ reckless <- simulatereps(det, .2, .2, .2)
 # References
 
 ``` {r biblio, echo=FALSE, results="asis"}
-I(knitcitations::bibliography())
+I(print(knitcitations::bibliography(), "html"))
 ````
