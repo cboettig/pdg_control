@@ -6,7 +6,11 @@ options(device = function(width = 5, height = 5) {
     pdf(NULL, width = width, height = height)
 })
 knitcitations::cleanbib()
+cache=FALSE
+plotcache=FALSE
 ````
+
+
 
 # Calculating the value of information
 
@@ -105,10 +109,13 @@ gi <- scenario(0.2, 0.0, 0.2)
 gmi <- scenario(0.2, 0.2, 0.2)
 ````
 
+``` {r not_all_zero}
+det <- scenario(0.01, 0.0, 0.0)
+````
 
 ### plots
 
-``` {r sethiplots}
+``` {r sethiplots, cache=cacheplots}
 require(reshape2)
 policy <- melt(data.frame(stock = x_grid, det = det$D[,1], g = g$D[,1], m = m$D[,1], gm = gm$D[,1], gi = gi$D[,1], gmi = gmi$D[,1]), id = "stock")
 ggplot(policy) + geom_point(aes(stock, stock-x_grid[value], color=variable)) + ylab("escapement") 
@@ -132,28 +139,73 @@ simulatereps <- function(opt, true_g, true_m, true_i){
     ForwardSimulate(f, pars, x_grid, h_grid, x0 = K, opt$D, z_g, z_m, z_i, profit)
   })
   
-  list(sims = sims, opt = opt, policy_uncertainty = c(policy_g, policy_m, policy_i),
-  true_stochasticity = c(true_g, true_m, true_i))
+  list(sims = sims, opt = opt, true_stochasticity = c(true_g, true_m, true_i))
 }
 ````
 
 
 Corner cases 
 
-```{r }
+``` {r cache=cache}
 base <- simulatereps(det, 0, 0, 0)
 reckless <- simulatereps(det, .2, .2, .2)
 ````
 
-```{r }
+``` {r cache=cache}
 full <- simulatereps(gmi, .2, .2, .2)
 cautious <- simulatereps(gmi, 0, 0, 0)
 ````
+
+
+``` {r tidy, cache=FALSE}
+sims <- list(base = base$sims, full = full$sims, reckless=reckless$sims, cautious=cautious$sims)
+dat <- melt(sims, id=names(sims[[1]][[1]]))  
+dt <- data.table(dat)
+setnames(dt, c("L2", "L1"), c("reps", "uncertainty")) # names are nice
+````
+
+### Plots 
+
+
+``` {r  onerep, cache=plotcache }
+ggplot(subset(dt,reps==1)) +
+  geom_line(aes(time, fishstock)) +
+  geom_abline(intercept=opt$S, slope = 0) +
+  geom_line(aes(time, harvest), col="darkgreen") + 
+  facet_wrap(~uncertainty) 
+````
+
+This plot summarizes the stock dynamics by visualizing the replicates. Reed's S shown again.
+
+``` {r  fig.cap="the induced dynamics in the stock size over time, for all replicates, by scenario", cache=plotcache}
+p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) 
+p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1) + facet_wrap(~uncertainty)
+````
+
+``` {r fig.cap="The profits made in each time interval of a single replicate, by scenario", cache=plotcache}
+ggplot(subset(dt,reps==1)) +
+  geom_line(aes(time, profit))  + facet_wrap(~uncertainty)
+
+````
+
+
+``` {r fig.cap="the distribution of profits by scenario", cache=plotcache}
+profits <-dt[ , sum(profit), by=c("reps", "uncertainty")] 
+ggplot(profits) + geom_histogram(aes(V1)) + facet_wrap(~uncertainty)
+````
+
+Summary statistics 
+
+``` {r, cache=FALSE}
+profits[, mean(V1), by=uncertainty]
+profits[, sd(V1), by=uncertainty]
+````
+
 
 
 
 # References
 
 ``` {r biblio, echo=FALSE, results="asis"}
-I(print(knitcitations::bibliography(), "html"))
+print(knitcitations::bibliography(), "html")
 ````
