@@ -145,18 +145,18 @@ simulatereps <- function(opt, true_g, true_m, true_i){
 
 Corner cases 
 
-``` {r cache=FALSE}
+``` {r }
 base <- simulatereps(det, 0, 0, 0)
 reckless <- simulatereps(det, .2, .2, .2)
 ````
 
-``` {r cache=FALSE}
+``` {r }
 full <- simulatereps(gmi, .2, .2, .2)
 cautious <- simulatereps(gmi, 0, 0, 0)
 ````
 
 
-``` {r tidy, cache=FALSE}
+``` {r tidy}
 sims <- list(base = base$sims, full = full$sims, reckless=reckless$sims, cautious=cautious$sims)
 dat <- melt(sims, id=names(sims[[1]][[1]]))  
 dt <- data.table(dat)
@@ -166,7 +166,7 @@ setnames(dt, c("L2", "L1"), c("reps", "uncertainty")) # names are nice
 ### Plots 
 
 
-``` {r  onerep, cache=FALSE }
+``` {r  onerep}
 ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, fishstock)) +
   geom_line(aes(time, harvest), col="darkgreen") + 
@@ -175,26 +175,26 @@ ggplot(subset(dt,reps==1)) +
 
 This plot summarizes the stock dynamics by visualizing the replicates.
 
-``` {r  fig.cap="the induced dynamics in the stock size over time, for all replicates, by scenario", cache=FALSE}
+``` {r  fig.cap="the induced dynamics in the stock size over time, for all replicates, by scenario"}
 p1 <- ggplot(dt) 
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1) + facet_wrap(~uncertainty)
 ````
 
-``` {r fig.cap="The profits made in each time interval of a single replicate, by scenario", cache=FALSE}
+``` {r fig.cap="The profits made in each time interval of a single replicate, by scenario"}
 ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, profit))  + facet_wrap(~uncertainty)
 
 ````
 
 
-``` {r fig.cap="the distribution of profits by scenario", cache=FALSE}
+``` {r fig.cap="the distribution of profits by scenario"}
 profits <-dt[ , sum(profit), by=c("reps", "uncertainty")] 
 ggplot(profits) + geom_histogram(aes(V1)) + facet_wrap(~uncertainty)
 ````
 
 Summary statistics 
 
-``` {r, cache=FALSE}
+``` {r cache=FALSE}
 profits[, mean(V1), by=uncertainty]
 profits[, sd(V1), by=uncertainty]
 ````

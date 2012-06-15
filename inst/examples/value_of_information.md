@@ -220,14 +220,14 @@ ggplot(policy) + geom_point(aes(stock, stock -
     x_grid[value], color = variable)) + ylab("escapement")
 ```
 
-![plot of chunk sethiplots](http://farm8.staticflickr.com/7231/7188203487_4a28697e9b_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8004/7188209009_8f1cd59e7f_o.png) 
 
 ```r
 ggplot(policy) + geom_smooth(aes(stock, stock - 
     x_grid[value], color = variable)) + ylab("escapement")
 ```
 
-![plot of chunk sethiplots](http://farm8.staticflickr.com/7091/7188203649_d88b1d45c1_o.png) 
+![plot of chunk sethiplots](http://farm6.staticflickr.com/5311/7373441840_dbd8426239_o.png) 
 
 ```r
 
@@ -239,14 +239,14 @@ ggplot(value) + geom_point(aes(stock, value, color = variable)) +
     ylab("Net Present Value")
 ```
 
-![plot of chunk sethiplots](http://farm8.staticflickr.com/7240/7373436432_54fe4aa08f_o.png) 
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7233/7373442026_76a1768b0b_o.png) 
 
 ```r
 ggplot(value) + geom_smooth(aes(stock, value, 
     color = variable)) + ylab("Net Present Value")
 ```
 
-![plot of chunk sethiplots](http://farm6.staticflickr.com/5468/7188204039_b5988d6d56_o.png) 
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7074/7373442184_739fb1abfa_o.png) 
 
 
 ## Simulations
@@ -322,7 +322,7 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time,
     facet_wrap(~uncertainty)
 ```
 
-![plot of chunk onerep](http://farm8.staticflickr.com/7092/7373436940_3e0409c6e6_o.png) 
+![plot of chunk onerep](http://farm9.staticflickr.com/8144/7373442514_69b4466d69_o.png) 
 
 
 This plot summarizes the stock dynamics by visualizing the replicates.
@@ -335,7 +335,7 @@ p1 + geom_line(aes(time, fishstock, group = reps),
     alpha = 0.1) + facet_wrap(~uncertainty)
 ```
 
-![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm8.staticflickr.com/7093/7373437310_ee974b561b_o.png) 
+![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm8.staticflickr.com/7085/7373442794_b7d6c2b3f9_o.png) 
 
 
 
@@ -345,7 +345,7 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time,
     profit)) + facet_wrap(~uncertainty)
 ```
 
-![The profits made in each time interval of a single replicate, by scenario](http://farm9.staticflickr.com/8025/7373437616_8c6da3c866_o.png) 
+![The profits made in each time interval of a single replicate, by scenario](http://farm9.staticflickr.com/8007/7188210303_4af7a7e076_o.png) 
 
 
 
@@ -356,10 +356,36 @@ profits <- dt[, sum(profit), by = c("reps", "uncertainty")]
 ggplot(profits) + geom_histogram(aes(V1)) + facet_wrap(~uncertainty)
 ```
 
-![the distribution of profits by scenario](http://farm8.staticflickr.com/7231/7188205169_cd823f782a_o.png) 
+![the distribution of profits by scenario](http://farm9.staticflickr.com/8152/7188210481_971e0ffb92_o.png) 
 
 
 Summary statistics 
+
+
+
+```r
+profits[, mean(V1), by = uncertainty]
+```
+
+```
+     uncertainty    V1
+[1,]        base 33.13
+[2,]        full 31.77
+[3,]    reckless 30.56
+[4,]    cautious 32.53
+```
+
+```r
+profits[, sd(V1), by = uncertainty]
+```
+
+```
+     uncertainty    V1
+[1,]        base 0.000
+[2,]        full 7.241
+[3,]    reckless 7.363
+[4,]    cautious 0.000
+```
 
 
 
