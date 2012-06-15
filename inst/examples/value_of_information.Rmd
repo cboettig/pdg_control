@@ -6,8 +6,6 @@ options(device = function(width = 5, height = 5) {
     pdf(NULL, width = width, height = height)
 })
 knitcitations::cleanbib()
-cache=FALSE
-plotcache=FALSE
 ````
 
 
@@ -115,7 +113,7 @@ det <- scenario(0.01, 0.0, 0.0)
 
 ### plots
 
-``` {r sethiplots, cache=cacheplots}
+``` {r sethiplots, cache=FALSE}
 require(reshape2)
 policy <- melt(data.frame(stock = x_grid, det = det$D[,1], g = g$D[,1], m = m$D[,1], gm = gm$D[,1], gi = gi$D[,1], gmi = gmi$D[,1]), id = "stock")
 ggplot(policy) + geom_point(aes(stock, stock-x_grid[value], color=variable)) + ylab("escapement") 
@@ -144,14 +142,15 @@ simulatereps <- function(opt, true_g, true_m, true_i){
 ````
 
 
+
 Corner cases 
 
-``` {r cache=cache}
+``` {r cache=FALSE}
 base <- simulatereps(det, 0, 0, 0)
 reckless <- simulatereps(det, .2, .2, .2)
 ````
 
-``` {r cache=cache}
+``` {r cache=FALSE}
 full <- simulatereps(gmi, .2, .2, .2)
 cautious <- simulatereps(gmi, 0, 0, 0)
 ````
@@ -167,29 +166,28 @@ setnames(dt, c("L2", "L1"), c("reps", "uncertainty")) # names are nice
 ### Plots 
 
 
-``` {r  onerep, cache=plotcache }
+``` {r  onerep, cache=FALSE }
 ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, fishstock)) +
-  geom_abline(intercept=opt$S, slope = 0) +
   geom_line(aes(time, harvest), col="darkgreen") + 
   facet_wrap(~uncertainty) 
 ````
 
-This plot summarizes the stock dynamics by visualizing the replicates. Reed's S shown again.
+This plot summarizes the stock dynamics by visualizing the replicates.
 
-``` {r  fig.cap="the induced dynamics in the stock size over time, for all replicates, by scenario", cache=plotcache}
-p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) 
+``` {r  fig.cap="the induced dynamics in the stock size over time, for all replicates, by scenario", cache=FALSE}
+p1 <- ggplot(dt) 
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1) + facet_wrap(~uncertainty)
 ````
 
-``` {r fig.cap="The profits made in each time interval of a single replicate, by scenario", cache=plotcache}
+``` {r fig.cap="The profits made in each time interval of a single replicate, by scenario", cache=FALSE}
 ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, profit))  + facet_wrap(~uncertainty)
 
 ````
 
 
-``` {r fig.cap="the distribution of profits by scenario", cache=plotcache}
+``` {r fig.cap="the distribution of profits by scenario", cache=FALSE}
 profits <-dt[ , sum(profit), by=c("reps", "uncertainty")] 
 ggplot(profits) + geom_histogram(aes(V1)) + facet_wrap(~uncertainty)
 ````

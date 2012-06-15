@@ -211,6 +211,88 @@ Library ggplot2 loaded.
 
 
 
+```r
+require(reshape2)
+policy <- melt(data.frame(stock = x_grid, det = det$D[, 
+    1], g = g$D[, 1], m = m$D[, 1], gm = gm$D[, 1], gi = gi$D[, 
+    1], gmi = gmi$D[, 1]), id = "stock")
+ggplot(policy) + geom_point(aes(stock, stock - 
+    x_grid[value], color = variable)) + ylab("escapement")
+```
+
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7231/7188203487_4a28697e9b_o.png) 
+
+```r
+ggplot(policy) + geom_smooth(aes(stock, stock - 
+    x_grid[value], color = variable)) + ylab("escapement")
+```
+
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7091/7188203649_d88b1d45c1_o.png) 
+
+```r
+
+
+value <- melt(data.frame(stock = x_grid, det = det$V, 
+    g = g$V, m = m$V, gm = gm$V, gi = gi$V, gmi = gmi$V), 
+    id = "stock")
+ggplot(value) + geom_point(aes(stock, value, color = variable)) + 
+    ylab("Net Present Value")
+```
+
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7240/7373436432_54fe4aa08f_o.png) 
+
+```r
+ggplot(value) + geom_smooth(aes(stock, value, 
+    color = variable)) + ylab("Net Present Value")
+```
+
+![plot of chunk sethiplots](http://farm6.staticflickr.com/5468/7188204039_b5988d6d56_o.png) 
+
+
+## Simulations
+
+
+
+```r
+simulatereps <- function(opt, true_g, true_m, 
+    true_i) {
+    z_g <- function() rlnorm(1, 0, true_g)
+    z_m <- function() rlnorm(1, 0, true_m)
+    z_i <- function() rlnorm(1, 0, true_i)
+    
+    sims <- lapply(1:100, function(i) {
+        ForwardSimulate(f, pars, x_grid, h_grid, x0 = K, 
+            opt$D, z_g, z_m, z_i, profit)
+    })
+    
+    list(sims = sims, opt = opt, true_stochasticity = c(true_g, 
+        true_m, true_i))
+}
+```
+
+
+
+
+
+
+Corner cases 
+
+
+
+```r
+base <- simulatereps(det, 0, 0, 0)
+reckless <- simulatereps(det, 0.2, 0.2, 0.2)
+```
+
+
+
+
+
+
+```r
+full <- simulatereps(gmi, 0.2, 0.2, 0.2)
+cautious <- simulatereps(gmi, 0, 0, 0)
+```
 
 
 
@@ -218,6 +300,66 @@ Library ggplot2 loaded.
 
 
 
+```r
+sims <- list(base = base$sims, full = full$sims, 
+    reckless = reckless$sims, cautious = cautious$sims)
+dat <- melt(sims, id = names(sims[[1]][[1]]))
+dt <- data.table(dat)
+setnames(dt, c("L2", "L1"), c("reps", "uncertainty"))  # names are nice
+```
+
+
+
+
+### Plots 
+
+
+
+
+```r
+ggplot(subset(dt, reps == 1)) + geom_line(aes(time, 
+    fishstock)) + geom_line(aes(time, harvest), col = "darkgreen") + 
+    facet_wrap(~uncertainty)
+```
+
+![plot of chunk onerep](http://farm8.staticflickr.com/7092/7373436940_3e0409c6e6_o.png) 
+
+
+This plot summarizes the stock dynamics by visualizing the replicates.
+
+
+
+```r
+p1 <- ggplot(dt)
+p1 + geom_line(aes(time, fishstock, group = reps), 
+    alpha = 0.1) + facet_wrap(~uncertainty)
+```
+
+![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm8.staticflickr.com/7093/7373437310_ee974b561b_o.png) 
+
+
+
+
+```r
+ggplot(subset(dt, reps == 1)) + geom_line(aes(time, 
+    profit)) + facet_wrap(~uncertainty)
+```
+
+![The profits made in each time interval of a single replicate, by scenario](http://farm9.staticflickr.com/8025/7373437616_8c6da3c866_o.png) 
+
+
+
+
+
+```r
+profits <- dt[, sum(profit), by = c("reps", "uncertainty")]
+ggplot(profits) + geom_histogram(aes(V1)) + facet_wrap(~uncertainty)
+```
+
+![the distribution of profits by scenario](http://farm8.staticflickr.com/7231/7188205169_cd823f782a_o.png) 
+
+
+Summary statistics 
 
 
 
@@ -225,9 +367,11 @@ Library ggplot2 loaded.
 
 
 
+# References
 
-
-
-
+<p>Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005).
+&ldquo;Fishery Management Under Multiple Uncertainty.&rdquo;
+<EM>Journal of Environmental Economics And Management</EM>, <B>50</B>.
+ISSN 00950696, <a href="http://dx.doi.org/10.1016/j.jeem.2004.11.005">http://dx.doi.org/10.1016/j.jeem.2004.11.005</a>.
 
 
