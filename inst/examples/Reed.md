@@ -54,51 +54,10 @@ Chose the state equation / population dynamics function
 
 
 ```r
-f <- BevHolt
-```
-
-
-
-
-Note that the `pdg_control` pacakge already has a definition for the `BevHolt` function, (typing the function name prints the function)
-
-
-
-```r
-BevHolt
-```
-
-
-
-```
-function (x, h, p) 
-{
-    x <- max(0, x - h)
-    A <- p[1]
-    B <- p[2]
-    sapply(x, function(x) {
-        x <- max(0, x)
-        max(0, A * x/(1 + B * x))
-    })
-}
-<environment: namespace:pdgControl>
-```
-
-
-
-
-That is, \( f(x,h) = \frac{A x}{1 + B x} \)
-
-Of course we could pass in any custom function of stocksize `x`, harvest `h` and parameter vector `p` in place of `BevHolt`.  Note that we would need to write this function explicitly so that it can take vector values of `x` (i.e. uses `sapply`), an annoying feature of `R` for users comming from Matlab.  
-
-
-We must now define parameters for the function.  Note that the positive stationary root of the model is given by \( (A-1)/B \), which we'll store for future reference as `K`.  
-
-
-
-```r
-pars <- c(1.5, 0.05)
-K <- (pars[1] - 1)/pars[2]
+f <- RickerAllee
+K <- 4 
+xT <- 2 # final value, also allee threshold
+pars <- c(1.5, K, xT) 
 ```
 
 
@@ -111,7 +70,7 @@ and we use a harvest-based profit function with default parameters
 
 
 ```r
-profit <- profit_harvest(price=1, c0 = 0.01) 
+profit <- profit_harvest(price=1, c0 = 0.01, c1=0) 
 ```
 
 
@@ -168,10 +127,12 @@ Plot the policy function (in terms of escapement, `x-h`, rather than harvest `h`
 
 
 ```r
-qplot(x_grid, x_grid - x_grid[opt$D[,1]], xlab="stock size", ylab="escapement")
+q1 <- qplot(x_grid, x_grid - x_grid[opt$D[,1]], xlab="stock size", ylab="escapement") + 
+geom_point(aes(x,y), data=data.frame(x=opt$S, y=opt$S), col="red")
+q1
 ```
 
-![plot of chunk policyfn_plot](http://farm6.staticflickr.com/5195/7184328341_75e3d3e218_o.png) 
+![plot of chunk policyfn_plot](http://farm8.staticflickr.com/7102/7373513712_34eb138a2e_o.png) 
 
 
 and the value function (at equilibrium):
@@ -179,10 +140,12 @@ and the value function (at equilibrium):
 
 
 ```r
-qplot(x_grid, opt$V, xlab="stock size", ylab="value")
+q2 <- qplot(x_grid, opt$V, xlab="stock size", ylab="value") + 
+geom_vline(xintercept=opt$S)
+q2
 ```
 
-![plot of chunk valuefn_plot](http://farm8.staticflickr.com/7072/7369563458_7142e0a9bb_o.png) 
+![plot of chunk valuefn_plot](http://farm8.staticflickr.com/7093/7188280853_114fdeaee8_o.png) 
 
 
 
@@ -249,7 +212,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest), col="darkgreen") 
 ```
 
-![plot of chunk p0](http://farm8.staticflickr.com/7100/7184328965_cd99d8c2e0_o.png) 
+![plot of chunk p0](http://farm6.staticflickr.com/5238/7373514112_ebb21317c5_o.png) 
 
 
 
@@ -260,27 +223,10 @@ This plot summarizes the stock dynamics by visualizing the replicates. Reed's S 
 ```r
 p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) + 
   geom_abline(intercept=xT, slope = 0, lty=2) 
-```
-
-
-
-```
-Error: object 'xT' not found
-```
-
-
-
-```r
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-
-
-```
-Error: object 'p1' not found
-```
-
-
+![plot of chunk p1](http://farm8.staticflickr.com/7239/7188281285_0ab227714c_o.png) 
 
 
 We can also look at the harvest dynamics:
@@ -291,13 +237,7 @@ We can also look at the harvest dynamics:
 p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
 ```
 
-
-
-```
-Error: object 'p1' not found
-```
-
-
+![plot of chunk p2](http://farm8.staticflickr.com/7215/7188281433_8e627885ca_o.png) 
 
 
 This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement: 
@@ -308,90 +248,6 @@ This strategy is supposed to be a constant-escapement strategy. We can visualize
 p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
 ```
 
-
-
-```
-Error: object 'p1' not found
-```
-
-
-
-
-
-
-
-
-### Visualizing the optimal policy
-Note that when the boundary is sufficiently far away, i.e. for the first couple timesteps, the optimal policy is stationary.  The optimal policy is shown here over time, where the color indicates the harvest recommended for each possible stock value at that time (shown on the vertical axis).  Note that below a certain stock value, harvesting is not recommended and the dots turn red (Reed's constant escapement rule!)  However, at very low values, harvesting starts again (orange dots), because of the allee effect - these populations are doomed anyway, so may as well fish all that remains.
-
-Note that interestingly, populations just below the allee threshold are given the chance to be rescued stochastically early on - that small chance that they recover is worth the expected loss.  The "no-harvest" zones stand out clearly in the red areas of this graph.
-
-
-
-```r
-policy <- melt(opt$D)
-policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
-p5 <- ggplot(policy_zoom) + 
-  geom_point(aes(Var2, (x_grid[Var1]), col=h_grid[value])) + 
-  labs(x = "time", y = "fishstock") +
-  scale_colour_gradientn(colours = rainbow(4)) +
-  geom_abline(intercept=opt$S, slope = 0) +
-  geom_abline(intercept=xT, slope=0, lty=2)
-```
-
-
-
-```
-Error: object 'xT' not found
-```
-
-
-
-```r
-p5
-```
-
-
-
-```
-Error: object 'p5' not found
-```
-
-
-
-
-The harvest intensity is limited by the stock size.
-
-
-
-
-```r
-p6 <- ggplot(policy_zoom) + 
-  geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
-  labs(x = "time", y = "fishstock") +
-  scale_colour_gradientn(colours = rainbow(4)) +
-  geom_abline(intercept=opt$S, slope = 0) +
-  geom_abline(intercept=xT, slope=0, lty=2)
-```
-
-
-
-```
-Error: object 'xT' not found
-```
-
-
-
-```r
-p6 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1, data=dt)
-```
-
-
-
-```
-Error: object 'p6' not found
-```
-
-
+![plot of chunk p3](http://farm9.staticflickr.com/8145/7373514698_bbe7c5f70f_o.png) 
 
 
