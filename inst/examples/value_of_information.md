@@ -220,14 +220,14 @@ ggplot(policy) + geom_point(aes(stock, stock -
     x_grid[value], color = variable)) + ylab("escapement")
 ```
 
-![plot of chunk sethiplots](http://farm6.staticflickr.com/5458/7376655280_ef22091bf0_o.png) 
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7095/7395320626_34f2212554_o.png) 
 
 ```r
 ggplot(policy) + geom_smooth(aes(stock, stock - 
     x_grid[value], color = variable)) + ylab("escapement")
 ```
 
-![plot of chunk sethiplots](http://farm8.staticflickr.com/7225/7376655562_8b601307e2_o.png) 
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7216/7395321048_556df76031_o.png) 
 
 ```r
 
@@ -239,14 +239,14 @@ ggplot(value) + geom_point(aes(stock, value, color = variable)) +
     ylab("Net Present Value")
 ```
 
-![plot of chunk sethiplots](http://farm8.staticflickr.com/7237/7376655880_63b814d8b5_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8006/7395321480_7613246778_o.png) 
 
 ```r
 ggplot(value) + geom_smooth(aes(stock, value, 
     color = variable)) + ylab("Net Present Value")
 ```
 
-![plot of chunk sethiplots](http://farm8.staticflickr.com/7092/7376656176_c7ffa75606_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8141/7395322218_7212067722_o.png) 
 
 
 ## Simulations
@@ -265,8 +265,9 @@ simulatereps <- function(opt, true_g, true_m,
             opt$D, z_g, z_m, z_i, profit)
     })
     
-    list(sims = sims, opt = opt, true_stochasticity = c(true_g, 
-        true_m, true_i))
+    # list(sims = sims, opt = opt, true_stochasticity =
+    #   c(true_g, true_m, true_i))
+    sims
 }
 ```
 
@@ -274,14 +275,22 @@ simulatereps <- function(opt, true_g, true_m,
 
 
 
-
-Corner cases 
+All cases
 
 
 
 ```r
-base <- simulatereps(det, 0, 0, 0)
-reckless <- simulatereps(det, 0.2, 0.2, 0.2)
+policyfn <- list(det = det, g = g, m = m, i = i, 
+    gm = gm, gi = gi, gmi = gmi)
+noise <- list(s0 = c(0, 0, 0), sg = c(0.2, 0, 
+    0), sm = c(0, 0.2, 0), si = c(0, 0, 0.2), sgm = c(0.2, 
+    0.2, 0), sgi = c(0.2, 0, 0.2), sgmi = c(0.2, 0.2, 0.2))
+allcases <- lapply(policyfn, function(policyfn_i) {
+    lapply(noise, function(noise_i) {
+        simulatereps(policyfn_i, noise_i[1], noise_i[2], 
+            noise_i[3])
+    })
+})
 ```
 
 
@@ -290,23 +299,12 @@ reckless <- simulatereps(det, 0.2, 0.2, 0.2)
 
 
 ```r
-full <- simulatereps(gmi, 0.2, 0.2, 0.2)
-cautious <- simulatereps(gmi, 0, 0, 0)
-```
-
-
-
-
-
-
-
-```r
-sims <- list(base = base$sims, full = full$sims, 
-    reckless = reckless$sims, cautious = cautious$sims)
+sims <- unlist(allcases, recursive = FALSE)
 dat <- melt(sims, id = names(sims[[1]][[1]]))
 dt <- data.table(dat)
 setnames(dt, c("L2", "L1"), c("reps", "uncertainty"))  # names are nice
 ```
+
 
 
 
@@ -322,7 +320,7 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time,
     facet_wrap(~uncertainty)
 ```
 
-![plot of chunk onerep](http://farm8.staticflickr.com/7074/7376656904_00339e8c82_o.png) 
+![plot of chunk onerep](http://farm6.staticflickr.com/5333/7395548324_acedc3251d_o.png) 
 
 
 This plot summarizes the stock dynamics by visualizing the replicates.
@@ -335,7 +333,7 @@ p1 + geom_line(aes(time, fishstock, group = reps),
     alpha = 0.1) + facet_wrap(~uncertainty)
 ```
 
-![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm8.staticflickr.com/7074/7376657434_6d475591f6_o.png) 
+![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm6.staticflickr.com/5275/7395552194_95bbab1150_o.png) 
 
 
 
@@ -345,7 +343,7 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time,
     profit)) + facet_wrap(~uncertainty)
 ```
 
-![The profits made in each time interval of a single replicate, by scenario](http://farm8.staticflickr.com/7211/7376657836_ca7116d3d4_o.png) 
+![The profits made in each time interval of a single replicate, by scenario](http://farm8.staticflickr.com/7241/7395628756_6dd34b9d28_o.png) 
 
 
 
@@ -356,7 +354,7 @@ profits <- dt[, sum(profit), by = c("reps", "uncertainty")]
 ggplot(profits) + geom_histogram(aes(V1)) + facet_wrap(~uncertainty)
 ```
 
-![the distribution of profits by scenario](http://farm8.staticflickr.com/7103/7376658262_498e1a50c4_o.png) 
+![the distribution of profits by scenario](http://farm9.staticflickr.com/8168/7395556128_1e80a34153_o.png) 
 
 
 Summary statistics 
@@ -364,30 +362,54 @@ Summary statistics
 
 
 ```r
-profits[, mean(V1), by = uncertainty]
+means <- profits[, mean(V1), by = uncertainty]
+sds <- profits[, sd(V1), by = uncertainty]
 ```
 
-```
-     uncertainty    V1
-[1,]        base 33.13
-[2,]        full 31.83
-[3,]    reckless 28.74
-[4,]    cautious 32.91
-```
+
+
+
+
 
 ```r
-profits[, sd(V1), by = uncertainty]
+require(xtable)
+uncertainties <- c("deter", "growth", "measure", 
+    "implement", "growth+measure", "growth+implement", "all")
+print(xtable(matrix(means$V1, nrow = 7, dimnames = list(uncertainties, 
+    uncertainties))), type = "html")
 ```
 
-```
-     uncertainty    V1
-[1,]        base 0.000
-[2,]        full 6.390
-[3,]    reckless 8.839
-[4,]    cautious 0.000
-```
+<!-- html table generated in R 2.14.1 by xtable 1.7-0 package -->
+<!-- Mon Jun 18 11:22:39 2012 -->
+<TABLE border=1>
+<TR> <TH>  </TH> <TH> deter </TH> <TH> growth </TH> <TH> measure </TH> <TH> implement </TH> <TH> growth+measure </TH> <TH> growth+implement </TH> <TH> all </TH>  </TR>
+  <TR> <TD align="right"> deter </TD> <TD align="right"> 33.13 </TD> <TD align="right"> 33.13 </TD> <TD align="right"> 33.13 </TD> <TD align="right"> 33.07 </TD> <TD align="right"> 32.98 </TD> <TD align="right"> 32.62 </TD> <TD align="right"> 32.91 </TD> </TR>
+  <TR> <TD align="right"> growth </TD> <TD align="right"> 36.02 </TD> <TD align="right"> 35.41 </TD> <TD align="right"> 33.83 </TD> <TD align="right"> 36.73 </TD> <TD align="right"> 35.46 </TD> <TD align="right"> 35.43 </TD> <TD align="right"> 35.86 </TD> </TR>
+  <TR> <TD align="right"> measure </TD> <TD align="right"> 30.72 </TD> <TD align="right"> 30.25 </TD> <TD align="right"> 31.37 </TD> <TD align="right"> 30.84 </TD> <TD align="right"> 31.64 </TD> <TD align="right"> 30.97 </TD> <TD align="right"> 31.44 </TD> </TR>
+  <TR> <TD align="right"> implement </TD> <TD align="right"> 32.66 </TD> <TD align="right"> 32.51 </TD> <TD align="right"> 32.65 </TD> <TD align="right"> 32.21 </TD> <TD align="right"> 32.64 </TD> <TD align="right"> 31.97 </TD> <TD align="right"> 31.95 </TD> </TR>
+  <TR> <TD align="right"> growth+measure </TD> <TD align="right"> 31.55 </TD> <TD align="right"> 32.23 </TD> <TD align="right"> 34.26 </TD> <TD align="right"> 32.96 </TD> <TD align="right"> 32.60 </TD> <TD align="right"> 34.06 </TD> <TD align="right"> 33.77 </TD> </TR>
+  <TR> <TD align="right"> growth+implement </TD> <TD align="right"> 34.51 </TD> <TD align="right"> 34.73 </TD> <TD align="right"> 35.12 </TD> <TD align="right"> 35.38 </TD> <TD align="right"> 35.57 </TD> <TD align="right"> 35.47 </TD> <TD align="right"> 35.64 </TD> </TR>
+  <TR> <TD align="right"> all </TD> <TD align="right"> 31.19 </TD> <TD align="right"> 31.02 </TD> <TD align="right"> 31.71 </TD> <TD align="right"> 29.65 </TD> <TD align="right"> 32.47 </TD> <TD align="right"> 32.58 </TD> <TD align="right"> 32.23 </TD> </TR>
+   </TABLE>
 
 
+```r
+print(xtable(matrix(sds$V1, nrow = 7, dimnames = list(uncertainties, 
+    uncertainties))), type = "html")
+```
+
+<!-- html table generated in R 2.14.1 by xtable 1.7-0 package -->
+<!-- Mon Jun 18 11:22:39 2012 -->
+<TABLE border=1>
+<TR> <TH>  </TH> <TH> deter </TH> <TH> growth </TH> <TH> measure </TH> <TH> implement </TH> <TH> growth+measure </TH> <TH> growth+implement </TH> <TH> all </TH>  </TR>
+  <TR> <TD align="right"> deter </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> </TR>
+  <TR> <TD align="right"> growth </TD> <TD align="right"> 5.70 </TD> <TD align="right"> 5.52 </TD> <TD align="right"> 5.61 </TD> <TD align="right"> 5.95 </TD> <TD align="right"> 7.11 </TD> <TD align="right"> 5.63 </TD> <TD align="right"> 5.36 </TD> </TR>
+  <TR> <TD align="right"> measure </TD> <TD align="right"> 3.14 </TD> <TD align="right"> 4.61 </TD> <TD align="right"> 2.04 </TD> <TD align="right"> 3.12 </TD> <TD align="right"> 1.45 </TD> <TD align="right"> 2.64 </TD> <TD align="right"> 0.89 </TD> </TR>
+  <TR> <TD align="right"> implement </TD> <TD align="right"> 0.58 </TD> <TD align="right"> 0.73 </TD> <TD align="right"> 0.57 </TD> <TD align="right"> 2.34 </TD> <TD align="right"> 0.48 </TD> <TD align="right"> 2.30 </TD> <TD align="right"> 2.37 </TD> </TR>
+  <TR> <TD align="right"> growth+measure </TD> <TD align="right"> 7.64 </TD> <TD align="right"> 5.78 </TD> <TD align="right"> 4.88 </TD> <TD align="right"> 6.74 </TD> <TD align="right"> 5.55 </TD> <TD align="right"> 5.46 </TD> <TD align="right"> 5.74 </TD> </TR>
+  <TR> <TD align="right"> growth+implement </TD> <TD align="right"> 5.30 </TD> <TD align="right"> 5.55 </TD> <TD align="right"> 5.18 </TD> <TD align="right"> 5.50 </TD> <TD align="right"> 6.41 </TD> <TD align="right"> 6.33 </TD> <TD align="right"> 5.00 </TD> </TR>
+  <TR> <TD align="right"> all </TD> <TD align="right"> 7.51 </TD> <TD align="right"> 7.22 </TD> <TD align="right"> 6.62 </TD> <TD align="right"> 8.60 </TD> <TD align="right"> 6.86 </TD> <TD align="right"> 5.51 </TD> <TD align="right"> 6.96 </TD> </TR>
+   </TABLE>
 
 
 

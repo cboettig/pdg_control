@@ -122,7 +122,7 @@ ggplot(value) + geom_smooth(aes(stock, value, color=variable)) + ylab("Net Prese
 
 ## Simulations
 
-``` {r } 
+``` {r simfn} 
 simulatereps <- function(opt, true_g, true_m, true_i){
   z_g <- function() rlnorm(1,  0, true_g) 
   z_m <- function() rlnorm(1,  0, true_m) 
@@ -132,36 +132,36 @@ simulatereps <- function(opt, true_g, true_m, true_i){
     ForwardSimulate(f, pars, x_grid, h_grid, x0 = K, opt$D, z_g, z_m, z_i, profit)
   })
   
-  list(sims = sims, opt = opt, true_stochasticity = c(true_g, true_m, true_i))
+#  list(sims = sims, opt = opt, true_stochasticity = c(true_g, true_m, true_i))
+  sims
 }
 ````
 
 
+All cases
 
-Corner cases 
-
-``` {r }
-base <- simulatereps(det, 0, 0, 0)
-reckless <- simulatereps(det, .1, .1, .1)
+``` {r runallsims} 
+policyfn <- list(det=det, g=g, m=m, i=i, gm=gm, gi=gi, gmi=gmi)
+noise <- list(s0=c(0,0,0), sg=c(.2, 0, 0), sm=c(0, .2, 0), si=c(0,0,.2), sgm=c(.2, .2, 0), sgi=c(.2, 0, .2), sgmi=c(.2, .2, .2)) 
+allcases <- lapply(policyfn, function(policyfn_i){
+  lapply(noise, function(noise_i){
+    simulatereps(policyfn_i, noise_i[1], noise_i[2], noise_i[3])
+  })
+})
 ````
 
-``` {r }
-full <- simulatereps(gmi, .1, .1, .1)
-cautious <- simulatereps(gmi, 0, 0, 0)
-````
-
-
-``` {r tidy}
-sims <- list(base = base$sims, full = full$sims, reckless=reckless$sims, cautious=cautious$sims)
+``` {r tidyall}
+sims <- unlist(allcases, recursive=FALSE)
 dat <- melt(sims, id=names(sims[[1]][[1]]))  
 dt <- data.table(dat)
 setnames(dt, c("L2", "L1"), c("reps", "uncertainty")) # names are nice
 ````
 
+
 ### Plots 
 
 
-``` {r  onerep}
+``` {r  onerep, dependson="tidyall"}
 ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, fishstock)) +
   geom_line(aes(time, harvest), col="darkgreen") + 
@@ -170,29 +170,37 @@ ggplot(subset(dt,reps==1)) +
 
 This plot summarizes the stock dynamics by visualizing the replicates.
 
-``` {r  fig.cap="the induced dynamics in the stock size over time, for all replicates, by scenario"}
+``` {r stock, fig.cap="the induced dynamics in the stock size over time, for all replicates, by scenario", dependson="tidyall"}
 p1 <- ggplot(dt) 
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1) + facet_wrap(~uncertainty)
 ````
 
-``` {r fig.cap="The profits made in each time interval of a single replicate, by scenario"}
+``` {r profits_time, fig.cap="The profits made in each time interval of a single replicate, by scenario", dependson="tidyall"}
 ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, profit))  + facet_wrap(~uncertainty)
 
 ````
 
 
-``` {r fig.cap="the distribution of profits by scenario"}
+``` {r profits, fig.cap="the distribution of profits by scenario", dependson="tidyall"}
 profits <-dt[ , sum(profit), by=c("reps", "uncertainty")] 
 ggplot(profits) + geom_histogram(aes(V1)) + facet_wrap(~uncertainty)
 ````
 
 Summary statistics 
 
-``` {r cache=FALSE}
-profits[, mean(V1), by=uncertainty]
-profits[, sd(V1), by=uncertainty]
+``` {r summarystats, cache=FALSE}
+means <- profits[, mean(V1), by=uncertainty]
+sds <- profits[, sd(V1), by=uncertainty]
 ````
+
+``` {r prettytable, cache=FALSE, results="asis"}
+require(xtable)
+uncertainties <- c("deter", "growth", "measure", "implement", "growth+measure", "growth+implement", "all")
+print(xtable(matrix(means$V1, nrow=7, dimnames=list(uncertainties, uncertainties))), type="html")
+print(xtable(matrix(sds$V1, nrow=7, dimnames=list(uncertainties, uncertainties))), type="html")
+````
+
 
 
 
