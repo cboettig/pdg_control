@@ -197,8 +197,8 @@ sds <- profits[, sd(V1), by=uncertainty]
 ``` {r prettytable, cache=FALSE, results="asis"}
 require(xtable)
 uncertainties <- c("deter", "growth", "measure", "implement", "growth+measure", "growth+implement", "all")
-print(xtable(matrix(means$V1, nrow=7, dimnames=list(uncertainties, uncertainties))), type="html")
-print(xtable(matrix(sds$V1, nrow=7, dimnames=list(uncertainties, uncertainties))), type="html")
+print(xtable(matrix(means$V1, nrow=7, dimnames=list(uncertainties, uncertainties)), caption="Mean realized net present value over simulations"), type="html")
+print(xtable(matrix(sds$V1, nrow=7, dimnames=list(uncertainties, uncertainties)), caption="Standard deviation in realized net present value over simulations"), type="html")
 ````
 
 
