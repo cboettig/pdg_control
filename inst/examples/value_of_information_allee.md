@@ -221,14 +221,14 @@ ggplot(policy) + geom_point(aes(stock, stock -
     x_grid[value], color = variable)) + ylab("escapement")
 ```
 
-![plot of chunk sethiplots](http://farm8.staticflickr.com/7087/7373921098_bc3ecc1209_o.png) 
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7093/7377022524_b8b775502d_o.png) 
 
 ```r
 ggplot(policy) + geom_smooth(aes(stock, stock - 
     x_grid[value], color = variable)) + ylab("escapement")
 ```
 
-![plot of chunk sethiplots](http://farm8.staticflickr.com/7092/7373921234_7b0c4f5101_o.png) 
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7105/7377022796_713e9fd91c_o.png) 
 
 ```r
 
@@ -240,14 +240,14 @@ ggplot(value) + geom_point(aes(stock, value, color = variable)) +
     ylab("Net Present Value")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8153/7373921360_6ea99e4eab_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8166/7377023094_6ae6a48f9f_o.png) 
 
 ```r
 ggplot(value) + geom_smooth(aes(stock, value, 
     color = variable)) + ylab("Net Present Value")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8021/7188688189_5c927cab7a_o.png) 
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7222/7377023526_ffdd801eb5_o.png) 
 
 
 ## Simulations
@@ -304,31 +304,10 @@ cautious <- simulatereps(gmi, 0, 0, 0)
 ```r
 sims <- list(base = base$sims, full = full$sims, 
     reckless = reckless$sims, cautious = cautious$sims)
-```
-
-```
-Error: object 'base' not found```
-
-```r
 dat <- melt(sims, id = names(sims[[1]][[1]]))
-```
-
-```
-Error: object 'sims' not found```
-
-```r
 dt <- data.table(dat)
-```
-
-```
-Error: object 'dat' not found```
-
-```r
 setnames(dt, c("L2", "L1"), c("reps", "uncertainty"))  # names are nice
 ```
-
-```
-Error: x is not a data.table```
 
 
 
@@ -344,10 +323,7 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time,
     facet_wrap(~uncertainty)
 ```
 
-```
-Error: object 'reps' not found```
-
-
+![plot of chunk onerep](http://farm8.staticflickr.com/7072/7377024178_d189f694f3_o.png) 
 
 
 This plot summarizes the stock dynamics by visualizing the replicates.
@@ -356,20 +332,11 @@ This plot summarizes the stock dynamics by visualizing the replicates.
 
 ```r
 p1 <- ggplot(dt)
-```
-
-```
-Error: ggplot2 doesn't know how to deal with data of class function```
-
-```r
 p1 + geom_line(aes(time, fishstock, group = reps), 
     alpha = 0.1) + facet_wrap(~uncertainty)
 ```
 
-```
-Error: object 'p1' not found```
-
-
+![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm9.staticflickr.com/8145/7377024636_b57f130e4e_o.png) 
 
 
 
@@ -379,10 +346,7 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time,
     profit)) + facet_wrap(~uncertainty)
 ```
 
-```
-Error: object 'reps' not found```
-
-
+![The profits made in each time interval of a single replicate, by scenario](http://farm8.staticflickr.com/7083/7377025130_c0ceea9773_o.png) 
 
 
 
@@ -390,19 +354,10 @@ Error: object 'reps' not found```
 
 ```r
 profits <- dt[, sum(profit), by = c("reps", "uncertainty")]
-```
-
-```
-Error: invalid 'type' (closure) of argument```
-
-```r
 ggplot(profits) + geom_histogram(aes(V1)) + facet_wrap(~uncertainty)
 ```
 
-```
-Error: object 'profits' not found```
-
-
+![the distribution of profits by scenario](http://farm8.staticflickr.com/7099/7377025530_0666ea70fe_o.png) 
 
 
 Summary statistics 
@@ -414,14 +369,24 @@ profits[, mean(V1), by = uncertainty]
 ```
 
 ```
-Error: object 'profits' not found```
+     uncertainty     V1
+[1,]        base 10.921
+[2,]        full  9.731
+[3,]    reckless  8.864
+[4,]    cautious 10.676
+```
 
 ```r
 profits[, sd(V1), by = uncertainty]
 ```
 
 ```
-Error: object 'profits' not found```
+     uncertainty    V1
+[1,]        base 0.000
+[2,]        full 1.763
+[3,]    reckless 2.578
+[4,]    cautious 0.000
+```
 
 
 
