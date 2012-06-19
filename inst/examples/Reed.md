@@ -54,10 +54,12 @@ Chose the state equation / population dynamics function
 
 
 ```r
-f <- RickerAllee
-K <- 4 
-xT <- 2 # final value, also allee threshold
-pars <- c(1.5, K, xT) 
+f <- BevHolt
+pars <- c(1.5, 0.05)
+K <- (pars[1] - 1)/pars[2]
+#K <- 4 
+#xT <- 2 # final value, also allee threshold
+#pars <- c(1.5, K, xT) 
 ```
 
 
@@ -70,7 +72,7 @@ and we use a harvest-based profit function with default parameters
 
 
 ```r
-profit <- profit_harvest(price=1, c0 = 0.01, c1=0) 
+profit <- profit_harvest(price=1, c0 = 0.01, c1=.5) 
 ```
 
 
@@ -132,7 +134,7 @@ geom_point(aes(x,y), data=data.frame(x=opt$S, y=opt$S), col="red")
 q1
 ```
 
-![plot of chunk policyfn_plot](http://farm8.staticflickr.com/7102/7373513712_34eb138a2e_o.png) 
+![plot of chunk policyfn_plot](http://farm9.staticflickr.com/8025/7397971232_d74fe17f29_o.png) 
 
 
 and the value function (at equilibrium):
@@ -145,7 +147,7 @@ geom_vline(xintercept=opt$S)
 q2
 ```
 
-![plot of chunk valuefn_plot](http://farm8.staticflickr.com/7093/7188280853_114fdeaee8_o.png) 
+![plot of chunk valuefn_plot](http://farm9.staticflickr.com/8026/7397971668_d21ea9ef70_o.png) 
 
 
 
@@ -212,7 +214,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest), col="darkgreen") 
 ```
 
-![plot of chunk p0](http://farm6.staticflickr.com/5238/7373514112_ebb21317c5_o.png) 
+![plot of chunk p0](http://farm9.staticflickr.com/8166/7397972244_f7a588f839_o.png) 
 
 
 
@@ -223,31 +225,26 @@ This plot summarizes the stock dynamics by visualizing the replicates. Reed's S 
 ```r
 p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) + 
   geom_abline(intercept=xT, slope = 0, lty=2) 
+```
+
+
+
+```
+Error: object 'xT' not found
+```
+
+
+
+```r
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk p1](http://farm8.staticflickr.com/7239/7188281285_0ab227714c_o.png) 
 
 
-We can also look at the harvest dynamics:
-
-
-
-```r
-p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
+```
+Error: object 'p1' not found
 ```
 
-![plot of chunk p2](http://farm8.staticflickr.com/7215/7188281433_8e627885ca_o.png) 
 
-
-This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement: 
-
-
-
-```r
-p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
-```
-
-![plot of chunk p3](http://farm9.staticflickr.com/8145/7373514698_bbe7c5f70f_o.png) 
 
 
