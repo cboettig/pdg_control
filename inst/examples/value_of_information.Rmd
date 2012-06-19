@@ -127,11 +127,10 @@ ggplot(value) + geom_smooth(aes(stock, value, color=variable)) + ylab("Net Prese
 
 ## Simulations
 
-**quick debug check -- make z_g shocks only negative to confirm growth noise isn't good**
 
 ``` {r simfn} 
 simulatereps <- function(opt, true_g, true_m, true_i){
-  z_g <- function() min(rlnorm(1,  0, true_g), 1)
+  z_g <- function() rlnorm(1,  0, true_g)
   z_m <- function() rlnorm(1,  0, true_m) 
   z_i <- function() rlnorm(1,  0, true_i) 
 

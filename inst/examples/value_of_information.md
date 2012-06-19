@@ -251,14 +251,13 @@ ggplot(value) + geom_smooth(aes(stock, value,
 
 ## Simulations
 
-**quick debug check -- make z_g shocks only negative to confirm growth noise isn't good**
 
 
 
 ```r
 simulatereps <- function(opt, true_g, true_m, 
     true_i) {
-    z_g <- function() min(rlnorm(1, 0, true_g), 1)
+    z_g <- function() rlnorm(1, 0, true_g)
     z_m <- function() rlnorm(1, 0, true_m)
     z_i <- function() rlnorm(1, 0, true_i)
     
@@ -322,7 +321,7 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time,
     facet_wrap(~uncertainty)
 ```
 
-![plot of chunk onerep](http://farm8.staticflickr.com/7076/7398281466_c9afdf74e9_o.png) 
+![plot of chunk onerep](http://farm6.staticflickr.com/5279/7398423458_58f91df24e_o.png) 
 
 
 This plot summarizes the stock dynamics by visualizing the replicates.
@@ -335,7 +334,7 @@ p1 + geom_line(aes(time, fishstock, group = reps),
     alpha = 0.1) + facet_wrap(~uncertainty)
 ```
 
-![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm8.staticflickr.com/7083/7398285530_5985b393d5_o.png) 
+![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm8.staticflickr.com/7101/7398430924_79503efe95_o.png) 
 
 
 
@@ -345,7 +344,7 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time,
     profit)) + facet_wrap(~uncertainty)
 ```
 
-![The profits made in each time interval of a single replicate, by scenario](http://farm9.staticflickr.com/8159/7398287338_0b54426487_o.png) 
+![The profits made in each time interval of a single replicate, by scenario](http://farm8.staticflickr.com/7089/7398434318_ed4460a089_o.png) 
 
 
 
@@ -356,7 +355,7 @@ profits <- dt[, sum(profit), by = c("reps", "uncertainty")]
 ggplot(profits) + geom_histogram(aes(V1)) + facet_wrap(~uncertainty)
 ```
 
-![the distribution of profits by scenario](http://farm9.staticflickr.com/8166/7398289600_6fd35559b3_o.png) 
+![the distribution of profits by scenario](http://farm8.staticflickr.com/7095/7398438596_4e8e7c4fc6_o.png) 
 
 
 Summary statistics 
@@ -382,16 +381,16 @@ print(xtable(matrix(means$V1, nrow = 7, dimnames = list(uncertainties,
 ```
 
 <!-- html table generated in R 2.14.1 by xtable 1.7-0 package -->
-<!-- Mon Jun 18 18:25:18 2012 -->
+<!-- Mon Jun 18 18:52:48 2012 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> deter </TH> <TH> growth </TH> <TH> measure </TH> <TH> implement </TH> <TH> growth+measure </TH> <TH> growth+implement </TH> <TH> all </TH>  </TR>
   <TR> <TD align="right"> deter </TD> <TD align="right"> 33.13 </TD> <TD align="right"> 33.13 </TD> <TD align="right"> 33.13 </TD> <TD align="right"> 33.07 </TD> <TD align="right"> 32.98 </TD> <TD align="right"> 32.62 </TD> <TD align="right"> 32.91 </TD> </TR>
-  <TR> <TD align="right"> growth </TD> <TD align="right"> 24.29 </TD> <TD align="right"> 24.23 </TD> <TD align="right"> 24.32 </TD> <TD align="right"> 23.71 </TD> <TD align="right"> 23.17 </TD> <TD align="right"> 23.12 </TD> <TD align="right"> 23.00 </TD> </TR>
-  <TR> <TD align="right"> measure </TD> <TD align="right"> 30.57 </TD> <TD align="right"> 30.75 </TD> <TD align="right"> 31.70 </TD> <TD align="right"> 29.76 </TD> <TD align="right"> 31.36 </TD> <TD align="right"> 30.83 </TD> <TD align="right"> 31.55 </TD> </TR>
-  <TR> <TD align="right"> implement </TD> <TD align="right"> 32.62 </TD> <TD align="right"> 32.70 </TD> <TD align="right"> 32.63 </TD> <TD align="right"> 32.52 </TD> <TD align="right"> 32.51 </TD> <TD align="right"> 32.18 </TD> <TD align="right"> 32.44 </TD> </TR>
-  <TR> <TD align="right"> growth+measure </TD> <TD align="right"> 23.15 </TD> <TD align="right"> 22.67 </TD> <TD align="right"> 23.65 </TD> <TD align="right"> 22.71 </TD> <TD align="right"> 23.17 </TD> <TD align="right"> 22.73 </TD> <TD align="right"> 23.31 </TD> </TR>
-  <TR> <TD align="right"> growth+implement </TD> <TD align="right"> 24.12 </TD> <TD align="right"> 23.36 </TD> <TD align="right"> 23.83 </TD> <TD align="right"> 22.97 </TD> <TD align="right"> 23.18 </TD> <TD align="right"> 22.72 </TD> <TD align="right"> 23.28 </TD> </TR>
-  <TR> <TD align="right"> all </TD> <TD align="right"> 22.27 </TD> <TD align="right"> 22.24 </TD> <TD align="right"> 23.21 </TD> <TD align="right"> 21.64 </TD> <TD align="right"> 22.34 </TD> <TD align="right"> 22.45 </TD> <TD align="right"> 22.52 </TD> </TR>
+  <TR> <TD align="right"> growth </TD> <TD align="right"> 36.94 </TD> <TD align="right"> 35.29 </TD> <TD align="right"> 34.13 </TD> <TD align="right"> 35.62 </TD> <TD align="right"> 36.84 </TD> <TD align="right"> 35.39 </TD> <TD align="right"> 36.02 </TD> </TR>
+  <TR> <TD align="right"> measure </TD> <TD align="right"> 29.92 </TD> <TD align="right"> 30.15 </TD> <TD align="right"> 31.31 </TD> <TD align="right"> 30.27 </TD> <TD align="right"> 31.27 </TD> <TD align="right"> 30.58 </TD> <TD align="right"> 31.55 </TD> </TR>
+  <TR> <TD align="right"> implement </TD> <TD align="right"> 32.66 </TD> <TD align="right"> 32.65 </TD> <TD align="right"> 32.63 </TD> <TD align="right"> 32.54 </TD> <TD align="right"> 32.55 </TD> <TD align="right"> 32.23 </TD> <TD align="right"> 32.33 </TD> </TR>
+  <TR> <TD align="right"> growth+measure </TD> <TD align="right"> 31.65 </TD> <TD align="right"> 32.19 </TD> <TD align="right"> 33.42 </TD> <TD align="right"> 33.28 </TD> <TD align="right"> 33.17 </TD> <TD align="right"> 32.98 </TD> <TD align="right"> 33.46 </TD> </TR>
+  <TR> <TD align="right"> growth+implement </TD> <TD align="right"> 34.28 </TD> <TD align="right"> 35.74 </TD> <TD align="right"> 36.21 </TD> <TD align="right"> 34.83 </TD> <TD align="right"> 35.22 </TD> <TD align="right"> 36.31 </TD> <TD align="right"> 35.23 </TD> </TR>
+  <TR> <TD align="right"> all </TD> <TD align="right"> 29.95 </TD> <TD align="right"> 30.13 </TD> <TD align="right"> 32.82 </TD> <TD align="right"> 30.57 </TD> <TD align="right"> 33.00 </TD> <TD align="right"> 29.74 </TD> <TD align="right"> 32.17 </TD> </TR>
    </TABLE>
 
 
@@ -401,16 +400,16 @@ print(xtable(matrix(sds$V1, nrow = 7, dimnames = list(uncertainties,
 ```
 
 <!-- html table generated in R 2.14.1 by xtable 1.7-0 package -->
-<!-- Mon Jun 18 18:25:18 2012 -->
+<!-- Mon Jun 18 18:52:48 2012 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> deter </TH> <TH> growth </TH> <TH> measure </TH> <TH> implement </TH> <TH> growth+measure </TH> <TH> growth+implement </TH> <TH> all </TH>  </TR>
   <TR> <TD align="right"> deter </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> </TR>
-  <TR> <TD align="right"> growth </TD> <TD align="right"> 2.42 </TD> <TD align="right"> 2.35 </TD> <TD align="right"> 2.52 </TD> <TD align="right"> 2.54 </TD> <TD align="right"> 2.60 </TD> <TD align="right"> 2.98 </TD> <TD align="right"> 2.44 </TD> </TR>
-  <TR> <TD align="right"> measure </TD> <TD align="right"> 4.04 </TD> <TD align="right"> 3.25 </TD> <TD align="right"> 1.02 </TD> <TD align="right"> 5.41 </TD> <TD align="right"> 1.62 </TD> <TD align="right"> 1.85 </TD> <TD align="right"> 1.04 </TD> </TR>
-  <TR> <TD align="right"> implement </TD> <TD align="right"> 0.60 </TD> <TD align="right"> 0.49 </TD> <TD align="right"> 0.57 </TD> <TD align="right"> 0.54 </TD> <TD align="right"> 0.62 </TD> <TD align="right"> 0.62 </TD> <TD align="right"> 0.57 </TD> </TR>
-  <TR> <TD align="right"> growth+measure </TD> <TD align="right"> 3.28 </TD> <TD align="right"> 3.77 </TD> <TD align="right"> 2.34 </TD> <TD align="right"> 3.81 </TD> <TD align="right"> 2.08 </TD> <TD align="right"> 3.00 </TD> <TD align="right"> 2.64 </TD> </TR>
-  <TR> <TD align="right"> growth+implement </TD> <TD align="right"> 2.62 </TD> <TD align="right"> 2.48 </TD> <TD align="right"> 2.51 </TD> <TD align="right"> 2.48 </TD> <TD align="right"> 2.73 </TD> <TD align="right"> 2.89 </TD> <TD align="right"> 2.57 </TD> </TR>
-  <TR> <TD align="right"> all </TD> <TD align="right"> 4.15 </TD> <TD align="right"> 4.28 </TD> <TD align="right"> 3.01 </TD> <TD align="right"> 3.92 </TD> <TD align="right"> 2.58 </TD> <TD align="right"> 3.20 </TD> <TD align="right"> 3.14 </TD> </TR>
+  <TR> <TD align="right"> growth </TD> <TD align="right"> 5.59 </TD> <TD align="right"> 5.94 </TD> <TD align="right"> 5.52 </TD> <TD align="right"> 5.38 </TD> <TD align="right"> 5.71 </TD> <TD align="right"> 6.06 </TD> <TD align="right"> 6.22 </TD> </TR>
+  <TR> <TD align="right"> measure </TD> <TD align="right"> 5.65 </TD> <TD align="right"> 4.56 </TD> <TD align="right"> 1.56 </TD> <TD align="right"> 4.44 </TD> <TD align="right"> 2.23 </TD> <TD align="right"> 3.78 </TD> <TD align="right"> 1.04 </TD> </TR>
+  <TR> <TD align="right"> implement </TD> <TD align="right"> 0.61 </TD> <TD align="right"> 0.53 </TD> <TD align="right"> 0.59 </TD> <TD align="right"> 0.56 </TD> <TD align="right"> 0.55 </TD> <TD align="right"> 0.69 </TD> <TD align="right"> 0.69 </TD> </TR>
+  <TR> <TD align="right"> growth+measure </TD> <TD align="right"> 6.70 </TD> <TD align="right"> 6.86 </TD> <TD align="right"> 4.88 </TD> <TD align="right"> 5.95 </TD> <TD align="right"> 5.53 </TD> <TD align="right"> 5.79 </TD> <TD align="right"> 4.96 </TD> </TR>
+  <TR> <TD align="right"> growth+implement </TD> <TD align="right"> 5.27 </TD> <TD align="right"> 6.18 </TD> <TD align="right"> 5.63 </TD> <TD align="right"> 5.80 </TD> <TD align="right"> 5.76 </TD> <TD align="right"> 5.07 </TD> <TD align="right"> 6.62 </TD> </TR>
+  <TR> <TD align="right"> all </TD> <TD align="right"> 7.84 </TD> <TD align="right"> 7.60 </TD> <TD align="right"> 6.34 </TD> <TD align="right"> 7.43 </TD> <TD align="right"> 6.21 </TD> <TD align="right"> 8.28 </TD> <TD align="right"> 6.54 </TD> </TR>
    </TABLE>
 
 
