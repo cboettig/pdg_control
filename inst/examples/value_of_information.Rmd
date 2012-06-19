@@ -127,9 +127,11 @@ ggplot(value) + geom_smooth(aes(stock, value, color=variable)) + ylab("Net Prese
 
 ## Simulations
 
+**quick debug check -- make z_g shocks only negative to confirm growth noise isn't good**
+
 ``` {r simfn} 
 simulatereps <- function(opt, true_g, true_m, true_i){
-  z_g <- function() rlnorm(1,  0, true_g) 
+  z_g <- function() min(rlnorm(1,  0, true_g), 1)
   z_m <- function() rlnorm(1,  0, true_m) 
   z_i <- function() rlnorm(1,  0, true_i) 
 
@@ -145,7 +147,7 @@ simulatereps <- function(opt, true_g, true_m, true_i){
 
 All cases
 
-``` {r runallsims} 
+``` {r runallsims, dependson="simfn"} 
 policyfn <- list(det=det, g=g, m=m, i=i, gm=gm, gi=gi, gmi=gmi)
 noise <- list(s0=c(0,0,0), sg=c(.2, 0, 0), sm=c(0, .2, 0), si=c(0,0,.2), sgm=c(.2, .2, 0), sgi=c(.2, 0, .2), sgmi=c(.2, .2, .2)) 
 allcases <- lapply(policyfn, function(policyfn_i){
@@ -155,7 +157,7 @@ allcases <- lapply(policyfn, function(policyfn_i){
 })
 ````
 
-``` {r tidyall}
+``` {r tidyall, dependson="runallsims"}
 sims <- unlist(allcases, recursive=FALSE)
 dat <- melt(sims, id=names(sims[[1]][[1]]))  
 dt <- data.table(dat)
