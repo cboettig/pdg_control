@@ -2,6 +2,7 @@
 
 
 
+
  * author Carl Boettiger, <cboettig@gmail.com>
  * license: CC0
 
@@ -123,13 +124,52 @@ lapply(penaltyfns, function(penalty){
   names(dat) <- c(names(policies[[1]]), "c2")
  dat
 })
+```
+
+
+
+```
+Error: .Random.seed is not an integer vector but of type 'promise'
+```
+
+
+
+```r
 dat <- melt(policies, id = names(policies[[1]]))
 names(dat) <- c(names(policies[[1]]), "penalty")
 c2 <-  seq(0.01, 3, length.out = 15)
 c2_index <- sapply(dat$c2, function(c) which(c2 %in% c))
 dat2 <- data.frame(dat, c2_index = c2_index)
+```
+
+
+
+```
+Error: arguments imply differing number of rows: 150, 0
+```
+
+
+
+```r
 dt <- data.table(dat2)
+```
+
+
+
+```
+Error: object 'dat2' not found
+```
+
+
+
+```r
 setkey(dt,penalty,c2_index,reps)
+```
+
+
+
+```
+Error: some columns are not in the data.table: penalty,c2_index,reps
 ```
 
 
@@ -149,12 +189,51 @@ sapply(c("L2", "L1", "fixed", "asy"), function(plty){
          sd(harvest)/sd(fishstock), by=reps]$V1)
   })
 })
+```
+
+
+
+```
+Error: comparison (1) is possible only for atomic and list types
+```
+
+
+
+```r
 df <- melt(data.frame(c2=c2, vartrend),id="c2") 
+```
+
+
+
+```
+Error: object 'vartrend' not found
+```
+
+
+
+```r
 p1 <- ggplot(df) + geom_point(aes(c2, value, color=variable))+ geom_line(aes(c2, value, color=variable))
+```
+
+
+
+```
+Error: ggplot2 doesn't know how to deal with data of class function
+```
+
+
+
+```r
 p1
 ```
 
-![plot of chunk unnamed-chunk-2](http://farm8.staticflickr.com/7224/6850042286_ef81b74acc_o.png) 
+
+
+```
+Error: object 'p1' not found
+```
+
+
 
 
 Correlation trend
@@ -168,12 +247,51 @@ cortrend <- sapply(c("L2", "L1", "fixed", "asy"), function(plty){
          cor(harvest, fishstock), by=reps]$V1)
   })
 })
+```
+
+
+
+```
+Error: comparison (1) is possible only for atomic and list types
+```
+
+
+
+```r
 df <- melt(data.frame(c2=c2, cortrend),id="c2") 
+```
+
+
+
+```
+Error: object 'cortrend' not found
+```
+
+
+
+```r
 p2 <- ggplot(df) + geom_point(aes(c2, value, color=variable)) + geom_line(aes(c2, value, color=variable))
+```
+
+
+
+```
+Error: ggplot2 doesn't know how to deal with data of class function
+```
+
+
+
+```r
 p2
 ```
 
-![plot of chunk unnamed-chunk-3](http://farm8.staticflickr.com/7248/6996165783_41c9894bdb_o.png) 
+
+
+```
+Error: object 'p2' not found
+```
+
+
 
 
 
@@ -189,13 +307,64 @@ npv <- sapply(c("L2", "L1", "fixed", "asy"), function(plty){
          sum(profit_fishing*discount), by=reps]$V1)
   })
 })
+```
+
+
+
+```
+Error: comparison (1) is possible only for atomic and list types
+```
+
+
+
+```r
 df <- melt(data.frame(c2=c2, npv),id="c2") 
+```
+
+
+
+```
+Error: object 'npv' not found
+```
+
+
+
+```r
 NPV0 <- mean(npv[1,])
+```
+
+
+
+```
+Error: object 'npv' not found
+```
+
+
+
+```r
 p2 <- ggplot(df) + geom_point(aes(c2, (NPV0-value)/NPV0, color=variable)) + geom_line(aes(c2, (NPV0-value)/NPV0, color=variable))
+```
+
+
+
+```
+Error: ggplot2 doesn't know how to deal with data of class function
+```
+
+
+
+```r
 p2
 ```
 
-![plot of chunk unnamed-chunk-4](http://farm7.staticflickr.com/6042/6996166285_19e365b92a_o.png) 
+
+
+```
+Error: object 'p2' not found
+```
+
+
+
 
 
 

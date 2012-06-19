@@ -1,12 +1,7 @@
-<!--roptions dev='png', fig.width=10, fig.height=7, tidy=FALSE, warning=FALSE, message=FALSE, comment=NA, cache.path="policycost/", cache=FALSE-->
+<!--roptions  tidy=FALSE, warning=FALSE, message=FALSE, comment=NA, cache=TRUE, cache.path="simulate_npv_curves/"-->
 <!--begin.rcode setup, include=FALSE
-render_gfm()  
-opts_knit$set(upload = TRUE)   
-require(socialR)
-options(flickrOptions=list(
-  description="https://github.com/cboettig/pdg_control/blob/master/inst/examples/",
-  tags="stochpop, pdg_control"))
-opts_knit$set(upload.fun = flickr.url)
+render_markdown()  
+opts_knit$set(upload.fun = socialR::flickr.url)
 end.rcode-->
 
 
