@@ -28,31 +28,16 @@ rm(list=ls())
 Chose the state equation / population dynamics function
 
 ``` {r }
-#f <- function(x,h,p){
-#	S = x - h
-#	p[1] * S * (1 - S/p[2]) + S
-#}
+f <- function(x,h,p){
+	S = x - h
+	p[1] * S * (1 - S/p[2]) + S
+}
 ````
 
 With parameters `r` = `r r <- 1` and `K` = `r K <- 100`.
 
 ``` {r }
-#pars <- c(r, K)
-````
-
-## OR
-
-We consider a Beverton Holt state equation governing population dynamics, \\( f(x,h) = \frac{A x}{1 + B x} \\)
-
-``` {r }
-f <- BevHolt
-````
-
-With parameters `A` = `r A <- 1.5` and `B` = `r B <- 0.05`.
-
-``` {r }
-pars <- c(1.5, 0.05)
-K <- (pars[1] - 1)/pars[2]
+pars <- c(r, K)
 ````
 
 We consider a profits from fishing to be a function of harvest `h` and stock size `x`,  
