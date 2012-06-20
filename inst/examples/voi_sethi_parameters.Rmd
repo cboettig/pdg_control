@@ -125,16 +125,25 @@ gmi <- scenario(0.5, 0.5, 0.5)
 ``` {r sethiplots, dependson="runall"}
 require(reshape2)
 policy <- melt(data.frame(stock = x_grid, det = det$D[,1], g = g$D[,1], m = m$D[,1], i= m$D[,i], gm = gm$D[,1], gi = gi$D[,1], gmi = gmi$D[,1]), id = "stock")
-ggplot(policy) + geom_point(aes(stock, stock-x_grid[value], color=variable)) 
-	geom_smooth(aes(stock, stock-x_grid[value], color=variable)) + ylab("escapement") 
+ggplot(policy) + 
+  geom_point(aes(stock, stock-x_grid[value], color=variable)) +
+	geom_smooth(aes(stock, stock-x_grid[value], color=variable)) +
+  ylab("escapement") 
 
-ggplot(policy) + geom_point(aes(stock, stock-x_grid[value], color=variable)) 
-	geom_smooth(aes(stock, x_grid[value], color=variable)) + ylab("harvest") 
+ggplot(policy) +
+  geom_point(aes(stock, stock-x_grid[value], color=variable)) +
+	geom_smooth(aes(stock, x_grid[value], color=variable)) +
+  ylab("harvest") 
 
 
-value <- melt(data.frame(stock = x_grid, det=det$V, g = g$V, m = m$V, gm = gm$V, gi = gi$V, gmi = gmi$V), id = "stock")
-ggplot(value) + geom_point(aes(stock, value, color=variable)) +
-	ggplot(value) + geom_smooth(aes(stock, value, color=variable)) + ylab("Net Present Value")
+value <- melt(data.frame(stock = x_grid, det=det$V, 
+                         g = g$V, m = m$V, gm = gm$V, 
+                         gi = gi$V, gmi = gmi$V), id = "stock")
+
+ggplot(value) + 
+  geom_point(aes(stock, value, color=variable)) +
+  geom_smooth(aes(stock, value, color=variable)) +
+  ylab("Net Present Value")
 ````
 
 ## Simulations

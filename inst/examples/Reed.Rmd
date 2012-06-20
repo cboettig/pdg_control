@@ -1,6 +1,6 @@
 `ro cache=FALSE, tidy=FALSE, warning=FALSE, comment=NA, message=FALSE, verbose=TRUE or`
 
-``` {r  echo=FALSE }
+``` {r  echo=FALSE, cache=FALSE}
 opts_knit$set(upload.fun = socialR::flickr.url)
 orig = getOptions("device")
 options(device = function(width = 5, height = 5) {
