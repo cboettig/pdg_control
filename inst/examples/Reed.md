@@ -118,7 +118,7 @@ h_grid <- x_grid
 delta <- 0.05
 xT <- 0
 OptTime <- 25
-sigma_g <- .1
+sigma_g <- .5
 ```
 
 
@@ -193,7 +193,7 @@ geom_point(aes(x,y), data=data.frame(x=opt$S, y=opt$S), col="red")
 q1
 ```
 
-![plot of chunk policyfn_plot](http://farm6.staticflickr.com/5279/7410144754_4678420c9c_o.png) 
+![plot of chunk policyfn_plot](http://farm8.staticflickr.com/7258/7410154894_0f6f8db6ba_o.png) 
 
 
 and the value function (at equilibrium):
@@ -206,7 +206,7 @@ geom_vline(xintercept=opt$S)
 q2
 ```
 
-![plot of chunk valuefn_plot](http://farm9.staticflickr.com/8163/7410145134_b61939af88_o.png) 
+![plot of chunk valuefn_plot](http://farm8.staticflickr.com/7259/7410155218_d5460cf387_o.png) 
 
 
 
@@ -258,7 +258,7 @@ ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, harvest), col="darkgreen") 
 ```
 
-![plot of chunk p0](http://farm9.staticflickr.com/8026/7410145632_f3e1eb8c95_o.png) 
+![plot of chunk p0](http://farm6.staticflickr.com/5119/7410155732_91e3aac8cd_o.png) 
 
 
 
@@ -272,7 +272,7 @@ p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) +
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 ```
 
-![plot of chunk p1](http://farm6.staticflickr.com/5236/7410146120_f9eef58d32_o.png) 
+![plot of chunk p1](http://farm6.staticflickr.com/5460/7410156194_38ac0ba261_o.png) 
 
 
 
