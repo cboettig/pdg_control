@@ -164,10 +164,11 @@ setnames(dt, "L1", "reps") # names are nice
 Let's begin by looking at the dynamics of a single replicate. The line shows Reed's S, the level above which the stock should be harvested (where catch should be the difference between stock and S).  To confirm that this policy is being followed, note that harvesting only occurs when the stock is above this line, and harvest is proportional to the amount by which it is above.  Change the replicate `reps==` to see the results from a different replicate.  
 
 ``` {r  p0}
-ggplot(subset(dt,reps==1)) +
+p0 <- ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, fishstock)) +
   geom_abline(intercept=opt$S, slope = 0) +
   geom_line(aes(time, harvest), col="darkgreen") 
+p0
 ````
 
 
@@ -176,7 +177,8 @@ This plot summarizes the stock dynamics by visualizing the replicates. Reed's S 
 ``` {r  p1}
 p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) + 
   geom_abline(intercept=xT, slope = 0, lty=2) 
-p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
+p1 <- p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
+p1
 ````
 
 

@@ -24,7 +24,10 @@ Chose the state equation / population dynamics function
 
 
 ```r
-#f <- function(x,h,p){#	S = x - h#	p[1] * S * (1 - S/p[2]) + S#}
+f <- function(x,h,p){
+	S = x - h
+	p[1] * S * (1 - S/p[2]) + S
+}
 ```
 
 
@@ -35,32 +38,7 @@ With parameters `r` = `1` and `K` = `100`.
 
 
 ```r
-#pars <- c(r, K)
-```
-
-
-
-
-## OR
-
-We consider a Beverton Holt state equation governing population dynamics, \\( f(x,h) = \frac{A x}{1 + B x} \\)
-
-
-
-```r
-f <- BevHolt
-```
-
-
-
-
-With parameters `A` = `1.5` and `B` = `0.05`.
-
-
-
-```r
-pars <- c(1.5, 0.05)
-K <- (pars[1] - 1)/pars[2]
+pars <- c(r, K)
 ```
 
 
@@ -98,7 +76,7 @@ grid_n <- 100
 
 
 
-We seek a harvest policy which maximizes the discounted profit from the fishery using a stochastic dynamic programming approach over a discrete grid of stock sizes from `0` to `15` on a grid of `100` points, and over an identical discrete grid of possible harvest values.  
+We seek a harvest policy which maximizes the discounted profit from the fishery using a stochastic dynamic programming approach over a discrete grid of stock sizes from `0` to `150` on a grid of `100` points, and over an identical discrete grid of possible harvest values.  
 
 
 
@@ -193,7 +171,7 @@ geom_point(aes(x,y), data=data.frame(x=opt$S, y=opt$S), col="red")
 q1
 ```
 
-![plot of chunk policyfn_plot](http://farm8.staticflickr.com/7258/7410154894_0f6f8db6ba_o.png) 
+![plot of chunk policyfn_plot](http://farm8.staticflickr.com/7113/7410172420_1635db49b9_o.png) 
 
 
 and the value function (at equilibrium):
@@ -206,7 +184,7 @@ geom_vline(xintercept=opt$S)
 q2
 ```
 
-![plot of chunk valuefn_plot](http://farm8.staticflickr.com/7259/7410155218_d5460cf387_o.png) 
+![plot of chunk valuefn_plot](http://farm9.staticflickr.com/8161/7410172826_aa3a2309ba_o.png) 
 
 
 
@@ -252,13 +230,14 @@ Let's begin by looking at the dynamics of a single replicate. The line shows Ree
 
 
 ```r
-ggplot(subset(dt,reps==1)) +
+p0 <- ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, fishstock)) +
   geom_abline(intercept=opt$S, slope = 0) +
   geom_line(aes(time, harvest), col="darkgreen") 
+p0
 ```
 
-![plot of chunk p0](http://farm6.staticflickr.com/5119/7410155732_91e3aac8cd_o.png) 
+![plot of chunk p0](http://farm8.staticflickr.com/7108/7410173302_ff72717e54_o.png) 
 
 
 
@@ -269,10 +248,11 @@ This plot summarizes the stock dynamics by visualizing the replicates. Reed's S 
 ```r
 p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) + 
   geom_abline(intercept=xT, slope = 0, lty=2) 
-p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
+p1 <- p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
+p1
 ```
 
-![plot of chunk p1](http://farm6.staticflickr.com/5460/7410156194_38ac0ba261_o.png) 
+![plot of chunk p1](http://farm6.staticflickr.com/5038/7410173816_206520e416_o.png) 
 
 
 
