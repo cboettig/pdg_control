@@ -20,12 +20,16 @@
 #' @param x_grid the discrete values allowed for the population size, x
 #' @param h_grid the discrete values of harvest levels to optimize over
 #' @param sigma_g the variance of the population growth process
+#' @param pdfn the probability density function, taking the proportional
+#' chance of a transition to that state, f(x), and the parameter sigma_g
+#' If NULL (default), will use the log normal density.  
 #' @return the transition matrix at each value of h in the grid. 
 #' @details this analytical approach doesn't reliably support other 
 #'  sources of variation.  The quality of the analytic approximations 
 #'  (lognormal) can be tested. 
 #' @export
-determine_SDP_matrix <- function(f, p, x_grid, h_grid, sigma_g){
+determine_SDP_matrix <- function(f, p, x_grid, h_grid, sigma_g, pdfn=NULL){
+  if(is.null(pdf)) pdf <- function(P, s) dlnorm(P, 0, s) #logmean of 0 is log(1)
   gridsize <- length(x_grid)
   SDP_Mat <- lapply(h_grid, function(h){
     SDP_matrix <- matrix(0, nrow=gridsize, ncol=gridsize)
@@ -41,7 +45,7 @@ determine_SDP_matrix <- function(f, p, x_grid, h_grid, sigma_g){
         # relative probability of a transition to that state
         ProportionalChance <- x_grid / x2_expected
         # lognormal due to multiplicative Gaussian noise
-        Prob <- dlnorm(ProportionalChance, 0, sigma_g) #logmean of 0 is log(1)
+        Prob <- pdfn(ProportionalChance, sigma_g)
         # Store normalized probabilities in row
         SDP_matrix[i,] <- Prob/sum(Prob)
 ## dnorm(x_i, mu, sigma)  x_i+1,  
