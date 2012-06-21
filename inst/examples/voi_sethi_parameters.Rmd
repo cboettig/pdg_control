@@ -24,17 +24,6 @@ require(data.table)
 rm(list=ls())
 ````
 
-`ro cache=TRUE, tidy=FALSE, warning=FALSE, comment=NA, message=FALSE, fig.width=10, fig.height=10, cache.path="value_of_information/" or`
-
-``` {r  echo=FALSE, cache=FALSE }
-opts_knit$set(upload.fun = socialR::flickr.url)
-options(device = function(width = 5, height = 5) {
-    pdf(NULL, width = width, height = height)
-})
-knitcitations::cleanbib()
-````
-
-
 Chose the state equation / population dynamics function
 
 ``` {r }
@@ -126,7 +115,7 @@ gmi <- scenario(lvl, lvl, lvl)
 ``` {r sethiplots, dependson="runall"}
 require(reshape2)
 policy <- melt(data.frame(stock = x_grid, det = det$D[,1], 
-               g = g$D[,1], m = m$D[,1], i= m$D[,i], 
+               g = g$D[,1], m = m$D[,1], i= m$D[,1], 
                gm = gm$D[,1], gi = gi$D[,1], gmi = gmi$D[,1]), 
                id = "stock")
 
@@ -231,5 +220,5 @@ print(xtable(matrix(sds$V1, nrow=7, dimnames=list(uncertainties, uncertainties))
 # References
 
 ``` {r biblio, echo=FALSE, results="asis"}
-print(knitcitations::bibliography(), "html")
-`
+knitcitations::bibliography("html")
+````

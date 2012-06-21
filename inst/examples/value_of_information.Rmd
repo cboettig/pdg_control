@@ -117,12 +117,12 @@ det <- scenario(0.01, 0.0, 0.0)
 
 ``` {r sethiplots, dependson="runall"}
 require(reshape2)
-policy <- melt(data.frame(stock = x_grid, det = det$D[,1], g = g$D[,1], m = m$D[,1], gm = gm$D[,1], gi = gi$D[,1], gmi = gmi$D[,1]), id = "stock")
+policy <- melt(data.frame(stock = x_grid, det = det$D[,1], g = g$D[,1], m = m$D[,1], i=i$D[,1], gm = gm$D[,1], gi = gi$D[,1], gmi = gmi$D[,1]), id = "stock")
 ggplot(policy) + geom_point(aes(stock, stock-x_grid[value], color=variable)) + ylab("escapement") 
 ggplot(policy) + geom_smooth(aes(stock, stock-x_grid[value], color=variable))+ ylab("escapement") 
 
 
-value <- melt(data.frame(stock = x_grid, det=det$V, g = g$V, m = m$V, gm = gm$V, gi = gi$V, gmi = gmi$V), id = "stock")
+value <- melt(data.frame(stock = x_grid, det=det$V, g = g$V, m = m$V, i=i$V, gm = gm$V, gi = gi$V, gmi = gmi$V), id = "stock")
 ggplot(value) + geom_point(aes(stock, value, color=variable)) + ylab("Net Present Value")
 ggplot(value) + geom_smooth(aes(stock, value, color=variable)) + ylab("Net Present Value")
 ````
@@ -132,9 +132,9 @@ ggplot(value) + geom_smooth(aes(stock, value, color=variable)) + ylab("Net Prese
 
 ``` {r simfn} 
 simulatereps <- function(opt, true_g, true_m, true_i){
-  z_g <- function() rlnorm(1,  0, true_g)
-  z_m <- function() rlnorm(1,  0, true_m) 
-  z_i <- function() rlnorm(1,  0, true_i) 
+  z_g <- function() rnorm(1,  0, true_g)
+  z_m <- function() rnorm(1,  0, true_m) 
+  z_i <- function() rnorm(1,  0, true_i) 
 
   sims <- lapply(1:100, function(i){
     ForwardSimulate(f, pars, x_grid, h_grid, x0 = K, opt$D, z_g, z_m, z_i, profit)
@@ -214,5 +214,5 @@ print(xtable(matrix(sds$V1, nrow=7, dimnames=list(uncertainties, uncertainties))
 # References
 
 ``` {r biblio, echo=FALSE, results="asis"}
-print(knitcitations::bibliography(), "html")
+knitcitations::bibliography("html")
 ````

@@ -259,7 +259,7 @@ m <- dt[fishstock > 1.5,
 
 ``` {r summaryplot}
 signals <- melt(data.frame(var=var_tau$V1, acor=acor_tau$V1, m=m$V1))
-ggplot(signals) + geom_density(aes(value)) + facet_wrap(~variable)
+ggplot(signals) + geom_histogram(aes(value)) + facet_wrap(~variable, scales="free")
 ````
 
 

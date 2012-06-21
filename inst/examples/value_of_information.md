@@ -216,39 +216,39 @@ Library ggplot2 loaded.
 ```r
 require(reshape2)
 policy <- melt(data.frame(stock = x_grid, det = det$D[, 
-    1], g = g$D[, 1], m = m$D[, 1], gm = gm$D[, 1], gi = gi$D[, 
-    1], gmi = gmi$D[, 1]), id = "stock")
+    1], g = g$D[, 1], m = m$D[, 1], i = i$D[, 1], gm = gm$D[, 
+    1], gi = gi$D[, 1], gmi = gmi$D[, 1]), id = "stock")
 ggplot(policy) + geom_point(aes(stock, stock - 
     x_grid[value], color = variable)) + ylab("escapement")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8009/7412348136_e298e7a689_o.png) 
+![plot of chunk sethiplots](http://farm6.staticflickr.com/5320/7414961890_e975413573_o.png) 
 
 ```r
 ggplot(policy) + geom_smooth(aes(stock, stock - 
     x_grid[value], color = variable)) + ylab("escapement")
 ```
 
-![plot of chunk sethiplots](http://farm6.staticflickr.com/5195/7412348496_be751559cf_o.png) 
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7274/7414962292_552cf7eaac_o.png) 
 
 ```r
 
 
 value <- melt(data.frame(stock = x_grid, det = det$V, 
-    g = g$V, m = m$V, gm = gm$V, gi = gi$V, gmi = gmi$V), 
+    g = g$V, m = m$V, i = i$V, gm = gm$V, gi = gi$V, gmi = gmi$V), 
     id = "stock")
 ggplot(value) + geom_point(aes(stock, value, color = variable)) + 
     ylab("Net Present Value")
 ```
 
-![plot of chunk sethiplots](http://farm6.staticflickr.com/5275/7412348728_92b8887761_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8023/7414962678_2edb865de8_o.png) 
 
 ```r
 ggplot(value) + geom_smooth(aes(stock, value, 
     color = variable)) + ylab("Net Present Value")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8006/7412348954_80e00cc62b_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8141/7414963056_99b800a292_o.png) 
 
 
 ## Simulations
@@ -259,9 +259,9 @@ ggplot(value) + geom_smooth(aes(stock, value,
 ```r
 simulatereps <- function(opt, true_g, true_m, 
     true_i) {
-    z_g <- function() rlnorm(1, 0, true_g)
-    z_m <- function() rlnorm(1, 0, true_m)
-    z_i <- function() rlnorm(1, 0, true_i)
+    z_g <- function() rnorm(1, 0, true_g)
+    z_m <- function() rnorm(1, 0, true_m)
+    z_i <- function() rnorm(1, 0, true_i)
     
     sims <- lapply(1:100, function(i) {
         ForwardSimulate(f, pars, x_grid, h_grid, x0 = K, 
@@ -323,7 +323,7 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time,
     facet_wrap(~uncertainty)
 ```
 
-![plot of chunk onerep](http://farm8.staticflickr.com/7118/7412352494_80efa088cd_o.png) 
+![plot of chunk onerep](http://farm8.staticflickr.com/7259/7414888302_54dd380a58_o.png) 
 
 
 This plot summarizes the stock dynamics by visualizing the replicates.
@@ -336,7 +336,7 @@ p1 + geom_line(aes(time, fishstock, group = reps),
     alpha = 0.1) + facet_wrap(~uncertainty)
 ```
 
-![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm6.staticflickr.com/5195/7412354400_4de03f6c6c_o.png) 
+![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm9.staticflickr.com/8151/7414890862_1f506bbb56_o.png) 
 
 
 
@@ -346,7 +346,7 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time,
     profit)) + facet_wrap(~uncertainty)
 ```
 
-![The profits made in each time interval of a single replicate, by scenario](http://farm6.staticflickr.com/5039/7412355306_b804e3b673_o.png) 
+![The profits made in each time interval of a single replicate, by scenario](http://farm8.staticflickr.com/7258/7414964544_26cbb4a41d_o.png) 
 
 
 
@@ -357,7 +357,7 @@ profits <- dt[, sum(profit), by = c("reps", "uncertainty")]
 ggplot(profits) + geom_histogram(aes(V1)) + facet_wrap(~uncertainty)
 ```
 
-![the distribution of profits by scenario](http://farm6.staticflickr.com/5466/7412356474_7322c700bc_o.png) 
+![the distribution of profits by scenario](http://farm8.staticflickr.com/7121/7414893630_14bbed1577_o.png) 
 
 
 Summary statistics 
@@ -383,16 +383,16 @@ print(xtable(matrix(means$V1, nrow = 7, dimnames = list(uncertainties,
 ```
 
 <!-- html table generated in R 2.14.1 by xtable 1.7-0 package -->
-<!-- Wed Jun 20 22:31:33 2012 -->
+<!-- Thu Jun 21 10:02:45 2012 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> deter </TH> <TH> growth </TH> <TH> measure </TH> <TH> implement </TH> <TH> growth+measure </TH> <TH> growth+implement </TH> <TH> all </TH>  </TR>
-  <TR> <TD align="right"> deter </TD> <TD align="right"> 9.99 </TD> <TD align="right"> 9.99 </TD> <TD align="right"> 9.99 </TD> <TD align="right"> 9.99 </TD> <TD align="right"> 9.99 </TD> <TD align="right"> 9.99 </TD> <TD align="right"> 9.99 </TD> </TR>
-  <TR> <TD align="right"> growth </TD> <TD align="right"> 9.99 </TD> <TD align="right"> 9.99 </TD> <TD align="right"> 9.99 </TD> <TD align="right"> 9.99 </TD> <TD align="right"> 9.99 </TD> <TD align="right"> 9.99 </TD> <TD align="right"> 9.99 </TD> </TR>
-  <TR> <TD align="right"> measure </TD> <TD align="right"> 10.13 </TD> <TD align="right"> 10.11 </TD> <TD align="right"> 10.21 </TD> <TD align="right"> 10.13 </TD> <TD align="right"> 10.13 </TD> <TD align="right"> 10.13 </TD> <TD align="right"> 10.12 </TD> </TR>
-  <TR> <TD align="right"> implement </TD> <TD align="right"> 10.18 </TD> <TD align="right"> 10.19 </TD> <TD align="right"> 10.13 </TD> <TD align="right"> 10.16 </TD> <TD align="right"> 10.15 </TD> <TD align="right"> 10.13 </TD> <TD align="right"> 10.13 </TD> </TR>
-  <TR> <TD align="right"> growth+measure </TD> <TD align="right"> 10.14 </TD> <TD align="right"> 10.14 </TD> <TD align="right"> 10.13 </TD> <TD align="right"> 10.15 </TD> <TD align="right"> 10.14 </TD> <TD align="right"> 10.14 </TD> <TD align="right"> 10.13 </TD> </TR>
-  <TR> <TD align="right"> growth+implement </TD> <TD align="right"> 10.22 </TD> <TD align="right"> 10.18 </TD> <TD align="right"> 10.18 </TD> <TD align="right"> 10.14 </TD> <TD align="right"> 10.18 </TD> <TD align="right"> 10.14 </TD> <TD align="right"> 10.10 </TD> </TR>
-  <TR> <TD align="right"> all </TD> <TD align="right"> 10.23 </TD> <TD align="right"> 10.18 </TD> <TD align="right"> 10.23 </TD> <TD align="right"> 10.23 </TD> <TD align="right"> 10.24 </TD> <TD align="right"> 10.14 </TD> <TD align="right"> 10.22 </TD> </TR>
+  <TR> <TD align="right"> deter </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> </TR>
+  <TR> <TD align="right"> growth </TD> <TD align="right"> -0.41 </TD> <TD align="right"> -0.51 </TD> <TD align="right"> -0.48 </TD> <TD align="right"> -0.42 </TD> <TD align="right"> -0.37 </TD> <TD align="right"> -0.47 </TD> <TD align="right"> -0.39 </TD> </TR>
+  <TR> <TD align="right"> measure </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> </TR>
+  <TR> <TD align="right"> implement </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> </TR>
+  <TR> <TD align="right"> growth+measure </TD> <TD align="right"> -0.35 </TD> <TD align="right"> -0.45 </TD> <TD align="right"> -0.41 </TD> <TD align="right"> -0.42 </TD> <TD align="right"> -0.42 </TD> <TD align="right"> -0.46 </TD> <TD align="right"> -0.29 </TD> </TR>
+  <TR> <TD align="right"> growth+implement </TD> <TD align="right"> -0.39 </TD> <TD align="right"> -0.34 </TD> <TD align="right"> -0.39 </TD> <TD align="right"> -0.49 </TD> <TD align="right"> -0.43 </TD> <TD align="right"> -0.42 </TD> <TD align="right"> -0.38 </TD> </TR>
+  <TR> <TD align="right"> all </TD> <TD align="right"> -0.44 </TD> <TD align="right"> -0.43 </TD> <TD align="right"> -0.47 </TD> <TD align="right"> -0.41 </TD> <TD align="right"> -0.43 </TD> <TD align="right"> -0.45 </TD> <TD align="right"> -0.36 </TD> </TR>
    </TABLE>
 
 
@@ -402,16 +402,16 @@ print(xtable(matrix(sds$V1, nrow = 7, dimnames = list(uncertainties,
 ```
 
 <!-- html table generated in R 2.14.1 by xtable 1.7-0 package -->
-<!-- Wed Jun 20 22:31:33 2012 -->
+<!-- Thu Jun 21 10:02:45 2012 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> deter </TH> <TH> growth </TH> <TH> measure </TH> <TH> implement </TH> <TH> growth+measure </TH> <TH> growth+implement </TH> <TH> all </TH>  </TR>
   <TR> <TD align="right"> deter </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> </TR>
-  <TR> <TD align="right"> growth </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> </TR>
-  <TR> <TD align="right"> measure </TD> <TD align="right"> 0.22 </TD> <TD align="right"> 0.21 </TD> <TD align="right"> 0.27 </TD> <TD align="right"> 0.19 </TD> <TD align="right"> 0.20 </TD> <TD align="right"> 0.22 </TD> <TD align="right"> 0.22 </TD> </TR>
-  <TR> <TD align="right"> implement </TD> <TD align="right"> 0.23 </TD> <TD align="right"> 0.24 </TD> <TD align="right"> 0.21 </TD> <TD align="right"> 0.23 </TD> <TD align="right"> 0.24 </TD> <TD align="right"> 0.22 </TD> <TD align="right"> 0.22 </TD> </TR>
-  <TR> <TD align="right"> growth+measure </TD> <TD align="right"> 0.22 </TD> <TD align="right"> 0.22 </TD> <TD align="right"> 0.25 </TD> <TD align="right"> 0.23 </TD> <TD align="right"> 0.23 </TD> <TD align="right"> 0.25 </TD> <TD align="right"> 0.24 </TD> </TR>
-  <TR> <TD align="right"> growth+implement </TD> <TD align="right"> 0.28 </TD> <TD align="right"> 0.27 </TD> <TD align="right"> 0.28 </TD> <TD align="right"> 0.22 </TD> <TD align="right"> 0.23 </TD> <TD align="right"> 0.25 </TD> <TD align="right"> 0.20 </TD> </TR>
-  <TR> <TD align="right"> all </TD> <TD align="right"> 0.30 </TD> <TD align="right"> 0.30 </TD> <TD align="right"> 0.31 </TD> <TD align="right"> 0.35 </TD> <TD align="right"> 0.35 </TD> <TD align="right"> 0.23 </TD> <TD align="right"> 0.34 </TD> </TR>
+  <TR> <TD align="right"> growth </TD> <TD align="right"> 0.55 </TD> <TD align="right"> 0.60 </TD> <TD align="right"> 0.59 </TD> <TD align="right"> 0.55 </TD> <TD align="right"> 0.56 </TD> <TD align="right"> 0.63 </TD> <TD align="right"> 0.56 </TD> </TR>
+  <TR> <TD align="right"> measure </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> </TR>
+  <TR> <TD align="right"> implement </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> </TR>
+  <TR> <TD align="right"> growth+measure </TD> <TD align="right"> 0.53 </TD> <TD align="right"> 0.56 </TD> <TD align="right"> 0.60 </TD> <TD align="right"> 0.62 </TD> <TD align="right"> 0.61 </TD> <TD align="right"> 0.58 </TD> <TD align="right"> 0.46 </TD> </TR>
+  <TR> <TD align="right"> growth+implement </TD> <TD align="right"> 0.55 </TD> <TD align="right"> 0.51 </TD> <TD align="right"> 0.53 </TD> <TD align="right"> 0.57 </TD> <TD align="right"> 0.61 </TD> <TD align="right"> 0.56 </TD> <TD align="right"> 0.51 </TD> </TR>
+  <TR> <TD align="right"> all </TD> <TD align="right"> 0.61 </TD> <TD align="right"> 0.53 </TD> <TD align="right"> 0.57 </TD> <TD align="right"> 0.58 </TD> <TD align="right"> 0.59 </TD> <TD align="right"> 0.60 </TD> <TD align="right"> 0.52 </TD> </TR>
    </TABLE>
 
 
