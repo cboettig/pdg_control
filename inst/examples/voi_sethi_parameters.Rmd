@@ -1,4 +1,4 @@
-`ro cache=TRUE, warning=FALSE, comment=NA, message=FALSE, cache.path="voi_sethi_parameters/", verbose=TRUE or`
+`ro cache=TRUE, warning=FALSE, comment=NA, message=FALSE, cache.path="voi_sethi_parameters_bignoise/", verbose=TRUE or`
 
 ``` {r  echo=FALSE, cache=FALSE }
 opts_knit$set(upload.fun = socialR::flickr.url)
@@ -97,22 +97,48 @@ scenario <- function(policy_g, policy_m, policy_i){
 }
 ````
 
+Determine the policies for each of the scenarios (noise combinations).
+
 ``` {r runall}
-lvl <- 0.1
+lvl <- 0.3
+````
+
+``` {r }
 det <- scenario(0.01, 0.0, 0.0)
+````
+
+``` {r }
 g   <- scenario(lvl, 0.0, 0.0)
+````
+
+``` {r }
 m   <- scenario(0.0, lvl, 0.0)
+````
+
+``` {r }
 i   <- scenario(0.0, 0.0, lvl)
+````
+
+``` {r }
 gm  <- scenario(lvl, lvl, 0.0)
+````
+
+``` {r }
 gi  <- scenario(lvl, 0.0, lvl)
-im  <- scenario(0.0, lvl, lvl)
+````
+
+``` {r }
+mi  <- scenario(0.0, lvl, lvl)
+````
+
+``` {r }
 gmi <- scenario(lvl, lvl, lvl)
 ````
 
 
 ### plots
 
-``` {r sethiplots, dependson="runall"}
+``` {r sethiplots}
 require(reshape2)
 policy <- melt(data.frame(stock = x_grid, det = det$D[,1], 
                g = g$D[,1], m = m$D[,1], i= m$D[,1], 
@@ -161,8 +187,8 @@ simulatereps <- function(opt, true_g, true_m, true_i){
 All cases
 
 ``` {r runallsims, dependson="simfn"} 
-policyfn <- list(det=det, g=g, m=m, i=i, gm=gm, gi=gi, gmi=gmi)
-noise <- list(s0=c(0,0,0), sg=c(lvl, 0, 0), sm=c(0, lvl, 0), si=c(0,0,lvl), sgm=c(lvl, lvl, 0), sgi=c(lvl, 0, lvl), sgmi=c(lvl, lvl, lvl)) 
+policyfn <- list(det=det, g=g, m=m, i=i, gm=gm, gi=gi, mi=mi, gmi=gmi)
+noise <- list(s0=c(0,0,0), sg=c(lvl, 0, 0), sm=c(0, lvl, 0), si=c(0,0,lvl), sgm=c(lvl, lvl, 0), sgi=c(lvl, 0, lvl), smi = c(0, lvl, lvl), sgmi=c(lvl, lvl, lvl)) 
 allcases <- lapply(policyfn, function(policyfn_i){
   lapply(noise, function(noise_i){
     simulatereps(policyfn_i, noise_i[1], noise_i[2], noise_i[3])
@@ -210,9 +236,9 @@ sds <- profits[, sd(V1), by=uncertainty]
 
 ``` {r prettytable, cache=FALSE, results="asis"}
 require(xtable)
-uncertainties <- c("deterministic", "growth", "measure", "implement", "growth+measure", "growth+implement", "all")
-print(xtable(matrix(means$V1, nrow=7, dimnames=list(uncertainties, uncertainties))), type="html")
-print(xtable(matrix(sds$V1, nrow=7, dimnames=list(uncertainties, uncertainties))), type="html")
+uncertainties <- c("det", "growth", "measure", "impl", "growth+measure", "growth+impl", "impl+measure" "all")
+print(xtable(matrix(means$V1, nrow=8, dimnames=list(uncertainties, uncertainties))), type="html")
+print(xtable(matrix(sds$V1, nrow=8, dimnames=list(uncertainties, uncertainties))), type="html")
 ````
 
 
