@@ -125,7 +125,7 @@ ggplot(policy) +
   ylab("escapement") 
 
 ggplot(policy) +
-  geom_point(aes(stock, stock-x_grid[value], color=variable)) +
+  geom_point(aes(stock, x_grid[value], color=variable)) +
 	geom_smooth(aes(stock, x_grid[value], color=variable)) +
   ylab("harvest") 
 
@@ -210,7 +210,7 @@ sds <- profits[, sd(V1), by=uncertainty]
 
 ``` {r prettytable, cache=FALSE, results="asis"}
 require(xtable)
-uncertainties <- c("deterministic", "growth", "measure", "implement", "growth+measure", "growth+implement", "measure+implement", "all")
+uncertainties <- c("deterministic", "growth", "measure", "implement", "growth+measure", "growth+implement", "all")
 print(xtable(matrix(means$V1, nrow=7, dimnames=list(uncertainties, uncertainties))), type="html")
 print(xtable(matrix(sds$V1, nrow=7, dimnames=list(uncertainties, uncertainties))), type="html")
 ````

@@ -219,16 +219,16 @@ ggplot(policy) + geom_point(aes(stock, stock -
     stock - x_grid[value], color = variable)) + ylab("escapement")
 ```
 
-![plot of chunk sethiplots](http://farm8.staticflickr.com/7261/7415817902_8a7ce52dd2_o.png) 
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7259/7416278218_b7b4271ce3_o.png) 
 
 ```r
 
-ggplot(policy) + geom_point(aes(stock, stock - 
-    x_grid[value], color = variable)) + geom_smooth(aes(stock, 
-    x_grid[value], color = variable)) + ylab("harvest")
+ggplot(policy) + geom_point(aes(stock, x_grid[value], 
+    color = variable)) + geom_smooth(aes(stock, x_grid[value], 
+    color = variable)) + ylab("harvest")
 ```
 
-![plot of chunk sethiplots](http://farm6.staticflickr.com/5455/7415818268_cebd418b65_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8164/7416278820_8704828f66_o.png) 
 
 ```r
 
@@ -241,7 +241,7 @@ ggplot(value) + geom_point(aes(stock, value, color = variable)) +
     geom_smooth(aes(stock, value, color = variable)) + ylab("Net Present Value")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8143/7415818718_08068f6932_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8005/7416279222_c4e163b8c7_o.png) 
 
 
 ## Simulations
@@ -360,22 +360,42 @@ sds <- profits[, sd(V1), by = uncertainty]
 require(xtable)
 uncertainties <- c("deterministic", "growth", 
     "measure", "implement", "growth+measure", "growth+implement", 
-    "measure+implement", "all")
+    "all")
 print(xtable(matrix(means$V1, nrow = 7, dimnames = list(uncertainties, 
     uncertainties))), type = "html")
 ```
 
-```
-Error: length of 'dimnames' [1] not equal to array extent```
+<!-- html table generated in R 2.14.1 by xtable 1.7-0 package -->
+<!-- Thu Jun 21 14:11:45 2012 -->
+<TABLE border=1>
+<TR> <TH>  </TH> <TH> deterministic </TH> <TH> growth </TH> <TH> measure </TH> <TH> implement </TH> <TH> growth+measure </TH> <TH> growth+implement </TH> <TH> all </TH>  </TR>
+  <TR> <TD align="right"> deterministic </TD> <TD align="right"> 674.24 </TD> <TD align="right"> 674.24 </TD> <TD align="right"> 674.24 </TD> <TD align="right"> 674.24 </TD> <TD align="right"> 674.24 </TD> <TD align="right"> 674.24 </TD> <TD align="right"> 674.24 </TD> </TR>
+  <TR> <TD align="right"> growth </TD> <TD align="right"> 684.77 </TD> <TD align="right"> 687.36 </TD> <TD align="right"> 680.98 </TD> <TD align="right"> 688.88 </TD> <TD align="right"> 686.54 </TD> <TD align="right"> 687.39 </TD> <TD align="right"> 677.78 </TD> </TR>
+  <TR> <TD align="right"> measure </TD> <TD align="right"> 659.35 </TD> <TD align="right"> 659.19 </TD> <TD align="right"> 657.10 </TD> <TD align="right"> 657.44 </TD> <TD align="right"> 658.29 </TD> <TD align="right"> 658.09 </TD> <TD align="right"> 658.41 </TD> </TR>
+  <TR> <TD align="right"> implement </TD> <TD align="right"> 670.45 </TD> <TD align="right"> 670.92 </TD> <TD align="right"> 670.80 </TD> <TD align="right"> 670.37 </TD> <TD align="right"> 670.24 </TD> <TD align="right"> 670.34 </TD> <TD align="right"> 670.30 </TD> </TR>
+  <TR> <TD align="right"> growth+measure </TD> <TD align="right"> 670.09 </TD> <TD align="right"> 669.03 </TD> <TD align="right"> 662.09 </TD> <TD align="right"> 663.28 </TD> <TD align="right"> 665.16 </TD> <TD align="right"> 664.49 </TD> <TD align="right"> 664.75 </TD> </TR>
+  <TR> <TD align="right"> growth+implement </TD> <TD align="right"> 676.98 </TD> <TD align="right"> 675.74 </TD> <TD align="right"> 680.50 </TD> <TD align="right"> 680.06 </TD> <TD align="right"> 678.51 </TD> <TD align="right"> 675.86 </TD> <TD align="right"> 678.70 </TD> </TR>
+  <TR> <TD align="right"> all </TD> <TD align="right"> 666.08 </TD> <TD align="right"> 664.86 </TD> <TD align="right"> 666.87 </TD> <TD align="right"> 659.18 </TD> <TD align="right"> 659.58 </TD> <TD align="right"> 662.80 </TD> <TD align="right"> 658.50 </TD> </TR>
+   </TABLE>
+
 
 ```r
 print(xtable(matrix(sds$V1, nrow = 7, dimnames = list(uncertainties, 
     uncertainties))), type = "html")
 ```
 
-```
-Error: length of 'dimnames' [1] not equal to array extent```
-
+<!-- html table generated in R 2.14.1 by xtable 1.7-0 package -->
+<!-- Thu Jun 21 14:11:45 2012 -->
+<TABLE border=1>
+<TR> <TH>  </TH> <TH> deterministic </TH> <TH> growth </TH> <TH> measure </TH> <TH> implement </TH> <TH> growth+measure </TH> <TH> growth+implement </TH> <TH> all </TH>  </TR>
+  <TR> <TD align="right"> deterministic </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> </TR>
+  <TR> <TD align="right"> growth </TD> <TD align="right"> 36.26 </TD> <TD align="right"> 36.28 </TD> <TD align="right"> 38.06 </TD> <TD align="right"> 37.42 </TD> <TD align="right"> 32.84 </TD> <TD align="right"> 34.16 </TD> <TD align="right"> 42.24 </TD> </TR>
+  <TR> <TD align="right"> measure </TD> <TD align="right"> 5.64 </TD> <TD align="right"> 5.49 </TD> <TD align="right"> 6.75 </TD> <TD align="right"> 7.33 </TD> <TD align="right"> 6.15 </TD> <TD align="right"> 5.61 </TD> <TD align="right"> 5.56 </TD> </TR>
+  <TR> <TD align="right"> implement </TD> <TD align="right"> 3.64 </TD> <TD align="right"> 3.40 </TD> <TD align="right"> 3.66 </TD> <TD align="right"> 4.10 </TD> <TD align="right"> 4.60 </TD> <TD align="right"> 3.92 </TD> <TD align="right"> 3.34 </TD> </TR>
+  <TR> <TD align="right"> growth+measure </TD> <TD align="right"> 37.59 </TD> <TD align="right"> 38.37 </TD> <TD align="right"> 29.85 </TD> <TD align="right"> 38.17 </TD> <TD align="right"> 35.71 </TD> <TD align="right"> 35.61 </TD> <TD align="right"> 38.08 </TD> </TR>
+  <TR> <TD align="right"> growth+implement </TD> <TD align="right"> 38.81 </TD> <TD align="right"> 35.78 </TD> <TD align="right"> 38.83 </TD> <TD align="right"> 38.85 </TD> <TD align="right"> 41.09 </TD> <TD align="right"> 36.06 </TD> <TD align="right"> 34.98 </TD> </TR>
+  <TR> <TD align="right"> all </TD> <TD align="right"> 38.60 </TD> <TD align="right"> 37.18 </TD> <TD align="right"> 32.69 </TD> <TD align="right"> 40.24 </TD> <TD align="right"> 34.89 </TD> <TD align="right"> 38.93 </TD> <TD align="right"> 37.73 </TD> </TR>
+   </TABLE>
 
 
 
