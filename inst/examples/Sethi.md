@@ -7,11 +7,7 @@
  * author Carl Boettiger, <cboettig@gmail.com>
  * license: CC0
 
- Implements a numerical version of the SDP described in (Sethi _et. al._ 2005).
-
-
-Clear the workspace and load package dependencies: 
-
+ Implements a numerical version of the SDP described in 
 
 
 
@@ -93,9 +89,9 @@ h_grid <- x_grid
 delta <- 0.05
 xT <- 0
 OptTime <- 25
-sigma_g <- .1
-sigma_m <- .1
-sigma_i <- .1
+sigma_g <- .5
+sigma_m <- .5
+sigma_i <- .5
 ```
 
 
@@ -111,14 +107,14 @@ for the random variable `z_g`, given by
 
 ```r
 z_g <- function() 1+(2*runif(1, 0,  1)-1) * sigma_g
-z_m <- function() 1+(2*runif(1, 0,  1)-1) * sigma_g
-z_i <- function() 1+(2*runif(1, 0,  1)-1) * sigma_g
+z_m <- function() 1+(2*runif(1, 0,  1)-1) * sigma_m
+z_i <- function() 1+(2*runif(1, 0,  1)-1) * sigma_i
 ```
 
 
 
 
-With `sigma_g` = `0.1`, `sigma_m` = `0.1`, `sigma_i` = `0.1`.
+With `sigma_g` = `0.5`, `sigma_m` = `0.5`, `sigma_i` = `0.5`.
 
 
 In the Sethi case, computing the distribution over multiple sources of noise is actually quite difficult.  Simulation turns out to be more efficient than numerically integrating over each distribution.  This code parallelizes the operation over four cores, but can be scaled to an arbitrary cluster. 
@@ -260,23 +256,6 @@ p1
 ![plot of chunk p1](http://farm6.staticflickr.com/5116/7411018680_e9fe9cc3d1_o.png) 
 
 
-
-# References
-
-
-
-```
-Error: argument is not interpretable as logical```
-
-
-
-
-
-
-
-```r
-options(device=orig)
-```
 
 
 
