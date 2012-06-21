@@ -4,7 +4,6 @@
 
 
 
-
 # Calculating the value of information
 
  Implements a numerical version of the SDP described in (Sethi _et. al._ 2005).
@@ -105,15 +104,6 @@ require(snowfall)
 sfInit(parallel = TRUE, cpu = 16)
 ```
 
-```
-R Version:  R version 2.14.1 (2011-12-22) 
-
-```
-
-
-
-
-
 
 
 ```r
@@ -138,69 +128,14 @@ scenario <- function(policy_g, policy_m, policy_i) {
 ```r
 lvl <- 0.1
 det <- scenario(0.01, 0, 0)
-```
-
-```
-Library ggplot2 loaded.
-```
-
-```r
 g <- scenario(lvl, 0, 0)
-```
-
-```
-Library ggplot2 loaded.
-```
-
-```r
 m <- scenario(0, lvl, 0)
-```
-
-```
-Library ggplot2 loaded.
-```
-
-```r
 i <- scenario(0, 0, lvl)
-```
-
-```
-Library ggplot2 loaded.
-```
-
-```r
 gm <- scenario(lvl, lvl, 0)
-```
-
-```
-Library ggplot2 loaded.
-```
-
-```r
 gi <- scenario(lvl, 0, lvl)
-```
-
-```
-Library ggplot2 loaded.
-```
-
-```r
 im <- scenario(0, lvl, lvl)
-```
-
-```
-Library ggplot2 loaded.
-```
-
-```r
 gmi <- scenario(lvl, lvl, lvl)
 ```
-
-```
-Library ggplot2 loaded.
-```
-
-
 
 
 
