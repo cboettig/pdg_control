@@ -2,11 +2,6 @@
 
 
 
-```
-Error: could not find function "getOptions"```
-
-
-
 
 # Sethi Model
  * author Carl Boettiger, <cboettig@gmail.com>
@@ -133,14 +128,6 @@ In the Sethi case, computing the distribution over multiple sources of noise is 
 ```r
 require(snowfall) 
 sfInit(parallel=TRUE, cpu=16)
-```
-
-```
-R Version:  R version 2.14.1 (2011-12-22) 
-
-```
-
-```r
 SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=1e5)
 ```
 
@@ -177,43 +164,31 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0,
 ```r
 policy <- data.frame(stock = x_grid, value = opt$D[,1])
 ggplot(policy) + 
-  geom_point(aes(stock, stock-x_grid[value], color=variable)) + 
+  geom_point(aes(stock, stock-x_grid[value])) + 
 	geom_smooth(aes(stock, stock-x_grid[value])) + ylab("escapement") 
 ```
 
-```
-Error: object 'variable' not found```
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8153/7411017340_170939495e_o.png) 
 
 ```r
 
 ggplot(policy) + 
-  geom_point(aes(stock, x_grid[value], color=variable)) 
+  geom_point(aes(stock, x_grid[value])) + 
+	geom_smooth(aes(stock, x_grid[value])) + ylab("harvest") 
 ```
 
-```
-Error: object 'variable' not found```
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7110/7411017622_8f216dc141_o.png) 
 
 ```r
-	geom_smooth(aes(stock, x_grid[value], color=variable)) + ylab("harvest") 
-```
-
-```
-Error: non-numeric argument to binary operator```
-
-```r
-
 
 value <- data.frame(stock = x_grid, value=opt$V)
 ggplot(value) + 
-  geom_point(aes(stock, value, color=variable)) +
-  geom_smooth(aes(stock, value, color=variable)) +
+  geom_point(aes(stock, value)) +
+  geom_smooth(aes(stock, value)) +
   ylab("Net Present Value")
 ```
 
-```
-Error: object 'variable' not found```
-
-
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7126/7411017892_9bf8f64ff5_o.png) 
 
 
 
@@ -267,7 +242,7 @@ p0 <- ggplot(subset(dt,reps==1)) +
 p0
 ```
 
-![plot of chunk p0](http://farm6.staticflickr.com/5324/7410676738_d860827052_o.png) 
+![plot of chunk p0](http://farm6.staticflickr.com/5112/7411018290_f0350e0f4d_o.png) 
 
 
 
@@ -282,7 +257,7 @@ p1 <- p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 p1
 ```
 
-![plot of chunk p1](http://farm9.staticflickr.com/8155/7410677186_dbf3fc29bf_o.png) 
+![plot of chunk p1](http://farm6.staticflickr.com/5116/7411018680_e9fe9cc3d1_o.png) 
 
 
 
@@ -302,9 +277,6 @@ Error: argument is not interpretable as logical```
 ```r
 options(device=orig)
 ```
-
-```
-Error: object 'orig' not found```
 
 
 
