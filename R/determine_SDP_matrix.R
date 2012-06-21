@@ -29,7 +29,8 @@
 #'  (lognormal) can be tested. 
 #' @export
 determine_SDP_matrix <- function(f, p, x_grid, h_grid, sigma_g, pdfn=NULL){
-  if(is.null(pdf)) pdf <- function(P, s) dlnorm(P, 0, s) #logmean of 0 is log(1)
+  if(is.null(pdfn)) 
+    pdfn <- function(P, s) dlnorm(P, 0, s) #logmean of 0 is log(1)
   gridsize <- length(x_grid)
   SDP_Mat <- lapply(h_grid, function(h){
     SDP_matrix <- matrix(0, nrow=gridsize, ncol=gridsize)
@@ -48,7 +49,6 @@ determine_SDP_matrix <- function(f, p, x_grid, h_grid, sigma_g, pdfn=NULL){
         Prob <- pdfn(ProportionalChance, sigma_g)
         # Store normalized probabilities in row
         SDP_matrix[i,] <- Prob/sum(Prob)
-## dnorm(x_i, mu, sigma)  x_i+1,  
       }
     }
     SDP_matrix
