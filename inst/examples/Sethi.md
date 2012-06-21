@@ -2,12 +2,29 @@
 
 
 
+```
+Error: there is no package called 'knitcitations'```
+
+
+
 
 # Sethi Model
  * author Carl Boettiger, <cboettig@gmail.com>
  * license: CC0
 
  Implements a numerical version of the SDP described in 
+
+```
+
+Error in loadNamespace(name) : there is no package called 'knitcitations'
+
+```
+
+.
+
+
+Clear the workspace and load package dependencies: 
+
 
 
 
@@ -124,6 +141,19 @@ In the Sethi case, computing the distribution over multiple sources of noise is 
 ```r
 require(snowfall) 
 sfInit(parallel=TRUE, cpu=16)
+```
+
+```
+R Version:  R version 2.14.1 (2011-12-22) 
+
+```
+
+
+
+
+
+
+```r
 SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=1e5)
 ```
 
@@ -156,7 +186,6 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0,
 
 
 
-
 ```r
 policy <- data.frame(stock = x_grid, value = opt$D[,1])
 ggplot(policy) + 
@@ -164,7 +193,7 @@ ggplot(policy) +
 	geom_smooth(aes(stock, stock-x_grid[value])) + ylab("escapement") 
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8153/7411017340_170939495e_o.png) 
+![plot of chunk sethiplots](http://farm6.staticflickr.com/5119/7411686124_ba0582a09f_o.png) 
 
 ```r
 
@@ -173,7 +202,7 @@ ggplot(policy) +
 	geom_smooth(aes(stock, x_grid[value])) + ylab("harvest") 
 ```
 
-![plot of chunk sethiplots](http://farm8.staticflickr.com/7110/7411017622_8f216dc141_o.png) 
+![plot of chunk sethiplots](http://farm6.staticflickr.com/5344/7411686458_45d064cc44_o.png) 
 
 ```r
 
@@ -184,7 +213,7 @@ ggplot(value) +
   ylab("Net Present Value")
 ```
 
-![plot of chunk sethiplots](http://farm8.staticflickr.com/7126/7411017892_9bf8f64ff5_o.png) 
+![plot of chunk sethiplots](http://farm6.staticflickr.com/5280/7411686738_32f5ea3871_o.png) 
 
 
 
@@ -238,7 +267,7 @@ p0 <- ggplot(subset(dt,reps==1)) +
 p0
 ```
 
-![plot of chunk p0](http://farm6.staticflickr.com/5112/7411018290_f0350e0f4d_o.png) 
+![plot of chunk p0](http://farm9.staticflickr.com/8027/7411687314_29a2d8838c_o.png) 
 
 
 
@@ -253,7 +282,15 @@ p1 <- p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 p1
 ```
 
-![plot of chunk p1](http://farm6.staticflickr.com/5116/7411018680_e9fe9cc3d1_o.png) 
+![plot of chunk p1](http://farm8.staticflickr.com/7137/7411687788_723fe6a6cf_o.png) 
+
+
+
+# References
+
+NULL
+list()
+
 
 
 
