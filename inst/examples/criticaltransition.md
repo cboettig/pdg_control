@@ -163,7 +163,7 @@ geom_point(aes(x,y), data=data.frame(x=opt$S, y=opt$S), col="red")
 q1
 ```
 
-![plot of chunk policyfn_plot](http://farm6.staticflickr.com/5198/7411172904_2e3aefbea0_o.png) 
+![plot of chunk policyfn_plot](http://farm8.staticflickr.com/7112/7411630380_be6ae8f7ed_o.png) 
 
 
 and the value function (at equilibrium):
@@ -176,7 +176,7 @@ geom_vline(xintercept=opt$S)
 q2
 ```
 
-![plot of chunk valuefn_plot](http://farm6.staticflickr.com/5469/7411173220_fb6786f2f6_o.png) 
+![plot of chunk valuefn_plot](http://farm8.staticflickr.com/7272/7411630830_edc9d48b56_o.png) 
 
 
 
@@ -236,6 +236,7 @@ ForwardSimulate <-
 
 
 
+
 The bifurcation parameter will increase from `1` to `1.995`.  
 
 
@@ -284,7 +285,7 @@ p0 <- ggplot(subset(dt,reps==1)) +
 p0
 ```
 
-![plot of chunk p0](http://farm9.staticflickr.com/8158/7411174212_7e2783a284_o.png) 
+![plot of chunk p0](http://farm8.staticflickr.com/7130/7411634950_4ee3e9d2e5_o.png) 
 
 
 
@@ -299,7 +300,59 @@ p1 <- p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 p1
 ```
 
-![plot of chunk p1](http://farm8.staticflickr.com/7266/7411174736_34308c892d_o.png) 
+![plot of chunk p1](http://farm8.staticflickr.com/7117/7411636406_5a6d056bd6_o.png) 
+
+
+
+
+## Calculate warning signals 
+
+
+
+```r
+library(earlywarning)
+```
+
+
+
+
+
+
+```r
+acor_tau <- dt[fishstock > 1.5, 
+               warningtrend(data.frame(time=time, value=fishstock),
+                            window_autocorr),
+               by=reps]
+
+var_tau <- dt[fishstock > 1.5, 
+              warningtrend(data.frame(time=time, value=fishstock),
+                          window_var),
+              by=reps]
+```
+
+
+
+
+
+
+```r
+m <- dt[fishstock > 1.5, 
+        stability_model(data.frame(time=time, value=fishstock),
+                          "LSN")$pars["m"],
+        by=reps]
+```
+
+
+
+
+
+
+```r
+signals <- melt(data.frame(var=var_tau$V1, acor=acor_tau$V1, m=m$V1))
+ggplot(signals) + geom_density(aes(value)) + facet_wrap(~variable)
+```
+
+![plot of chunk summaryplot](http://farm9.staticflickr.com/8150/7411976914_006ecbe249_o.png) 
 
 
 

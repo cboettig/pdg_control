@@ -2,18 +2,36 @@
 
 
 
+```
+Error: there is no package called 'knitcitations'```
+
+
+
 
 
 
 # Calculating the value of information
 
- Implements a numerical version of the SDP described in (Sethi _et. al._ 2005).
+ Implements a numerical version of the SDP described in 
+
+```
+
+Error in loadNamespace(name) : there is no package called 'knitcitations'
+
+```
+
+.
  Compute the optimal solution under different forms of uncertainty.   
 
 
 
 
 
+
+
+
+```
+Error: there is no package called 'knitcitations'```
 
 
 
@@ -140,7 +158,8 @@ scenario <- function(policy_g, policy_m, policy_i){
 
 
 ```r
-det <- scenario(0.1, 0.0, 0.0)
+lvl <- 0.1
+det <- scenario(0.01, 0.0, 0.0)
 ```
 
 ```
@@ -148,7 +167,7 @@ Library ggplot2 loaded.
 ```
 
 ```r
-g   <- scenario(0.5, 0.0, 0.0)
+g   <- scenario(lvl, 0.0, 0.0)
 ```
 
 ```
@@ -156,7 +175,7 @@ Library ggplot2 loaded.
 ```
 
 ```r
-m   <- scenario(0.0, 0.5, 0.0)
+m   <- scenario(0.0, lvl, 0.0)
 ```
 
 ```
@@ -164,7 +183,7 @@ Library ggplot2 loaded.
 ```
 
 ```r
-i   <- scenario(0.0, 0.0, 0.5)
+i   <- scenario(0.0, 0.0, lvl)
 ```
 
 ```
@@ -172,7 +191,7 @@ Library ggplot2 loaded.
 ```
 
 ```r
-gm  <- scenario(0.5, 0.5, 0.0)
+gm  <- scenario(lvl, lvl, 0.0)
 ```
 
 ```
@@ -180,7 +199,7 @@ Library ggplot2 loaded.
 ```
 
 ```r
-gi  <- scenario(0.5, 0.0, 0.5)
+gi  <- scenario(lvl, 0.0, lvl)
 ```
 
 ```
@@ -188,7 +207,7 @@ Library ggplot2 loaded.
 ```
 
 ```r
-im  <- scenario(0.0, 0.5, 0.5)
+im  <- scenario(0.0, lvl, lvl)
 ```
 
 ```
@@ -196,7 +215,7 @@ Library ggplot2 loaded.
 ```
 
 ```r
-gmi <- scenario(0.5, 0.5, 0.5)
+gmi <- scenario(lvl, lvl, lvl)
 ```
 
 ```
@@ -213,53 +232,51 @@ Library ggplot2 loaded.
 
 ```r
 require(reshape2)
-policy <- melt(data.frame(stock = x_grid, det = det$D[,1], g = g$D[,1], m = m$D[,1], i= m$D[,i], gm = gm$D[,1], gi = gi$D[,1], gmi = gmi$D[,1]), id = "stock")
+policy <- melt(data.frame(stock = x_grid, det = det$D[,1], 
+               g = g$D[,1], m = m$D[,1], i= m$D[,i], 
+               gm = gm$D[,1], gi = gi$D[,1], gmi = gmi$D[,1]), 
+               id = "stock")
 ```
 
 ```
 Error: invalid subscript type 'list'```
 
 ```r
-ggplot(policy) + geom_point(aes(stock, stock-x_grid[value], color=variable)) 
+
+ggplot(policy) + 
+  geom_point(aes(stock, stock-x_grid[value], color=variable)) +
+	geom_smooth(aes(stock, stock-x_grid[value], color=variable)) +
+  ylab("escapement") 
 ```
 
 ```
 Error: object 'policy' not found```
 
 ```r
-	geom_smooth(aes(stock, stock-x_grid[value], color=variable)) + ylab("escapement") 
-```
 
-```
-Error: non-numeric argument to binary operator```
-
-```r
-
-ggplot(policy) + geom_point(aes(stock, stock-x_grid[value], color=variable)) 
+ggplot(policy) +
+  geom_point(aes(stock, stock-x_grid[value], color=variable)) +
+	geom_smooth(aes(stock, x_grid[value], color=variable)) +
+  ylab("harvest") 
 ```
 
 ```
 Error: object 'policy' not found```
 
 ```r
-	geom_smooth(aes(stock, x_grid[value], color=variable)) + ylab("harvest") 
+
+
+value <- melt(data.frame(stock = x_grid, det=det$V, 
+                         g = g$V, m = m$V, gm = gm$V, 
+                         gi = gi$V, gmi = gmi$V), id = "stock")
+
+ggplot(value) + 
+  geom_point(aes(stock, value, color=variable)) +
+  geom_smooth(aes(stock, value, color=variable)) +
+  ylab("Net Present Value")
 ```
 
-```
-Error: non-numeric argument to binary operator```
-
-```r
-
-
-value <- melt(data.frame(stock = x_grid, det=det$V, g = g$V, m = m$V, gm = gm$V, gi = gi$V, gmi = gmi$V), id = "stock")
-ggplot(value) + geom_point(aes(stock, value, color=variable)) +
-	ggplot(value) + geom_smooth(aes(stock, value, color=variable)) + ylab("Net Present Value")
-```
-
-```
-Error: non-numeric argument to binary operator```
-
-
+![plot of chunk sethiplots](http://farm6.staticflickr.com/5036/7412344600_6b4efec59f_o.png) 
 
 
 ## Simulations
@@ -291,7 +308,7 @@ All cases
 
 ```r
 policyfn <- list(det=det, g=g, m=m, i=i, gm=gm, gi=gi, gmi=gmi)
-noise <- list(s0=c(0,0,0), sg=c(.2, 0, 0), sm=c(0, .2, 0), si=c(0,0,.2), sgm=c(.2, .2, 0), sgi=c(.2, 0, .2), sgmi=c(.2, .2, .2)) 
+noise <- list(s0=c(0,0,0), sg=c(lvl, 0, 0), sm=c(0, lvl, 0), si=c(0,0,lvl), sgm=c(lvl, lvl, 0), sgi=c(lvl, 0, lvl), sgmi=c(lvl, lvl, lvl)) 
 allcases <- lapply(policyfn, function(policyfn_i){
   lapply(noise, function(noise_i){
     simulatereps(policyfn_i, noise_i[1], noise_i[2], noise_i[3])
