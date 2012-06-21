@@ -66,7 +66,7 @@ curve(1*x^2/(x^3+1), 0, 10, add=T, col="blue")
 curve(1.9*x^2/(x^3+1), 0, 10, add=T, col="red")
 ```
 
-![plot of chunk showMay](http://farm9.staticflickr.com/8011/7415883340_01a9249d6e_o.png) 
+![plot of chunk showMay](http://farm8.staticflickr.com/7253/7416153746_d913cbe032_o.png) 
 
 
 
@@ -125,7 +125,8 @@ h_grid <- x_grid
 delta <- 0.05
 xT <- 0
 OptTime <- 25
-sigma_g <- .5
+sigma_g <- .2
+P <- 1
 ```
 
 
@@ -172,7 +173,7 @@ SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
 
 ### Find the optimum by dynamic programming
 
-Bellman's algorithm to compute the a cautious solution that selects a fraction `P` = `1` of the optimal harvest solution for all possible trajectories in the iterative optimization.  
+Bellman's algorithm to compute the a cautious solution that selects a fraction `P` = `P` of the optimal harvest solution for all possible trajectories in the iterative optimization.  
 
 
 
@@ -197,7 +198,7 @@ geom_point(aes(x,y), data=data.frame(x=opt$S, y=opt$S), col="red")
 q1
 ```
 
-![plot of chunk policyfn_plot](http://farm8.staticflickr.com/7128/7415884662_3a02e4642d_o.png) 
+![plot of chunk policyfn_plot](http://farm9.staticflickr.com/8161/7416155182_b86b6d0a15_o.png) 
 
 
 and the value function (at equilibrium):
@@ -210,7 +211,7 @@ geom_vline(xintercept=opt$S)
 q2
 ```
 
-![plot of chunk valuefn_plot](http://farm8.staticflickr.com/7129/7415885082_b3e5146ee2_o.png) 
+![plot of chunk valuefn_plot](http://farm9.staticflickr.com/8158/7416155606_9b5c707d31_o.png) 
 
 
 
@@ -260,7 +261,7 @@ p0 <- ggplot(subset(dt,reps==1)) +
 p0
 ```
 
-![plot of chunk p0](http://farm8.staticflickr.com/7137/7415885838_b8756bcacf_o.png) 
+![plot of chunk p0](http://farm6.staticflickr.com/5118/7416156170_ea4a18e2f5_o.png) 
 
 
 
@@ -280,7 +281,19 @@ p1 <- p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 p1
 ```
 
-![plot of chunk p1](http://farm9.staticflickr.com/8017/7415886396_d7042c6548_o.png) 
+![plot of chunk p1](http://farm8.staticflickr.com/7125/7416156616_3f76bcc973_o.png) 
+
+
+
+```r
+p2 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) + 
+  geom_abline(intercept=xT, slope = 0, lty=2) 
+p2 <- p2 + geom_line(aes(time, harvest, group = reps), alpha = 0.2)
+p2
+```
+
+![plot of chunk p2](http://farm8.staticflickr.com/7111/7416157380_04384ef72a_o.png) 
+
 
 
 
@@ -292,7 +305,7 @@ profits <-dt[ , sum(profit), by="reps"]
 ggplot(profits) + geom_histogram(aes(V1)) 
 ```
 
-![the distribution of profits by scenario](http://farm8.staticflickr.com/7122/7415886820_ef1321a52d_o.png) 
+![the distribution of profits by scenario](http://farm8.staticflickr.com/7130/7416157784_e70ba1f26f_o.png) 
 
 
 

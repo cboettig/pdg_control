@@ -82,11 +82,12 @@ h_grid <- x_grid
 ````
 
 
-``` {r miscpars}
+``` {r miscpars, dependson="grid"}
 delta <- 0.05
 xT <- 0
 OptTime <- 25
-sigma_g <- .5
+sigma_g <- .2
+P <- 1
 ````
 
 We will determine the optimal solution over a `r OptTime` time step window with boundary condition for stock at `r xT` and discounting rate of `r delta`.  The Reed model considers a stochastic growth model 
@@ -108,14 +109,14 @@ z_i <- function() 1
 
 
 
-``` {r  SDP_Mat, dependson="grid"}
+``` {r  SDP_Mat, dependson="miscpars"}
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
 ````
 
 
 ### Find the optimum by dynamic programming
 
-Bellman's algorithm to compute the a cautious solution that selects a fraction `P` = `r P <- 1` of the optimal harvest solution for all possible trajectories in the iterative optimization.  
+Bellman's algorithm to compute the a cautious solution that selects a fraction `P` = `P` of the optimal harvest solution for all possible trajectories in the iterative optimization.  
 
 ``` {r  find_dp_opt, dependson="SDP_Mat"}
 opt <- find_dp_cautious(SDP_Mat, x_grid, h_grid, OptTime, xT, 
