@@ -44,8 +44,6 @@ Ask R to show us how this function is defined, and plot the transition point usi
 May
 ```
 
-
-
 ```
 function (x, h, p) 
 {
@@ -62,8 +60,6 @@ function (x, h, p)
 <environment: namespace:pdgControl>
 ```
 
-
-
 ```r
 
 curve(.75*(1-x/10), 0, 10)
@@ -71,7 +67,7 @@ curve(1*x^2/(x^3+1), 0, 10, add=T, col="blue")
 curve(1.9*x^2/(x^3+1), 0, 10, add=T, col="red")
 ```
 
-![plot of chunk showMay](http://farm9.staticflickr.com/8147/7415511766_7a222eca39_o.png) 
+![plot of chunk showMay](http://farm9.staticflickr.com/8143/7415596848_fababcbb41_o.png) 
 
 
 
@@ -129,14 +125,14 @@ h_grid <- x_grid
 ```r
 delta <- 0.05
 xT <- 0
-OptTime <- 200
+OptTime <- 25
 sigma_g <- .5
 ```
 
 
 
 
-We will determine the optimal solution over a `200` time step window with boundary condition for stock at `0` and discounting rate of `0.05`.  The Reed model considers a stochastic growth model 
+We will determine the optimal solution over a `25` time step window with boundary condition for stock at `0` and discounting rate of `0.05`.  The Reed model considers a stochastic growth model 
 
 <div> $$ x_{t+1} = z_g f(x_t) $$ </div> 
 
@@ -202,7 +198,7 @@ geom_point(aes(x,y), data=data.frame(x=opt$S, y=opt$S), col="red")
 q1
 ```
 
-![plot of chunk policyfn_plot](http://farm8.staticflickr.com/7255/7415517996_0696b07a60_o.png) 
+![plot of chunk policyfn_plot](http://farm9.staticflickr.com/8160/7415598210_c9e1eaa4a8_o.png) 
 
 
 and the value function (at equilibrium):
@@ -215,7 +211,7 @@ geom_vline(xintercept=opt$S)
 q2
 ```
 
-![plot of chunk valuefn_plot](http://farm8.staticflickr.com/7129/7415518520_dd1f38e43a_o.png) 
+![plot of chunk valuefn_plot](http://farm9.staticflickr.com/8153/7415598602_a70d1ba8a7_o.png) 
 
 
 
@@ -265,7 +261,7 @@ p0 <- ggplot(subset(dt,reps==1)) +
 p0
 ```
 
-![plot of chunk p0](http://farm8.staticflickr.com/7107/7415520438_04bc8acd5b_o.png) 
+![plot of chunk p0](http://farm9.staticflickr.com/8010/7415599312_0e951aa9c9_o.png) 
 
 
 
@@ -285,8 +281,19 @@ p1 <- p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 p1
 ```
 
-![plot of chunk p1](http://farm8.staticflickr.com/7269/7415521104_064206ab4d_o.png) 
+![plot of chunk p1](http://farm8.staticflickr.com/7248/7415599950_fb3b9d6bcd_o.png) 
 
+
+
+
+
+
+```r
+profits <-dt[ , sum(profit), by="reps"] 
+ggplot(profits) + geom_histogram(aes(V1)) 
+```
+
+![the distribution of profits by scenario](http://farm6.staticflickr.com/5040/7415601954_12219bc6a8_o.png) 
 
 
 
