@@ -66,7 +66,7 @@ curve(1*x^2/(x^3+1), 0, 10, add=T, col="blue")
 curve(1.9*x^2/(x^3+1), 0, 10, add=T, col="red")
 ```
 
-![plot of chunk showMay](http://farm8.staticflickr.com/7253/7416153746_d913cbe032_o.png) 
+![plot of chunk showMay](http://farm6.staticflickr.com/5319/7416163490_55a61eed7d_o.png) 
 
 
 
@@ -126,7 +126,7 @@ delta <- 0.05
 xT <- 0
 OptTime <- 25
 sigma_g <- .2
-P <- 1
+P <- .5
 ```
 
 
@@ -198,7 +198,7 @@ geom_point(aes(x,y), data=data.frame(x=opt$S, y=opt$S), col="red")
 q1
 ```
 
-![plot of chunk policyfn_plot](http://farm9.staticflickr.com/8161/7416155182_b86b6d0a15_o.png) 
+![plot of chunk policyfn_plot](http://farm8.staticflickr.com/7247/7416164758_d656859142_o.png) 
 
 
 and the value function (at equilibrium):
@@ -211,7 +211,7 @@ geom_vline(xintercept=opt$S)
 q2
 ```
 
-![plot of chunk valuefn_plot](http://farm9.staticflickr.com/8158/7416155606_9b5c707d31_o.png) 
+![plot of chunk valuefn_plot](http://farm8.staticflickr.com/7138/7416165156_7e0b59583e_o.png) 
 
 
 
@@ -261,7 +261,7 @@ p0 <- ggplot(subset(dt,reps==1)) +
 p0
 ```
 
-![plot of chunk p0](http://farm6.staticflickr.com/5118/7416156170_ea4a18e2f5_o.png) 
+![plot of chunk p0](http://farm9.staticflickr.com/8147/7416165780_c2b96dda71_o.png) 
 
 
 
@@ -281,7 +281,7 @@ p1 <- p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 p1
 ```
 
-![plot of chunk p1](http://farm8.staticflickr.com/7125/7416156616_3f76bcc973_o.png) 
+![plot of chunk p1](http://farm8.staticflickr.com/7132/7416166440_8544c37d88_o.png) 
 
 
 
@@ -292,7 +292,7 @@ p2 <- p2 + geom_line(aes(time, harvest, group = reps), alpha = 0.2)
 p2
 ```
 
-![plot of chunk p2](http://farm8.staticflickr.com/7111/7416157380_04384ef72a_o.png) 
+![plot of chunk p2](http://farm9.staticflickr.com/8141/7416166884_4b119f80f0_o.png) 
 
 
 
@@ -305,7 +305,7 @@ profits <-dt[ , sum(profit), by="reps"]
 ggplot(profits) + geom_histogram(aes(V1)) 
 ```
 
-![the distribution of profits by scenario](http://farm8.staticflickr.com/7130/7416157784_e70ba1f26f_o.png) 
+![the distribution of profits by scenario](http://farm8.staticflickr.com/7135/7416167322_98ffa3da75_o.png) 
 
 
 
