@@ -87,14 +87,14 @@ h_grid <- x_grid
 ```r
 delta <- 0.05
 xT <- 0
-OptTime <- 25
+OptTime <- 200
 sigma_g <- .5
 ```
 
 
 
 
-We will determine the optimal solution over a `25` time step window with boundary condition for stock at `0` and discounting rate of `0.05`.  The Reed model considers a stochastic growth model 
+We will determine the optimal solution over a `200` time step window with boundary condition for stock at `0` and discounting rate of `0.05`.  The Reed model considers a stochastic growth model 
 
 <div> $$ x_{t+1} = z_g f(x_t) $$ </div> 
 
@@ -143,8 +143,8 @@ Bellman's algorithm to compute the optimal solution for all possible trajectorie
 
 
 ```r
-opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0, 
-                     profit, delta=0.05, reward=0)
+opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=OptTime, xT=xT, 
+                     profit, delta=delta, reward=0)
 ```
 
 
@@ -163,7 +163,7 @@ geom_point(aes(x,y), data=data.frame(x=opt$S, y=opt$S), col="red")
 q1
 ```
 
-![plot of chunk policyfn_plot](http://farm6.staticflickr.com/5239/7411080242_99ff4ac4d7_o.png) 
+![plot of chunk policyfn_plot](http://farm6.staticflickr.com/5198/7411172904_2e3aefbea0_o.png) 
 
 
 and the value function (at equilibrium):
@@ -176,7 +176,7 @@ geom_vline(xintercept=opt$S)
 q2
 ```
 
-![plot of chunk valuefn_plot](http://farm6.staticflickr.com/5117/7411080494_76c4a6a61a_o.png) 
+![plot of chunk valuefn_plot](http://farm6.staticflickr.com/5469/7411173220_fb6786f2f6_o.png) 
 
 
 
@@ -186,12 +186,13 @@ q2
 ### Simulate 
 
 Now we'll simulate 100 replicates of this stochastic process, but with the system dynamics gradually changing over time.   
-The bifurcation parameter will increase from `1` to `3`.  
 
 
 
 
 ```r
+Dt <- 1
+
 ForwardSimulate <- 
   function(f, pars, x_grid, h_grid, x0, D, z_g,
          z_m=function(x) 1, z_i = function(x) 1, 
@@ -209,7 +210,7 @@ ForwardSimulate <-
   for(t in 1:(OptTime-1)){
 
     # Move towards collapse
-    pars[3] <- pars[3] + 2/OptTime
+    pars[3] <- pars[3] + Dt/OptTime
 
 
 
@@ -235,6 +236,7 @@ ForwardSimulate <-
 
 
 
+The bifurcation parameter will increase from `1` to `1.995`.  
 
 
 
@@ -282,7 +284,7 @@ p0 <- ggplot(subset(dt,reps==1)) +
 p0
 ```
 
-![plot of chunk p0](http://farm6.staticflickr.com/5469/7411080952_f2dd884f9f_o.png) 
+![plot of chunk p0](http://farm9.staticflickr.com/8158/7411174212_7e2783a284_o.png) 
 
 
 
@@ -297,7 +299,7 @@ p1 <- p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 p1
 ```
 
-![plot of chunk p1](http://farm8.staticflickr.com/7269/7411081312_2fa915ff06_o.png) 
+![plot of chunk p1](http://farm8.staticflickr.com/7266/7411174736_34308c892d_o.png) 
 
 
 
@@ -307,8 +309,6 @@ p1
 &ldquo;Optimal Escapement Levels in Stochastic And Deterministic Harvesting Models.&rdquo;
 <EM>Journal of Environmental Economics And Management</EM>, <B>6</B>.
 ISSN 00950696, <a href="http://dx.doi.org/10.1016/0095-0696(79)90014-7">http://dx.doi.org/10.1016/0095-0696(79)90014-7</a>.
-
-
 
 
 
