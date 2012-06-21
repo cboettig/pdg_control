@@ -1,29 +1,9 @@
 
 
-
-
-```
-Error: there is no package called 'knitcitations'```
-
-
-
-
 # Sethi Model
  * author Carl Boettiger, <cboettig@gmail.com>
  * license: CC0
 
- Implements a numerical version of the SDP described in 
-
-```
-
-Error in loadNamespace(name) : there is no package called 'knitcitations'
-
-```
-
-.
-
-
-Clear the workspace and load package dependencies: 
 
 
 
@@ -283,13 +263,6 @@ p1
 ```
 
 ![plot of chunk p1](http://farm8.staticflickr.com/7137/7411687788_723fe6a6cf_o.png) 
-
-
-
-# References
-
-NULL
-list()
 
 
 
