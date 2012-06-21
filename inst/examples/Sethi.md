@@ -2,6 +2,11 @@
 
 
 
+```
+Error: could not find function "getOptions"```
+
+
+
 
 # Sethi Model
  * author Carl Boettiger, <cboettig@gmail.com>
@@ -15,112 +20,71 @@ Clear the workspace and load package dependencies:
 
 
 
-Define noise parameters 
+Chose the state equation / population dynamics function as a logistic map: 
 
 
 
 ```r
-sigma_g <- 0.1    # Noise in population growth
-sigma_m <- 0.1     # noise in stock assessment measurement
-sigma_i <- 0.1     # noise in implementation of the quota
-```
-
-
-
-
-we'll use log normal noise functions. 
-For Reed, only `z_g` will be random.
-Sethi et al will add the other forms of noise: 
-
-
-
-```r
-z_g <- function() rlnorm(1,  0, sigma_g) # mean 1
-z_m <- function() rlnorm(1,  0, sigma_m) # mean 1
-z_i <- function() rlnorm(1,  0, sigma_i) # mean 1
-```
-
-
-
-
-
-Chose the state equation / population dynamics function
-
-
-
-```r
-f <- BevHolt
-```
-
-
-
-
-Note that the `pdg_control` pacakge already has a definition for the `BevHolt` function, (typing the function name prints the function)
-
-
-
-```r
-BevHolt
-```
-
-
-
-```
-function (x, h, p) 
-{
-    x <- max(0, x - h)
-    A <- p[1]
-    B <- p[2]
-    sapply(x, function(x) {
-        x <- max(0, x)
-        max(0, A * x/(1 + B * x))
-    })
+f <- function(x,h,p){
+	S = x - h
+	p[1] * S * (1 - S/p[2]) + S
 }
-<environment: namespace:pdgControl>
 ```
 
 
 
 
-That is, \\( f(x,h) = \frac{A x}{1 + B x} \\)
-
-Of course we could pass in any custom function of stocksize `x`, harvest `h` and parameter vector `p` in place of `BevHolt`.  Note that we would need to write this function explicitly so that it can take vector values of `x` (i.e. uses `sapply`), an annoying feature of `R` for users comming from Matlab.  
-
-
-We must now define parameters for the function.  Note that the positive stationary root of the model is given by \\( \frac{A-1}{B} \\), which we'll store for future reference as `K`.  
+With parameters `r` = `1` and `K` = `100`.
 
 
 
 ```r
-pars <- c(1.5, 0.05)
-K <- (pars[1] - 1)/pars[2]
+pars <- c(r, K)
 ```
 
 
 
 
 
+We consider a profits from fishing to be a function of harvest `h` and stock size `x`,  
 
-and we use a harvest-based profit function with default parameters
+<div> $$ \Pi(x,h) = h - \left( c_0  + c_1 \frac{h}{x} \right) \frac{h}{x}, $$ </div> 
+
+conditioned on h > x and x > 0,
 
 
 
 ```r
-profit <- profit_harvest(price=1, c0 = 0.01) 
+price <- 1
+c0 <- 0.0
+c1 <- 0
+profit <- profit_harvest(price=price, c0 = c0, c1=c1) 
 ```
 
 
 
 
-The `profit_harvest` function has the form \\( \Pi = h - \left( c_0  + c_1 \frac{h}{x} \right) \frac{h}{x} \\), conditioned on \\( h > x \\) and \\(x > 0 \\).  Note that the R code defines a function from another function using a trick known as a _closure_.  Again we could write a custom profit function as long as it can take a vector stock size `x` and a scalar harvest level `h`.  Details for provided functions can be found in the manual, i.e. `?profit_harvest`. 
+with price = `1`, `c0` = `0` and `c1` = `0`. 
 
-
-Now we must set up the discrete grids for stock size and havest levels (which will use same resolution as for stock), in order to calculate the SDP solution.   Here we set the gridsize to 100.  
 
 
 
 ```r
-x_grid <- seq(0, 1.5 * K, length = 100)  
+xmin <- 0
+xmax <- 1.5 * K
+grid_n <- 100
+```
+
+
+
+
+We seek a harvest policy which maximizes the discounted profit from the fishery using a stochastic dynamic programming approach over a discrete grid of stock sizes from `0` to `150` on a grid of `100` points, and over an identical discrete grid of possible harvest values.  
+
+
+
+
+```r
+x_grid <- seq(xmin, xmax, length = grid_n)  
 h_grid <- x_grid  
 ```
 
@@ -128,9 +92,38 @@ h_grid <- x_grid
 
 
 
-### Calculate the transition matrix (with noise in growth only)      
 
-We calculate the stochastic transition matrix for the probability of going from any state \\(x_t \\) to any other state \\(x_{t+1}\\) the following year, for each possible choice of harvest \\( h_t \\).  This provides a look-up table for the dynamic programming calculations.  
+
+```r
+delta <- 0.05
+xT <- 0
+OptTime <- 25
+sigma_g <- .1
+sigma_m <- .1
+sigma_i <- .1
+```
+
+
+
+
+We will determine the optimal solution over a `25` time step window with boundary condition for stock at `0` and discounting rate of `0.05`.  The Reed model considers a stochastic growth model 
+
+<div> $$ x_{t+1} = z_g f(x_t) $$ </div> 
+
+for the random variable `z_g`, given by 
+
+
+
+```r
+z_g <- function() 1+(2*runif(1, 0,  1)-1) * sigma_g
+z_m <- function() 1+(2*runif(1, 0,  1)-1) * sigma_g
+z_i <- function() 1+(2*runif(1, 0,  1)-1) * sigma_g
+```
+
+
+
+
+With `sigma_g` = `0.1`, `sigma_m` = `0.1`, `sigma_i` = `0.1`.
 
 
 In the Sethi case, computing the distribution over multiple sources of noise is actually quite difficult.  Simulation turns out to be more efficient than numerically integrating over each distribution.  This code parallelizes the operation over four cores, but can be scaled to an arbitrary cluster. 
@@ -142,20 +135,14 @@ require(snowfall)
 sfInit(parallel=TRUE, cpu=16)
 ```
 
-
-
 ```
 R Version:  R version 2.14.1 (2011-12-22) 
 
 ```
 
-
-
 ```r
-SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=9999)
+SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps=1e5)
 ```
-
-
 
 ```
 Library ggplot2 loaded.
@@ -182,26 +169,51 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0,
 
 
 
-Plot the policy function:
 
 
-
-```r
-qplot(x_grid, x_grid - x_grid[opt$D[,1]], xlab="stock size", ylab="escapement")
-```
-
-![plot of chunk policyfn_plot](http://farm9.staticflickr.com/8001/7369782410_fcd0c89e70_o.png) 
-
-
-and the value function:
 
 
 
 ```r
-qplot(x_grid, opt$V, xlab="stock size", ylab="value")
+policy <- data.frame(stock = x_grid, value = opt$D[,1])
+ggplot(policy) + 
+  geom_point(aes(stock, stock-x_grid[value], color=variable)) + 
+	geom_smooth(aes(stock, stock-x_grid[value])) + ylab("escapement") 
 ```
 
-![plot of chunk valuefn_plot](http://farm8.staticflickr.com/7081/7184547429_570c4d3563_o.png) 
+```
+Error: object 'variable' not found```
+
+```r
+
+ggplot(policy) + 
+  geom_point(aes(stock, x_grid[value], color=variable)) 
+```
+
+```
+Error: object 'variable' not found```
+
+```r
+	geom_smooth(aes(stock, x_grid[value], color=variable)) + ylab("harvest") 
+```
+
+```
+Error: non-numeric argument to binary operator```
+
+```r
+
+
+value <- data.frame(stock = x_grid, value=opt$V)
+ggplot(value) + 
+  geom_point(aes(stock, value, color=variable)) +
+  geom_smooth(aes(stock, value, color=variable)) +
+  ylab("Net Present Value")
+```
+
+```
+Error: object 'variable' not found```
+
+
 
 
 
@@ -240,6 +252,7 @@ setnames(dt, "L1", "reps") # names are nice
 
 
 
+
 ### Plots 
 
 Let's begin by looking at the dynamics of a single replicate. The line shows Reed's S, the level above which the stock should be harvested (where catch should be the difference between stock and S).  To confirm that this policy is being followed, note that harvesting only occurs when the stock is above this line, and harvest is proportional to the amount by which it is above.  Change the replicate `reps==` to see the results from a different replicate.  
@@ -247,141 +260,51 @@ Let's begin by looking at the dynamics of a single replicate. The line shows Ree
 
 
 ```r
-ggplot(subset(dt,reps==1)) +
+p0 <- ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, fishstock)) +
   geom_abline(intercept=opt$S, slope = 0) +
   geom_line(aes(time, harvest), col="darkgreen") 
+p0
 ```
 
-![plot of chunk onerep](http://farm8.staticflickr.com/7103/7184547779_f174e92d33_o.png) 
+![plot of chunk p0](http://farm6.staticflickr.com/5324/7410676738_d860827052_o.png) 
 
 
 
-This plot summarizes the stock dynamics by visualizing the replicates. Reed's S shown again.
+This plot summarizes the stock dynamics by visualizing the replicates. Reed's S shown again, along with the dotted line showing the allee threshold, below which the stock will go to zero (unless rescued stochastically). 
 
 
 
 ```r
-p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) 
-p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
+p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) + 
+  geom_abline(intercept=xT, slope = 0, lty=2) 
+p1 <- p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
+p1
 ```
 
-![plot of chunk all](http://farm9.staticflickr.com/8156/7369783520_7971a89ae2_o.png) 
-
-
-We can also look at the harvest dynamics:
-
-
-
-```r
-p1 + geom_line(aes(time, harvest, group = reps), alpha = 0.1, col="darkgreen")
-```
-
-![plot of chunk harvestplot](http://farm8.staticflickr.com/7101/7184548555_62c8770dc3_o.png) 
-
-
-This strategy is supposed to be a constant-escapement strategy. We can visualize the escapement: 
-
-
-
-```r
-p1 + geom_line(aes(time, escapement, group = reps), alpha = 0.1, col="darkgrey")
-```
-
-![plot of chunk escapement](http://farm8.staticflickr.com/7235/7184548809_e5a60191bc_o.png) 
-
-
-
-
-
-
-### Visualizing the optimal policy
-
-Note that when the boundary is sufficiently far away, i.e. for the first couple timesteps, the optimal policy is stationary.  The optimal policy is shown here over time, where the color indicates the harvest recommended for each possible stock value at that time (shown on the vertical axis). Observe that the solution does not correspond to a simple Reed-style rule.  
-
-
-
-```r
-policy <- melt(opt$D)
-policy_zoom <- subset(policy, x_grid[Var1] < max(dt$fishstock) )
-```
-
-
-
-```
-Error: object 'Var1' not found
-```
-
-
-
-```r
-p5 <- ggplot(policy_zoom) + 
-  geom_point(aes(Var2, (x_grid[Var1]), col=h_grid[value])) + 
-  labs(x = "time", y = "fishstock") +
-  scale_colour_gradientn(colours = rainbow(4)) +
-  geom_abline(intercept=opt$S, slope = 0) 
-```
-
-
-
-```
-Error: object 'policy_zoom' not found
-```
-
-
-
-```r
-p5
-```
-
-
-
-```
-Error: object 'p5' not found
-```
-
-
-
-
-The harvest intensity is limited by the stock size.
-
-
-
-
-```r
-p6 <- ggplot(policy_zoom) + 
-  geom_point(aes(Var2, (x_grid[Var1]), col=x_grid[Var1] - h_grid[value])) + 
-  labs(x = "time", y = "fishstock") +
-  scale_colour_gradientn(colours = rainbow(4)) +
-  geom_abline(intercept=opt$S, slope = 0) 
-```
-
-
-
-```
-Error: object 'policy_zoom' not found
-```
-
-
-
-```r
-p6 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1, data=dt)
-```
-
-
-
-```
-Error: object 'p6' not found
-```
-
+![plot of chunk p1](http://farm9.staticflickr.com/8155/7410677186_dbf3fc29bf_o.png) 
 
 
 
 # References
 
-Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005). "Fishery
-management under multiple uncertainty." _Journal of Environmental
-Economics and Management_, *50*. ISSN 00950696, <URL:
-http://dx.doi.org/10.1016/j.jeem.2004.11.005>.
+
+
+```
+Error: argument is not interpretable as logical```
+
+
+
+
+
+
+
+```r
+options(device=orig)
+```
+
+```
+Error: object 'orig' not found```
+
 
 
