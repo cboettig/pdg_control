@@ -101,6 +101,29 @@ Myer_harvest <- function(x, h, p){
 
 
 
+#' Harvesting model with a bifurcation from May (1977)
+#' increasing parameter "a" (p[3]) will drive the bifurcation
+#' @param x the current population level
+#' @param h total harvest level
+#' @param p vector of parameters c(r, K, a, H, Q) 
+#' @return the population level in the next timestep
+#' @details try pars <- c(r = .75, k = 10, a=1, H=1, Q = 3)
+#' See the position of the bifurcation at around a = 1.9:
+#' curve(.75*(1-x/10), 0, 10)
+#' curve(1.9*x^2/(x^3+1), 0, 10, add=T, col="red")
+#' goes to nonzero alternate stable state.  
+#' @export
+May <- function(x, h, p){
+  sapply(x, function(x){
+         s <- x - h # escapement
+         r <- as.numeric(p[1])
+         K <- as.numeric(p[2])
+         a <- as.numeric(p[3])
+         H <- as.numeric(p[4])
+         Q <- as.numeric(p[5])
+         s * exp(r * (1 - s / K) - a * s ^ (Q - 1) / (s ^ Q + H ^ Q)) 
+  })
+}
 
 
 #' Ricker-like model with Allee effect (Allen)

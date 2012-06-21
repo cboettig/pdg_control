@@ -1,6 +1,7 @@
 export(BevHolt)
 export(BevHolt_effort)
 export(ForwardSimulate)
+export(May)
 export(Myer_harvest)
 export(Myers)
 export(Ricker)
