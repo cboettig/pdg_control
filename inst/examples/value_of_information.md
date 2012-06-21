@@ -383,7 +383,7 @@ print(xtable(matrix(means$V1, nrow = 7, dimnames = list(uncertainties,
 ```
 
 <!-- html table generated in R 2.14.1 by xtable 1.7-0 package -->
-<!-- Thu Jun 21 10:02:45 2012 -->
+<!-- Thu Jun 21 10:18:23 2012 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> deter </TH> <TH> growth </TH> <TH> measure </TH> <TH> implement </TH> <TH> growth+measure </TH> <TH> growth+implement </TH> <TH> all </TH>  </TR>
   <TR> <TD align="right"> deter </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> </TR>
@@ -402,7 +402,7 @@ print(xtable(matrix(sds$V1, nrow = 7, dimnames = list(uncertainties,
 ```
 
 <!-- html table generated in R 2.14.1 by xtable 1.7-0 package -->
-<!-- Thu Jun 21 10:02:45 2012 -->
+<!-- Thu Jun 21 10:18:23 2012 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> deter </TH> <TH> growth </TH> <TH> measure </TH> <TH> implement </TH> <TH> growth+measure </TH> <TH> growth+implement </TH> <TH> all </TH>  </TR>
   <TR> <TD align="right"> deter </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> </TR>

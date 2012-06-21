@@ -37,6 +37,20 @@ pars <- c(r = .75, k = 10, a=1, H=1, Q = 3)
 K <- 8 # approx
 ````
 
+Ask R to show us how this function is defined, and plot the transition point using these parameters.
+
+``` {r showMay, fig.keep="last"}
+May
+
+curve(.75*(1-x/10), 0, 10)
+curve(1*x^2/(x^3+1), 0, 10, add=T, col="blue")
+curve(1.9*x^2/(x^3+1), 0, 10, add=T, col="red")
+````
+
+
+
+
+
 We consider a profits from fishing to be a function of harvest `h` and stock size `x`,  
 
 <div> $$ \Pi(x,h) = h - \left( c_0  + c_1 \frac{h}{x} \right) \frac{h}{x}, $$ </div> 

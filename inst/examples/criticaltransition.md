@@ -36,6 +36,44 @@ K <- 8 # approx
 
 
 
+Ask R to show us how this function is defined, and plot the transition point using these parameters.
+
+
+
+```r
+May
+```
+
+```
+function (x, h, p) 
+{
+    sapply(x, function(x) {
+        s <- x - h
+        r <- as.numeric(p[1])
+        K <- as.numeric(p[2])
+        a <- as.numeric(p[3])
+        H <- as.numeric(p[4])
+        Q <- as.numeric(p[5])
+        s * exp(r * (1 - s/K) - a * s^(Q - 1)/(s^Q + H^Q))
+    })
+}
+<environment: namespace:pdgControl>
+```
+
+```r
+
+curve(.75*(1-x/10), 0, 10)
+curve(1*x^2/(x^3+1), 0, 10, add=T, col="blue")
+curve(1.9*x^2/(x^3+1), 0, 10, add=T, col="red")
+```
+
+![plot of chunk showMay](http://farm8.staticflickr.com/7250/7415131928_40008bb377_o.png) 
+
+
+
+
+
+
 We consider a profits from fishing to be a function of harvest `h` and stock size `x`,  
 
 <div> $$ \Pi(x,h) = h - \left( c_0  + c_1 \frac{h}{x} \right) \frac{h}{x}, $$ </div> 
