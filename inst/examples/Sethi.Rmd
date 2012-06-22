@@ -1,4 +1,4 @@
-`ro cache=TRUE, tidy=FALSE, warning=FALSE, comment=NA, message=FALSE, verbose=TRUE, cache.path="Sethi/" or`
+`ro cache=TRUE, tidy=FALSE, warning=FALSE, comment=NA, message=FALSE, verbose=TRUE, cache.path="Sethi_bignoise/" or`
 
 ``` {r  echo=FALSE, cache=FALSE }
 opts_knit$set(upload.fun = socialR::flickr.url)
@@ -78,8 +78,8 @@ h_grid <- x_grid
 delta <- 0.05
 xT <- 0
 OptTime <- 25
-sigma_g <- .5
-sigma_m <- .5
+sigma_g <- .001
+sigma_m <- .001
 sigma_i <- .5
 ````
 
