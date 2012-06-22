@@ -4,6 +4,7 @@
 
 
 
+
 # Calculating the value of information
 
  Implements a numerical version of the SDP described in (Sethi _et. al._ 2005).
@@ -104,6 +105,15 @@ require(snowfall)
 sfInit(parallel = TRUE, cpu = 16)
 ```
 
+```
+R Version:  R version 2.14.1 (2011-12-22) 
+
+```
+
+
+
+
+
 
 
 ```r
@@ -123,19 +133,119 @@ scenario <- function(policy_g, policy_m, policy_i) {
 
 
 
+Determine the policies for each of the scenarios (noise combinations).
+
 
 
 ```r
-lvl <- 0.1
+lvl <- 0.3
+```
+
+
+
+
+
+
+```r
 det <- scenario(0.01, 0, 0)
+```
+
+```
+Library ggplot2 loaded.
+```
+
+
+
+
+
+
+```r
 g <- scenario(lvl, 0, 0)
+```
+
+```
+Library ggplot2 loaded.
+```
+
+
+
+
+
+
+```r
 m <- scenario(0, lvl, 0)
+```
+
+```
+Library ggplot2 loaded.
+```
+
+
+
+
+
+
+```r
 i <- scenario(0, 0, lvl)
+```
+
+```
+Library ggplot2 loaded.
+```
+
+
+
+
+
+
+```r
 gm <- scenario(lvl, lvl, 0)
+```
+
+```
+Library ggplot2 loaded.
+```
+
+
+
+
+
+
+```r
 gi <- scenario(lvl, 0, lvl)
-im <- scenario(0, lvl, lvl)
+```
+
+```
+Library ggplot2 loaded.
+```
+
+
+
+
+
+
+```r
+mi <- scenario(0, lvl, lvl)
+```
+
+```
+Library ggplot2 loaded.
+```
+
+
+
+
+
+
+```r
 gmi <- scenario(lvl, lvl, lvl)
 ```
+
+```
+Library ggplot2 loaded.
+```
+
+
 
 
 
@@ -154,7 +264,7 @@ ggplot(policy) + geom_point(aes(stock, stock -
     stock - x_grid[value], color = variable)) + ylab("escapement")
 ```
 
-![plot of chunk sethiplots](http://farm8.staticflickr.com/7259/7416278218_b7b4271ce3_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8008/7417173208_ee15d87e6e_o.png) 
 
 ```r
 
@@ -163,7 +273,7 @@ ggplot(policy) + geom_point(aes(stock, x_grid[value],
     color = variable)) + ylab("harvest")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8164/7416278820_8704828f66_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8020/7417173520_12efbb8ddd_o.png) 
 
 ```r
 
@@ -176,7 +286,7 @@ ggplot(value) + geom_point(aes(stock, value, color = variable)) +
     geom_smooth(aes(stock, value, color = variable)) + ylab("Net Present Value")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8005/7416279222_c4e163b8c7_o.png) 
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7250/7417173800_5107b571c1_o.png) 
 
 
 ## Simulations
@@ -210,10 +320,11 @@ All cases
 
 ```r
 policyfn <- list(det = det, g = g, m = m, i = i, 
-    gm = gm, gi = gi, gmi = gmi)
+    gm = gm, gi = gi, mi = mi, gmi = gmi)
 noise <- list(s0 = c(0, 0, 0), sg = c(lvl, 0, 
     0), sm = c(0, lvl, 0), si = c(0, 0, lvl), sgm = c(lvl, 
-    lvl, 0), sgi = c(lvl, 0, lvl), sgmi = c(lvl, lvl, lvl))
+    lvl, 0), sgi = c(lvl, 0, lvl), smi = c(0, lvl, lvl), 
+    sgmi = c(lvl, lvl, lvl))
 allcases <- lapply(policyfn, function(policyfn_i) {
     lapply(noise, function(noise_i) {
         simulatereps(policyfn_i, noise_i[1], noise_i[2], 
@@ -249,7 +360,7 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time,
     facet_wrap(~uncertainty)
 ```
 
-![plot of chunk onerep](http://farm8.staticflickr.com/7262/7416382244_b42ea9aae1_o.png) 
+![plot of chunk onerep](http://farm9.staticflickr.com/8142/7417179538_4643061e9a_o.png) 
 
 
 This plot summarizes the stock dynamics by visualizing the replicates.
@@ -262,7 +373,7 @@ p1 + geom_line(aes(time, fishstock, group = reps),
     alpha = 0.1) + facet_wrap(~uncertainty)
 ```
 
-![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm9.staticflickr.com/8003/7416386694_7a2beb2e6f_o.png) 
+![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm9.staticflickr.com/8021/7417183646_8b52832229_o.png) 
 
 
 
@@ -273,7 +384,10 @@ profits <- dt[, sum(profit), by = c("reps", "uncertainty")]
 ggplot(profits) + geom_histogram(aes(V1)) + facet_wrap(~uncertainty)
 ```
 
-![the distribution of profits by scenario](http://farm8.staticflickr.com/7125/7416389440_b7bdf89b4f_o.png) 
+```
+Error: position_stack requires constant width```
+
+
 
 
 Summary statistics 
@@ -290,56 +404,5 @@ sds <- profits[, sd(V1), by = uncertainty]
 
 
 
-```r
-require(xtable)
-uncertainties <- c("deterministic", "growth", 
-    "measure", "implement", "growth+measure", "growth+implement", 
-    "all")
-print(xtable(matrix(means$V1, nrow = 7, dimnames = list(uncertainties, 
-    uncertainties))), type = "html")
-```
-
-<!-- html table generated in R 2.14.1 by xtable 1.7-0 package -->
-<!-- Thu Jun 21 14:34:05 2012 -->
-<TABLE border=1>
-<TR> <TH>  </TH> <TH> deterministic </TH> <TH> growth </TH> <TH> measure </TH> <TH> implement </TH> <TH> growth+measure </TH> <TH> growth+implement </TH> <TH> all </TH>  </TR>
-  <TR> <TD align="right"> deterministic </TD> <TD align="right"> 674.24 </TD> <TD align="right"> 674.24 </TD> <TD align="right"> 674.24 </TD> <TD align="right"> 674.24 </TD> <TD align="right"> 674.24 </TD> <TD align="right"> 674.24 </TD> <TD align="right"> 674.24 </TD> </TR>
-  <TR> <TD align="right"> growth </TD> <TD align="right"> 673.86 </TD> <TD align="right"> 672.03 </TD> <TD align="right"> 674.80 </TD> <TD align="right"> 672.41 </TD> <TD align="right"> 675.34 </TD> <TD align="right"> 673.48 </TD> <TD align="right"> 674.64 </TD> </TR>
-  <TR> <TD align="right"> measure </TD> <TD align="right"> 668.34 </TD> <TD align="right"> 668.35 </TD> <TD align="right"> 668.49 </TD> <TD align="right"> 668.40 </TD> <TD align="right"> 668.90 </TD> <TD align="right"> 668.50 </TD> <TD align="right"> 668.48 </TD> </TR>
-  <TR> <TD align="right"> implement </TD> <TD align="right"> 672.65 </TD> <TD align="right"> 672.22 </TD> <TD align="right"> 672.62 </TD> <TD align="right"> 671.83 </TD> <TD align="right"> 672.40 </TD> <TD align="right"> 672.56 </TD> <TD align="right"> 672.22 </TD> </TR>
-  <TR> <TD align="right"> growth+measure </TD> <TD align="right"> 666.84 </TD> <TD align="right"> 672.25 </TD> <TD align="right"> 670.16 </TD> <TD align="right"> 667.48 </TD> <TD align="right"> 667.78 </TD> <TD align="right"> 668.48 </TD> <TD align="right"> 672.21 </TD> </TR>
-  <TR> <TD align="right"> growth+implement </TD> <TD align="right"> 673.36 </TD> <TD align="right"> 668.46 </TD> <TD align="right"> 670.25 </TD> <TD align="right"> 671.88 </TD> <TD align="right"> 672.58 </TD> <TD align="right"> 671.20 </TD> <TD align="right"> 673.67 </TD> </TR>
-  <TR> <TD align="right"> all </TD> <TD align="right"> 665.96 </TD> <TD align="right"> 667.67 </TD> <TD align="right"> 664.82 </TD> <TD align="right"> 665.86 </TD> <TD align="right"> 667.26 </TD> <TD align="right"> 667.77 </TD> <TD align="right"> 666.34 </TD> </TR>
-   </TABLE>
-
-
-```r
-print(xtable(matrix(sds$V1, nrow = 7, dimnames = list(uncertainties, 
-    uncertainties))), type = "html")
-```
-
-<!-- html table generated in R 2.14.1 by xtable 1.7-0 package -->
-<!-- Thu Jun 21 14:34:05 2012 -->
-<TABLE border=1>
-<TR> <TH>  </TH> <TH> deterministic </TH> <TH> growth </TH> <TH> measure </TH> <TH> implement </TH> <TH> growth+measure </TH> <TH> growth+implement </TH> <TH> all </TH>  </TR>
-  <TR> <TD align="right"> deterministic </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> </TR>
-  <TR> <TD align="right"> growth </TD> <TD align="right"> 22.64 </TD> <TD align="right"> 20.26 </TD> <TD align="right"> 20.05 </TD> <TD align="right"> 18.94 </TD> <TD align="right"> 19.55 </TD> <TD align="right"> 20.95 </TD> <TD align="right"> 20.65 </TD> </TR>
-  <TR> <TD align="right"> measure </TD> <TD align="right"> 2.64 </TD> <TD align="right"> 2.65 </TD> <TD align="right"> 2.50 </TD> <TD align="right"> 2.66 </TD> <TD align="right"> 2.34 </TD> <TD align="right"> 2.50 </TD> <TD align="right"> 2.35 </TD> </TR>
-  <TR> <TD align="right"> implement </TD> <TD align="right"> 2.49 </TD> <TD align="right"> 2.29 </TD> <TD align="right"> 2.44 </TD> <TD align="right"> 2.73 </TD> <TD align="right"> 2.43 </TD> <TD align="right"> 2.48 </TD> <TD align="right"> 2.21 </TD> </TR>
-  <TR> <TD align="right"> growth+measure </TD> <TD align="right"> 22.89 </TD> <TD align="right"> 22.07 </TD> <TD align="right"> 22.25 </TD> <TD align="right"> 21.92 </TD> <TD align="right"> 21.28 </TD> <TD align="right"> 19.32 </TD> <TD align="right"> 21.11 </TD> </TR>
-  <TR> <TD align="right"> growth+implement </TD> <TD align="right"> 18.83 </TD> <TD align="right"> 22.31 </TD> <TD align="right"> 20.58 </TD> <TD align="right"> 22.80 </TD> <TD align="right"> 21.05 </TD> <TD align="right"> 21.30 </TD> <TD align="right"> 20.11 </TD> </TR>
-  <TR> <TD align="right"> all </TD> <TD align="right"> 23.53 </TD> <TD align="right"> 21.18 </TD> <TD align="right"> 20.88 </TD> <TD align="right"> 21.54 </TD> <TD align="right"> 20.23 </TD> <TD align="right"> 20.53 </TD> <TD align="right"> 19.52 </TD> </TR>
-   </TABLE>
-
-
-
-
-
-# References
-
-<p>Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005).
-&ldquo;Fishery Management Under Multiple Uncertainty.&rdquo;
-<EM>Journal of Environmental Economics And Management</EM>, <B>50</B>.
-ISSN 00950696, <a href="http://dx.doi.org/10.1016/j.jeem.2004.11.005">http://dx.doi.org/10.1016/j.jeem.2004.11.005</a>.
 
 
