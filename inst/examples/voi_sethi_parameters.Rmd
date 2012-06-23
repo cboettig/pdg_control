@@ -114,27 +114,27 @@ all_low <- scenario(0.1, 0.1, 0.1)
 ````
 
 ``` {r }
-g   <- scenario(lvl, 0.001, 0.001)
+g   <- scenario(lvl, 0, 0)
 ````
 
 ``` {r }
-m   <- scenario(0.001, lvl, 0.001)
+m   <- scenario(0, lvl, 0)
 ````
 
 ``` {r }
-i   <- scenario(0.001, 0.001, lvl)
+i   <- scenario(0, 0, lvl)
 ````
 
 ``` {r }
-gm  <- scenario(lvl, lvl, 0.001)
+gm  <- scenario(lvl, lvl, 0)
 ````
 
 ``` {r }
-gi  <- scenario(lvl, 0.001, lvl)
+gi  <- scenario(lvl, 0, lvl)
 ````
 
 ``` {r }
-mi  <- scenario(0.001, lvl, lvl)
+mi  <- scenario(0, lvl, lvl)
 ````
 
 ``` {r }
@@ -193,8 +193,10 @@ simulatereps <- function(opt, true_g, true_m, true_i){
 All cases
 
 ``` {r runallsims, dependson="simfn"} 
-policyfn <- list(det=det, g=g, m=m, i=i, gm=gm, gi=gi, mi=mi, gmi=gmi)
-noise <- list(s0.001=c(0.001,0.001,0.001), sg=c(lvl, 0.001, 0.001), sm=c(0.001, lvl, 0.001), si=c(0.001,0.001,lvl), sgm=c(lvl, lvl, 0.001), sgi=c(lvl, 0.001, lvl), smi = c(0.001, lvl, lvl), sgmi=c(lvl, lvl, lvl)) 
+policyfn <- list(det=det, low=low, g=g, m=m, i=i, gm=gm, gi=gi, mi=mi, gmi=gmi)
+noise <- list( det  = c(0,0,0),        low = c(0.1, .1, .1),  growth = c(lvl, 0, 0),
+               measure  = c(0, lvl, 0),implement = c(0,0,lvl),growth_measure = c(lvl, lvl, 0), 
+               growth_implement = c(lvl, 0, lvl),  measure_implement = c(0, lvl, lvl), all = c(lvl, lvl, lvl)) 
 allcases <- lapply(policyfn, function(policyfn_i){
   lapply(noise, function(noise_i){
     simulatereps(policyfn_i, noise_i[1], noise_i[2], noise_i[3])
@@ -242,7 +244,7 @@ sds <- profits[, sd(V1), by=uncertainty]
 
 ``` {r prettytable, cache=FALSE, results="asis"}
 require(xtable)
-uncertainties <- c("det", "growth", "measure", "impl", "growth+measure", "growth+impl", "impl+measure", "all")
+uncertainties <- names(noise) 
 print(xtable(matrix(means$V1, nrow=8, dimnames=list(uncertainties, uncertainties))), type="html")
 print(xtable(matrix(sds$V1, nrow=8, dimnames=list(uncertainties, uncertainties))), type="html")
 ````
