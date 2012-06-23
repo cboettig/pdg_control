@@ -1,9 +1,16 @@
 
 
+
+
+
 # Sethi Model
  * author Carl Boettiger, <cboettig@gmail.com>
  * license: CC0
 
+ Implements a numerical version of the SDP described in (Sethi _et. al._ 2005).
+
+
+Clear the workspace and load package dependencies: 
 
 
 
@@ -14,8 +21,10 @@ Chose the state equation / population dynamics function as a logistic map:
 
 ```r
 f <- function(x,h,p){
-	S = x - h
-	p[1] * S * (1 - S/p[2]) + S
+  sapply(x, function(x){
+  	S = max(x - h, 0)
+  	p[1] * S * (1 - S/p[2]) + S
+  })
 }
 ```
 
@@ -173,7 +182,7 @@ ggplot(policy) +
 	geom_smooth(aes(stock, stock-x_grid[value])) + ylab("escapement") 
 ```
 
-![plot of chunk sethiplots](http://farm6.staticflickr.com/5119/7411686124_ba0582a09f_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8155/7423706852_f1bba5c328_o.png) 
 
 ```r
 
@@ -182,7 +191,7 @@ ggplot(policy) +
 	geom_smooth(aes(stock, x_grid[value])) + ylab("harvest") 
 ```
 
-![plot of chunk sethiplots](http://farm6.staticflickr.com/5344/7411686458_45d064cc44_o.png) 
+![plot of chunk sethiplots](http://farm6.staticflickr.com/5152/7423707120_8954f64692_o.png) 
 
 ```r
 
@@ -193,7 +202,7 @@ ggplot(value) +
   ylab("Net Present Value")
 ```
 
-![plot of chunk sethiplots](http://farm6.staticflickr.com/5280/7411686738_32f5ea3871_o.png) 
+![plot of chunk sethiplots](http://farm6.staticflickr.com/5231/7423707252_7221358b59_o.png) 
 
 
 
@@ -247,7 +256,7 @@ p0 <- ggplot(subset(dt,reps==1)) +
 p0
 ```
 
-![plot of chunk p0](http://farm9.staticflickr.com/8027/7411687314_29a2d8838c_o.png) 
+![plot of chunk p0](http://farm9.staticflickr.com/8152/7423707674_998bf971ef_o.png) 
 
 
 
@@ -262,7 +271,16 @@ p1 <- p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 p1
 ```
 
-![plot of chunk p1](http://farm8.staticflickr.com/7137/7411687788_723fe6a6cf_o.png) 
+![plot of chunk p1](http://farm6.staticflickr.com/5117/7423708088_f24ed75563_o.png) 
+
+
+
+# References
+
+<p>Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005).
+&ldquo;Fishery Management Under Multiple Uncertainty.&rdquo;
+<EM>Journal of Environmental Economics And Management</EM>, <B>50</B>.
+ISSN 00950696, <a href="http://dx.doi.org/10.1016/j.jeem.2004.11.005">http://dx.doi.org/10.1016/j.jeem.2004.11.005</a>.
 
 
 
