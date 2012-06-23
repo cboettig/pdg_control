@@ -28,8 +28,10 @@ Chose the state equation / population dynamics function
 
 ``` {r }
 f <- function(x,h,p){
-	S = x - h
-	p[1] * S * (1 - S/p[2]) + S
+  sapply(x, function(x){
+  	S = max(x - h, 0)
+  	p[1] * S * (1 - S/p[2]) + S
+  })
 }
 ````
 
@@ -100,35 +102,35 @@ scenario <- function(policy_g, policy_m, policy_i){
 Determine the policies for each of the scenarios (noise combinations).
 
 ``` {r runall}
-lvl <- 0.3
+lvl <- 0.5
 ````
 
 ``` {r }
-det <- scenario(0.01, 0.0, 0.0)
+det <- scenario(0.00101, 0.001, 0.001)
 ````
 
 ``` {r }
-g   <- scenario(lvl, 0.0, 0.0)
+g   <- scenario(lvl, 0.001, 0.001)
 ````
 
 ``` {r }
-m   <- scenario(0.0, lvl, 0.0)
+m   <- scenario(0.001, lvl, 0.001)
 ````
 
 ``` {r }
-i   <- scenario(0.0, 0.0, lvl)
+i   <- scenario(0.001, 0.001, lvl)
 ````
 
 ``` {r }
-gm  <- scenario(lvl, lvl, 0.0)
+gm  <- scenario(lvl, lvl, 0.001)
 ````
 
 ``` {r }
-gi  <- scenario(lvl, 0.0, lvl)
+gi  <- scenario(lvl, 0.001, lvl)
 ````
 
 ``` {r }
-mi  <- scenario(0.0, lvl, lvl)
+mi  <- scenario(0.001, lvl, lvl)
 ````
 
 ``` {r }
@@ -188,7 +190,7 @@ All cases
 
 ``` {r runallsims, dependson="simfn"} 
 policyfn <- list(det=det, g=g, m=m, i=i, gm=gm, gi=gi, mi=mi, gmi=gmi)
-noise <- list(s0=c(0,0,0), sg=c(lvl, 0, 0), sm=c(0, lvl, 0), si=c(0,0,lvl), sgm=c(lvl, lvl, 0), sgi=c(lvl, 0, lvl), smi = c(0, lvl, lvl), sgmi=c(lvl, lvl, lvl)) 
+noise <- list(s0.001=c(0.001,0.001,0.001), sg=c(lvl, 0.001, 0.001), sm=c(0.001, lvl, 0.001), si=c(0.001,0.001,lvl), sgm=c(lvl, lvl, 0.001), sgi=c(lvl, 0.001, lvl), smi = c(0.001, lvl, lvl), sgmi=c(lvl, lvl, lvl)) 
 allcases <- lapply(policyfn, function(policyfn_i){
   lapply(noise, function(noise_i){
     simulatereps(policyfn_i, noise_i[1], noise_i[2], noise_i[3])
@@ -217,7 +219,7 @@ ggplot(subset(dt,reps==1)) +
 This plot summarizes the stock dynamics by visualizing the replicates.
 
 ``` {r stock, fig.cap="the induced dynamics in the stock size over time, for all replicates, by scenario", dependson="tidyall"}
-p1 <- ggplot(dt) 
+p1 <- ggplot(subset(dt, fishstock>0)) 
 p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1) + facet_wrap(~uncertainty)
 ````
 

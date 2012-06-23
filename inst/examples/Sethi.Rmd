@@ -31,8 +31,10 @@ Chose the state equation / population dynamics function as a logistic map:
 
 ``` {r }
 f <- function(x,h,p){
-	S = x - h
-	p[1] * S * (1 - S/p[2]) + S
+  sapply(x, function(x){
+  	S = max(x - h, 0)
+  	p[1] * S * (1 - S/p[2]) + S
+  })
 }
 ````
 
@@ -78,8 +80,8 @@ h_grid <- x_grid
 delta <- 0.05
 xT <- 0
 OptTime <- 25
-sigma_g <- .001
-sigma_m <- .001
+sigma_g <- .5
+sigma_m <- .5
 sigma_i <- .5
 ````
 
@@ -194,7 +196,7 @@ p1
 # References
 
 ``` {r biblio, echo=FALSE, results="asis"}
-print(knitcitations::bibliography(), style="html")
+knitcitations::bibliography("html")
 ````
 
 
