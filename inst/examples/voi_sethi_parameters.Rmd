@@ -238,7 +238,7 @@ sds <- profits[, sd(V1), by=uncertainty]
 
 ``` {r prettytable, cache=FALSE, results="asis"}
 require(xtable)
-uncertainties <- c("det", "growth", "measure", "impl", "growth+measure", "growth+impl", "impl+measure" "all")
+uncertainties <- c("det", "growth", "measure", "impl", "growth+measure", "growth+impl", "impl+measure", "all")
 print(xtable(matrix(means$V1, nrow=8, dimnames=list(uncertainties, uncertainties))), type="html")
 print(xtable(matrix(sds$V1, nrow=8, dimnames=list(uncertainties, uncertainties))), type="html")
 ````

@@ -404,5 +404,58 @@ sds <- profits[, sd(V1), by = uncertainty]
 
 
 
+```r
+require(xtable)
+uncertainties <- c("det", "growth", "measure", 
+    "impl", "growth+measure", "growth+impl", "impl+measure", 
+    "all")
+print(xtable(matrix(means$V1, nrow = 8, dimnames = list(uncertainties, 
+    uncertainties))), type = "html")
+```
+
+<!-- html table generated in R 2.14.1 by xtable 1.7-0 package -->
+<!-- Sat Jun 23 12:55:12 2012 -->
+<TABLE border=1>
+<TR> <TH>  </TH> <TH> det </TH> <TH> growth </TH> <TH> measure </TH> <TH> impl </TH> <TH> growth+measure </TH> <TH> growth+impl </TH> <TH> impl+measure </TH> <TH> all </TH>  </TR>
+  <TR> <TD align="right"> det </TD> <TD align="right"> 668.16 </TD> <TD align="right"> 674.53 </TD> <TD align="right"> 674.17 </TD> <TD align="right"> 672.73 </TD> <TD align="right"> 673.59 </TD> <TD align="right"> 668.30 </TD> <TD align="right"> 673.29 </TD> <TD align="right"> 663.49 </TD> </TR>
+  <TR> <TD align="right"> growth </TD> <TD align="right"> 663.73 </TD> <TD align="right"> 691.08 </TD> <TD align="right"> 664.49 </TD> <TD align="right"> 684.95 </TD> <TD align="right"> 692.24 </TD> <TD align="right"> 682.32 </TD> <TD align="right"> 643.37 </TD> <TD align="right"> 658.22 </TD> </TR>
+  <TR> <TD align="right"> measure </TD> <TD align="right"> 556.42 </TD> <TD align="right"> 563.60 </TD> <TD align="right"> 586.39 </TD> <TD align="right"> 550.40 </TD> <TD align="right"> 592.05 </TD> <TD align="right"> 515.50 </TD> <TD align="right"> 580.60 </TD> <TD align="right"> 585.14 </TD> </TR>
+  <TR> <TD align="right"> impl </TD> <TD align="right"> 644.11 </TD> <TD align="right"> 650.11 </TD> <TD align="right"> 651.09 </TD> <TD align="right"> 650.42 </TD> <TD align="right"> 649.24 </TD> <TD align="right"> 648.52 </TD> <TD align="right"> 648.75 </TD> <TD align="right"> 641.25 </TD> </TR>
+  <TR> <TD align="right"> growth+measure </TD> <TD align="right"> 566.73 </TD> <TD align="right"> 575.88 </TD> <TD align="right"> 582.07 </TD> <TD align="right"> 557.54 </TD> <TD align="right"> 588.06 </TD> <TD align="right"> 539.90 </TD> <TD align="right"> 581.51 </TD> <TD align="right"> 564.03 </TD> </TR>
+  <TR> <TD align="right"> growth+impl </TD> <TD align="right"> 634.21 </TD> <TD align="right"> 641.05 </TD> <TD align="right"> 624.10 </TD> <TD align="right"> 639.99 </TD> <TD align="right"> 640.94 </TD> <TD align="right"> 635.67 </TD> <TD align="right"> 647.07 </TD> <TD align="right"> 620.94 </TD> </TR>
+  <TR> <TD align="right"> impl+measure </TD> <TD align="right"> 405.89 </TD> <TD align="right"> 389.87 </TD> <TD align="right"> 437.02 </TD> <TD align="right"> 389.76 </TD> <TD align="right"> 442.34 </TD> <TD align="right"> 419.33 </TD> <TD align="right"> 452.07 </TD> <TD align="right"> 438.89 </TD> </TR>
+  <TR> <TD align="right"> all </TD> <TD align="right"> 423.59 </TD> <TD align="right"> 432.70 </TD> <TD align="right"> 470.25 </TD> <TD align="right"> 399.05 </TD> <TD align="right"> 449.59 </TD> <TD align="right"> 355.47 </TD> <TD align="right"> 458.69 </TD> <TD align="right"> 414.71 </TD> </TR>
+   </TABLE>
+
+
+```r
+print(xtable(matrix(sds$V1, nrow = 8, dimnames = list(uncertainties, 
+    uncertainties))), type = "html")
+```
+
+<!-- html table generated in R 2.14.1 by xtable 1.7-0 package -->
+<!-- Sat Jun 23 12:55:12 2012 -->
+<TABLE border=1>
+<TR> <TH>  </TH> <TH> det </TH> <TH> growth </TH> <TH> measure </TH> <TH> impl </TH> <TH> growth+measure </TH> <TH> growth+impl </TH> <TH> impl+measure </TH> <TH> all </TH>  </TR>
+  <TR> <TD align="right"> det </TD> <TD align="right"> 0.08 </TD> <TD align="right"> 0.41 </TD> <TD align="right"> 0.10 </TD> <TD align="right"> 0.19 </TD> <TD align="right"> 0.46 </TD> <TD align="right"> 0.31 </TD> <TD align="right"> 0.47 </TD> <TD align="right"> 0.70 </TD> </TR>
+  <TR> <TD align="right"> growth </TD> <TD align="right"> 110.61 </TD> <TD align="right"> 102.34 </TD> <TD align="right"> 101.63 </TD> <TD align="right"> 101.61 </TD> <TD align="right"> 112.49 </TD> <TD align="right"> 106.85 </TD> <TD align="right"> 103.35 </TD> <TD align="right"> 82.97 </TD> </TR>
+  <TR> <TD align="right"> measure </TD> <TD align="right"> 34.03 </TD> <TD align="right"> 31.69 </TD> <TD align="right"> 20.59 </TD> <TD align="right"> 69.68 </TD> <TD align="right"> 23.47 </TD> <TD align="right"> 131.48 </TD> <TD align="right"> 24.15 </TD> <TD align="right"> 18.55 </TD> </TR>
+  <TR> <TD align="right"> impl </TD> <TD align="right"> 13.26 </TD> <TD align="right"> 11.88 </TD> <TD align="right"> 13.04 </TD> <TD align="right"> 12.59 </TD> <TD align="right"> 12.99 </TD> <TD align="right"> 10.50 </TD> <TD align="right"> 13.87 </TD> <TD align="right"> 13.71 </TD> </TR>
+  <TR> <TD align="right"> growth+measure </TD> <TD align="right"> 95.77 </TD> <TD align="right"> 93.08 </TD> <TD align="right"> 94.80 </TD> <TD align="right"> 93.17 </TD> <TD align="right"> 100.72 </TD> <TD align="right"> 114.70 </TD> <TD align="right"> 85.79 </TD> <TD align="right"> 81.50 </TD> </TR>
+  <TR> <TD align="right"> growth+impl </TD> <TD align="right"> 107.34 </TD> <TD align="right"> 90.39 </TD> <TD align="right"> 100.70 </TD> <TD align="right"> 98.66 </TD> <TD align="right"> 97.27 </TD> <TD align="right"> 99.37 </TD> <TD align="right"> 110.67 </TD> <TD align="right"> 90.89 </TD> </TR>
+  <TR> <TD align="right"> impl+measure </TD> <TD align="right"> 174.01 </TD> <TD align="right"> 185.83 </TD> <TD align="right"> 169.40 </TD> <TD align="right"> 181.17 </TD> <TD align="right"> 170.39 </TD> <TD align="right"> 169.55 </TD> <TD align="right"> 157.74 </TD> <TD align="right"> 179.14 </TD> </TR>
+  <TR> <TD align="right"> all </TD> <TD align="right"> 166.27 </TD> <TD align="right"> 168.65 </TD> <TD align="right"> 143.18 </TD> <TD align="right"> 182.11 </TD> <TD align="right"> 157.54 </TD> <TD align="right"> 183.03 </TD> <TD align="right"> 173.67 </TD> <TD align="right"> 173.95 </TD> </TR>
+   </TABLE>
+
+
+
+
+
+# References
+
+<p>Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005).
+&ldquo;Fishery Management Under Multiple Uncertainty.&rdquo;
+<EM>Journal of Environmental Economics And Management</EM>, <B>50</B>.
+ISSN 00950696, <a href="http://dx.doi.org/10.1016/j.jeem.2004.11.005">http://dx.doi.org/10.1016/j.jeem.2004.11.005</a>.
 
 
