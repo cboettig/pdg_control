@@ -19,8 +19,10 @@ Chose the state equation / population dynamics function
 
 ```r
 f <- function(x, h, p) {
-    S = x - h
-    p[1] * S * (1 - S/p[2]) + S
+    sapply(x, function(x) {
+        S = max(x - h, 0)
+        p[1] * S * (1 - S/p[2]) + S
+    })
 }
 ```
 
@@ -138,7 +140,7 @@ Determine the policies for each of the scenarios (noise combinations).
 
 
 ```r
-lvl <- 0.3
+lvl <- 0.5
 ```
 
 
@@ -147,7 +149,7 @@ lvl <- 0.3
 
 
 ```r
-det <- scenario(0.01, 0, 0)
+det <- scenario(0.00101, 0.001, 0.001)
 ```
 
 ```
@@ -160,7 +162,7 @@ Library ggplot2 loaded.
 
 
 ```r
-g <- scenario(lvl, 0, 0)
+g <- scenario(lvl, 0.001, 0.001)
 ```
 
 ```
@@ -173,7 +175,7 @@ Library ggplot2 loaded.
 
 
 ```r
-m <- scenario(0, lvl, 0)
+m <- scenario(0.001, lvl, 0.001)
 ```
 
 ```
@@ -186,7 +188,7 @@ Library ggplot2 loaded.
 
 
 ```r
-i <- scenario(0, 0, lvl)
+i <- scenario(0.001, 0.001, lvl)
 ```
 
 ```
@@ -199,7 +201,7 @@ Library ggplot2 loaded.
 
 
 ```r
-gm <- scenario(lvl, lvl, 0)
+gm <- scenario(lvl, lvl, 0.001)
 ```
 
 ```
@@ -212,7 +214,7 @@ Library ggplot2 loaded.
 
 
 ```r
-gi <- scenario(lvl, 0, lvl)
+gi <- scenario(lvl, 0.001, lvl)
 ```
 
 ```
@@ -225,7 +227,7 @@ Library ggplot2 loaded.
 
 
 ```r
-mi <- scenario(0, lvl, lvl)
+mi <- scenario(0.001, lvl, lvl)
 ```
 
 ```
@@ -264,7 +266,7 @@ ggplot(policy) + geom_point(aes(stock, stock -
     stock - x_grid[value], color = variable)) + ylab("escapement")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8008/7417173208_ee15d87e6e_o.png) 
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7256/7424377052_9b7e722a9f_o.png) 
 
 ```r
 
@@ -273,7 +275,7 @@ ggplot(policy) + geom_point(aes(stock, x_grid[value],
     color = variable)) + ylab("harvest")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8020/7417173520_12efbb8ddd_o.png) 
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7106/7424377306_667cca255c_o.png) 
 
 ```r
 
@@ -286,7 +288,7 @@ ggplot(value) + geom_point(aes(stock, value, color = variable)) +
     geom_smooth(aes(stock, value, color = variable)) + ylab("Net Present Value")
 ```
 
-![plot of chunk sethiplots](http://farm8.staticflickr.com/7250/7417173800_5107b571c1_o.png) 
+![plot of chunk sethiplots](http://farm6.staticflickr.com/5465/7424377532_31eaebd7ef_o.png) 
 
 
 ## Simulations
@@ -321,10 +323,11 @@ All cases
 ```r
 policyfn <- list(det = det, g = g, m = m, i = i, 
     gm = gm, gi = gi, mi = mi, gmi = gmi)
-noise <- list(s0 = c(0, 0, 0), sg = c(lvl, 0, 
-    0), sm = c(0, lvl, 0), si = c(0, 0, lvl), sgm = c(lvl, 
-    lvl, 0), sgi = c(lvl, 0, lvl), smi = c(0, lvl, lvl), 
-    sgmi = c(lvl, lvl, lvl))
+noise <- list(s0.001 = c(0.001, 0.001, 0.001), 
+    sg = c(lvl, 0.001, 0.001), sm = c(0.001, lvl, 0.001), 
+    si = c(0.001, 0.001, lvl), sgm = c(lvl, lvl, 0.001), 
+    sgi = c(lvl, 0.001, lvl), smi = c(0.001, lvl, lvl), sgmi = c(lvl, 
+        lvl, lvl))
 allcases <- lapply(policyfn, function(policyfn_i) {
     lapply(noise, function(noise_i) {
         simulatereps(policyfn_i, noise_i[1], noise_i[2], 
@@ -360,7 +363,7 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time,
     facet_wrap(~uncertainty)
 ```
 
-![plot of chunk onerep](http://farm9.staticflickr.com/8142/7417179538_4643061e9a_o.png) 
+![plot of chunk onerep](http://farm6.staticflickr.com/5470/7424381870_5cf372b85c_o.png) 
 
 
 This plot summarizes the stock dynamics by visualizing the replicates.
@@ -368,12 +371,12 @@ This plot summarizes the stock dynamics by visualizing the replicates.
 
 
 ```r
-p1 <- ggplot(dt)
+p1 <- ggplot(subset(dt, fishstock > 0))
 p1 + geom_line(aes(time, fishstock, group = reps), 
     alpha = 0.1) + facet_wrap(~uncertainty)
 ```
 
-![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm9.staticflickr.com/8021/7417183646_8b52832229_o.png) 
+![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm8.staticflickr.com/7273/7424384394_623922d85c_o.png) 
 
 
 
@@ -384,10 +387,7 @@ profits <- dt[, sum(profit), by = c("reps", "uncertainty")]
 ggplot(profits) + geom_histogram(aes(V1)) + facet_wrap(~uncertainty)
 ```
 
-```
-Error: position_stack requires constant width```
-
-
+![the distribution of profits by scenario](http://farm9.staticflickr.com/8151/7424385896_34e667446e_o.png) 
 
 
 Summary statistics 

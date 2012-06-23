@@ -21,8 +21,10 @@ Chose the state equation / population dynamics function as a logistic map:
 
 ```r
 f <- function(x,h,p){
-	S = x - h
-	p[1] * S * (1 - S/p[2]) + S
+  sapply(x, function(x){
+  	S = max(x - h, 0)
+  	p[1] * S * (1 - S/p[2]) + S
+  })
 }
 ```
 
@@ -93,8 +95,8 @@ h_grid <- x_grid
 delta <- 0.05
 xT <- 0
 OptTime <- 25
-sigma_g <- .001
-sigma_m <- .001
+sigma_g <- .5
+sigma_m <- .5
 sigma_i <- .5
 ```
 
@@ -118,7 +120,7 @@ z_i <- function() 1+(2*runif(1, 0,  1)-1) * sigma_i
 
 
 
-With `sigma_g` = `0.001`, `sigma_m` = `0.001`, `sigma_i` = `0.5`.
+With `sigma_g` = `0.5`, `sigma_m` = `0.5`, `sigma_i` = `0.5`.
 
 
 In the Sethi case, computing the distribution over multiple sources of noise is actually quite difficult.  Simulation turns out to be more efficient than numerically integrating over each distribution.  This code parallelizes the operation over four cores, but can be scaled to an arbitrary cluster. 
@@ -180,7 +182,7 @@ ggplot(policy) +
 	geom_smooth(aes(stock, stock-x_grid[value])) + ylab("escapement") 
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8005/7421486746_a94f1c7f56_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8155/7423706852_f1bba5c328_o.png) 
 
 ```r
 
@@ -189,7 +191,7 @@ ggplot(policy) +
 	geom_smooth(aes(stock, x_grid[value])) + ylab("harvest") 
 ```
 
-![plot of chunk sethiplots](http://farm8.staticflickr.com/7249/7421487068_461b8fb043_o.png) 
+![plot of chunk sethiplots](http://farm6.staticflickr.com/5152/7423707120_8954f64692_o.png) 
 
 ```r
 
@@ -200,7 +202,7 @@ ggplot(value) +
   ylab("Net Present Value")
 ```
 
-![plot of chunk sethiplots](http://farm6.staticflickr.com/5464/7421487434_d8e8f27b28_o.png) 
+![plot of chunk sethiplots](http://farm6.staticflickr.com/5231/7423707252_7221358b59_o.png) 
 
 
 
@@ -254,7 +256,7 @@ p0 <- ggplot(subset(dt,reps==1)) +
 p0
 ```
 
-![plot of chunk p0](http://farm9.staticflickr.com/8014/7421487962_4a1bf2e718_o.png) 
+![plot of chunk p0](http://farm9.staticflickr.com/8152/7423707674_998bf971ef_o.png) 
 
 
 
@@ -269,16 +271,12 @@ p1 <- p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 p1
 ```
 
-![plot of chunk p1](http://farm6.staticflickr.com/5344/7421488380_798fd7d982_o.png) 
+![plot of chunk p1](http://farm6.staticflickr.com/5117/7423708088_f24ed75563_o.png) 
 
 
 
 # References
 
-<p>Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005).
-&ldquo;Fishery Management Under Multiple Uncertainty.&rdquo;
-<EM>Journal of Environmental Economics And Management</EM>, <B>50</B>.
-ISSN 00950696, <a href="http://dx.doi.org/10.1016/j.jeem.2004.11.005">http://dx.doi.org/10.1016/j.jeem.2004.11.005</a>.
 <p>Sethi G, Costello C, Fisher A, Hanemann M and Karp L (2005).
 &ldquo;Fishery Management Under Multiple Uncertainty.&rdquo;
 <EM>Journal of Environmental Economics And Management</EM>, <B>50</B>.
