@@ -4,7 +4,6 @@
 
 
 
-
 # Calculating the value of information
 
  Implements a numerical version of the SDP described in (Sethi _et. al._ 2005).
@@ -461,15 +460,15 @@ print(xtable(matrix(sds$V1, nrow = length(noise),
 <!-- html table generated in R 2.14.1 by xtable 1.7-0 package -->
 <!-- Mon Jun 25 09:06:00 2012 -->
 <TABLE border=1>
-<TR> <TH>  </TH> <TH> det </TH> <TH> low </TH> <TH> growth </TH> <TH> measure </TH> <TH> implement </TH> <TH> growth_measure </TH> <TH> growth_implement </TH> <TH> measure_implement </TH> <TH> all </TH>  </TR>
+<TR> <TH>  </TH> <TH> det </TH> <TH> low </TH> <TH> growth </TH> <TH> meas </TH> <TH> impl </TH> <TH> gro_meas </TH> <TH> gro_imp </TH> <TH> meas_imp </TH> <TH> all </TH>  </TR>
   <TR> <TD align="right"> det </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> </TR>
   <TR> <TD align="right"> low </TD> <TD align="right"> 22.80 </TD> <TD align="right"> 19.07 </TD> <TD align="right"> 22.03 </TD> <TD align="right"> 17.68 </TD> <TD align="right"> 19.26 </TD> <TD align="right"> 22.90 </TD> <TD align="right"> 17.36 </TD> <TD align="right"> 21.15 </TD> <TD align="right"> 22.38 </TD> </TR>
-  <TR> <TD align="right"> growth </TD> <TD align="right"> 106.87 </TD> <TD align="right"> 107.47 </TD> <TD align="right"> 100.07 </TD> <TD align="right"> 110.41 </TD> <TD align="right"> 107.83 </TD> <TD align="right"> 93.08 </TD> <TD align="right"> 110.18 </TD> <TD align="right"> 119.66 </TD> <TD align="right"> 98.79 </TD> </TR>
-  <TR> <TD align="right"> measure </TD> <TD align="right"> 55.92 </TD> <TD align="right"> 61.69 </TD> <TD align="right"> 31.18 </TD> <TD align="right"> 25.07 </TD> <TD align="right"> 29.78 </TD> <TD align="right"> 20.51 </TD> <TD align="right"> 102.15 </TD> <TD align="right"> 24.69 </TD> <TD align="right"> 18.85 </TD> </TR>
-  <TR> <TD align="right"> implement </TD> <TD align="right"> 12.52 </TD> <TD align="right"> 11.34 </TD> <TD align="right"> 13.38 </TD> <TD align="right"> 12.56 </TD> <TD align="right"> 13.01 </TD> <TD align="right"> 13.27 </TD> <TD align="right"> 11.40 </TD> <TD align="right"> 14.43 </TD> <TD align="right"> 11.62 </TD> </TR>
-  <TR> <TD align="right"> growth_measure </TD> <TD align="right"> 106.36 </TD> <TD align="right"> 96.71 </TD> <TD align="right"> 92.00 </TD> <TD align="right"> 94.33 </TD> <TD align="right"> 127.93 </TD> <TD align="right"> 92.74 </TD> <TD align="right"> 137.62 </TD> <TD align="right"> 99.40 </TD> <TD align="right"> 82.45 </TD> </TR>
-  <TR> <TD align="right"> growth_implement </TD> <TD align="right"> 93.77 </TD> <TD align="right"> 102.25 </TD> <TD align="right"> 106.51 </TD> <TD align="right"> 96.90 </TD> <TD align="right"> 102.85 </TD> <TD align="right"> 97.06 </TD> <TD align="right"> 79.78 </TD> <TD align="right"> 98.75 </TD> <TD align="right"> 97.92 </TD> </TR>
-  <TR> <TD align="right"> measure_implement </TD> <TD align="right"> 178.13 </TD> <TD align="right"> 168.77 </TD> <TD align="right"> 165.51 </TD> <TD align="right"> 162.55 </TD> <TD align="right"> 179.85 </TD> <TD align="right"> 167.82 </TD> <TD align="right"> 175.59 </TD> <TD align="right"> 154.52 </TD> <TD align="right"> 155.50 </TD> </TR>
+  <TR> <TD align="right"> grow </TD> <TD align="right"> 106.87 </TD> <TD align="right"> 107.47 </TD> <TD align="right"> 100.07 </TD> <TD align="right"> 110.41 </TD> <TD align="right"> 107.83 </TD> <TD align="right"> 93.08 </TD> <TD align="right"> 110.18 </TD> <TD align="right"> 119.66 </TD> <TD align="right"> 98.79 </TD> </TR>
+  <TR> <TD align="right"> meas </TD> <TD align="right"> 55.92 </TD> <TD align="right"> 61.69 </TD> <TD align="right"> 31.18 </TD> <TD align="right"> 25.07 </TD> <TD align="right"> 29.78 </TD> <TD align="right"> 20.51 </TD> <TD align="right"> 102.15 </TD> <TD align="right"> 24.69 </TD> <TD align="right"> 18.85 </TD> </TR>
+  <TR> <TD align="right"> impl </TD> <TD align="right"> 12.52 </TD> <TD align="right"> 11.34 </TD> <TD align="right"> 13.38 </TD> <TD align="right"> 12.56 </TD> <TD align="right"> 13.01 </TD> <TD align="right"> 13.27 </TD> <TD align="right"> 11.40 </TD> <TD align="right"> 14.43 </TD> <TD align="right"> 11.62 </TD> </TR>
+  <TR> <TD align="right"> gro_meas </TD> <TD align="right"> 106.36 </TD> <TD align="right"> 96.71 </TD> <TD align="right"> 92.00 </TD> <TD align="right"> 94.33 </TD> <TD align="right"> 127.93 </TD> <TD align="right"> 92.74 </TD> <TD align="right"> 137.62 </TD> <TD align="right"> 99.40 </TD> <TD align="right"> 82.45 </TD> </TR>
+  <TR> <TD align="right"> gro_imp </TD> <TD align="right"> 93.77 </TD> <TD align="right"> 102.25 </TD> <TD align="right"> 106.51 </TD> <TD align="right"> 96.90 </TD> <TD align="right"> 102.85 </TD> <TD align="right"> 97.06 </TD> <TD align="right"> 79.78 </TD> <TD align="right"> 98.75 </TD> <TD align="right"> 97.92 </TD> </TR>
+  <TR> <TD align="right"> meas_imp </TD> <TD align="right"> 178.13 </TD> <TD align="right"> 168.77 </TD> <TD align="right"> 165.51 </TD> <TD align="right"> 162.55 </TD> <TD align="right"> 179.85 </TD> <TD align="right"> 167.82 </TD> <TD align="right"> 175.59 </TD> <TD align="right"> 154.52 </TD> <TD align="right"> 155.50 </TD> </TR>
   <TR> <TD align="right"> all </TD> <TD align="right"> 166.82 </TD> <TD align="right"> 179.12 </TD> <TD align="right"> 189.97 </TD> <TD align="right"> 191.33 </TD> <TD align="right"> 195.58 </TD> <TD align="right"> 169.33 </TD> <TD align="right"> 182.70 </TD> <TD align="right"> 163.87 </TD> <TD align="right"> 162.37 </TD> </TR>
    </TABLE>
 
