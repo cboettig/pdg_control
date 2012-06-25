@@ -1,7 +1,7 @@
 `ro cache=TRUE, warning=FALSE, comment=NA, message=FALSE, cache.path="voi_May/", verbose=TRUE or`
 
 ``` {r  echo=FALSE, cache=FALSE }
-opts_knit$set(upload.fun = socialR::flickr.url)
+#opts_knit$set(upload.fun = socialR::flickr.url)
 options(device = function(width = 5, height = 5) {
     pdf(NULL, width = width, height = height)
 })
@@ -12,9 +12,6 @@ knitcitations::cleanbib()
 
 # Value of information under the May alternative stable states model with uniform noise
 
- Implements a numerical version of the SDP described in `r knitcitations::citep("10.1016/j.jeem.2004.11.005")`.
- Compute the optimal solution under different forms of uncertainty.   
-
 ``` {r  setup, echo=FALSE, cache=FALSE}
 # load required libraries
 require(pdgControl)
@@ -23,6 +20,15 @@ require(ggplot2)
 require(data.table)
 rm(list=ls())
 ````
+
+
+Chose the state equation / population dynamics function
+
+``` {r stateeqn}
+f <- May
+````
+
+
 With parameters 
 
 ``` {r pars}
@@ -256,9 +262,3 @@ print(xtable(matrix(sds$V1, nrow=length(noise), dimnames=list(uncertainties, unc
 ````
 
 
-
-# References
-
-``` {r biblio, echo=FALSE, results="asis"}
-knitcitations::bibliography("html")
-````
