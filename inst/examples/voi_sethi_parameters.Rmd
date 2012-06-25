@@ -142,13 +142,20 @@ gmi <- scenario(lvl, lvl, lvl)
 ````
 
 
+```{r }
+low <- all_low
+````
+
+
 ### plots
 
-``` {r sethiplots}
+
+
+``` {r sethiplots, rerun=TRUE}
 require(reshape2)
-policy <- melt(data.frame(stock = x_grid, det = det$D[,1], 
+policy <- melt(data.frame(stock = x_grid, det = det$D[,1], low=low$D[,1],
                g = g$D[,1], m = m$D[,1], i= m$D[,1], 
-               gm = gm$D[,1], gi = gi$D[,1], gmi = gmi$D[,1]), 
+               gm = gm$D[,1], gi = gi$D[,1], mi = mi$D[,1], gmi = gmi$D[,1]), 
                id = "stock")
 
 ggplot(policy) + 
@@ -162,9 +169,9 @@ ggplot(policy) +
   ylab("harvest") 
 
 
-value <- melt(data.frame(stock = x_grid, det=det$V, 
+value <- melt(data.frame(stock = x_grid, det=det$V, low = low$V, 
                          g = g$V, m = m$V, gm = gm$V, 
-                         gi = gi$V, gmi = gmi$V), id = "stock")
+                         gi = gi$V, mi=mi$V, gmi = gmi$V), id = "stock")
 
 ggplot(value) + 
   geom_point(aes(stock, value, color=variable)) +
@@ -174,7 +181,7 @@ ggplot(value) +
 
 ## Simulations
 
-``` {r simfn} 
+``` {r simfn, rerun=TRUE} 
 simulatereps <- function(opt, true_g, true_m, true_i){
 
   z_g <- function() 1+(2*runif(1, 0,  1)-1) * true_g
@@ -245,8 +252,8 @@ sds <- profits[, sd(V1), by=uncertainty]
 ``` {r prettytable, cache=FALSE, results="asis"}
 require(xtable)
 uncertainties <- names(noise) 
-print(xtable(matrix(means$V1, nrow=8, dimnames=list(uncertainties, uncertainties))), type="html")
-print(xtable(matrix(sds$V1, nrow=8, dimnames=list(uncertainties, uncertainties))), type="html")
+print(xtable(matrix(means$V1, nrow=length(noise), dimnames=list(uncertainties, uncertainties))), type="html")
+print(xtable(matrix(sds$V1, nrow=length(noise), dimnames=list(uncertainties, uncertainties))), type="html")
 ````
 
 
