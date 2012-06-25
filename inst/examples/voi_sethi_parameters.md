@@ -3,7 +3,6 @@
 
 
 
-
 # Calculating the value of information
 
  Implements a numerical version of the SDP described in (Sethi _et. al._ 2005).
@@ -439,15 +438,15 @@ print(xtable(matrix(means$V1, nrow = length(noise),
 <!-- html table generated in R 2.14.1 by xtable 1.7-0 package -->
 <!-- Mon Jun 25 09:06:00 2012 -->
 <TABLE border=1>
-<TR> <TH>  </TH> <TH> det </TH> <TH> low </TH> <TH> growth </TH> <TH> measure </TH> <TH> implement </TH> <TH> growth_measure </TH> <TH> growth_implement </TH> <TH> measure_implement </TH> <TH> all </TH>  </TR>
+<TR> <TH>  </TH> <TH> det </TH> <TH> low </TH> <TH> growth </TH> <TH> meas</TH> <TH> imp </TH> <TH> gro_meas </TH> <TH> gro_imp </TH> <TH> meas_imp </TH> <TH> all </TH>  </TR>
   <TR> <TD align="right"> det </TD> <TD align="right"> 668.18 </TD> <TD align="right"> 674.24 </TD> <TD align="right"> 673.90 </TD> <TD align="right"> 674.24 </TD> <TD align="right"> 674.24 </TD> <TD align="right"> 674.24 </TD> <TD align="right"> 672.66 </TD> <TD align="right"> 672.73 </TD> <TD align="right"> 672.73 </TD> </TR>
   <TR> <TD align="right"> low </TD> <TD align="right"> 658.41 </TD> <TD align="right"> 667.17 </TD> <TD align="right"> 668.13 </TD> <TD align="right"> 668.70 </TD> <TD align="right"> 667.71 </TD> <TD align="right"> 667.11 </TD> <TD align="right"> 666.11 </TD> <TD align="right"> 665.49 </TD> <TD align="right"> 663.88 </TD> </TR>
-  <TR> <TD align="right"> growth </TD> <TD align="right"> 665.60 </TD> <TD align="right"> 658.17 </TD> <TD align="right"> 678.24 </TD> <TD align="right"> 672.08 </TD> <TD align="right"> 663.51 </TD> <TD align="right"> 663.35 </TD> <TD align="right"> 678.42 </TD> <TD align="right"> 673.02 </TD> <TD align="right"> 659.98 </TD> </TR>
-  <TR> <TD align="right"> measure </TD> <TD align="right"> 561.96 </TD> <TD align="right"> 563.93 </TD> <TD align="right"> 565.44 </TD> <TD align="right"> 580.35 </TD> <TD align="right"> 567.14 </TD> <TD align="right"> 586.47 </TD> <TD align="right"> 539.94 </TD> <TD align="right"> 585.76 </TD> <TD align="right"> 581.12 </TD> </TR>
-  <TR> <TD align="right"> implement </TD> <TD align="right"> 642.66 </TD> <TD align="right"> 652.05 </TD> <TD align="right"> 648.74 </TD> <TD align="right"> 650.36 </TD> <TD align="right"> 648.10 </TD> <TD align="right"> 652.25 </TD> <TD align="right"> 648.68 </TD> <TD align="right"> 651.49 </TD> <TD align="right"> 647.17 </TD> </TR>
-  <TR> <TD align="right"> growth_measure </TD> <TD align="right"> 570.61 </TD> <TD align="right"> 559.36 </TD> <TD align="right"> 549.87 </TD> <TD align="right"> 591.47 </TD> <TD align="right"> 546.31 </TD> <TD align="right"> 568.15 </TD> <TD align="right"> 526.44 </TD> <TD align="right"> 571.87 </TD> <TD align="right"> 570.54 </TD> </TR>
-  <TR> <TD align="right"> growth_implement </TD> <TD align="right"> 656.30 </TD> <TD align="right"> 630.27 </TD> <TD align="right"> 631.36 </TD> <TD align="right"> 649.04 </TD> <TD align="right"> 642.05 </TD> <TD align="right"> 636.24 </TD> <TD align="right"> 626.19 </TD> <TD align="right"> 644.27 </TD> <TD align="right"> 629.62 </TD> </TR>
-  <TR> <TD align="right"> measure_implement </TD> <TD align="right"> 409.87 </TD> <TD align="right"> 414.02 </TD> <TD align="right"> 409.90 </TD> <TD align="right"> 453.13 </TD> <TD align="right"> 390.19 </TD> <TD align="right"> 454.33 </TD> <TD align="right"> 383.75 </TD> <TD align="right"> 461.56 </TD> <TD align="right"> 437.81 </TD> </TR>
+  <TR> <TD align="right"> gro </TD> <TD align="right"> 665.60 </TD> <TD align="right"> 658.17 </TD> <TD align="right"> 678.24 </TD> <TD align="right"> 672.08 </TD> <TD align="right"> 663.51 </TD> <TD align="right"> 663.35 </TD> <TD align="right"> 678.42 </TD> <TD align="right"> 673.02 </TD> <TD align="right"> 659.98 </TD> </TR>
+  <TR> <TD align="right"> meas </TD> <TD align="right"> 561.96 </TD> <TD align="right"> 563.93 </TD> <TD align="right"> 565.44 </TD> <TD align="right"> 580.35 </TD> <TD align="right"> 567.14 </TD> <TD align="right"> 586.47 </TD> <TD align="right"> 539.94 </TD> <TD align="right"> 585.76 </TD> <TD align="right"> 581.12 </TD> </TR>
+  <TR> <TD align="right"> impl </TD> <TD align="right"> 642.66 </TD> <TD align="right"> 652.05 </TD> <TD align="right"> 648.74 </TD> <TD align="right"> 650.36 </TD> <TD align="right"> 648.10 </TD> <TD align="right"> 652.25 </TD> <TD align="right"> 648.68 </TD> <TD align="right"> 651.49 </TD> <TD align="right"> 647.17 </TD> </TR>
+  <TR> <TD align="right"> gro_meas </TD> <TD align="right"> 570.61 </TD> <TD align="right"> 559.36 </TD> <TD align="right"> 549.87 </TD> <TD align="right"> 591.47 </TD> <TD align="right"> 546.31 </TD> <TD align="right"> 568.15 </TD> <TD align="right"> 526.44 </TD> <TD align="right"> 571.87 </TD> <TD align="right"> 570.54 </TD> </TR>
+  <TR> <TD align="right"> gro_imp </TD> <TD align="right"> 656.30 </TD> <TD align="right"> 630.27 </TD> <TD align="right"> 631.36 </TD> <TD align="right"> 649.04 </TD> <TD align="right"> 642.05 </TD> <TD align="right"> 636.24 </TD> <TD align="right"> 626.19 </TD> <TD align="right"> 644.27 </TD> <TD align="right"> 629.62 </TD> </TR>
+  <TR> <TD align="right"> meas_imp </TD> <TD align="right"> 409.87 </TD> <TD align="right"> 414.02 </TD> <TD align="right"> 409.90 </TD> <TD align="right"> 453.13 </TD> <TD align="right"> 390.19 </TD> <TD align="right"> 454.33 </TD> <TD align="right"> 383.75 </TD> <TD align="right"> 461.56 </TD> <TD align="right"> 437.81 </TD> </TR>
   <TR> <TD align="right"> all </TD> <TD align="right"> 414.06 </TD> <TD align="right"> 414.96 </TD> <TD align="right"> 380.41 </TD> <TD align="right"> 444.25 </TD> <TD align="right"> 407.72 </TD> <TD align="right"> 471.61 </TD> <TD align="right"> 374.73 </TD> <TD align="right"> 463.12 </TD> <TD align="right"> 449.96 </TD> </TR>
    </TABLE>
 
