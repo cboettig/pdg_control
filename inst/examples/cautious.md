@@ -7,7 +7,6 @@
 
  * Author [Carl Boettiger](http://carlboettiger.info), <cboettig@gmail.com>
  * License: [CC0](http://creativecommons.org/publicdomain/zero/1.0/)
- * Description:  Implements a numerical version of the SDP described in Reed, (1979), in which the dynamics are slowly moving towards a tipping point.  
 
 
 
@@ -173,13 +172,26 @@ SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
 
 ### Find the optimum by dynamic programming
 
-Bellman's algorithm to compute the a cautious solution that selects a fraction `P` = `P` of the optimal harvest solution for all possible trajectories in the iterative optimization.  
 
 
 
 ```r
-opt <- find_dp_cautious(SDP_Mat, x_grid, h_grid, OptTime, xT, 
-                     profit, delta, reward=0, P = P)
+require(snowfall)
+sfInit(parallel=TRUE, cpu=2)
+```
+
+
+
+
+Bellman's algorithm to compute the a cautious solution that selects a fraction `P` = `P` of the optimal harvest solution for all possible trajectories in the iterative optimization. Loop over 10 values of P.   
+
+
+
+```r
+P <- seq(0, 1, length.out=10)
+opts <- lapply(P, function(P) 
+  find_dp_cautious(SDP_Mat, x_grid, h_grid, OptTime, xT, 
+                     profit, delta, reward=0, P = P))
 ```
 
 
@@ -193,130 +205,41 @@ Plot the policy function (in terms of escapement, `x-h`, rather than harvest `h`
 
 
 ```r
-q1 <- qplot(x_grid, x_grid - x_grid[opt$D[,1]], xlab="stock size", ylab="escapement") + 
-geom_point(aes(x,y), data=data.frame(x=opt$S, y=opt$S), col="red")
-q1
+require(reshape2)
+dat <- sapply(opts, function(x) x$D[,1])
+dat <- as.data.frame(cbind(stock=x_grid, dat))
+names(dat) <- c("stock", as.character(round(P,2)))
+policy <- melt(dat, id="stock")
+ggplot(policy) + geom_line(aes(stock,x_grid - x_grid[value], color=variable)) + ylab("escapement")
 ```
 
-![plot of chunk policyfn_plot](http://farm8.staticflickr.com/7247/7416164758_d656859142_o.png) 
-
-
-and the value function (at equilibrium):
-
-
-
-```r
-q2 <- qplot(x_grid, opt$V, xlab="stock size", ylab="value") + 
-geom_vline(xintercept=opt$S)
-q2
-```
-
-![plot of chunk valuefn_plot](http://farm8.staticflickr.com/7138/7416165156_7e0b59583e_o.png) 
-
-
-
-
-
-
-### Simulate 
-
-Now we'll simulate 100 replicates of this stochastic process,
-
-
-```r
-sims <- lapply(1:100, function(i){
-  ForwardSimulate(f, pars, x_grid, h_grid, x0=K, opt$D, z_g, z_m, z_i)
-})
-```
-
-
-
-
-## Summarize and plot the results                                                   
-
-R makes it easy to work with this big replicate data set.  We make data tidy (melt), fast (data.tables), and nicely labeled.
-
-
-
-```r
-dat <- melt(sims, id=names(sims[[1]]))  
-dt <- data.table(dat)
-setnames(dt, "L1", "reps") # names are nice
-```
-
-
-
-
-### Plots 
-
-Let's begin by looking at the dynamics of a single replicate. The line shows Reed's S, the level above which the stock should be harvested (where catch should be the difference between stock and S).  To confirm that this policy is being followed, note that harvesting only occurs when the stock is above this line, and harvest is proportional to the amount by which it is above.  Change the replicate `reps==` to see the results from a different replicate.  
-
-
-
-```r
-p0 <- ggplot(subset(dt,reps==1)) +
-  geom_line(aes(time, fishstock)) +
-  geom_abline(intercept=opt$S, slope = 0) +
-  geom_line(aes(time, harvest), col="darkgreen") 
-p0
-```
-
-![plot of chunk p0](http://farm9.staticflickr.com/8147/7416165780_c2b96dda71_o.png) 
-
-
-
-
-
-
-
-
-This plot summarizes the stock dynamics by visualizing the replicates. Reed's S shown again, along with the dotted line showing the allee threshold, below which the stock will go to zero (unless rescued stochastically). 
-
-
-
-```r
-p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) + 
-  geom_abline(intercept=xT, slope = 0, lty=2) 
-p1 <- p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
-p1
-```
-
-![plot of chunk p1](http://farm8.staticflickr.com/7132/7416166440_8544c37d88_o.png) 
-
-
-
-```r
-p2 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) + 
-  geom_abline(intercept=xT, slope = 0, lty=2) 
-p2 <- p2 + geom_line(aes(time, harvest, group = reps), alpha = 0.2)
-p2
-```
-
-![plot of chunk p2](http://farm9.staticflickr.com/8141/7416166884_4b119f80f0_o.png) 
-
-
-
+![plot of chunk policyfn_plot](http://farm9.staticflickr.com/8152/7455686164_d55ac0dde9_o.png) 
 
 
 
 
 ```r
-profits <-dt[ , sum(profit), by="reps"] 
-ggplot(profits) + geom_histogram(aes(V1)) 
+dat <- sapply(opts, function(x) x$V)
+dat <- as.data.frame(cbind(stock=x_grid, dat))
+names(dat) <- c("stock", as.character(round(P,2)))
+policy <- melt(dat, id="stock")
+ggplot(policy) + geom_line(aes(stock, value, color=variable)) + ylab("Net present value")
 ```
 
-![the distribution of profits by scenario](http://farm8.staticflickr.com/7135/7416167322_98ffa3da75_o.png) 
+![plot of chunk valuefn_plot](http://farm9.staticflickr.com/8008/7455686866_998376f0ae_o.png) 
 
+```r
 
+x0_i <- which.min(abs(x_grid-K))
+values <- sapply(opts, function(x) x$V[x0_i])
+names(values) <- as.character(round(P,2))
+values
+```
 
-## Calculate warning signals 
-
-# References
-
-<p>Reed WJ (1979).
-&ldquo;Optimal Escapement Levels in Stochastic And Deterministic Harvesting Models.&rdquo;
-<EM>Journal of Environmental Economics And Management</EM>, <B>6</B>.
-ISSN 00950696, <a href="http://dx.doi.org/10.1016/0095-0696(79)90014-7">http://dx.doi.org/10.1016/0095-0696(79)90014-7</a>.
+```
+    0  0.11  0.22  0.33  0.44  0.56  0.67  0.78  0.89     1 
+ 0.00 14.14 21.21 25.16 27.38 28.78 29.99 30.64 31.43 32.11 
+```
 
 
 
