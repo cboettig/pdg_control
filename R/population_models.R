@@ -115,7 +115,7 @@ Myer_harvest <- function(x, h, p){
 #' @export
 May <- function(x, h, p){
   sapply(x, function(x){
-         s <- x - h # escapement
+         s <- max(x - h, 0) # escapement
          r <- as.numeric(p[1])
          K <- as.numeric(p[2])
          a <- as.numeric(p[3])
