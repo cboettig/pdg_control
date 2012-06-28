@@ -159,13 +159,13 @@ policy <- melt(data.frame(stock = x_grid, det = det$D[,1], low=low$D[,1],
                id = "stock")
 
 ggplot(policy) + 
-  geom_point(aes(stock, stock-x_grid[value], color=variable)) +
-	geom_smooth(aes(stock, stock-x_grid[value], color=variable)) +
+  geom_point(aes(stock, stock-x_grid[value], color=variable), shape='+') +
+	stat_smooth(aes(stock, stock-x_grid[value], color=variable), degree=1, se=FALSE) +
   ylab("escapement") 
 
 ggplot(policy) +
-  geom_point(aes(stock, x_grid[value], color=variable)) +
-	geom_smooth(aes(stock, x_grid[value], color=variable)) +
+  geom_point(aes(stock, x_grid[value], color=variable), shape='+') +
+	stat_smooth(aes(stock, x_grid[value], color=variable), degree=1, se=FALSE) +
   ylab("harvest") 
 
 
@@ -175,7 +175,7 @@ value <- melt(data.frame(stock = x_grid, det=det$V, low = low$V,
 
 ggplot(value) + 
   geom_point(aes(stock, value, color=variable)) +
-  geom_smooth(aes(stock, value, color=variable)) +
+  stat_smooth(aes(stock, value, color=variable), degree=1, se=FALSE) +
   ylab("Net Present Value")
 ````
 
@@ -219,28 +219,6 @@ setnames(dt, c("L2", "L1"), c("reps", "uncertainty")) # names are nice
 ````
 
 
-### Plots 
-
-
-``` {r  onerep, dependson="tidyall"}
-ggplot(subset(dt,reps==1)) +
-  geom_line(aes(time, fishstock)) +
-  geom_line(aes(time, harvest), col="darkgreen") + 
-  facet_wrap(~uncertainty) 
-````
-
-This plot summarizes the stock dynamics by visualizing the replicates.
-
-``` {r stock, fig.cap="the induced dynamics in the stock size over time, for all replicates, by scenario", dependson="tidyall"}
-p1 <- ggplot(subset(dt, fishstock>0)) 
-p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1) + facet_wrap(~uncertainty)
-````
-
-
-``` {r profits, fig.cap="the distribution of profits by scenario", dependson="tidyall"}
-profits <-dt[ , sum(profit), by=c("reps", "uncertainty")] 
-ggplot(profits) + geom_histogram(aes(V1)) + facet_wrap(~uncertainty)
-````
 
 Summary statistics 
 
