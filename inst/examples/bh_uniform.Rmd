@@ -34,7 +34,7 @@ f <- BevHolt
 With parameters `A` = `r A <- 1.5` and `B` = `r B <- 0.05`.
 
 ``` {r }
-pars <- c(1.5, 0.05)
+pars <- c(A, B)
 K <- (pars[1] - 1)/pars[2]
 ````
 
@@ -149,9 +149,7 @@ low <- all_low
 
 ### plots
 
-
-
-``` {r sethiplots, rerun=TRUE}
+``` {r sethiplots}
 require(reshape2)
 policy <- melt(data.frame(stock = x_grid, det = det$D[,1], low=low$D[,1],
                g = g$D[,1], m = m$D[,1], i= m$D[,1], 
@@ -159,13 +157,15 @@ policy <- melt(data.frame(stock = x_grid, det = det$D[,1], low=low$D[,1],
                id = "stock")
 
 ggplot(policy) + 
-  geom_point(aes(stock, stock-x_grid[value], color=variable)) +
-	geom_smooth(aes(stock, stock-x_grid[value], color=variable)) +
+  geom_point(aes(stock, stock-x_grid[value], color=variable), shape='+') +
+	stat_smooth(aes(stock, stock-x_grid[value], color=variable), 
+    degree=1, se=FALSE, span=0.3) +
   ylab("escapement") 
 
 ggplot(policy) +
-  geom_point(aes(stock, x_grid[value], color=variable)) +
-	geom_smooth(aes(stock, x_grid[value], color=variable)) +
+  geom_point(aes(stock, x_grid[value], color=variable), shape='+') +
+	stat_smooth(aes(stock, x_grid[value], color=variable),
+    degree=1, se=FALSE, span=0.3) +
   ylab("harvest") 
 
 
@@ -174,10 +174,17 @@ value <- melt(data.frame(stock = x_grid, det=det$V, low = low$V,
                          gi = gi$V, mi=mi$V, gmi = gmi$V), id = "stock")
 
 ggplot(value) + 
-  geom_point(aes(stock, value, color=variable)) +
-  geom_smooth(aes(stock, value, color=variable)) +
+  geom_point(aes(stock, value, color=variable), shape='+') +
+#  stat_smooth(aes(stock, value, color=variable),
+#    degree=0, se=FALSE, span=0.15) +
   ylab("Net Present Value")
 ````
+
+
+
+
+
+
 
 ## Simulations
 

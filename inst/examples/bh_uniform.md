@@ -30,7 +30,7 @@ With parameters `A` = `1.5` and `B` = `0.05`.
 
 
 ```r
-pars <- c(1.5, 0.05)
+pars <- c(A, B)
 K <- (pars[1] - 1)/pars[2]
 ```
 
@@ -276,27 +276,27 @@ low <- all_low
 
 
 
-
-
 ```r
 require(reshape2)
 policy <- melt(data.frame(stock = x_grid, det = det$D[, 1], low = low$D[, 
     1], g = g$D[, 1], m = m$D[, 1], i = m$D[, 1], gm = gm$D[, 1], gi = gi$D[, 
     1], mi = mi$D[, 1], gmi = gmi$D[, 1]), id = "stock")
 
-ggplot(policy) + geom_point(aes(stock, stock - x_grid[value], color = variable)) + 
-    geom_smooth(aes(stock, stock - x_grid[value], color = variable)) + ylab("escapement")
+ggplot(policy) + geom_point(aes(stock, stock - x_grid[value], color = variable), 
+    shape = "+") + stat_smooth(aes(stock, stock - x_grid[value], color = variable), 
+    degree = 1, se = FALSE, span = 0.3) + ylab("escapement")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8167/7459392044_caa42b402c_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8027/7462130520_8f6604168d_o.png) 
 
 ```r
 
-ggplot(policy) + geom_point(aes(stock, x_grid[value], color = variable)) + 
-    geom_smooth(aes(stock, x_grid[value], color = variable)) + ylab("harvest")
+ggplot(policy) + geom_point(aes(stock, x_grid[value], color = variable), 
+    shape = "+") + stat_smooth(aes(stock, x_grid[value], color = variable), 
+    degree = 1, se = FALSE, span = 0.3) + ylab("harvest")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8165/7459392238_52b3f6d5cb_o.png) 
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7131/7462130906_2e68803e78_o.png) 
 
 ```r
 
@@ -304,11 +304,19 @@ ggplot(policy) + geom_point(aes(stock, x_grid[value], color = variable)) +
 value <- melt(data.frame(stock = x_grid, det = det$V, low = low$V, 
     g = g$V, m = m$V, gm = gm$V, gi = gi$V, mi = mi$V, gmi = gmi$V), id = "stock")
 
-ggplot(value) + geom_point(aes(stock, value, color = variable)) + 
-    geom_smooth(aes(stock, value, color = variable)) + ylab("Net Present Value")
+ggplot(value) + geom_point(aes(stock, value, color = variable), shape = "+") + 
+    # stat_smooth(aes(stock, value, color=variable), degree=0, se=FALSE,
+# span=0.15) +
+ylab("Net Present Value")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8012/7459392446_0762a30eca_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8007/7462131456_e3fe12eaa9_o.png) 
+
+
+
+
+
+
 
 
 ## Simulations
@@ -428,7 +436,7 @@ print(xtable(matrix(means$V1, nrow = length(noise), dimnames = list(uncertaintie
 ```
 
 <!-- html table generated in R 2.14.1 by xtable 1.7-0 package -->
-<!-- Thu Jun 28 00:38:11 2012 -->
+<!-- Thu Jun 28 11:32:45 2012 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> det </TH> <TH> low </TH> <TH> growth </TH> <TH> measure </TH> <TH> implement </TH> <TH> growth_measure </TH> <TH> growth_implement </TH> <TH> measure_implement </TH> <TH> all </TH>  </TR>
   <TR> <TD align="right"> det </TD> <TD align="right"> 31.79 </TD> <TD align="right"> 33.18 </TD> <TD align="right"> 32.99 </TD> <TD align="right"> 32.10 </TD> <TD align="right"> 33.03 </TD> <TD align="right"> 32.12 </TD> <TD align="right"> 32.73 </TD> <TD align="right"> 32.10 </TD> <TD align="right"> 31.97 </TD> </TR>
@@ -449,7 +457,7 @@ print(xtable(matrix(sds$V1, nrow = length(noise), dimnames = list(uncertainties,
 ```
 
 <!-- html table generated in R 2.14.1 by xtable 1.7-0 package -->
-<!-- Thu Jun 28 00:38:11 2012 -->
+<!-- Thu Jun 28 11:32:45 2012 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> det </TH> <TH> low </TH> <TH> growth </TH> <TH> measure </TH> <TH> implement </TH> <TH> growth_measure </TH> <TH> growth_implement </TH> <TH> measure_implement </TH> <TH> all </TH>  </TR>
   <TR> <TD align="right"> det </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> </TR>

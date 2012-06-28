@@ -286,19 +286,19 @@ policy <- melt(data.frame(stock = x_grid, det = det$D[, 1], low = low$D[,
 
 ggplot(policy) + geom_point(aes(stock, stock - x_grid[value], color = variable), 
     shape = "+") + stat_smooth(aes(stock, stock - x_grid[value], color = variable), 
-    degree = 1, se = FALSE) + ylab("escapement")
+    degree = 1, se = FALSE, span = 0.3) + ylab("escapement")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8011/7462000842_73bd6364c2_o.png) 
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7110/7462091564_bf24ef2e12_o.png) 
 
 ```r
 
 ggplot(policy) + geom_point(aes(stock, x_grid[value], color = variable), 
     shape = "+") + stat_smooth(aes(stock, x_grid[value], color = variable), 
-    degree = 1, se = FALSE) + ylab("harvest")
+    degree = 1, se = FALSE, span = 0.3) + ylab("harvest")
 ```
 
-![plot of chunk sethiplots](http://farm8.staticflickr.com/7264/7462001444_2e8c89b0c2_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8008/7462092004_96a77532e6_o.png) 
 
 ```r
 
@@ -306,12 +306,13 @@ ggplot(policy) + geom_point(aes(stock, x_grid[value], color = variable),
 value <- melt(data.frame(stock = x_grid, det = det$V, low = low$V, 
     g = g$V, m = m$V, gm = gm$V, gi = gi$V, mi = mi$V, gmi = gmi$V), id = "stock")
 
-ggplot(value) + geom_point(aes(stock, value, color = variable)) + 
-    stat_smooth(aes(stock, value, color = variable), degree = 1, se = FALSE) + 
-    ylab("Net Present Value")
+ggplot(value) + geom_point(aes(stock, value, color = variable), shape = "+") + 
+    # stat_smooth(aes(stock, value, color=variable), degree=0, se=FALSE,
+# span=0.15) +
+ylab("Net Present Value")
 ```
 
-![plot of chunk sethiplots](http://farm8.staticflickr.com/7115/7462001918_e3cdd495fe_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8010/7462092326_efdbfda91f_o.png) 
 
 
 ## Simulations

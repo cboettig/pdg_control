@@ -107,11 +107,6 @@ require(snowfall)
 sfInit(parallel = TRUE, cpu = 16)
 ```
 
-```
-R Version:  R version 2.14.1 (2011-12-22) 
-
-```
-
 
 
 
@@ -125,10 +120,9 @@ scenario <- function(policy_g, policy_m, policy_i) {
     z_m <- function() 1 + (2 * runif(1, 0, 1) - 1) * policy_m
     z_i <- function() 1 + (2 * runif(1, 0, 1) - 1) * policy_i
     
-    SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, 
-        z_g, z_m, z_i, reps = 2e+05)
-    opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, 
-        xT, profit, delta, reward = 0)
+    SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps = 20000)
+    opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, 
+        reward = 0)
 }
 ```
 
@@ -279,42 +273,43 @@ low <- all_low
 
 
 
-
 ```r
 require(reshape2)
-policy <- melt(data.frame(stock = x_grid, det = det$D[, 
-    1], low = low$D[, 1], g = g$D[, 1], m = m$D[, 1], i = m$D[, 
-    1], gm = gm$D[, 1], gi = gi$D[, 1], mi = mi$D[, 1], gmi = gmi$D[, 
-    1]), id = "stock")
+policy <- melt(data.frame(stock = x_grid, det = det$D[, 1], low = low$D[, 
+    1], g = g$D[, 1], m = m$D[, 1], i = m$D[, 1], gm = gm$D[, 1], gi = gi$D[, 
+    1], mi = mi$D[, 1], gmi = gmi$D[, 1]), id = "stock")
 
-ggplot(policy) + geom_point(aes(stock, stock - 
-    x_grid[value], color = variable)) + geom_smooth(aes(stock, 
-    stock - x_grid[value], color = variable)) + ylab("escapement")
+ggplot(policy) + geom_point(aes(stock, stock - x_grid[value], color = variable), 
+    shape = "+") + stat_smooth(aes(stock, stock - x_grid[value], color = variable), 
+    degree = 1, se = FALSE, span = 0.3) + ylab("escapement")
 ```
 
-![plot of chunk sethiplots](http://farm8.staticflickr.com/7137/7456298040_1f4ea25cb8_o.png) 
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7269/7462132696_51b5851222_o.png) 
 
 ```r
 
-ggplot(policy) + geom_point(aes(stock, x_grid[value], 
-    color = variable)) + geom_smooth(aes(stock, x_grid[value], 
-    color = variable)) + ylab("harvest")
+ggplot(policy) + geom_point(aes(stock, x_grid[value], color = variable), 
+    shape = "+") + stat_smooth(aes(stock, x_grid[value], color = variable), 
+    degree = 1, se = FALSE, span = 0.3) + ylab("harvest")
 ```
 
-![plot of chunk sethiplots](http://farm8.staticflickr.com/7270/7456299098_3eaf656e12_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8152/7462133716_d96e26ee18_o.png) 
 
 ```r
 
 
-value <- melt(data.frame(stock = x_grid, det = det$V, 
-    low = low$V, g = g$V, m = m$V, gm = gm$V, gi = gi$V, 
-    mi = mi$V, gmi = gmi$V), id = "stock")
+value <- melt(data.frame(stock = x_grid, det = det$V, low = low$V, 
+    g = g$V, m = m$V, gm = gm$V, gi = gi$V, mi = mi$V, gmi = gmi$V), id = "stock")
 
-ggplot(value) + geom_point(aes(stock, value, color = variable)) + 
-    geom_smooth(aes(stock, value, color = variable)) + ylab("Net Present Value")
+ggplot(value) + geom_point(aes(stock, value, color = variable), shape = "+") + 
+    # stat_smooth(aes(stock, value, color=variable), degree=0, se=FALSE,
+# span=0.15) +
+ylab("Net Present Value")
 ```
 
-![plot of chunk sethiplots](http://farm8.staticflickr.com/7135/7456300466_8393492196_o.png) 
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7247/7462134040_18a3e7ded7_o.png) 
+
+
 
 
 ## Simulations
@@ -433,12 +428,12 @@ sds <- profits[, sd(V1), by = uncertainty]
 ```r
 require(xtable)
 uncertainties <- names(noise)
-print(xtable(matrix(means$V1, nrow = length(noise), 
-    dimnames = list(uncertainties, uncertainties))), type = "html")
+print(xtable(matrix(means$V1, nrow = length(noise), dimnames = list(uncertainties, 
+    uncertainties))), type = "html")
 ```
 
 <!-- html table generated in R 2.14.1 by xtable 1.7-0 package -->
-<!-- Wed Jun 27 13:03:23 2012 -->
+<!-- Thu Jun 28 11:33:16 2012 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> det </TH> <TH> low </TH> <TH> growth </TH> <TH> measure </TH> <TH> implement </TH> <TH> growth_measure </TH> <TH> growth_implement </TH> <TH> measure_implement </TH> <TH> all </TH>  </TR>
   <TR> <TD align="right"> det </TD> <TD align="right"> 668.18 </TD> <TD align="right"> 674.24 </TD> <TD align="right"> 673.80 </TD> <TD align="right"> 674.24 </TD> <TD align="right"> 674.24 </TD> <TD align="right"> 674.24 </TD> <TD align="right"> 669.44 </TD> <TD align="right"> 674.24 </TD> <TD align="right"> 667.72 </TD> </TR>
@@ -454,12 +449,12 @@ print(xtable(matrix(means$V1, nrow = length(noise),
 
 
 ```r
-print(xtable(matrix(sds$V1, nrow = length(noise), 
-    dimnames = list(uncertainties, uncertainties))), type = "html")
+print(xtable(matrix(sds$V1, nrow = length(noise), dimnames = list(uncertainties, 
+    uncertainties))), type = "html")
 ```
 
 <!-- html table generated in R 2.14.1 by xtable 1.7-0 package -->
-<!-- Wed Jun 27 13:03:23 2012 -->
+<!-- Thu Jun 28 11:33:16 2012 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> det </TH> <TH> low </TH> <TH> growth </TH> <TH> measure </TH> <TH> implement </TH> <TH> growth_measure </TH> <TH> growth_implement </TH> <TH> measure_implement </TH> <TH> all </TH>  </TR>
   <TR> <TD align="right"> det </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> </TR>
