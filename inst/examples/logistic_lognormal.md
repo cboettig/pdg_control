@@ -106,11 +106,6 @@ require(snowfall)
 sfInit(parallel = TRUE, cpu = 16)
 ```
 
-```
-R Version:  R version 2.14.1 (2011-12-22) 
-
-```
-
 
 
 
@@ -402,8 +397,8 @@ Error: object 'profits' not found
 ```r
 require(xtable)
 uncertainties <- names(noise)
-print(xtable(matrix(means$V1, nrow = length(noise), dimnames = list(uncertainties, 
-    uncertainties))), type = "html")
+print(xtable(matrix(means$V1, nrow = length(noise), 
+    dimnames = list(uncertainties, uncertainties))), type = "html")
 ```
 
 ```
@@ -411,8 +406,8 @@ Error: object 'means' not found
 ```
 
 ```r
-print(xtable(matrix(sds$V1, nrow = length(noise), dimnames = list(uncertainties, 
-    uncertainties))), type = "html")
+print(xtable(matrix(sds$V1, nrow = length(noise), 
+    dimnames = list(uncertainties, uncertainties))), type = "html")
 ```
 
 ```
