@@ -256,7 +256,7 @@ sds <- profits[, sd(V1), by=parameter]
 
 ``` {r prettytable, cache=FALSE, results="asis"}
 require(xtable)
-scenarios <- names(par_list) 
+scenarios <- c("low", "med", "high")
 print(xtable(matrix(means$V1, nrow=length(scenarios), dimnames=list(scenarios, scenarios))), type="html")
 print(xtable(matrix(sds$V1, nrow=length(scenarios), dimnames=list(scenarios, scenarios))), type="html")
 ````
