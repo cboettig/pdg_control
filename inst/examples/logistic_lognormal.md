@@ -133,7 +133,7 @@ Determine the policies for each of the scenarios (noise combinations).
 
 
 ```r
-lvl <- 0.5
+lvl <- 0.2
 ```
 
 
@@ -284,7 +284,7 @@ ggplot(policy) + geom_point(aes(stock, stock - x_grid[value], color = variable),
     degree = 1, se = FALSE, span = 0.3) + ylab("escapement")
 ```
 
-![plot of chunk sethiplots](http://farm8.staticflickr.com/7110/7462091564_bf24ef2e12_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8003/7470405550_92e5c80bde_o.png) 
 
 ```r
 
@@ -293,7 +293,7 @@ ggplot(policy) + geom_point(aes(stock, x_grid[value], color = variable),
     degree = 1, se = FALSE, span = 0.3) + ylab("harvest")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8008/7462092004_96a77532e6_o.png) 
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7265/7470405844_f31f56fd5b_o.png) 
 
 ```r
 
@@ -307,7 +307,7 @@ ggplot(value) + geom_point(aes(stock, value, color = variable), shape = "+") +
 ylab("Net Present Value")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8010/7462092326_efdbfda91f_o.png) 
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7267/7470406062_1d9b2f571f_o.png) 
 
 
 ## Simulations
@@ -397,8 +397,8 @@ Error: object 'profits' not found
 ```r
 require(xtable)
 uncertainties <- names(noise)
-print(xtable(matrix(means$V1, nrow = length(noise), 
-    dimnames = list(uncertainties, uncertainties))), type = "html")
+print(xtable(matrix(means$V1, nrow = length(noise), dimnames = list(uncertainties, 
+    uncertainties))), type = "html")
 ```
 
 ```
@@ -406,8 +406,8 @@ Error: object 'means' not found
 ```
 
 ```r
-print(xtable(matrix(sds$V1, nrow = length(noise), 
-    dimnames = list(uncertainties, uncertainties))), type = "html")
+print(xtable(matrix(sds$V1, nrow = length(noise), dimnames = list(uncertainties, 
+    uncertainties))), type = "html")
 ```
 
 ```

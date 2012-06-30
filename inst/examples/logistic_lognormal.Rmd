@@ -1,4 +1,4 @@
-`ro cache=TRUE, warning=FALSE, comment=NA, message=FALSE, cache.path="logistic_lognormal_fast/", verbose=TRUE or`
+`ro cache=TRUE, warning=FALSE, comment=NA, message=FALSE, cache.path="logistic_lognormal/", verbose=TRUE or`
 
 ``` {r  echo=FALSE, cache=FALSE }
 opts_knit$set(upload.fun = socialR::flickr.url)
@@ -102,7 +102,7 @@ scenario <- function(policy_g, policy_m, policy_i){
 Determine the policies for each of the scenarios (noise combinations).
 
 ``` {r runall}
-lvl <- 0.5
+lvl <- 0.2
 ````
 
 ``` {r }

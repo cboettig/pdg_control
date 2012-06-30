@@ -136,7 +136,7 @@ Determine the policies for each of the scenarios (noise combinations).
 
 
 ```r
-lvl <- 0.5
+lvl <- 0.2
 ```
 
 
@@ -274,27 +274,27 @@ low <- all_low
 
 
 
-
-
 ```r
 require(reshape2)
 policy <- melt(data.frame(stock = x_grid, det = det$D[, 1], low = low$D[, 
     1], g = g$D[, 1], m = m$D[, 1], i = m$D[, 1], gm = gm$D[, 1], gi = gi$D[, 
     1], mi = mi$D[, 1], gmi = gmi$D[, 1]), id = "stock")
 
-ggplot(policy) + geom_point(aes(stock, stock - x_grid[value], color = variable)) + 
-    geom_smooth(aes(stock, stock - x_grid[value], color = variable)) + ylab("escapement")
+ggplot(policy) + geom_point(aes(stock, stock - x_grid[value], color = variable), 
+    shape = "+") + stat_smooth(aes(stock, stock - x_grid[value], color = variable), 
+    degree = 1, se = FALSE, span = 0.3) + ylab("escapement")
 ```
 
-![plot of chunk sethiplots](http://farm8.staticflickr.com/7116/7463588954_baf23280c6_o.png) 
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7125/7469644504_59df8f5dce_o.png) 
 
 ```r
 
-ggplot(policy) + geom_point(aes(stock, x_grid[value], color = variable)) + 
-    geom_smooth(aes(stock, x_grid[value], color = variable)) + ylab("harvest")
+ggplot(policy) + geom_point(aes(stock, x_grid[value], color = variable), 
+    shape = "+") + stat_smooth(aes(stock, x_grid[value], color = variable), 
+    degree = 1, se = FALSE, span = 0.3) + ylab("harvest")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8013/7463589282_56899d96b0_o.png) 
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7140/7469644784_1159eb4c28_o.png) 
 
 ```r
 
@@ -302,11 +302,15 @@ ggplot(policy) + geom_point(aes(stock, x_grid[value], color = variable)) +
 value <- melt(data.frame(stock = x_grid, det = det$V, low = low$V, 
     g = g$V, m = m$V, gm = gm$V, gi = gi$V, mi = mi$V, gmi = gmi$V), id = "stock")
 
-ggplot(value) + geom_point(aes(stock, value, color = variable)) + 
-    geom_smooth(aes(stock, value, color = variable)) + ylab("Net Present Value")
+ggplot(value) + geom_point(aes(stock, value, color = variable), shape = "+") + 
+    # stat_smooth(aes(stock, value, color=variable), degree=0, se=FALSE,
+# span=0.15) +
+ylab("Net Present Value")
 ```
 
-![plot of chunk sethiplots](http://farm8.staticflickr.com/7262/7463589528_d221a029bb_o.png) 
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7136/7469645060_01c550d491_o.png) 
+
+
 
 
 ## Simulations
@@ -377,7 +381,7 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time, fishstock)) +
     geom_line(aes(time, harvest), col = "darkgreen") + facet_wrap(~uncertainty)
 ```
 
-![plot of chunk onerep](http://farm9.staticflickr.com/8153/7463596070_0811da4dcb_o.png) 
+![plot of chunk onerep](http://farm8.staticflickr.com/7132/7469650652_eccdb2d244_o.png) 
 
 
 This plot summarizes the stock dynamics by visualizing the replicates.
@@ -390,7 +394,7 @@ p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1) +
     facet_wrap(~uncertainty)
 ```
 
-![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm9.staticflickr.com/8167/7463598666_0713f06f6b_o.png) 
+![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm8.staticflickr.com/7247/7469653076_d8a3b76e43_o.png) 
 
 
 
@@ -401,7 +405,7 @@ profits <- dt[, sum(profit), by = c("reps", "uncertainty")]
 ggplot(profits) + geom_histogram(aes(V1)) + facet_wrap(~uncertainty)
 ```
 
-![the distribution of profits by scenario](http://farm9.staticflickr.com/8156/7463600340_70b4b5b51d_o.png) 
+![the distribution of profits by scenario](http://farm8.staticflickr.com/7111/7469654324_5eff07b886_o.png) 
 
 
 Summary statistics 
@@ -426,18 +430,18 @@ print(xtable(matrix(means$V1, nrow = length(noise), dimnames = list(uncertaintie
 ```
 
 <!-- html table generated in R 2.14.1 by xtable 1.7-0 package -->
-<!-- Thu Jun 28 16:24:10 2012 -->
+<!-- Fri Jun 29 17:13:24 2012 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> det </TH> <TH> low </TH> <TH> growth </TH> <TH> measure </TH> <TH> implement </TH> <TH> growth_measure </TH> <TH> growth_implement </TH> <TH> measure_implement </TH> <TH> all </TH>  </TR>
-  <TR> <TD align="right"> det </TD> <TD align="right"> 318.18 </TD> <TD align="right"> 331.49 </TD> <TD align="right"> 331.73 </TD> <TD align="right"> 309.09 </TD> <TD align="right"> 331.80 </TD> <TD align="right"> 317.63 </TD> <TD align="right"> 324.24 </TD> <TD align="right"> 318.96 </TD> <TD align="right"> 319.21 </TD> </TR>
-  <TR> <TD align="right"> low </TD> <TD align="right"> 315.26 </TD> <TD align="right"> 328.47 </TD> <TD align="right"> 328.25 </TD> <TD align="right"> 317.61 </TD> <TD align="right"> 333.27 </TD> <TD align="right"> 327.02 </TD> <TD align="right"> 318.65 </TD> <TD align="right"> 326.91 </TD> <TD align="right"> 323.43 </TD> </TR>
-  <TR> <TD align="right"> growth </TD> <TD align="right"> 489.02 </TD> <TD align="right"> 451.76 </TD> <TD align="right"> 461.19 </TD> <TD align="right"> 406.91 </TD> <TD align="right"> 440.00 </TD> <TD align="right"> 393.64 </TD> <TD align="right"> 444.60 </TD> <TD align="right"> 421.21 </TD> <TD align="right"> 416.46 </TD> </TR>
-  <TR> <TD align="right"> measure </TD> <TD align="right"> 200.13 </TD> <TD align="right"> 195.60 </TD> <TD align="right"> 159.62 </TD> <TD align="right"> 264.33 </TD> <TD align="right"> 148.01 </TD> <TD align="right"> 245.58 </TD> <TD align="right"> 158.74 </TD> <TD align="right"> 254.71 </TD> <TD align="right"> 233.83 </TD> </TR>
-  <TR> <TD align="right"> implement </TD> <TD align="right"> 288.01 </TD> <TD align="right"> 291.49 </TD> <TD align="right"> 280.08 </TD> <TD align="right"> 308.85 </TD> <TD align="right"> 283.60 </TD> <TD align="right"> 305.13 </TD> <TD align="right"> 269.88 </TD> <TD align="right"> 309.42 </TD> <TD align="right"> 305.92 </TD> </TR>
-  <TR> <TD align="right"> growth_measure </TD> <TD align="right"> 316.07 </TD> <TD align="right"> 241.36 </TD> <TD align="right"> 201.05 </TD> <TD align="right"> 332.93 </TD> <TD align="right"> 199.35 </TD> <TD align="right"> 345.12 </TD> <TD align="right"> 167.60 </TD> <TD align="right"> 320.32 </TD> <TD align="right"> 325.72 </TD> </TR>
-  <TR> <TD align="right"> growth_implement </TD> <TD align="right"> 385.44 </TD> <TD align="right"> 302.00 </TD> <TD align="right"> 310.08 </TD> <TD align="right"> 405.32 </TD> <TD align="right"> 301.00 </TD> <TD align="right"> 396.23 </TD> <TD align="right"> 283.87 </TD> <TD align="right"> 405.13 </TD> <TD align="right"> 401.91 </TD> </TR>
-  <TR> <TD align="right"> measure_implement </TD> <TD align="right"> 176.47 </TD> <TD align="right"> 155.79 </TD> <TD align="right"> 165.19 </TD> <TD align="right"> 217.49 </TD> <TD align="right"> 155.83 </TD> <TD align="right"> 215.70 </TD> <TD align="right"> 151.01 </TD> <TD align="right"> 207.82 </TD> <TD align="right"> 204.85 </TD> </TR>
-  <TR> <TD align="right"> all </TD> <TD align="right"> 238.84 </TD> <TD align="right"> 230.40 </TD> <TD align="right"> 185.19 </TD> <TD align="right"> 292.89 </TD> <TD align="right"> 216.60 </TD> <TD align="right"> 294.51 </TD> <TD align="right"> 189.44 </TD> <TD align="right"> 298.38 </TD> <TD align="right"> 236.78 </TD> </TR>
+  <TR> <TD align="right"> det </TD> <TD align="right"> 318.18 </TD> <TD align="right"> 331.82 </TD> <TD align="right"> 329.84 </TD> <TD align="right"> 331.82 </TD> <TD align="right"> 331.56 </TD> <TD align="right"> 327.27 </TD> <TD align="right"> 326.85 </TD> <TD align="right"> 330.30 </TD> <TD align="right"> 328.64 </TD> </TR>
+  <TR> <TD align="right"> low </TD> <TD align="right"> 315.26 </TD> <TD align="right"> 328.61 </TD> <TD align="right"> 328.10 </TD> <TD align="right"> 331.86 </TD> <TD align="right"> 334.49 </TD> <TD align="right"> 331.74 </TD> <TD align="right"> 323.59 </TD> <TD align="right"> 334.02 </TD> <TD align="right"> 328.43 </TD> </TR>
+  <TR> <TD align="right"> growth </TD> <TD align="right"> 351.77 </TD> <TD align="right"> 352.50 </TD> <TD align="right"> 357.22 </TD> <TD align="right"> 348.45 </TD> <TD align="right"> 350.74 </TD> <TD align="right"> 346.36 </TD> <TD align="right"> 363.11 </TD> <TD align="right"> 354.33 </TD> <TD align="right"> 350.50 </TD> </TR>
+  <TR> <TD align="right"> measure </TD> <TD align="right"> 304.16 </TD> <TD align="right"> 310.53 </TD> <TD align="right"> 308.81 </TD> <TD align="right"> 318.18 </TD> <TD align="right"> 308.91 </TD> <TD align="right"> 313.09 </TD> <TD align="right"> 307.81 </TD> <TD align="right"> 313.05 </TD> <TD align="right"> 314.81 </TD> </TR>
+  <TR> <TD align="right"> implement </TD> <TD align="right"> 309.39 </TD> <TD align="right"> 326.71 </TD> <TD align="right"> 326.07 </TD> <TD align="right"> 327.25 </TD> <TD align="right"> 326.60 </TD> <TD align="right"> 324.04 </TD> <TD align="right"> 322.71 </TD> <TD align="right"> 326.22 </TD> <TD align="right"> 324.88 </TD> </TR>
+  <TR> <TD align="right"> growth_measure </TD> <TD align="right"> 337.97 </TD> <TD align="right"> 337.80 </TD> <TD align="right"> 328.30 </TD> <TD align="right"> 339.78 </TD> <TD align="right"> 307.55 </TD> <TD align="right"> 333.02 </TD> <TD align="right"> 324.93 </TD> <TD align="right"> 331.86 </TD> <TD align="right"> 342.77 </TD> </TR>
+  <TR> <TD align="right"> growth_implement </TD> <TD align="right"> 343.60 </TD> <TD align="right"> 343.46 </TD> <TD align="right"> 349.40 </TD> <TD align="right"> 354.16 </TD> <TD align="right"> 346.61 </TD> <TD align="right"> 347.43 </TD> <TD align="right"> 345.61 </TD> <TD align="right"> 353.86 </TD> <TD align="right"> 360.82 </TD> </TR>
+  <TR> <TD align="right"> measure_implement </TD> <TD align="right"> 293.85 </TD> <TD align="right"> 284.07 </TD> <TD align="right"> 294.72 </TD> <TD align="right"> 295.79 </TD> <TD align="right"> 290.21 </TD> <TD align="right"> 307.00 </TD> <TD align="right"> 296.86 </TD> <TD align="right"> 311.70 </TD> <TD align="right"> 308.94 </TD> </TR>
+  <TR> <TD align="right"> all </TD> <TD align="right"> 325.79 </TD> <TD align="right"> 318.84 </TD> <TD align="right"> 303.77 </TD> <TD align="right"> 329.83 </TD> <TD align="right"> 323.60 </TD> <TD align="right"> 329.15 </TD> <TD align="right"> 316.73 </TD> <TD align="right"> 335.38 </TD> <TD align="right"> 317.80 </TD> </TR>
    </TABLE>
 
 
@@ -447,18 +451,18 @@ print(xtable(matrix(sds$V1, nrow = length(noise), dimnames = list(uncertainties,
 ```
 
 <!-- html table generated in R 2.14.1 by xtable 1.7-0 package -->
-<!-- Thu Jun 28 16:24:10 2012 -->
+<!-- Fri Jun 29 17:13:24 2012 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> det </TH> <TH> low </TH> <TH> growth </TH> <TH> measure </TH> <TH> implement </TH> <TH> growth_measure </TH> <TH> growth_implement </TH> <TH> measure_implement </TH> <TH> all </TH>  </TR>
   <TR> <TD align="right"> det </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> </TR>
-  <TR> <TD align="right"> low </TD> <TD align="right"> 33.67 </TD> <TD align="right"> 28.55 </TD> <TD align="right"> 37.90 </TD> <TD align="right"> 26.90 </TD> <TD align="right"> 26.20 </TD> <TD align="right"> 29.92 </TD> <TD align="right"> 22.21 </TD> <TD align="right"> 26.49 </TD> <TD align="right"> 26.57 </TD> </TR>
-  <TR> <TD align="right"> growth </TD> <TD align="right"> 169.73 </TD> <TD align="right"> 156.71 </TD> <TD align="right"> 159.37 </TD> <TD align="right"> 141.21 </TD> <TD align="right"> 151.03 </TD> <TD align="right"> 125.92 </TD> <TD align="right"> 125.84 </TD> <TD align="right"> 146.94 </TD> <TD align="right"> 139.48 </TD> </TR>
-  <TR> <TD align="right"> measure </TD> <TD align="right"> 60.74 </TD> <TD align="right"> 61.09 </TD> <TD align="right"> 67.94 </TD> <TD align="right"> 37.42 </TD> <TD align="right"> 55.36 </TD> <TD align="right"> 51.72 </TD> <TD align="right"> 63.99 </TD> <TD align="right"> 47.38 </TD> <TD align="right"> 58.45 </TD> </TR>
-  <TR> <TD align="right"> implement </TD> <TD align="right"> 46.98 </TD> <TD align="right"> 69.07 </TD> <TD align="right"> 81.77 </TD> <TD align="right"> 22.05 </TD> <TD align="right"> 73.43 </TD> <TD align="right"> 41.43 </TD> <TD align="right"> 76.54 </TD> <TD align="right"> 31.61 </TD> <TD align="right"> 36.41 </TD> </TR>
-  <TR> <TD align="right"> growth_measure </TD> <TD align="right"> 158.87 </TD> <TD align="right"> 128.05 </TD> <TD align="right"> 127.50 </TD> <TD align="right"> 136.65 </TD> <TD align="right"> 138.57 </TD> <TD align="right"> 143.10 </TD> <TD align="right"> 103.42 </TD> <TD align="right"> 129.57 </TD> <TD align="right"> 124.54 </TD> </TR>
-  <TR> <TD align="right"> growth_implement </TD> <TD align="right"> 162.28 </TD> <TD align="right"> 131.16 </TD> <TD align="right"> 150.05 </TD> <TD align="right"> 159.96 </TD> <TD align="right"> 155.50 </TD> <TD align="right"> 137.07 </TD> <TD align="right"> 121.44 </TD> <TD align="right"> 145.30 </TD> <TD align="right"> 155.75 </TD> </TR>
-  <TR> <TD align="right"> measure_implement </TD> <TD align="right"> 64.12 </TD> <TD align="right"> 58.05 </TD> <TD align="right"> 67.45 </TD> <TD align="right"> 68.60 </TD> <TD align="right"> 60.55 </TD> <TD align="right"> 66.46 </TD> <TD align="right"> 54.65 </TD> <TD align="right"> 68.52 </TD> <TD align="right"> 64.94 </TD> </TR>
-  <TR> <TD align="right"> all </TD> <TD align="right"> 131.60 </TD> <TD align="right"> 141.12 </TD> <TD align="right"> 109.00 </TD> <TD align="right"> 143.23 </TD> <TD align="right"> 121.42 </TD> <TD align="right"> 153.92 </TD> <TD align="right"> 111.48 </TD> <TD align="right"> 138.94 </TD> <TD align="right"> 113.67 </TD> </TR>
+  <TR> <TD align="right"> low </TD> <TD align="right"> 33.67 </TD> <TD align="right"> 28.31 </TD> <TD align="right"> 39.45 </TD> <TD align="right"> 25.76 </TD> <TD align="right"> 27.40 </TD> <TD align="right"> 31.41 </TD> <TD align="right"> 27.39 </TD> <TD align="right"> 27.38 </TD> <TD align="right"> 30.50 </TD> </TR>
+  <TR> <TD align="right"> growth </TD> <TD align="right"> 63.60 </TD> <TD align="right"> 58.09 </TD> <TD align="right"> 60.52 </TD> <TD align="right"> 51.68 </TD> <TD align="right"> 54.95 </TD> <TD align="right"> 57.92 </TD> <TD align="right"> 56.75 </TD> <TD align="right"> 56.44 </TD> <TD align="right"> 57.15 </TD> </TR>
+  <TR> <TD align="right"> measure </TD> <TD align="right"> 22.49 </TD> <TD align="right"> 31.81 </TD> <TD align="right"> 37.86 </TD> <TD align="right"> 13.33 </TD> <TD align="right"> 29.57 </TD> <TD align="right"> 22.47 </TD> <TD align="right"> 36.29 </TD> <TD align="right"> 23.35 </TD> <TD align="right"> 9.06 </TD> </TR>
+  <TR> <TD align="right"> implement </TD> <TD align="right"> 8.00 </TD> <TD align="right"> 6.10 </TD> <TD align="right"> 4.74 </TD> <TD align="right"> 5.88 </TD> <TD align="right"> 6.08 </TD> <TD align="right"> 5.93 </TD> <TD align="right"> 6.36 </TD> <TD align="right"> 6.67 </TD> <TD align="right"> 5.67 </TD> </TR>
+  <TR> <TD align="right"> growth_measure </TD> <TD align="right"> 61.95 </TD> <TD align="right"> 60.45 </TD> <TD align="right"> 71.49 </TD> <TD align="right"> 52.83 </TD> <TD align="right"> 83.75 </TD> <TD align="right"> 59.95 </TD> <TD align="right"> 70.35 </TD> <TD align="right"> 51.09 </TD> <TD align="right"> 57.76 </TD> </TR>
+  <TR> <TD align="right"> growth_implement </TD> <TD align="right"> 57.71 </TD> <TD align="right"> 55.48 </TD> <TD align="right"> 52.68 </TD> <TD align="right"> 53.45 </TD> <TD align="right"> 58.05 </TD> <TD align="right"> 56.69 </TD> <TD align="right"> 56.87 </TD> <TD align="right"> 53.75 </TD> <TD align="right"> 61.30 </TD> </TR>
+  <TR> <TD align="right"> measure_implement </TD> <TD align="right"> 41.20 </TD> <TD align="right"> 65.59 </TD> <TD align="right"> 59.68 </TD> <TD align="right"> 52.05 </TD> <TD align="right"> 57.75 </TD> <TD align="right"> 29.71 </TD> <TD align="right"> 49.17 </TD> <TD align="right"> 15.12 </TD> <TD align="right"> 23.80 </TD> </TR>
+  <TR> <TD align="right"> all </TD> <TD align="right"> 62.71 </TD> <TD align="right"> 77.63 </TD> <TD align="right"> 84.30 </TD> <TD align="right"> 61.97 </TD> <TD align="right"> 60.77 </TD> <TD align="right"> 58.59 </TD> <TD align="right"> 69.11 </TD> <TD align="right"> 56.58 </TD> <TD align="right"> 69.44 </TD> </TR>
    </TABLE>
 
 

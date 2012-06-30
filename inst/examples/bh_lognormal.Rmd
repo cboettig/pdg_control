@@ -100,7 +100,7 @@ scenario <- function(policy_g, policy_m, policy_i){
 Determine the policies for each of the scenarios (noise combinations).
 
 ``` {r runall}
-lvl <- 0.5
+lvl <- 0.2
 ````
 
 ``` {r }
