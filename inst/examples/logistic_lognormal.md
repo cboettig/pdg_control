@@ -46,7 +46,7 @@ We consider a profits from fishing to be a function of harvest `h` and stock siz
 
 ```r
 price <- 1
-c0 <- 0
+c0 <- 0.01
 c1 <- 0
 profit <- profit_harvest(price = price, c0 = c0, c1 = c1)
 ```
@@ -54,7 +54,7 @@ profit <- profit_harvest(price = price, c0 = c0, c1 = c1)
 
 
 
-with price = `1`, `c0` = `0` and `c1` = `0`. 
+with price = `1`, `c0` = `0.01` and `c1` = `0`. 
 
 
 
@@ -284,7 +284,7 @@ ggplot(policy) + geom_point(aes(stock, stock - x_grid[value], color = variable),
     degree = 1, se = FALSE, span = 0.3) + ylab("escapement")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8003/7470405550_92e5c80bde_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8023/7476923342_164c0a22da_o.png) 
 
 ```r
 
@@ -293,7 +293,7 @@ ggplot(policy) + geom_point(aes(stock, x_grid[value], color = variable),
     degree = 1, se = FALSE, span = 0.3) + ylab("harvest")
 ```
 
-![plot of chunk sethiplots](http://farm8.staticflickr.com/7265/7470405844_f31f56fd5b_o.png) 
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7250/7476923752_d7442e9f42_o.png) 
 
 ```r
 
@@ -307,7 +307,7 @@ ggplot(value) + geom_point(aes(stock, value, color = variable), shape = "+") +
 ylab("Net Present Value")
 ```
 
-![plot of chunk sethiplots](http://farm8.staticflickr.com/7267/7470406062_1d9b2f571f_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8143/7476924004_05a2dc1554_o.png) 
 
 
 ## Simulations
