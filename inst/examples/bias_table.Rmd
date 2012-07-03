@@ -207,7 +207,7 @@ All cases
 
 ``` {r runallsims, dependson="simfn"} 
 policyfn <- list(low=opt_low, med=opt_med, high=opt_high)
-par_list <- list(c(0.5, 100), c(1, 100), c(1.5, 100)) 
+par_list <- list(c(1, 100), c(1.5, 100), c(2, 100)) 
 
 allcases <- lapply(policyfn, function(policyfn_i){
   lapply(par_list, function(par){
@@ -260,7 +260,6 @@ scenarios <- c("low", "med", "high")
 print(xtable(matrix(means$V1, nrow=length(scenarios), dimnames=list(scenarios, scenarios))), type="html")
 print(xtable(matrix(sds$V1, nrow=length(scenarios), dimnames=list(scenarios, scenarios))), type="html")
 ````
-
 
 
 # References
