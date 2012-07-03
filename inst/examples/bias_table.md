@@ -242,7 +242,7 @@ ggplot(policy) + geom_point(aes(stock, stock - x_grid[value], color = variable),
     degree = 1, se = FALSE, span = 0.3) + ylab("escapement")
 ```
 
-![plot of chunk sethiplots](figure/sethiplots1.png) 
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7132/7497595188_48bae94255_o.png) 
 
 ```r
 
@@ -251,7 +251,7 @@ ggplot(policy) + geom_point(aes(stock, x_grid[value], color = variable),
     degree = 1, se = FALSE, span = 0.3) + ylab("harvest")
 ```
 
-![plot of chunk sethiplots](figure/sethiplots2.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8010/7497595534_28f9e8995f_o.png) 
 
 ```r
 
@@ -265,7 +265,7 @@ ggplot(value) + geom_point(aes(stock, value, color = variable), shape = "+") +
 ylab("Net Present Value")
 ```
 
-![plot of chunk sethiplots](figure/sethiplots3.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8291/7497595864_c39e7f5e97_o.png) 
 
 
 
@@ -329,7 +329,7 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time, fishstock)) +
     geom_line(aes(time, harvest), col = "darkgreen") + facet_wrap(~parameter)
 ```
 
-![plot of chunk onerep](figure/onerep.png) 
+![plot of chunk onerep](http://farm8.staticflickr.com/7257/7497597416_fbbffe208e_o.png) 
 
 
 This plot summarizes the stock dynamics by visualizing the replicates.
@@ -342,7 +342,7 @@ p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1) +
     facet_wrap(~parameter)
 ```
 
-![the induced dynamics in the stock size over time, for all replicates, by scenario](figure/stock.png) 
+![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm9.staticflickr.com/8432/7497598324_20861e070f_o.png) 
 
 
 
@@ -353,7 +353,7 @@ profits <- dt[, sum(profit), by = c("reps", "parameter")]
 ggplot(profits) + geom_histogram(aes(V1)) + facet_wrap(~parameter)
 ```
 
-![the distribution of profits by scenario](figure/profits.png) 
+![the distribution of profits by scenario](http://farm9.staticflickr.com/8160/7497598920_98fca8447b_o.png) 
 
 
 Summary statistics 
@@ -378,12 +378,12 @@ print(xtable(matrix(means$V1, nrow = length(scenarios), dimnames = list(scenario
 ```
 
 <!-- html table generated in R 2.15.1 by xtable 1.7-0 package -->
-<!-- Tue Jul  3 15:56:18 2012 -->
+<!-- Tue Jul  3 15:59:12 2012 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> low </TH> <TH> med </TH> <TH> high </TH>  </TR>
-  <TR> <TD align="right"> low </TD> <TD align="right"> 364.21 </TD> <TD align="right"> 379.72 </TD> <TD align="right"> 378.41 </TD> </TR>
-  <TR> <TD align="right"> med </TD> <TD align="right"> 664.35 </TD> <TD align="right"> 651.63 </TD> <TD align="right"> 656.48 </TD> </TR>
-  <TR> <TD align="right"> high </TD> <TD align="right"> 934.71 </TD> <TD align="right"> 945.34 </TD> <TD align="right"> 945.27 </TD> </TR>
+  <TR> <TD align="right"> low </TD> <TD align="right"> 389.58 </TD> <TD align="right"> 387.33 </TD> <TD align="right"> 376.24 </TD> </TR>
+  <TR> <TD align="right"> med </TD> <TD align="right"> 669.38 </TD> <TD align="right"> 641.93 </TD> <TD align="right"> 665.12 </TD> </TR>
+  <TR> <TD align="right"> high </TD> <TD align="right"> 941.29 </TD> <TD align="right"> 957.63 </TD> <TD align="right"> 961.16 </TD> </TR>
    </TABLE>
 
 
@@ -393,12 +393,12 @@ print(xtable(matrix(sds$V1, nrow = length(scenarios), dimnames = list(scenarios,
 ```
 
 <!-- html table generated in R 2.15.1 by xtable 1.7-0 package -->
-<!-- Tue Jul  3 15:56:18 2012 -->
+<!-- Tue Jul  3 15:59:12 2012 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> low </TH> <TH> med </TH> <TH> high </TH>  </TR>
-  <TR> <TD align="right"> low </TD> <TD align="right"> 75.83 </TD> <TD align="right"> 98.01 </TD> <TD align="right"> 94.40 </TD> </TR>
-  <TR> <TD align="right"> med </TD> <TD align="right"> 101.80 </TD> <TD align="right"> 104.03 </TD> <TD align="right"> 97.84 </TD> </TR>
-  <TR> <TD align="right"> high </TD> <TD align="right"> 100.80 </TD> <TD align="right"> 126.65 </TD> <TD align="right"> 97.51 </TD> </TR>
+  <TR> <TD align="right"> low </TD> <TD align="right"> 69.11 </TD> <TD align="right"> 78.44 </TD> <TD align="right"> 85.42 </TD> </TR>
+  <TR> <TD align="right"> med </TD> <TD align="right"> 99.59 </TD> <TD align="right"> 121.68 </TD> <TD align="right"> 91.69 </TD> </TR>
+  <TR> <TD align="right"> high </TD> <TD align="right"> 119.90 </TD> <TD align="right"> 129.99 </TD> <TD align="right"> 115.00 </TD> </TR>
    </TABLE>
 
 
