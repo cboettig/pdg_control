@@ -50,8 +50,8 @@ with price = `r price`, `c0` = `r c0` and `c1` = `r c1`.
 
 ``` {r }
 xmin <- 0
-xmax <- 1.5 * K
-grid_n <- 100
+xmax <- 2.5 * K
+grid_n <- 200
 ````
 
 We seek a harvest policy which maximizes the discounted profit from the fishery using a stochastic dynamic programming approach over a discrete grid of stock sizes from `r xmin` to `r xmax` on a grid of `r grid_n` points, and over an identical discrete grid of possible harvest values.  

@@ -51,14 +51,14 @@ with price = `1`, `c0` = `0` and `c1` = `0`.
 
 ```r
 xmin <- 0
-xmax <- 1.5 * K
-grid_n <- 100
+xmax <- 2.5 * K
+grid_n <- 200
 ```
 
 
 
 
-We seek a harvest policy which maximizes the discounted profit from the fishery using a stochastic dynamic programming approach over a discrete grid of stock sizes from `0` to `150` on a grid of `100` points, and over an identical discrete grid of possible harvest values.  
+We seek a harvest policy which maximizes the discounted profit from the fishery using a stochastic dynamic programming approach over a discrete grid of stock sizes from `0` to `250` on a grid of `200` points, and over an identical discrete grid of possible harvest values.  
 
 
 
@@ -242,7 +242,7 @@ ggplot(policy) + geom_point(aes(stock, stock - x_grid[value], color = variable),
     degree = 1, se = FALSE, span = 0.3) + ylab("escapement")
 ```
 
-![plot of chunk sethiplots](http://farm8.staticflickr.com/7279/7497683582_05d7015634_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8153/7497716712_484f5225d0_o.png) 
 
 ```r
 
@@ -251,7 +251,7 @@ ggplot(policy) + geom_point(aes(stock, x_grid[value], color = variable),
     degree = 1, se = FALSE, span = 0.3) + ylab("harvest")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8433/7497684078_9949a5dc19_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8424/7497717014_279abff40a_o.png) 
 
 ```r
 
@@ -265,7 +265,7 @@ ggplot(value) + geom_point(aes(stock, value, color = variable), shape = "+") +
 ylab("Net Present Value")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8293/7497684410_e49851041e_o.png) 
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7124/7497717328_d66ab310b9_o.png) 
 
 
 
@@ -329,7 +329,7 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time, fishstock)) +
     geom_line(aes(time, harvest), col = "darkgreen") + facet_wrap(~parameter)
 ```
 
-![plot of chunk onerep](http://farm8.staticflickr.com/7128/7497685744_efed58117b_o.png) 
+![plot of chunk onerep](http://farm8.staticflickr.com/7113/7497718852_8bca1aea52_o.png) 
 
 
 This plot summarizes the stock dynamics by visualizing the replicates.
@@ -342,7 +342,7 @@ p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1) +
     facet_wrap(~parameter)
 ```
 
-![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm9.staticflickr.com/8148/7497686476_801fb35eda_o.png) 
+![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm9.staticflickr.com/8021/7497719594_6e39b37c0d_o.png) 
 
 
 
@@ -353,7 +353,7 @@ profits <- dt[, sum(profit), by = c("reps", "parameter")]
 ggplot(profits) + geom_histogram(aes(V1)) + facet_wrap(~parameter)
 ```
 
-![the distribution of profits by scenario](http://farm8.staticflickr.com/7273/7497687082_17a3d8d932_o.png) 
+![the distribution of profits by scenario](http://farm9.staticflickr.com/8002/7497720020_1a214c689c_o.png) 
 
 
 Summary statistics 
@@ -378,12 +378,12 @@ print(xtable(matrix(means$V1, nrow = length(scenarios), dimnames = list(scenario
 ```
 
 <!-- html table generated in R 2.15.1 by xtable 1.7-0 package -->
-<!-- Tue Jul  3 16:17:12 2012 -->
+<!-- Tue Jul  3 16:24:09 2012 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> low </TH> <TH> med </TH> <TH> high </TH>  </TR>
-  <TR> <TD align="right"> low </TD> <TD align="right"> 694.77 </TD> <TD align="right"> 675.13 </TD> <TD align="right"> 665.94 </TD> </TR>
-  <TR> <TD align="right"> med </TD> <TD align="right"> 943.34 </TD> <TD align="right"> 966.92 </TD> <TD align="right"> 947.70 </TD> </TR>
-  <TR> <TD align="right"> high </TD> <TD align="right"> 1218.80 </TD> <TD align="right"> 1268.39 </TD> <TD align="right"> 1233.71 </TD> </TR>
+  <TR> <TD align="right"> low </TD> <TD align="right"> 671.38 </TD> <TD align="right"> 680.58 </TD> <TD align="right"> 684.76 </TD> </TR>
+  <TR> <TD align="right"> med </TD> <TD align="right"> 942.00 </TD> <TD align="right"> 996.55 </TD> <TD align="right"> 972.30 </TD> </TR>
+  <TR> <TD align="right"> high </TD> <TD align="right"> 1259.03 </TD> <TD align="right"> 1240.00 </TD> <TD align="right"> 1260.79 </TD> </TR>
    </TABLE>
 
 
@@ -393,12 +393,12 @@ print(xtable(matrix(sds$V1, nrow = length(scenarios), dimnames = list(scenarios,
 ```
 
 <!-- html table generated in R 2.15.1 by xtable 1.7-0 package -->
-<!-- Tue Jul  3 16:17:12 2012 -->
+<!-- Tue Jul  3 16:24:09 2012 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> low </TH> <TH> med </TH> <TH> high </TH>  </TR>
-  <TR> <TD align="right"> low </TD> <TD align="right"> 103.49 </TD> <TD align="right"> 111.21 </TD> <TD align="right"> 85.09 </TD> </TR>
-  <TR> <TD align="right"> med </TD> <TD align="right"> 130.79 </TD> <TD align="right"> 137.50 </TD> <TD align="right"> 117.53 </TD> </TR>
-  <TR> <TD align="right"> high </TD> <TD align="right"> 148.05 </TD> <TD align="right"> 151.06 </TD> <TD align="right"> 126.32 </TD> </TR>
+  <TR> <TD align="right"> low </TD> <TD align="right"> 98.68 </TD> <TD align="right"> 102.60 </TD> <TD align="right"> 96.18 </TD> </TR>
+  <TR> <TD align="right"> med </TD> <TD align="right"> 128.90 </TD> <TD align="right"> 110.75 </TD> <TD align="right"> 141.86 </TD> </TR>
+  <TR> <TD align="right"> high </TD> <TD align="right"> 142.29 </TD> <TD align="right"> 149.04 </TD> <TD align="right"> 135.10 </TD> </TR>
    </TABLE>
 
 
