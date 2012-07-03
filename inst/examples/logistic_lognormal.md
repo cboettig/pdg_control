@@ -46,7 +46,7 @@ We consider a profits from fishing to be a function of harvest `h` and stock siz
 
 ```r
 price <- 1
-c0 <- 0
+c0 <- 0.01
 c1 <- 0
 profit <- profit_harvest(price = price, c0 = c0, c1 = c1)
 ```
@@ -54,7 +54,7 @@ profit <- profit_harvest(price = price, c0 = c0, c1 = c1)
 
 
 
-with price = `1`, `c0` = `0` and `c1` = `0`. 
+with price = `1`, `c0` = `0.01` and `c1` = `0`. 
 
 
 
@@ -106,11 +106,6 @@ require(snowfall)
 sfInit(parallel = TRUE, cpu = 16)
 ```
 
-```
-R Version:  R version 2.14.1 (2011-12-22) 
-
-```
-
 
 
 
@@ -138,7 +133,7 @@ Determine the policies for each of the scenarios (noise combinations).
 
 
 ```r
-lvl <- 0.5
+lvl <- 0.2
 ```
 
 
@@ -289,7 +284,7 @@ ggplot(policy) + geom_point(aes(stock, stock - x_grid[value], color = variable),
     degree = 1, se = FALSE, span = 0.3) + ylab("escapement")
 ```
 
-![plot of chunk sethiplots](http://farm8.staticflickr.com/7110/7462091564_bf24ef2e12_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8023/7476923342_164c0a22da_o.png) 
 
 ```r
 
@@ -298,7 +293,7 @@ ggplot(policy) + geom_point(aes(stock, x_grid[value], color = variable),
     degree = 1, se = FALSE, span = 0.3) + ylab("harvest")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8008/7462092004_96a77532e6_o.png) 
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7250/7476923752_d7442e9f42_o.png) 
 
 ```r
 
@@ -312,7 +307,7 @@ ggplot(value) + geom_point(aes(stock, value, color = variable), shape = "+") +
 ylab("Net Present Value")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8010/7462092326_efdbfda91f_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8143/7476924004_05a2dc1554_o.png) 
 
 
 ## Simulations

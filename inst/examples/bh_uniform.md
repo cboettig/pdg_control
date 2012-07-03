@@ -46,7 +46,7 @@ We consider a profits from fishing to be a function of harvest `h` and stock siz
 
 ```r
 price <- 1
-c0 <- 0
+c0 <- 0.01
 c1 <- 0
 profit <- profit_harvest(price = price, c0 = c0, c1 = c1)
 ```
@@ -54,7 +54,7 @@ profit <- profit_harvest(price = price, c0 = c0, c1 = c1)
 
 
 
-with price = `1`, `c0` = `0` and `c1` = `0`. 
+with price = `1`, `c0` = `0.01` and `c1` = `0`. 
 
 
 
@@ -104,11 +104,6 @@ We use Monte Carlo integration over the noise processes to determine the transit
 ```r
 require(snowfall)
 sfInit(parallel = TRUE, cpu = 16)
-```
-
-```
-R Version:  R version 2.14.1 (2011-12-22) 
-
 ```
 
 
@@ -287,7 +282,7 @@ ggplot(policy) + geom_point(aes(stock, stock - x_grid[value], color = variable),
     degree = 1, se = FALSE, span = 0.3) + ylab("escapement")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8027/7462130520_8f6604168d_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8002/7478125636_cb710ee9b4_o.png) 
 
 ```r
 
@@ -296,7 +291,7 @@ ggplot(policy) + geom_point(aes(stock, x_grid[value], color = variable),
     degree = 1, se = FALSE, span = 0.3) + ylab("harvest")
 ```
 
-![plot of chunk sethiplots](http://farm8.staticflickr.com/7131/7462130906_2e68803e78_o.png) 
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7251/7478126126_3ba019a43c_o.png) 
 
 ```r
 
@@ -310,7 +305,7 @@ ggplot(value) + geom_point(aes(stock, value, color = variable), shape = "+") +
 ylab("Net Present Value")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8007/7462131456_e3fe12eaa9_o.png) 
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7262/7478126470_d60c2f46d9_o.png) 
 
 
 
@@ -350,10 +345,9 @@ All cases
 ```r
 policyfn <- list(det = det, low = low, g = g, m = m, i = i, gm = gm, 
     gi = gi, mi = mi, gmi = gmi)
-noise <- list(det = c(0, 0, 0), low = c(0.1, 0.1, 0.1), growth = c(lvl, 
-    0, 0), measure = c(0, lvl, 0), implement = c(0, 0, lvl), growth_measure = c(lvl, 
-    lvl, 0), growth_implement = c(lvl, 0, lvl), measure_implement = c(0, lvl, 
-    lvl), all = c(lvl, lvl, lvl))
+noise <- list(det = c(0, 0, 0), low = c(0.1, 0.1, 0.1), gro = c(lvl, 
+    0, 0), meas = c(0, lvl, 0), imp = c(0, 0, lvl), gro_meas = c(lvl, lvl, 0), 
+    gro_imp = c(lvl, 0, lvl), meas_imp = c(0, lvl, lvl), all = c(lvl, lvl, lvl))
 allcases <- lapply(policyfn, function(policyfn_i) {
     lapply(noise, function(noise_i) {
         simulatereps(policyfn_i, noise_i[1], noise_i[2], noise_i[3])
@@ -387,7 +381,7 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time, fishstock)) +
     geom_line(aes(time, harvest), col = "darkgreen") + facet_wrap(~uncertainty)
 ```
 
-![plot of chunk onerep](http://farm8.staticflickr.com/7119/7459397172_df75468087_o.png) 
+![plot of chunk onerep](http://farm9.staticflickr.com/8155/7478133886_57f03f4f27_o.png) 
 
 
 This plot summarizes the stock dynamics by visualizing the replicates.
@@ -400,7 +394,7 @@ p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1) +
     facet_wrap(~uncertainty)
 ```
 
-![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm8.staticflickr.com/7118/7459399330_df95424813_o.png) 
+![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm9.staticflickr.com/8142/7478137216_395a194a90_o.png) 
 
 
 
@@ -411,7 +405,7 @@ profits <- dt[, sum(profit), by = c("reps", "uncertainty")]
 ggplot(profits) + geom_histogram(aes(V1)) + facet_wrap(~uncertainty)
 ```
 
-![the distribution of profits by scenario](http://farm9.staticflickr.com/8020/7459400492_e475564923_o.png) 
+![the distribution of profits by scenario](http://farm9.staticflickr.com/8004/7478138736_5b4c1aeb1c_o.png) 
 
 
 Summary statistics 
@@ -436,18 +430,18 @@ print(xtable(matrix(means$V1, nrow = length(noise), dimnames = list(uncertaintie
 ```
 
 <!-- html table generated in R 2.14.1 by xtable 1.7-0 package -->
-<!-- Thu Jun 28 11:32:45 2012 -->
+<!-- Sun Jul  1 03:55:12 2012 -->
 <TABLE border=1>
-<TR> <TH>  </TH> <TH> det </TH> <TH> low </TH> <TH> growth </TH> <TH> measure </TH> <TH> implement </TH> <TH> growth_measure </TH> <TH> growth_implement </TH> <TH> measure_implement </TH> <TH> all </TH>  </TR>
-  <TR> <TD align="right"> det </TD> <TD align="right"> 31.79 </TD> <TD align="right"> 33.18 </TD> <TD align="right"> 32.99 </TD> <TD align="right"> 32.10 </TD> <TD align="right"> 33.03 </TD> <TD align="right"> 32.12 </TD> <TD align="right"> 32.73 </TD> <TD align="right"> 32.10 </TD> <TD align="right"> 31.97 </TD> </TR>
-  <TR> <TD align="right"> low </TD> <TD align="right"> 31.04 </TD> <TD align="right"> 32.80 </TD> <TD align="right"> 32.70 </TD> <TD align="right"> 32.23 </TD> <TD align="right"> 32.69 </TD> <TD align="right"> 32.25 </TD> <TD align="right"> 32.44 </TD> <TD align="right"> 32.07 </TD> <TD align="right"> 31.95 </TD> </TR>
-  <TR> <TD align="right"> growth </TD> <TD align="right"> 33.08 </TD> <TD align="right"> 33.05 </TD> <TD align="right"> 31.50 </TD> <TD align="right"> 30.33 </TD> <TD align="right"> 31.61 </TD> <TD align="right"> 31.81 </TD> <TD align="right"> 32.06 </TD> <TD align="right"> 32.84 </TD> <TD align="right"> 33.23 </TD> </TR>
-  <TR> <TD align="right"> measure </TD> <TD align="right"> 30.33 </TD> <TD align="right"> 29.47 </TD> <TD align="right"> 30.33 </TD> <TD align="right"> 30.71 </TD> <TD align="right"> 30.12 </TD> <TD align="right"> 30.86 </TD> <TD align="right"> 30.77 </TD> <TD align="right"> 30.74 </TD> <TD align="right"> 30.74 </TD> </TR>
-  <TR> <TD align="right"> implement </TD> <TD align="right"> 30.57 </TD> <TD align="right"> 32.15 </TD> <TD align="right"> 32.18 </TD> <TD align="right"> 32.13 </TD> <TD align="right"> 32.14 </TD> <TD align="right"> 32.09 </TD> <TD align="right"> 31.91 </TD> <TD align="right"> 32.02 </TD> <TD align="right"> 31.93 </TD> </TR>
-  <TR> <TD align="right"> growth_measure </TD> <TD align="right"> 29.51 </TD> <TD align="right"> 29.47 </TD> <TD align="right"> 28.98 </TD> <TD align="right"> 30.05 </TD> <TD align="right"> 28.33 </TD> <TD align="right"> 30.82 </TD> <TD align="right"> 29.09 </TD> <TD align="right"> 29.45 </TD> <TD align="right"> 31.38 </TD> </TR>
-  <TR> <TD align="right"> growth_implement </TD> <TD align="right"> 31.47 </TD> <TD align="right"> 31.92 </TD> <TD align="right"> 32.48 </TD> <TD align="right"> 30.97 </TD> <TD align="right"> 30.13 </TD> <TD align="right"> 31.14 </TD> <TD align="right"> 32.37 </TD> <TD align="right"> 31.90 </TD> <TD align="right"> 32.59 </TD> </TR>
-  <TR> <TD align="right"> measure_implement </TD> <TD align="right"> 26.74 </TD> <TD align="right"> 26.34 </TD> <TD align="right"> 26.38 </TD> <TD align="right"> 27.24 </TD> <TD align="right"> 25.00 </TD> <TD align="right"> 28.83 </TD> <TD align="right"> 27.03 </TD> <TD align="right"> 28.32 </TD> <TD align="right"> 28.08 </TD> </TR>
-  <TR> <TD align="right"> all </TD> <TD align="right"> 25.84 </TD> <TD align="right"> 26.09 </TD> <TD align="right"> 24.41 </TD> <TD align="right"> 26.86 </TD> <TD align="right"> 25.88 </TD> <TD align="right"> 27.08 </TD> <TD align="right"> 26.70 </TD> <TD align="right"> 27.39 </TD> <TD align="right"> 26.72 </TD> </TR>
+<TR> <TH>  </TH> <TH> det </TH> <TH> low </TH> <TH> gro </TH> <TH> meas </TH> <TH> imp </TH> <TH> gro_meas </TH> <TH> gro_imp </TH> <TH> meas_imp </TH> <TH> all </TH>  </TR>
+  <TR> <TD align="right"> det </TD> <TD align="right"> 31.61 </TD> <TD align="right"> 33.12 </TD> <TD align="right"> 32.96 </TD> <TD align="right"> 32.03 </TD> <TD align="right"> 32.98 </TD> <TD align="right"> 31.99 </TD> <TD align="right"> 32.68 </TD> <TD align="right"> 32.00 </TD> <TD align="right"> 31.76 </TD> </TR>
+  <TR> <TD align="right"> low </TD> <TD align="right"> 31.68 </TD> <TD align="right"> 32.56 </TD> <TD align="right"> 32.90 </TD> <TD align="right"> 32.31 </TD> <TD align="right"> 32.89 </TD> <TD align="right"> 32.11 </TD> <TD align="right"> 32.26 </TD> <TD align="right"> 31.87 </TD> <TD align="right"> 32.18 </TD> </TR>
+  <TR> <TD align="right"> gro </TD> <TD align="right"> 31.70 </TD> <TD align="right"> 33.20 </TD> <TD align="right"> 32.67 </TD> <TD align="right"> 32.21 </TD> <TD align="right"> 32.91 </TD> <TD align="right"> 32.27 </TD> <TD align="right"> 32.75 </TD> <TD align="right"> 32.45 </TD> <TD align="right"> 30.41 </TD> </TR>
+  <TR> <TD align="right"> meas </TD> <TD align="right"> 22.24 </TD> <TD align="right"> 29.52 </TD> <TD align="right"> 30.06 </TD> <TD align="right"> 30.79 </TD> <TD align="right"> 29.04 </TD> <TD align="right"> 30.78 </TD> <TD align="right"> 30.85 </TD> <TD align="right"> 30.83 </TD> <TD align="right"> 30.71 </TD> </TR>
+  <TR> <TD align="right"> imp </TD> <TD align="right"> 28.46 </TD> <TD align="right"> 32.15 </TD> <TD align="right"> 32.06 </TD> <TD align="right"> 31.99 </TD> <TD align="right"> 32.14 </TD> <TD align="right"> 31.98 </TD> <TD align="right"> 31.88 </TD> <TD align="right"> 31.92 </TD> <TD align="right"> 31.85 </TD> </TR>
+  <TR> <TD align="right"> gro_meas </TD> <TD align="right"> 20.96 </TD> <TD align="right"> 26.22 </TD> <TD align="right"> 28.06 </TD> <TD align="right"> 29.44 </TD> <TD align="right"> 28.97 </TD> <TD align="right"> 30.01 </TD> <TD align="right"> 29.79 </TD> <TD align="right"> 29.61 </TD> <TD align="right"> 29.32 </TD> </TR>
+  <TR> <TD align="right"> gro_imp </TD> <TD align="right"> 27.72 </TD> <TD align="right"> 31.16 </TD> <TD align="right"> 30.84 </TD> <TD align="right"> 31.40 </TD> <TD align="right"> 31.03 </TD> <TD align="right"> 31.62 </TD> <TD align="right"> 31.89 </TD> <TD align="right"> 31.44 </TD> <TD align="right"> 31.44 </TD> </TR>
+  <TR> <TD align="right"> meas_imp </TD> <TD align="right"> 18.86 </TD> <TD align="right"> 24.64 </TD> <TD align="right"> 27.04 </TD> <TD align="right"> 27.96 </TD> <TD align="right"> 26.00 </TD> <TD align="right"> 28.52 </TD> <TD align="right"> 26.73 </TD> <TD align="right"> 28.88 </TD> <TD align="right"> 27.52 </TD> </TR>
+  <TR> <TD align="right"> all </TD> <TD align="right"> 19.22 </TD> <TD align="right"> 22.36 </TD> <TD align="right"> 24.71 </TD> <TD align="right"> 25.80 </TD> <TD align="right"> 24.77 </TD> <TD align="right"> 28.07 </TD> <TD align="right"> 26.58 </TD> <TD align="right"> 26.39 </TD> <TD align="right"> 27.04 </TD> </TR>
    </TABLE>
 
 
@@ -457,18 +451,18 @@ print(xtable(matrix(sds$V1, nrow = length(noise), dimnames = list(uncertainties,
 ```
 
 <!-- html table generated in R 2.14.1 by xtable 1.7-0 package -->
-<!-- Thu Jun 28 11:32:45 2012 -->
+<!-- Sun Jul  1 03:55:12 2012 -->
 <TABLE border=1>
-<TR> <TH>  </TH> <TH> det </TH> <TH> low </TH> <TH> growth </TH> <TH> measure </TH> <TH> implement </TH> <TH> growth_measure </TH> <TH> growth_implement </TH> <TH> measure_implement </TH> <TH> all </TH>  </TR>
+<TR> <TH>  </TH> <TH> det </TH> <TH> low </TH> <TH> gro </TH> <TH> meas </TH> <TH> imp </TH> <TH> gro_meas </TH> <TH> gro_imp </TH> <TH> meas_imp </TH> <TH> all </TH>  </TR>
   <TR> <TD align="right"> det </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> <TD align="right"> 0.00 </TD> </TR>
-  <TR> <TD align="right"> low </TD> <TD align="right"> 1.88 </TD> <TD align="right"> 1.47 </TD> <TD align="right"> 1.60 </TD> <TD align="right"> 1.61 </TD> <TD align="right"> 1.66 </TD> <TD align="right"> 1.67 </TD> <TD align="right"> 1.60 </TD> <TD align="right"> 1.69 </TD> <TD align="right"> 1.50 </TD> </TR>
-  <TR> <TD align="right"> growth </TD> <TD align="right"> 9.78 </TD> <TD align="right"> 6.95 </TD> <TD align="right"> 8.40 </TD> <TD align="right"> 7.56 </TD> <TD align="right"> 7.83 </TD> <TD align="right"> 6.86 </TD> <TD align="right"> 8.57 </TD> <TD align="right"> 7.29 </TD> <TD align="right"> 8.24 </TD> </TR>
-  <TR> <TD align="right"> measure </TD> <TD align="right"> 1.38 </TD> <TD align="right"> 4.18 </TD> <TD align="right"> 1.56 </TD> <TD align="right"> 0.81 </TD> <TD align="right"> 3.14 </TD> <TD align="right"> 0.91 </TD> <TD align="right"> 1.03 </TD> <TD align="right"> 1.01 </TD> <TD align="right"> 0.81 </TD> </TR>
-  <TR> <TD align="right"> implement </TD> <TD align="right"> 1.03 </TD> <TD align="right"> 0.99 </TD> <TD align="right"> 0.88 </TD> <TD align="right"> 0.34 </TD> <TD align="right"> 0.90 </TD> <TD align="right"> 0.49 </TD> <TD align="right"> 0.88 </TD> <TD align="right"> 0.41 </TD> <TD align="right"> 0.39 </TD> </TR>
-  <TR> <TD align="right"> growth_measure </TD> <TD align="right"> 7.45 </TD> <TD align="right"> 7.86 </TD> <TD align="right"> 7.17 </TD> <TD align="right"> 6.90 </TD> <TD align="right"> 6.24 </TD> <TD align="right"> 7.49 </TD> <TD align="right"> 7.85 </TD> <TD align="right"> 6.63 </TD> <TD align="right"> 7.35 </TD> </TR>
-  <TR> <TD align="right"> growth_implement </TD> <TD align="right"> 7.29 </TD> <TD align="right"> 8.14 </TD> <TD align="right"> 7.62 </TD> <TD align="right"> 6.73 </TD> <TD align="right"> 7.21 </TD> <TD align="right"> 8.54 </TD> <TD align="right"> 7.45 </TD> <TD align="right"> 7.45 </TD> <TD align="right"> 8.26 </TD> </TR>
-  <TR> <TD align="right"> measure_implement </TD> <TD align="right"> 6.94 </TD> <TD align="right"> 6.94 </TD> <TD align="right"> 7.42 </TD> <TD align="right"> 6.69 </TD> <TD align="right"> 8.43 </TD> <TD align="right"> 4.73 </TD> <TD align="right"> 6.59 </TD> <TD align="right"> 5.28 </TD> <TD align="right"> 5.83 </TD> </TR>
-  <TR> <TD align="right"> all </TD> <TD align="right"> 9.06 </TD> <TD align="right"> 8.73 </TD> <TD align="right"> 9.33 </TD> <TD align="right"> 7.69 </TD> <TD align="right"> 8.41 </TD> <TD align="right"> 8.86 </TD> <TD align="right"> 8.74 </TD> <TD align="right"> 8.57 </TD> <TD align="right"> 9.40 </TD> </TR>
+  <TR> <TD align="right"> low </TD> <TD align="right"> 1.61 </TD> <TD align="right"> 1.56 </TD> <TD align="right"> 1.67 </TD> <TD align="right"> 1.47 </TD> <TD align="right"> 1.67 </TD> <TD align="right"> 1.61 </TD> <TD align="right"> 1.60 </TD> <TD align="right"> 1.46 </TD> <TD align="right"> 1.79 </TD> </TR>
+  <TR> <TD align="right"> gro </TD> <TD align="right"> 7.36 </TD> <TD align="right"> 8.36 </TD> <TD align="right"> 8.36 </TD> <TD align="right"> 6.83 </TD> <TD align="right"> 6.71 </TD> <TD align="right"> 6.78 </TD> <TD align="right"> 7.17 </TD> <TD align="right"> 7.47 </TD> <TD align="right"> 7.56 </TD> </TR>
+  <TR> <TD align="right"> meas </TD> <TD align="right"> 6.96 </TD> <TD align="right"> 4.26 </TD> <TD align="right"> 3.23 </TD> <TD align="right"> 0.79 </TD> <TD align="right"> 5.35 </TD> <TD align="right"> 0.95 </TD> <TD align="right"> 1.08 </TD> <TD align="right"> 0.86 </TD> <TD align="right"> 0.90 </TD> </TR>
+  <TR> <TD align="right"> imp </TD> <TD align="right"> 5.48 </TD> <TD align="right"> 0.87 </TD> <TD align="right"> 0.93 </TD> <TD align="right"> 0.37 </TD> <TD align="right"> 0.89 </TD> <TD align="right"> 0.42 </TD> <TD align="right"> 0.90 </TD> <TD align="right"> 0.38 </TD> <TD align="right"> 0.33 </TD> </TR>
+  <TR> <TD align="right"> gro_meas </TD> <TD align="right"> 7.84 </TD> <TD align="right"> 7.32 </TD> <TD align="right"> 6.86 </TD> <TD align="right"> 6.52 </TD> <TD align="right"> 8.29 </TD> <TD align="right"> 7.99 </TD> <TD align="right"> 6.89 </TD> <TD align="right"> 6.50 </TD> <TD align="right"> 6.24 </TD> </TR>
+  <TR> <TD align="right"> gro_imp </TD> <TD align="right"> 8.13 </TD> <TD align="right"> 6.72 </TD> <TD align="right"> 7.86 </TD> <TD align="right"> 7.54 </TD> <TD align="right"> 7.92 </TD> <TD align="right"> 7.22 </TD> <TD align="right"> 8.49 </TD> <TD align="right"> 7.93 </TD> <TD align="right"> 8.62 </TD> </TR>
+  <TR> <TD align="right"> meas_imp </TD> <TD align="right"> 7.27 </TD> <TD align="right"> 8.04 </TD> <TD align="right"> 6.31 </TD> <TD align="right"> 5.39 </TD> <TD align="right"> 7.68 </TD> <TD align="right"> 4.98 </TD> <TD align="right"> 7.12 </TD> <TD align="right"> 5.13 </TD> <TD align="right"> 6.20 </TD> </TR>
+  <TR> <TD align="right"> all </TD> <TD align="right"> 8.02 </TD> <TD align="right"> 8.45 </TD> <TD align="right"> 9.64 </TD> <TD align="right"> 8.31 </TD> <TD align="right"> 8.95 </TD> <TD align="right"> 8.06 </TD> <TD align="right"> 8.96 </TD> <TD align="right"> 8.20 </TD> <TD align="right"> 7.83 </TD> </TR>
    </TABLE>
 
 
