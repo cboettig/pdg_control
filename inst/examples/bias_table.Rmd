@@ -95,7 +95,7 @@ z_i <- function() 1
 
 ## Scenario 1: low r
 
-With parameter `r` = `r r <- 2`
+With parameter `r` = `r r <- 1`
 
 ``` {r }
 pars <- c(r, K)
@@ -115,7 +115,7 @@ opt_low <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, re
 
 ## Scenario 2: medium r
 
-With parameter `r` = `r r <- 1` 
+With parameter `r` = `r r <- 1.5` 
 
 ``` {r }
 pars <- c(r, K)
@@ -135,7 +135,7 @@ opt_med <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, re
 ## Scenario 3: high r
 
 
-With parameter `r` = `r r <- 1.5` 
+With parameter `r` = `r r <- 2` 
 
 ``` {r }
 pars <- c(r, K)
