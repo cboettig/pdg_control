@@ -48,7 +48,7 @@ conditioned on h > x and x > 0,
 
 ``` {r  profit}
 price <- 1
-c0 <- 0.0
+c0 <- 0.01
 c1 <- 0
 profit <- profit_harvest(price=price, c0 = c0, c1=c1) 
 ````
@@ -113,14 +113,34 @@ Bellman's algorithm to compute the optimal solution for all possible trajectorie
 opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward=0)
 ````
 
+
+## Compare to Clark (noise-free)
+
+``` {r  }
+pdfn2 <- function(P, s){
+  dunif(P, 1 - s, 1 + s)
+}
+SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, 0, pdfn2)
+````
+
+Bellman's algorithm to compute the optimal solution for all possible trajectories.
+
+``` {r  find_dp_opt }
+det <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward=0)
+````
+
+
+
 Note that `SDP_Mat` is specified from the calculation above, as are our grids and our profit function. `OptTime` is the stopping time.  `xT` specifies a boundary condition at the stopping time. A reward for meeting this boundary must be specified for it to make any difference.  `delta` indicates the economic discount rate. Again, details are in the function documentation.   
 
 
 Plot the policy function (in terms of escapement, `x-h`, rather than harvest `h`) at equilibrium (first time-step):
 
 ``` {r policyfn_plot}
-q1 <- qplot(x_grid, x_grid - x_grid[opt$D[,1]], xlab="stock size", ylab="escapement") + 
-geom_point(aes(x,y), data=data.frame(x=opt$S, y=opt$S), col="red")
+require(reshape2)
+policies <- melt(data.frame(tsock=x_grid, S = x_grid[opt$D[,1]], D = x_grid[det$D[,1]]), id="stock")
+
+q1 <- ggplot(policies, aes(x_grid, x_grid - value)) + xlab("stock size") + ylab=("escapement") 
 q1
 ````
 

@@ -195,7 +195,7 @@ ggplot(value) +
 
 ``` {r simfn, rerun=TRUE} 
 simulatereps <- function(opt, pars){
-  sims <- lapply(1:100, function(i){
+  sims <- lapply(1:5000, function(i){
     ForwardSimulate(f, pars, x_grid, h_grid, x0 = K, opt$D, z_g, z_m, z_i, profit)
   })
   sims

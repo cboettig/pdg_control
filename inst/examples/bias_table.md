@@ -242,7 +242,7 @@ ggplot(policy) + geom_point(aes(stock, stock - x_grid[value], color = variable),
     degree = 1, se = FALSE, span = 0.3) + ylab("escapement")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8153/7497716712_484f5225d0_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8149/7497751708_0435b14478_o.png) 
 
 ```r
 
@@ -251,7 +251,7 @@ ggplot(policy) + geom_point(aes(stock, x_grid[value], color = variable),
     degree = 1, se = FALSE, span = 0.3) + ylab("harvest")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8424/7497717014_279abff40a_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8166/7497752040_55b0bb293d_o.png) 
 
 ```r
 
@@ -265,7 +265,7 @@ ggplot(value) + geom_point(aes(stock, value, color = variable), shape = "+") +
 ylab("Net Present Value")
 ```
 
-![plot of chunk sethiplots](http://farm8.staticflickr.com/7124/7497717328_d66ab310b9_o.png) 
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7117/7497752398_7c64b40cdc_o.png) 
 
 
 
@@ -276,7 +276,7 @@ ylab("Net Present Value")
 
 ```r
 simulatereps <- function(opt, pars) {
-    sims <- lapply(1:100, function(i) {
+    sims <- lapply(1:5000, function(i) {
         ForwardSimulate(f, pars, x_grid, h_grid, x0 = K, opt$D, z_g, z_m, z_i, 
             profit)
     })
@@ -329,7 +329,7 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time, fishstock)) +
     geom_line(aes(time, harvest), col = "darkgreen") + facet_wrap(~parameter)
 ```
 
-![plot of chunk onerep](http://farm8.staticflickr.com/7113/7497718852_8bca1aea52_o.png) 
+![plot of chunk onerep](http://farm9.staticflickr.com/8008/7497803328_a0cabd636d_o.png) 
 
 
 This plot summarizes the stock dynamics by visualizing the replicates.
@@ -342,7 +342,7 @@ p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1) +
     facet_wrap(~parameter)
 ```
 
-![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm9.staticflickr.com/8021/7497719594_6e39b37c0d_o.png) 
+![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm8.staticflickr.com/7130/7497818102_6c79c934aa_o.png) 
 
 
 
@@ -353,7 +353,7 @@ profits <- dt[, sum(profit), by = c("reps", "parameter")]
 ggplot(profits) + geom_histogram(aes(V1)) + facet_wrap(~parameter)
 ```
 
-![the distribution of profits by scenario](http://farm9.staticflickr.com/8002/7497720020_1a214c689c_o.png) 
+![the distribution of profits by scenario](http://farm8.staticflickr.com/7118/7497818860_022fa88f68_o.png) 
 
 
 Summary statistics 
@@ -378,12 +378,12 @@ print(xtable(matrix(means$V1, nrow = length(scenarios), dimnames = list(scenario
 ```
 
 <!-- html table generated in R 2.15.1 by xtable 1.7-0 package -->
-<!-- Tue Jul  3 16:24:09 2012 -->
+<!-- Tue Jul  3 16:46:46 2012 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> low </TH> <TH> med </TH> <TH> high </TH>  </TR>
-  <TR> <TD align="right"> low </TD> <TD align="right"> 671.38 </TD> <TD align="right"> 680.58 </TD> <TD align="right"> 684.76 </TD> </TR>
-  <TR> <TD align="right"> med </TD> <TD align="right"> 942.00 </TD> <TD align="right"> 996.55 </TD> <TD align="right"> 972.30 </TD> </TR>
-  <TR> <TD align="right"> high </TD> <TD align="right"> 1259.03 </TD> <TD align="right"> 1240.00 </TD> <TD align="right"> 1260.79 </TD> </TR>
+  <TR> <TD align="right"> low </TD> <TD align="right"> 667.03 </TD> <TD align="right"> 672.49 </TD> <TD align="right"> 669.89 </TD> </TR>
+  <TR> <TD align="right"> med </TD> <TD align="right"> 958.94 </TD> <TD align="right"> 961.26 </TD> <TD align="right"> 962.82 </TD> </TR>
+  <TR> <TD align="right"> high </TD> <TD align="right"> 1243.40 </TD> <TD align="right"> 1250.62 </TD> <TD align="right"> 1250.30 </TD> </TR>
    </TABLE>
 
 
@@ -393,12 +393,12 @@ print(xtable(matrix(sds$V1, nrow = length(scenarios), dimnames = list(scenarios,
 ```
 
 <!-- html table generated in R 2.15.1 by xtable 1.7-0 package -->
-<!-- Tue Jul  3 16:24:09 2012 -->
+<!-- Tue Jul  3 16:46:46 2012 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> low </TH> <TH> med </TH> <TH> high </TH>  </TR>
-  <TR> <TD align="right"> low </TD> <TD align="right"> 98.68 </TD> <TD align="right"> 102.60 </TD> <TD align="right"> 96.18 </TD> </TR>
-  <TR> <TD align="right"> med </TD> <TD align="right"> 128.90 </TD> <TD align="right"> 110.75 </TD> <TD align="right"> 141.86 </TD> </TR>
-  <TR> <TD align="right"> high </TD> <TD align="right"> 142.29 </TD> <TD align="right"> 149.04 </TD> <TD align="right"> 135.10 </TD> </TR>
+  <TR> <TD align="right"> low </TD> <TD align="right"> 106.94 </TD> <TD align="right"> 105.56 </TD> <TD align="right"> 101.90 </TD> </TR>
+  <TR> <TD align="right"> med </TD> <TD align="right"> 125.62 </TD> <TD align="right"> 124.84 </TD> <TD align="right"> 121.46 </TD> </TR>
+  <TR> <TD align="right"> high </TD> <TD align="right"> 141.59 </TD> <TD align="right"> 140.19 </TD> <TD align="right"> 138.59 </TD> </TR>
    </TABLE>
 
 
