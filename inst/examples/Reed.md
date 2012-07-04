@@ -2,12 +2,6 @@
 
 
 
-```
-Error: could not find function "getOptions"
-```
-
-
-
 
 # Reed Model
 
@@ -54,7 +48,7 @@ conditioned on h > x and x > 0,
 
 ```r
 price <- 1
-c0 <- 0.0
+c0 <- 0.01
 c1 <- 0
 profit <- profit_harvest(price=price, c0 = c0, c1=c1) 
 ```
@@ -62,7 +56,7 @@ profit <- profit_harvest(price=price, c0 = c0, c1=c1)
 
 
 
-with price = `1`, `c0` = `0` and `c1` = `0`. 
+with price = `1`, `c0` = `0.01` and `c1` = `0`. 
 
 
 
@@ -151,9 +145,36 @@ Bellman's algorithm to compute the optimal solution for all possible trajectorie
 
 
 ```r
-opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime=25, xT=0, 
-                     profit, delta=0.05, reward=0)
+opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward=0)
 ```
+
+
+
+
+
+## Compare to Clark (noise-free)
+
+
+
+```r
+pdfn2 <- function(P, s){
+  dunif(P, 1 - s, 1 + s)
+}
+SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, 0, pdfn2)
+```
+
+
+
+
+Bellman's algorithm to compute the optimal solution for all possible trajectories.
+
+
+
+```r
+det <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward=0)
+```
+
+
 
 
 
@@ -166,12 +187,32 @@ Plot the policy function (in terms of escapement, `x-h`, rather than harvest `h`
 
 
 ```r
-q1 <- qplot(x_grid, x_grid - x_grid[opt$D[,1]], xlab="stock size", ylab="escapement") + 
-geom_point(aes(x,y), data=data.frame(x=opt$S, y=opt$S), col="red")
+require(reshape2)
+policies <- melt(data.frame(tsock=x_grid, S = x_grid[opt$D[,1]], D = x_grid[det$D[,1]]), id="stock")
+```
+
+```
+Error: id variables not found in data: stock
+```
+
+```r
+
+q1 <- ggplot(policies, aes(x_grid, x_grid - value)) + geom_point() + geom_line() + xlab("stock size") + ylab=("escapement") 
+```
+
+```
+Error: object 'q1' not found
+```
+
+```r
 q1
 ```
 
-![plot of chunk policyfn_plot](http://farm8.staticflickr.com/7113/7410172420_1635db49b9_o.png) 
+```
+Error: object 'q1' not found
+```
+
+
 
 
 and the value function (at equilibrium):
@@ -184,7 +225,7 @@ geom_vline(xintercept=opt$S)
 q2
 ```
 
-![plot of chunk valuefn_plot](http://farm9.staticflickr.com/8161/7410172826_aa3a2309ba_o.png) 
+![plot of chunk valuefn_plot](http://farm9.staticflickr.com/8421/7497877766_3f05bd41a1_o.png) 
 
 
 
@@ -237,7 +278,7 @@ p0 <- ggplot(subset(dt,reps==1)) +
 p0
 ```
 
-![plot of chunk p0](http://farm8.staticflickr.com/7108/7410173302_ff72717e54_o.png) 
+![plot of chunk p0](http://farm9.staticflickr.com/8003/7497878198_6e3e3e829c_o.png) 
 
 
 
@@ -252,7 +293,7 @@ p1 <- p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 p1
 ```
 
-![plot of chunk p1](http://farm6.staticflickr.com/5038/7410173816_206520e416_o.png) 
+![plot of chunk p1](http://farm8.staticflickr.com/7119/7497878582_7a4b1ab3b8_o.png) 
 
 
 
@@ -271,8 +312,6 @@ ISSN 00950696, <a href="http://dx.doi.org/10.1016/0095-0696(79)90014-7">http://d
 ```r
 options(device=orig)
 ```
-
-
 
 ```
 Error: object 'orig' not found
