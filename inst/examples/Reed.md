@@ -46,7 +46,7 @@ conditioned on h > x and x > 0,
 
 ```r
 price <- 1
-c0 <- 5
+c0 <- 0
 c1 <- 0
 profit <- profit_harvest(price=price, c0 = c0, c1=c1) 
 ```
@@ -54,7 +54,7 @@ profit <- profit_harvest(price=price, c0 = c0, c1=c1)
 
 
 
-with price = `1`, `c0` = `5` and `c1` = `0`. 
+with price = `1`, `c0` = `0` and `c1` = `0`. 
 
 
 
@@ -155,11 +155,7 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward
 
 
 ```r
-SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, 0.01, pdfn2)
-```
-
-```
-Error: object 'pdfn2' not found
+SDP_Mat2 <- determine_SDP_matrix(f, pars, x_grid, h_grid, 0.01, pdfn)
 ```
 
 
@@ -170,7 +166,7 @@ Bellman's algorithm to compute the optimal solution for all possible trajectorie
 
 
 ```r
-det <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward=0)
+det <- find_dp_optim(SDP_Mat2, x_grid, h_grid, OptTime, xT, profit, delta, reward=0)
 ```
 
 
@@ -192,7 +188,7 @@ q1 <- ggplot(policies, aes(stock, stock - value, color=variable)) + geom_point()
 q1
 ```
 
-![plot of chunk policyfn_plot](http://farm8.staticflickr.com/7118/7502594668_e2fc4be31b_o.png) 
+![plot of chunk policyfn_plot](http://farm9.staticflickr.com/8282/7502738176_79f8d76b57_o.png) 
 
 
 and the value function (at equilibrium):
@@ -205,7 +201,7 @@ geom_vline(xintercept=opt$S)
 q2
 ```
 
-![plot of chunk valuefn_plot](http://farm8.staticflickr.com/7251/7502595632_a163cc265b_o.png) 
+![plot of chunk valuefn_plot](http://farm8.staticflickr.com/7265/7502739072_bb70707a92_o.png) 
 
 
 
@@ -258,7 +254,7 @@ p0 <- ggplot(subset(dt,reps==1)) +
 p0
 ```
 
-![plot of chunk p0](http://farm8.staticflickr.com/7265/7502596202_3afd6df8b7_o.png) 
+![plot of chunk p0](http://farm8.staticflickr.com/7271/7502739636_87624c4352_o.png) 
 
 
 
@@ -273,7 +269,7 @@ p1 <- p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 p1
 ```
 
-![plot of chunk p1](http://farm9.staticflickr.com/8424/7502596478_0dda6d7361_o.png) 
+![plot of chunk p1](http://farm9.staticflickr.com/8164/7502740480_01053eb149_o.png) 
 
 
 
@@ -285,17 +281,6 @@ p1
 ISSN 00950696, <a href="http://dx.doi.org/10.1016/0095-0696(79)90014-7">http://dx.doi.org/10.1016/0095-0696(79)90014-7</a>.
 
 
-
-
-
-
-```r
-options(device=orig)
-```
-
-```
-Error: object 'orig' not found
-```
 
 
 
