@@ -52,13 +52,13 @@ with price = `1`, `c0` = `0` and `c1` = `0`.
 ```r
 xmin <- 0
 xmax <- 2.5 * K
-grid_n <- 200
+grid_n <- 300
 ```
 
 
 
 
-We seek a harvest policy which maximizes the discounted profit from the fishery using a stochastic dynamic programming approach over a discrete grid of stock sizes from `0` to `250` on a grid of `200` points, and over an identical discrete grid of possible harvest values.  
+We seek a harvest policy which maximizes the discounted profit from the fishery using a stochastic dynamic programming approach over a discrete grid of stock sizes from `0` to `250` on a grid of `300` points, and over an identical discrete grid of possible harvest values.  
 
 
 
@@ -124,7 +124,7 @@ With parameter `r` = `1`
 
 
 ```r
-pars <- c(r, K)
+pars1 <- c(r, K)
 ```
 
 
@@ -136,7 +136,7 @@ pars <- c(r, K)
 pdfn <- function(P, s) {
     dunif(P, 1 - s, 1 + s)
 }
-SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g, 
+SDP_Mat1 <- determine_SDP_matrix(f, pars1, x_grid, h_grid, sigma_g, 
     pdfn)
 ```
 
@@ -146,7 +146,7 @@ SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g,
 
 
 ```r
-opt_low <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, 
+opt_low <- find_dp_optim(SDP_Mat1, x_grid, h_grid, OptTime, xT, profit, 
     delta, reward = 0)
 ```
 
@@ -161,7 +161,7 @@ With parameter `r` = `1.5`
 
 
 ```r
-pars <- c(r, K)
+pars2 <- c(r, K)
 ```
 
 
@@ -170,10 +170,7 @@ pars <- c(r, K)
 
 
 ```r
-pdfn <- function(P, s) {
-    dunif(P, 1 - s, 1 + s)
-}
-SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g, 
+SDP_Mat2 <- determine_SDP_matrix(f, pars2, x_grid, h_grid, sigma_g, 
     pdfn)
 ```
 
@@ -183,7 +180,7 @@ SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g,
 
 
 ```r
-opt_med <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, 
+opt_med <- find_dp_optim(SDP_Mat2, x_grid, h_grid, OptTime, xT, profit, 
     delta, reward = 0)
 ```
 
@@ -198,7 +195,7 @@ With parameter `r` = `2`
 
 
 ```r
-pars <- c(r, K)
+pars3 <- c(r, K)
 ```
 
 
@@ -207,10 +204,7 @@ pars <- c(r, K)
 
 
 ```r
-pdfn <- function(P, s) {
-    dunif(P, 1 - s, 1 + s)
-}
-SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g, 
+SDP_Mat3 <- determine_SDP_matrix(f, pars3, x_grid, h_grid, sigma_g, 
     pdfn)
 ```
 
@@ -220,8 +214,8 @@ SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g,
 
 
 ```r
-opt_high <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, 
-    delta, reward = 0)
+opt_high <- find_dp_optim(SDP_Mat3, x_grid, h_grid, OptTime, xT, 
+    profit, delta, reward = 0)
 ```
 
 
@@ -242,7 +236,7 @@ ggplot(policy) + geom_point(aes(stock, stock - x_grid[value], color = variable),
     degree = 1, se = FALSE, span = 0.3) + ylab("escapement")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8149/7497751708_0435b14478_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8429/7502451502_a63e17d783_o.png) 
 
 ```r
 
@@ -251,7 +245,7 @@ ggplot(policy) + geom_point(aes(stock, x_grid[value], color = variable),
     degree = 1, se = FALSE, span = 0.3) + ylab("harvest")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8166/7497752040_55b0bb293d_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8422/7502451942_6dbd53e823_o.png) 
 
 ```r
 
@@ -265,7 +259,7 @@ ggplot(value) + geom_point(aes(stock, value, color = variable), shape = "+") +
 ylab("Net Present Value")
 ```
 
-![plot of chunk sethiplots](http://farm8.staticflickr.com/7117/7497752398_7c64b40cdc_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8432/7502452334_7c5e8e559e_o.png) 
 
 
 
@@ -294,7 +288,7 @@ All cases
 
 ```r
 policyfn <- list(low = opt_low, med = opt_med, high = opt_high)
-par_list <- list(c(1, 100), c(1.5, 100), c(2, 100))
+par_list <- list(pars1, pars2, pars3)
 
 allcases <- lapply(policyfn, function(policyfn_i) {
     lapply(par_list, function(par) {
@@ -329,7 +323,7 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time, fishstock)) +
     geom_line(aes(time, harvest), col = "darkgreen") + facet_wrap(~parameter)
 ```
 
-![plot of chunk onerep](http://farm9.staticflickr.com/8008/7497803328_a0cabd636d_o.png) 
+![plot of chunk onerep](http://farm8.staticflickr.com/7134/7502498934_7d180920c3_o.png) 
 
 
 This plot summarizes the stock dynamics by visualizing the replicates.
@@ -342,7 +336,7 @@ p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1) +
     facet_wrap(~parameter)
 ```
 
-![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm8.staticflickr.com/7130/7497818102_6c79c934aa_o.png) 
+![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm8.staticflickr.com/7129/7502514204_15826c1f89_o.png) 
 
 
 
@@ -353,7 +347,7 @@ profits <- dt[, sum(profit), by = c("reps", "parameter")]
 ggplot(profits) + geom_histogram(aes(V1)) + facet_wrap(~parameter)
 ```
 
-![the distribution of profits by scenario](http://farm8.staticflickr.com/7118/7497818860_022fa88f68_o.png) 
+![the distribution of profits by scenario](http://farm8.staticflickr.com/7257/7502515100_fa70e716cb_o.png) 
 
 
 Summary statistics 
@@ -377,13 +371,13 @@ print(xtable(matrix(means$V1, nrow = length(scenarios), dimnames = list(scenario
     scenarios))), type = "html")
 ```
 
-<!-- html table generated in R 2.15.1 by xtable 1.7-0 package -->
-<!-- Tue Jul  3 16:46:46 2012 -->
+<!-- html table generated in R 2.14.1 by xtable 1.7-0 package -->
+<!-- Wed Jul  4 11:02:18 2012 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> low </TH> <TH> med </TH> <TH> high </TH>  </TR>
-  <TR> <TD align="right"> low </TD> <TD align="right"> 667.03 </TD> <TD align="right"> 672.49 </TD> <TD align="right"> 669.89 </TD> </TR>
-  <TR> <TD align="right"> med </TD> <TD align="right"> 958.94 </TD> <TD align="right"> 961.26 </TD> <TD align="right"> 962.82 </TD> </TR>
-  <TR> <TD align="right"> high </TD> <TD align="right"> 1243.40 </TD> <TD align="right"> 1250.62 </TD> <TD align="right"> 1250.30 </TD> </TR>
+  <TR> <TD align="right"> low </TD> <TD align="right"> 668.90 </TD> <TD align="right"> 674.14 </TD> <TD align="right"> 673.44 </TD> </TR>
+  <TR> <TD align="right"> med </TD> <TD align="right"> 958.11 </TD> <TD align="right"> 959.80 </TD> <TD align="right"> 958.20 </TD> </TR>
+  <TR> <TD align="right"> high </TD> <TD align="right"> 1242.55 </TD> <TD align="right"> 1250.40 </TD> <TD align="right"> 1248.10 </TD> </TR>
    </TABLE>
 
 
@@ -392,25 +386,31 @@ print(xtable(matrix(sds$V1, nrow = length(scenarios), dimnames = list(scenarios,
     scenarios))), type = "html")
 ```
 
-<!-- html table generated in R 2.15.1 by xtable 1.7-0 package -->
-<!-- Tue Jul  3 16:46:46 2012 -->
+<!-- html table generated in R 2.14.1 by xtable 1.7-0 package -->
+<!-- Wed Jul  4 11:02:18 2012 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> low </TH> <TH> med </TH> <TH> high </TH>  </TR>
-  <TR> <TD align="right"> low </TD> <TD align="right"> 106.94 </TD> <TD align="right"> 105.56 </TD> <TD align="right"> 101.90 </TD> </TR>
-  <TR> <TD align="right"> med </TD> <TD align="right"> 125.62 </TD> <TD align="right"> 124.84 </TD> <TD align="right"> 121.46 </TD> </TR>
-  <TR> <TD align="right"> high </TD> <TD align="right"> 141.59 </TD> <TD align="right"> 140.19 </TD> <TD align="right"> 138.59 </TD> </TR>
+  <TR> <TD align="right"> low </TD> <TD align="right"> 110.14 </TD> <TD align="right"> 105.74 </TD> <TD align="right"> 103.84 </TD> </TR>
+  <TR> <TD align="right"> med </TD> <TD align="right"> 126.41 </TD> <TD align="right"> 122.92 </TD> <TD align="right"> 120.52 </TD> </TR>
+  <TR> <TD align="right"> high </TD> <TD align="right"> 144.04 </TD> <TD align="right"> 142.26 </TD> <TD align="right"> 136.82 </TD> </TR>
    </TABLE>
 
 
 
 
-# References
 
-
+```r
+k <- which.min(abs(K - x_grid))
+data.frame(low = opt_low$V[k], med = opt_med$V[k], high = opt_high$V[k])
+```
 
 ```
-Error: invalid subscript type 'list'
+    low med high
+ 665.7 953 1239
 ```
+
+
+
 
 
 
