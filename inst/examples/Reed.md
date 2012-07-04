@@ -218,7 +218,7 @@ geom_vline(xintercept=opt$S)
 q2
 ```
 
-![plot of chunk valuefn_plot](http://farm8.staticflickr.com/7251/7497911726_1687c316f5_o.png) 
+![plot of chunk valuefn_plot](http://farm8.staticflickr.com/7109/7502414104_37313f28a7_o.png) 
 
 
 
@@ -271,7 +271,7 @@ p0 <- ggplot(subset(dt,reps==1)) +
 p0
 ```
 
-![plot of chunk p0](http://farm9.staticflickr.com/8002/7497912084_9269dc066e_o.png) 
+![plot of chunk p0](http://farm9.staticflickr.com/8425/7502414702_432e369a54_o.png) 
 
 
 
@@ -286,7 +286,7 @@ p1 <- p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 p1
 ```
 
-![plot of chunk p1](http://farm9.staticflickr.com/8166/7497912474_0e6c90ac76_o.png) 
+![plot of chunk p1](http://farm9.staticflickr.com/8430/7502415300_35701a2eaa_o.png) 
 
 
 
