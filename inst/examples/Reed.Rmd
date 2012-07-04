@@ -138,9 +138,9 @@ Plot the policy function (in terms of escapement, `x-h`, rather than harvest `h`
 
 ``` {r policyfn_plot}
 require(reshape2)
-policies <- melt(data.frame(tsock=x_grid, S = x_grid[opt$D[,1]], D = x_grid[det$D[,1]]), id="stock")
+policies <- melt(data.frame(stock=x_grid, S = x_grid[opt$D[,1]], D = x_grid[det$D[,1]]), id="stock")
 
-q1 <- ggplot(policies, aes(x_grid, x_grid - value)) + geom_point() + geom_line() + xlab("stock size") + ylab=("escapement") 
+q1 <- ggplot(policies, aes(x_grid, x_grid - value, color=variable)) + geom_point() + geom_line() + xlab("stock size") + ylab=("escapement") 
 q1
 ````
 

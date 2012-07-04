@@ -188,16 +188,9 @@ Plot the policy function (in terms of escapement, `x-h`, rather than harvest `h`
 
 ```r
 require(reshape2)
-policies <- melt(data.frame(tsock=x_grid, S = x_grid[opt$D[,1]], D = x_grid[det$D[,1]]), id="stock")
-```
+policies <- melt(data.frame(stock=x_grid, S = x_grid[opt$D[,1]], D = x_grid[det$D[,1]]), id="stock")
 
-```
-Error: id variables not found in data: stock
-```
-
-```r
-
-q1 <- ggplot(policies, aes(x_grid, x_grid - value)) + geom_point() + geom_line() + xlab("stock size") + ylab=("escapement") 
+q1 <- ggplot(policies, aes(x_grid, x_grid - value, color=variable)) + geom_point() + geom_line() + xlab("stock size") + ylab=("escapement") 
 ```
 
 ```
@@ -225,7 +218,7 @@ geom_vline(xintercept=opt$S)
 q2
 ```
 
-![plot of chunk valuefn_plot](http://farm9.staticflickr.com/8421/7497877766_3f05bd41a1_o.png) 
+![plot of chunk valuefn_plot](http://farm8.staticflickr.com/7251/7497911726_1687c316f5_o.png) 
 
 
 
@@ -278,7 +271,7 @@ p0 <- ggplot(subset(dt,reps==1)) +
 p0
 ```
 
-![plot of chunk p0](http://farm9.staticflickr.com/8003/7497878198_6e3e3e829c_o.png) 
+![plot of chunk p0](http://farm9.staticflickr.com/8002/7497912084_9269dc066e_o.png) 
 
 
 
@@ -293,7 +286,7 @@ p1 <- p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 p1
 ```
 
-![plot of chunk p1](http://farm8.staticflickr.com/7119/7497878582_7a4b1ab3b8_o.png) 
+![plot of chunk p1](http://farm9.staticflickr.com/8166/7497912474_0e6c90ac76_o.png) 
 
 
 
