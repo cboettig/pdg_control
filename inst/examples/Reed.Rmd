@@ -35,6 +35,7 @@ With parameters `A` = `r A <- 1.5` and `B` = `r B <- 0.005`.
 
 ``` {r }
 pars <- c(A, B)
+K <- (A-1)/B
 ````
 
 We consider a profits from fishing to be a function of harvest `h` and stock size `x`,  
@@ -101,7 +102,6 @@ pdfn <- function(P, s){
 }
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g, pdfn)
 ````
-
 
 ### Find the optimum by dynamic programming
 
