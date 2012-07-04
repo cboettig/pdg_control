@@ -28,16 +28,13 @@ rm(list=ls())
 Chose the state equation / population dynamics function
 
 ``` {r }
-f <- function(x,h,p){
-	S = x - h
-	p[1] * S * (1 - S/p[2]) + S
-}
+f <- BevHolt 
 ````
 
-With parameters `r` = `r r <- 1` and `K` = `r K <- 100`.
+With parameters `A` = `r A <- 1.5` and `B` = `r B <- 0.005`.
 
 ``` {r }
-pars <- c(r, K)
+pars <- c(A, B)
 ````
 
 We consider a profits from fishing to be a function of harvest `h` and stock size `x`,  
@@ -48,7 +45,7 @@ conditioned on h > x and x > 0,
 
 ``` {r  profit}
 price <- 1
-c0 <- 0.01
+c0 <- 5
 c1 <- 0
 profit <- profit_harvest(price=price, c0 = c0, c1=c1) 
 ````
@@ -75,7 +72,7 @@ h_grid <- x_grid
 delta <- 0.05
 xT <- 0
 OptTime <- 25
-sigma_g <- .5
+sigma_g <- .2
 ````
 
 We will determine the optimal solution over a `r OptTime` time step window with boundary condition for stock at `r xT` and discounting rate of `r delta`.  The Reed model considers a stochastic growth model 
@@ -85,7 +82,7 @@ We will determine the optimal solution over a `r OptTime` time step window with 
 for the random variable `z_g`, given by 
 
 ``` {r noise}
-z_g <- function() 1+(2*runif(1, 0,  1)-1) * sigma_g
+z_g <- function() rlnorm(1,0, sigma_g)  # 1+(2*runif(1, 0,  1)-1) * sigma_g
 ````
 
 No other sources of noise enter into the dynamics.  
@@ -99,7 +96,8 @@ z_i <- function() 1
 
 ``` {r  SDP_Mat}
 pdfn <- function(P, s){
-  dunif(P, 1 - s, 1 + s)
+  # dunif(P, 1 - s, 1 + s)
+  dlnorm(P, 0, s)
 }
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g, pdfn)
 ````
@@ -117,9 +115,6 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward
 ## Compare to Clark (noise-free)
 
 ``` {r  }
-pdfn2 <- function(P, s){
-  dunif(P, 1 - s, 1 + s)
-}
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, 0.01, pdfn2)
 ````
 

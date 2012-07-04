@@ -18,21 +18,18 @@ Chose the state equation / population dynamics function
 
 
 ```r
-f <- function(x,h,p){
-	S = x - h
-	p[1] * S * (1 - S/p[2]) + S
-}
+f <- BevHolt 
 ```
 
 
 
 
-With parameters `r` = `1` and `K` = `100`.
+With parameters `A` = `1.5` and `B` = `0.005`.
 
 
 
 ```r
-pars <- c(r, K)
+pars <- c(A, B)
 ```
 
 
@@ -48,7 +45,7 @@ conditioned on h > x and x > 0,
 
 ```r
 price <- 1
-c0 <- 0.01
+c0 <- 5
 c1 <- 0
 profit <- profit_harvest(price=price, c0 = c0, c1=c1) 
 ```
@@ -56,7 +53,7 @@ profit <- profit_harvest(price=price, c0 = c0, c1=c1)
 
 
 
-with price = `1`, `c0` = `0.01` and `c1` = `0`. 
+with price = `1`, `c0` = `5` and `c1` = `0`. 
 
 
 
@@ -64,20 +61,46 @@ with price = `1`, `c0` = `0.01` and `c1` = `0`.
 ```r
 xmin <- 0
 xmax <- 1.5 * K
+```
+
+```
+Error: object 'K' not found
+```
+
+```r
 grid_n <- 100
 ```
 
 
 
 
-We seek a harvest policy which maximizes the discounted profit from the fishery using a stochastic dynamic programming approach over a discrete grid of stock sizes from `0` to `150` on a grid of `100` points, and over an identical discrete grid of possible harvest values.  
+We seek a harvest policy which maximizes the discounted profit from the fishery using a stochastic dynamic programming approach over a discrete grid of stock sizes from `0` to 
+
+```
+
+Error in eval(expr, envir, enclos) : object 'xmax' not found
+
+```
+
+ on a grid of `100` points, and over an identical discrete grid of possible harvest values.  
 
 
 
 
 ```r
 x_grid <- seq(xmin, xmax, length = grid_n)  
+```
+
+```
+Error: object 'xmax' not found
+```
+
+```r
 h_grid <- x_grid  
+```
+
+```
+Error: object 'x_grid' not found
 ```
 
 
@@ -90,7 +113,7 @@ h_grid <- x_grid
 delta <- 0.05
 xT <- 0
 OptTime <- 25
-sigma_g <- .5
+sigma_g <- .2
 ```
 
 
@@ -105,7 +128,7 @@ for the random variable `z_g`, given by
 
 
 ```r
-z_g <- function() 1+(2*runif(1, 0,  1)-1) * sigma_g
+z_g <- function() rlnorm(1,0, sigma_g)  # 1+(2*runif(1, 0,  1)-1) * sigma_g
 ```
 
 
@@ -129,9 +152,14 @@ z_i <- function() 1
 
 ```r
 pdfn <- function(P, s){
-  dunif(P, 1 - s, 1 + s)
+  # dunif(P, 1 - s, 1 + s)
+  dlnorm(P, 0, s)
 }
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g, pdfn)
+```
+
+```
+Error: object 'x_grid' not found
 ```
 
 
@@ -148,6 +176,10 @@ Bellman's algorithm to compute the optimal solution for all possible trajectorie
 opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward=0)
 ```
 
+```
+Error: object 'x_grid' not found
+```
+
 
 
 
@@ -157,10 +189,11 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward
 
 
 ```r
-pdfn2 <- function(P, s){
-  dunif(P, 1 - s, 1 + s)
-}
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, 0.01, pdfn2)
+```
+
+```
+Error: object 'pdfn2' not found
 ```
 
 
@@ -172,6 +205,10 @@ Bellman's algorithm to compute the optimal solution for all possible trajectorie
 
 ```r
 det <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward=0)
+```
+
+```
+Error: object 'x_grid' not found
 ```
 
 
@@ -189,11 +226,29 @@ Plot the policy function (in terms of escapement, `x-h`, rather than harvest `h`
 ```r
 require(reshape2)
 policies <- melt(data.frame(stock=x_grid, S = x_grid[opt$D[,1]], D = x_grid[det$D[,1]]), id="stock")
+```
+
+```
+Error: object 'x_grid' not found
+```
+
+```r
 q1 <- ggplot(policies, aes(stock, stock - value, color=variable)) + geom_point() + xlab("stock size") + ylab("escapement") 
+```
+
+```
+Error: object 'policies' not found
+```
+
+```r
 q1
 ```
 
-![plot of chunk policyfn_plot](http://farm9.staticflickr.com/8282/7502546400_3b2ec9378d_o.png) 
+```
+Error: object 'q1' not found
+```
+
+
 
 
 and the value function (at equilibrium):
@@ -203,10 +258,21 @@ and the value function (at equilibrium):
 ```r
 q2 <- qplot(x_grid, opt$V, xlab="stock size", ylab="value") + 
 geom_vline(xintercept=opt$S)
+```
+
+```
+Error: object 'opt' not found
+```
+
+```r
 q2
 ```
 
-![plot of chunk valuefn_plot](http://farm9.staticflickr.com/8425/7502546846_fc52c48cfc_o.png) 
+```
+Error: object 'q2' not found
+```
+
+
 
 
 
@@ -224,6 +290,10 @@ sims <- lapply(1:100, function(i){
 })
 ```
 
+```
+Error: object 'opt' not found
+```
+
 
 
 
@@ -238,8 +308,26 @@ R makes it easy to work with this big replicate data set.  We make data tidy (me
 
 ```r
 dat <- melt(sims, id=names(sims[[1]]))  
+```
+
+```
+Error: object 'sims' not found
+```
+
+```r
 dt <- data.table(dat)
+```
+
+```
+Error: object 'dat' not found
+```
+
+```r
 setnames(dt, "L1", "reps") # names are nice
+```
+
+```
+Error: x is not a data.table
 ```
 
 
@@ -256,10 +344,21 @@ p0 <- ggplot(subset(dt,reps==1)) +
   geom_line(aes(time, fishstock)) +
   geom_abline(intercept=opt$S, slope = 0) +
   geom_line(aes(time, harvest), col="darkgreen") 
+```
+
+```
+Error: object 'reps' not found
+```
+
+```r
 p0
 ```
 
-![plot of chunk p0](http://farm9.staticflickr.com/8432/7502547402_b5b7558ec3_o.png) 
+```
+Error: object 'p0' not found
+```
+
+
 
 
 
@@ -270,11 +369,29 @@ This plot summarizes the stock dynamics by visualizing the replicates. Reed's S 
 ```r
 p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) + 
   geom_abline(intercept=xT, slope = 0, lty=2) 
+```
+
+```
+Error: ggplot2 doesn't know how to deal with data of class function
+```
+
+```r
 p1 <- p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
+```
+
+```
+Error: object 'p1' not found
+```
+
+```r
 p1
 ```
 
-![plot of chunk p1](http://farm8.staticflickr.com/7134/7502547912_f542e65009_o.png) 
+```
+Error: object 'p1' not found
+```
+
+
 
 
 

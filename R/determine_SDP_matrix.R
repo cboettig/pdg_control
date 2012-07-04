@@ -22,21 +22,20 @@
 #' @param sigma_g the variance of the population growth process
 #' @param pdfn the probability density function, taking the proportional
 #' chance of a transition to that state, f(x), and the parameter sigma_g
-#' If NULL (default), will use the log normal density.  
+#' By default it will use the log normal density.  
 #' @return the transition matrix at each value of h in the grid. 
 #' @details this analytical approach doesn't reliably support other 
 #'  sources of variation.  The quality of the analytic approximations 
 #'  (lognormal) can be tested. 
 #' @export
-determine_SDP_matrix <- function(f, p, x_grid, h_grid, sigma_g, pdfn=NULL){
-  if(is.null(pdfn)) 
-    pdfn <- function(P, s) dlnorm(P, 0, s) #logmean of 0 is log(1)
+determine_SDP_matrix <- function(f, p, x_grid, h_grid, sigma_g,
+                                 pdfn=function(P, s) dlnorm(P, 0, s)){
   gridsize <- length(x_grid)
   SDP_Mat <- lapply(h_grid, function(h){
     SDP_matrix <- matrix(0, nrow=gridsize, ncol=gridsize)
     # Cycle over x values
     for(i in 1:gridsize){ ## VECTORIZE ME
-      ## Calculate the 
+      ## Calculate the expected transition  
       x1 <- x_grid[i]
       x2_expected <- f(x1, h, p)
       ## If expected 0, go to 0 with probabilty 1
@@ -45,7 +44,6 @@ determine_SDP_matrix <- function(f, p, x_grid, h_grid, sigma_g, pdfn=NULL){
       else {
         # relative probability of a transition to that state
         ProportionalChance <- x_grid / x2_expected
-        # lognormal due to multiplicative Gaussian noise
         Prob <- pdfn(ProportionalChance, sigma_g)
         # Store normalized probabilities in row
         SDP_matrix[i,] <- Prob/sum(Prob)
