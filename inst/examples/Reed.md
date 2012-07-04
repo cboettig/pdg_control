@@ -18,21 +18,19 @@ Chose the state equation / population dynamics function
 
 
 ```r
-f <- function(x,h,p){
-	S = x - h
-	p[1] * S * (1 - S/p[2]) + S
-}
+f <- BevHolt 
 ```
 
 
 
 
-With parameters `r` = `1` and `K` = `100`.
+With parameters `A` = `1.5` and `B` = `0.005`.
 
 
 
 ```r
-pars <- c(r, K)
+pars <- c(A, B)
+K <- (A-1)/B
 ```
 
 
@@ -48,7 +46,7 @@ conditioned on h > x and x > 0,
 
 ```r
 price <- 1
-c0 <- 0.01
+c0 <- 5
 c1 <- 0
 profit <- profit_harvest(price=price, c0 = c0, c1=c1) 
 ```
@@ -56,7 +54,7 @@ profit <- profit_harvest(price=price, c0 = c0, c1=c1)
 
 
 
-with price = `1`, `c0` = `0.01` and `c1` = `0`. 
+with price = `1`, `c0` = `5` and `c1` = `0`. 
 
 
 
@@ -90,7 +88,7 @@ h_grid <- x_grid
 delta <- 0.05
 xT <- 0
 OptTime <- 25
-sigma_g <- .5
+sigma_g <- .2
 ```
 
 
@@ -105,7 +103,7 @@ for the random variable `z_g`, given by
 
 
 ```r
-z_g <- function() 1+(2*runif(1, 0,  1)-1) * sigma_g
+z_g <- function() rlnorm(1,0, sigma_g)  # 1+(2*runif(1, 0,  1)-1) * sigma_g
 ```
 
 
@@ -129,11 +127,11 @@ z_i <- function() 1
 
 ```r
 pdfn <- function(P, s){
-  dunif(P, 1 - s, 1 + s)
+  # dunif(P, 1 - s, 1 + s)
+  dlnorm(P, 0, s)
 }
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g, pdfn)
 ```
-
 
 
 
@@ -157,10 +155,11 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward
 
 
 ```r
-pdfn2 <- function(P, s){
-  dunif(P, 1 - s, 1 + s)
-}
-SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, 0, pdfn2)
+SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, 0.01, pdfn2)
+```
+
+```
+Error: object 'pdfn2' not found
 ```
 
 
@@ -189,23 +188,11 @@ Plot the policy function (in terms of escapement, `x-h`, rather than harvest `h`
 ```r
 require(reshape2)
 policies <- melt(data.frame(stock=x_grid, S = x_grid[opt$D[,1]], D = x_grid[det$D[,1]]), id="stock")
-
-q1 <- ggplot(policies, aes(x_grid, x_grid - value, color=variable)) + geom_point() + geom_line() + xlab("stock size") + ylab=("escapement") 
-```
-
-```
-Error: object 'q1' not found
-```
-
-```r
+q1 <- ggplot(policies, aes(stock, stock - value, color=variable)) + geom_point() + xlab("stock size") + ylab("escapement") 
 q1
 ```
 
-```
-Error: object 'q1' not found
-```
-
-
+![plot of chunk policyfn_plot](http://farm8.staticflickr.com/7118/7502594668_e2fc4be31b_o.png) 
 
 
 and the value function (at equilibrium):
@@ -218,7 +205,7 @@ geom_vline(xintercept=opt$S)
 q2
 ```
 
-![plot of chunk valuefn_plot](http://farm8.staticflickr.com/7109/7502414104_37313f28a7_o.png) 
+![plot of chunk valuefn_plot](http://farm8.staticflickr.com/7251/7502595632_a163cc265b_o.png) 
 
 
 
@@ -271,7 +258,7 @@ p0 <- ggplot(subset(dt,reps==1)) +
 p0
 ```
 
-![plot of chunk p0](http://farm9.staticflickr.com/8425/7502414702_432e369a54_o.png) 
+![plot of chunk p0](http://farm8.staticflickr.com/7265/7502596202_3afd6df8b7_o.png) 
 
 
 
@@ -286,7 +273,7 @@ p1 <- p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 p1
 ```
 
-![plot of chunk p1](http://farm9.staticflickr.com/8430/7502415300_35701a2eaa_o.png) 
+![plot of chunk p1](http://farm9.staticflickr.com/8424/7502596478_0dda6d7361_o.png) 
 
 
 
