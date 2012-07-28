@@ -46,7 +46,7 @@ We consider a profits from fishing to be a function of harvest `h` and stock siz
 
 ```r
 price <- 1
-c0 <- 0.01
+c0 <- 0.1
 c1 <- 0
 profit <- profit_harvest(price = price, c0 = c0, c1 = c1)
 ```
@@ -54,7 +54,7 @@ profit <- profit_harvest(price = price, c0 = c0, c1 = c1)
 
 
 
-with price = `1`, `c0` = `0.01` and `c1` = `0`. 
+with price = `1`, `c0` = `0.1` and `c1` = `0`. 
 
 
 
@@ -119,7 +119,7 @@ scenario <- function(policy_g, policy_m, policy_i) {
     z_m <- function() rlnorm(1, 0, policy_m)
     z_i <- function() rlnorm(1, 0, policy_i)
     
-    SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps = 20000)
+    SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps = 10000)
     opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, 
         reward = 0)
 }
@@ -284,7 +284,7 @@ ggplot(policy) + geom_point(aes(stock, stock - x_grid[value], color = variable),
     degree = 1, se = FALSE, span = 0.3) + ylab("escapement")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8023/7476923342_164c0a22da_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8286/7497276938_c648a6d4d7_o.png) 
 
 ```r
 
@@ -293,7 +293,7 @@ ggplot(policy) + geom_point(aes(stock, x_grid[value], color = variable),
     degree = 1, se = FALSE, span = 0.3) + ylab("harvest")
 ```
 
-![plot of chunk sethiplots](http://farm8.staticflickr.com/7250/7476923752_d7442e9f42_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8424/7497277378_a4ba797c94_o.png) 
 
 ```r
 
@@ -307,7 +307,7 @@ ggplot(value) + geom_point(aes(stock, value, color = variable), shape = "+") +
 ylab("Net Present Value")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8143/7476924004_05a2dc1554_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8157/7497277764_89f4437d20_o.png) 
 
 
 ## Simulations
