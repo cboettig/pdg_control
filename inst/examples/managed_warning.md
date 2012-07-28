@@ -91,7 +91,7 @@ h_grid <- x_grid
 delta <- 0.05
 xT <- 0
 OptTime <- 200
-sigma_g <- .5
+sigma_g <- .1
 ```
 
 
@@ -106,7 +106,7 @@ for the random variable `z_g`, given by
 
 
 ```r
-z_g <- function() 1+(2*runif(1, 0,  1)-1) * sigma_g
+z_g <- function() dlnorm(1, 0, sigma_g)
 ```
 
 
@@ -129,10 +129,7 @@ z_i <- function() 1
 
 
 ```r
-pdfn <- function(P, s){
-  dunif(P, 1 - s, 1 + s)
-}
-SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g, pdfn)
+SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
 ```
 
 
@@ -166,7 +163,7 @@ geom_point(aes(x,y), data=data.frame(x=opt$S, y=opt$S), col="red")
 q1
 ```
 
-![plot of chunk policyfn_plot](http://farm9.staticflickr.com/8293/7532283022_f29ba956af_o.png) 
+![plot of chunk policyfn_plot](http://farm9.staticflickr.com/8434/7659960140_b8c2d2d387_o.png) 
 
 
 and the value function (at equilibrium):
@@ -179,7 +176,7 @@ geom_vline(xintercept=opt$S)
 q2
 ```
 
-![plot of chunk valuefn_plot](http://farm9.staticflickr.com/8285/7532283482_2c58cbd366_o.png) 
+![plot of chunk valuefn_plot](http://farm9.staticflickr.com/8143/7659960284_595765d901_o.png) 
 
 
 ### Simulate 
@@ -223,7 +220,7 @@ p0 <- ggplot(subset(dt,reps==1)) +
 p0
 ```
 
-![plot of chunk p0](http://farm8.staticflickr.com/7109/7532284660_26a9285f77_o.png) 
+![plot of chunk p0](http://farm9.staticflickr.com/8004/7659960728_36fbc7dfe5_o.png) 
 
 
 
@@ -238,7 +235,7 @@ p1 <- p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 p1
 ```
 
-![plot of chunk p1](http://farm9.staticflickr.com/8004/7532285098_b578be1904_o.png) 
+![plot of chunk p1](http://farm8.staticflickr.com/7274/7659960966_316908573d_o.png) 
 
 
 
@@ -287,21 +284,10 @@ m <- dt[,
 
 ```r
 signals <- melt(data.frame(var=var_tau$V1, acor=acor_tau$V1, m=m$V1))
-```
-
-```
-Error: object 'var_tau' not found
-```
-
-```r
 ggplot(signals) + geom_histogram(aes(value)) + facet_wrap(~variable, scales="free")
 ```
 
-```
-Error: object 'signals' not found
-```
-
-
+![plot of chunk summaryplot](http://farm9.staticflickr.com/8025/7660746166_a67be07bfd_o.png) 
 
 
 
@@ -341,21 +327,10 @@ m <- dt[,
 
 ```r
 signals <- melt(data.frame(var=var_tau$V1, acor=acor_tau$V1, m=m$V1))
-```
-
-```
-Error: object 'm' not found
-```
-
-```r
 ggplot(signals) + geom_histogram(aes(value)) + facet_wrap(~variable, scales="free")
 ```
 
-```
-Error: object 'signals' not found
-```
-
-
+![plot of chunk summaryplot2](http://farm8.staticflickr.com/7114/7661519102_015b46a285_o.png) 
 
 
 

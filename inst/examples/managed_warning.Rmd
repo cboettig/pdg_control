@@ -75,7 +75,7 @@ h_grid <- x_grid
 delta <- 0.05
 xT <- 0
 OptTime <- 200
-sigma_g <- .5
+sigma_g <- .1
 ````
 
 We will determine the optimal solution over a `r OptTime` time step window with boundary condition for stock at `r xT` and discounting rate of `r delta`.  The Reed model considers a stochastic growth model 
@@ -85,7 +85,7 @@ We will determine the optimal solution over a `r OptTime` time step window with 
 for the random variable `z_g`, given by 
 
 ``` {r noise}
-z_g <- function() 1+(2*runif(1, 0,  1)-1) * sigma_g
+z_g <- function() dlnorm(1, 0, sigma_g)
 ````
 
 No other sources of noise enter into the dynamics.  
@@ -98,10 +98,7 @@ z_i <- function() 1
 
 
 ``` {r  SDP_Mat}
-pdfn <- function(P, s){
-  dunif(P, 1 - s, 1 + s)
-}
-SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g, pdfn)
+SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
 ````
 
 
