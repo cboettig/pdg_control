@@ -137,7 +137,7 @@ z_i <- function() 1
 ```r
 pdfn <- function(P, s){
   # dunif(P, 1 - s, 1 + s)
-  dlnorm(P, 0, s)
+  1 + dlnorm(P, 0, s)
 }
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g, pdfn)
 ```
@@ -197,7 +197,7 @@ q1 <- ggplot(policies, aes(stock, stock - value, color=variable)) + geom_point()
 q1
 ```
 
-![plot of chunk policyfn_plot](http://farm9.staticflickr.com/8024/7680033282_4a534996f8_o.png) 
+![plot of chunk policyfn_plot](http://farm9.staticflickr.com/8008/7680052580_53e52b45b1_o.png) 
 
 
 and the value function (at equilibrium):
@@ -210,7 +210,7 @@ geom_vline(xintercept=opt$S)
 q2
 ```
 
-![plot of chunk valuefn_plot](http://farm9.staticflickr.com/8143/7680033592_0e73026d8f_o.png) 
+![plot of chunk valuefn_plot](http://farm9.staticflickr.com/8025/7680052832_0425aba787_o.png) 
 
 
 
@@ -263,7 +263,7 @@ p0 <- ggplot(subset(dt,reps==1)) +
 p0
 ```
 
-![plot of chunk p0](http://farm8.staticflickr.com/7251/7680034010_f0af30a30f_o.png) 
+![plot of chunk p0](http://farm9.staticflickr.com/8284/7680053220_5e069d9e69_o.png) 
 
 
 
@@ -278,7 +278,7 @@ p1 <- p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 p1
 ```
 
-![plot of chunk p1](http://farm9.staticflickr.com/8144/7680034376_64f2a8b2cb_o.png) 
+![plot of chunk p1](http://farm9.staticflickr.com/8143/7680053520_b58f788447_o.png) 
 
 
 
