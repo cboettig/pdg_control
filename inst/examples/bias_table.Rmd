@@ -1,4 +1,4 @@
-`ro cache=FALSE, warning=FALSE, comment=NA, message=FALSE, cache.path="bias_table/", verbose=TRUE or`
+`ro cache=FALSE, warning=FALSE, comment=NA, message=FALSE, cache.path="bias_table_measurement/", verbose=TRUE or`
 
 ``` {r  echo=FALSE, cache=FALSE }
 opts_knit$set(upload.fun = socialR::flickr.url)
@@ -66,7 +66,8 @@ h_grid <- x_grid
 delta <- 0.05
 xT <- 0
 OptTime <- 25
-sigma_g <- .5
+sigma_g <- .01
+sigma_m <- .5
 ````
 
 We will determine the optimal solution over a `r OptTime` time step window with boundary condition for stock at `r xT` and discounting rate of `r delta`.  The Reed model considers a stochastic growth model 
@@ -77,12 +78,12 @@ for the random variable `z_g`, given by
 
 ``` {r noise}
 z_g <- function() 1+(2*runif(1, 0,  1)-1) * sigma_g
+z_m <- function() 1+(2*runif(1, 0,  1)-1) * sigma_m
 ````
 
 No other sources of noise enter into the dynamics.  
 
 ``` {r othernoise}
-z_m <- function() 1
 z_i <- function() 1
 ````
 
@@ -100,11 +101,13 @@ With parameter `r` = `r r <- 1`
 pars1 <- c(r, K)
 ````
 
-``` {r  }
-pdfn <- function(P, s){
-  dunif(P, 1 - s, 1 + s)
-}
-SDP_Mat1 <- determine_SDP_matrix(f, pars1, x_grid, h_grid, sigma_g, pdfn)
+``` {r  parallel, cache=FALSE}
+require(snowfall) 
+sfInit(parallel=TRUE, cpu=16)
+````
+
+``` {r sdp_mat}
+SDP_Mat1 <- SDP_by_simulation(f, pars1, x_grid, h_grid, z_g, z_m, z_i, reps=1e4)
 ````
 
 ``` {r  }
@@ -120,9 +123,11 @@ With parameter `r` = `r r <- 1.5`
 pars2 <- c(r, K)
 ````
 
-``` {r  }
-SDP_Mat2 <- determine_SDP_matrix(f, pars2, x_grid, h_grid, sigma_g, pdfn)
+
+``` {r sdp_mat2}
+SDP_Mat2 <- SDP_by_simulation(f, pars2, x_grid, h_grid, z_g, z_m, z_i, reps=1e4)
 ````
+
 
 ``` {r  }
 opt_med <- find_dp_optim(SDP_Mat2, x_grid, h_grid, OptTime, xT, profit, delta, reward=0)
@@ -137,8 +142,8 @@ With parameter `r` = `r r <- 2`
 pars3 <- c(r, K)
 ````
 
-``` {r  }
-SDP_Mat3 <- determine_SDP_matrix(f, pars3, x_grid, h_grid, sigma_g, pdfn)
+``` {r sdp_mat3}
+SDP_Mat3 <- SDP_by_simulation(f, pars3, x_grid, h_grid, z_g, z_m, z_i, reps=1e4)
 ````
 
 ``` {r  }
