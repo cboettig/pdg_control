@@ -1,4 +1,4 @@
-`ro cache=TRUE, warning=FALSE, comment=NA, message=FALSE, cache.path="logistic_uniform_c01/", verbose=TRUE or`
+`ro cache=TRUE, warning=FALSE, comment=NA, message=FALSE, cache.path="logistic_uniform/", verbose=TRUE or`
 
 ``` {r  echo=FALSE, cache=FALSE }
 opts_knit$set(upload.fun = socialR::flickr.url)
@@ -45,7 +45,7 @@ We consider a profits from fishing to be a function of harvest `h` and stock siz
 
 ``` {r  profit}
 price <- 1
-c0 <- 0.1
+c0 <- 0
 c1 <- 0
 profit <- profit_harvest(price=price, c0 = c0, c1=c1) 
 ````
@@ -106,7 +106,7 @@ lvl <- 0.5
 ````
 
 ``` {r }
-det <- scenario(0.0, 0.00, 0.00)
+det <- scenario(0.01, 0.00, 0.00)
 ````
 
 ``` {r }
