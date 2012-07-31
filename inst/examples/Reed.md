@@ -18,7 +18,16 @@ Chose the state equation / population dynamics function
 
 
 ```r
-f <- BevHolt 
+f <- function (x, h, p) 
+{
+      x <- max(0, x - h)
+          A <- p[1]
+          B <- p[2]
+          sapply(x, function(x) {
+            x <- max(0, x)
+            max(0, A * x/(1 + B * x))
+          })
+}
 ```
 
 
@@ -103,7 +112,7 @@ for the random variable `z_g`, given by
 
 
 ```r
-z_g <- function() rlnorm(1,0, sigma_g)  # 1+(2*runif(1, 0,  1)-1) * sigma_g
+z_g <- function() 1 + rlnorm(1,0, sigma_g)  # 1+(2*runif(1, 0,  1)-1) * sigma_g
 ```
 
 
@@ -128,7 +137,7 @@ z_i <- function() 1
 ```r
 pdfn <- function(P, s){
   # dunif(P, 1 - s, 1 + s)
-  dlnorm(P, 0, s)
+  1 + dlnorm(P, 0, s)
 }
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g, pdfn)
 ```
@@ -188,7 +197,7 @@ q1 <- ggplot(policies, aes(stock, stock - value, color=variable)) + geom_point()
 q1
 ```
 
-![plot of chunk policyfn_plot](http://farm9.staticflickr.com/8282/7502738176_79f8d76b57_o.png) 
+![plot of chunk policyfn_plot](http://farm9.staticflickr.com/8008/7680052580_53e52b45b1_o.png) 
 
 
 and the value function (at equilibrium):
@@ -201,7 +210,7 @@ geom_vline(xintercept=opt$S)
 q2
 ```
 
-![plot of chunk valuefn_plot](http://farm8.staticflickr.com/7265/7502739072_bb70707a92_o.png) 
+![plot of chunk valuefn_plot](http://farm9.staticflickr.com/8025/7680052832_0425aba787_o.png) 
 
 
 
@@ -254,7 +263,7 @@ p0 <- ggplot(subset(dt,reps==1)) +
 p0
 ```
 
-![plot of chunk p0](http://farm8.staticflickr.com/7271/7502739636_87624c4352_o.png) 
+![plot of chunk p0](http://farm9.staticflickr.com/8284/7680053220_5e069d9e69_o.png) 
 
 
 
@@ -269,7 +278,7 @@ p1 <- p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 p1
 ```
 
-![plot of chunk p1](http://farm9.staticflickr.com/8164/7502740480_01053eb149_o.png) 
+![plot of chunk p1](http://farm9.staticflickr.com/8143/7680053520_b58f788447_o.png) 
 
 
 
