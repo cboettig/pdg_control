@@ -78,7 +78,8 @@ h_grid <- x_grid
 delta <- 0.05
 xT <- 0
 OptTime <- 25
-sigma_g <- 0.5
+sigma_g <- 0.01
+sigma_m <- 0.5
 ```
 
 
@@ -94,6 +95,7 @@ for the random variable `z_g`, given by
 
 ```r
 z_g <- function() 1 + (2 * runif(1, 0, 1) - 1) * sigma_g
+z_m <- function() 1 + (2 * runif(1, 0, 1) - 1) * sigma_m
 ```
 
 
@@ -104,7 +106,6 @@ No other sources of noise enter into the dynamics.
 
 
 ```r
-z_m <- function() 1
 z_i <- function() 1
 ```
 
@@ -133,11 +134,27 @@ pars1 <- c(r, K)
 
 
 ```r
-pdfn <- function(P, s) {
-    dunif(P, 1 - s, 1 + s)
-}
-SDP_Mat1 <- determine_SDP_matrix(f, pars1, x_grid, h_grid, sigma_g, 
-    pdfn)
+require(snowfall)
+sfInit(parallel = TRUE, cpu = 16)
+```
+
+```
+R Version:  R version 2.14.1 (2011-12-22) 
+
+```
+
+
+
+
+
+
+```r
+SDP_Mat1 <- SDP_by_simulation(f, pars1, x_grid, h_grid, z_g, z_m, 
+    z_i, reps = 10000)
+```
+
+```
+Library ggplot2 loaded.
 ```
 
 
@@ -169,10 +186,16 @@ pars2 <- c(r, K)
 
 
 
+
 ```r
-SDP_Mat2 <- determine_SDP_matrix(f, pars2, x_grid, h_grid, sigma_g, 
-    pdfn)
+SDP_Mat2 <- SDP_by_simulation(f, pars2, x_grid, h_grid, z_g, z_m, 
+    z_i, reps = 10000)
 ```
+
+```
+Library ggplot2 loaded.
+```
+
 
 
 
@@ -204,8 +227,12 @@ pars3 <- c(r, K)
 
 
 ```r
-SDP_Mat3 <- determine_SDP_matrix(f, pars3, x_grid, h_grid, sigma_g, 
-    pdfn)
+SDP_Mat3 <- SDP_by_simulation(f, pars3, x_grid, h_grid, z_g, z_m, 
+    z_i, reps = 10000)
+```
+
+```
+Library ggplot2 loaded.
 ```
 
 
@@ -236,7 +263,7 @@ ggplot(policy) + geom_point(aes(stock, stock - x_grid[value], color = variable),
     degree = 1, se = FALSE, span = 0.3) + ylab("escapement")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8429/7502451502_a63e17d783_o.png) 
+![plot of chunk sethiplots](http://farm8.staticflickr.com/7255/7681775570_fb4c0fe0c6_o.png) 
 
 ```r
 
@@ -245,7 +272,7 @@ ggplot(policy) + geom_point(aes(stock, x_grid[value], color = variable),
     degree = 1, se = FALSE, span = 0.3) + ylab("harvest")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8422/7502451942_6dbd53e823_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8004/7681775794_392afa4afa_o.png) 
 
 ```r
 
@@ -259,7 +286,7 @@ ggplot(value) + geom_point(aes(stock, value, color = variable), shape = "+") +
 ylab("Net Present Value")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8432/7502452334_7c5e8e559e_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8019/7681776006_58dfbfbb56_o.png) 
 
 
 
@@ -323,7 +350,7 @@ ggplot(subset(dt, reps == 1)) + geom_line(aes(time, fishstock)) +
     geom_line(aes(time, harvest), col = "darkgreen") + facet_wrap(~parameter)
 ```
 
-![plot of chunk onerep](http://farm8.staticflickr.com/7134/7502498934_7d180920c3_o.png) 
+![plot of chunk onerep](http://farm8.staticflickr.com/7107/7681821494_43678353b0_o.png) 
 
 
 This plot summarizes the stock dynamics by visualizing the replicates.
@@ -336,7 +363,7 @@ p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.1) +
     facet_wrap(~parameter)
 ```
 
-![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm8.staticflickr.com/7129/7502514204_15826c1f89_o.png) 
+![the induced dynamics in the stock size over time, for all replicates, by scenario](http://farm9.staticflickr.com/8161/7681834216_bb3c7b188b_o.png) 
 
 
 
@@ -347,7 +374,7 @@ profits <- dt[, sum(profit), by = c("reps", "parameter")]
 ggplot(profits) + geom_histogram(aes(V1)) + facet_wrap(~parameter)
 ```
 
-![the distribution of profits by scenario](http://farm8.staticflickr.com/7257/7502515100_fa70e716cb_o.png) 
+![the distribution of profits by scenario](http://farm8.staticflickr.com/7129/7681834788_651df17fe6_o.png) 
 
 
 Summary statistics 
@@ -372,12 +399,12 @@ print(xtable(matrix(means$V1, nrow = length(scenarios), dimnames = list(scenario
 ```
 
 <!-- html table generated in R 2.14.1 by xtable 1.7-0 package -->
-<!-- Wed Jul  4 11:02:18 2012 -->
+<!-- Mon Jul 30 21:12:34 2012 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> low </TH> <TH> med </TH> <TH> high </TH>  </TR>
-  <TR> <TD align="right"> low </TD> <TD align="right"> 668.90 </TD> <TD align="right"> 674.14 </TD> <TD align="right"> 673.44 </TD> </TR>
-  <TR> <TD align="right"> med </TD> <TD align="right"> 958.11 </TD> <TD align="right"> 959.80 </TD> <TD align="right"> 958.20 </TD> </TR>
-  <TR> <TD align="right"> high </TD> <TD align="right"> 1242.55 </TD> <TD align="right"> 1250.40 </TD> <TD align="right"> 1248.10 </TD> </TR>
+  <TR> <TD align="right"> low </TD> <TD align="right"> 583.71 </TD> <TD align="right"> 584.22 </TD> <TD align="right"> 584.36 </TD> </TR>
+  <TR> <TD align="right"> med </TD> <TD align="right"> 787.21 </TD> <TD align="right"> 790.42 </TD> <TD align="right"> 792.23 </TD> </TR>
+  <TR> <TD align="right"> high </TD> <TD align="right"> 965.00 </TD> <TD align="right"> 973.36 </TD> <TD align="right"> 976.40 </TD> </TR>
    </TABLE>
 
 
@@ -387,12 +414,12 @@ print(xtable(matrix(sds$V1, nrow = length(scenarios), dimnames = list(scenarios,
 ```
 
 <!-- html table generated in R 2.14.1 by xtable 1.7-0 package -->
-<!-- Wed Jul  4 11:02:18 2012 -->
+<!-- Mon Jul 30 21:12:34 2012 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> low </TH> <TH> med </TH> <TH> high </TH>  </TR>
-  <TR> <TD align="right"> low </TD> <TD align="right"> 110.14 </TD> <TD align="right"> 105.74 </TD> <TD align="right"> 103.84 </TD> </TR>
-  <TR> <TD align="right"> med </TD> <TD align="right"> 126.41 </TD> <TD align="right"> 122.92 </TD> <TD align="right"> 120.52 </TD> </TR>
-  <TR> <TD align="right"> high </TD> <TD align="right"> 144.04 </TD> <TD align="right"> 142.26 </TD> <TD align="right"> 136.82 </TD> </TR>
+  <TR> <TD align="right"> low </TD> <TD align="right"> 23.33 </TD> <TD align="right"> 22.80 </TD> <TD align="right"> 21.93 </TD> </TR>
+  <TR> <TD align="right"> med </TD> <TD align="right"> 39.38 </TD> <TD align="right"> 37.49 </TD> <TD align="right"> 36.88 </TD> </TR>
+  <TR> <TD align="right"> high </TD> <TD align="right"> 60.76 </TD> <TD align="right"> 55.68 </TD> <TD align="right"> 54.52 </TD> </TR>
    </TABLE>
 
 
@@ -405,8 +432,8 @@ data.frame(low = opt_low$V[k], med = opt_med$V[k], high = opt_high$V[k])
 ```
 
 ```
-    low med high
- 665.7 953 1239
+    low   med high
+1 643.8 903.2 1142
 ```
 
 
