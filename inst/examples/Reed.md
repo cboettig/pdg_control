@@ -7,7 +7,16 @@
 
  * Author [Carl Boettiger](http://carlboettiger.info), <cboettig@gmail.com>
  * License: [CC0](http://creativecommons.org/publicdomain/zero/1.0/)
- * Description:  Implements a numerical version of the SDP described in Reed, (1979).
+ * Description:  Implements a numerical version of the SDP described in 
+
+```
+
+Error in function (type, msg, asError = TRUE)  : 
+  Couldn't resolve host 'www.crossref.org'
+
+```
+
+.
 
 
 
@@ -20,26 +29,22 @@ Chose the state equation / population dynamics function
 ```r
 f <- function (x, h, p) 
 {
-      x <- max(0, x - h)
-          A <- p[1]
-          B <- p[2]
-          sapply(x, function(x) {
-            x <- max(0, x)
-            max(0, A * x/(1 + B * x) - x)
-          })
+ sapply(x, function(x){
+  	S = max(x - h, 0)
+  	p[1] * S * (1 - S/p[2]) + S
+  })
 }
 ```
 
 
 
 
-With parameters `A` = `1.5` and `B` = `0.005`.
+With parameters `K` = `100` and `r` = `1`.
 
 
 
 ```r
-pars <- c(A, B)
-K <- (A-1)/B
+pars <- c(r, K)
 ```
 
 
@@ -48,6 +53,7 @@ K <- (A-1)/B
 We consider a profits from fishing to be a function of harvest `h` and stock size `x`,  
 
 <div> $$ \Pi(x,h) = h - \left( c_0  + c_1 \frac{h}{x} \right) \frac{h}{x}, $$ </div> 
+
 
 conditioned on h > x and x > 0,
 
@@ -70,14 +76,14 @@ with price = `1`, `c0` = `0` and `c1` = `0`.
 
 ```r
 xmin <- 0
-xmax <- 1.5 * K
-grid_n <- 100
+xmax <- K
+grid_n <- 200
 ```
 
 
 
 
-We seek a harvest policy which maximizes the discounted profit from the fishery using a stochastic dynamic programming approach over a discrete grid of stock sizes from `0` to `150` on a grid of `100` points, and over an identical discrete grid of possible harvest values.  
+We seek a harvest policy which maximizes the discounted profit from the fishery using a stochastic dynamic programming approach over a discrete grid of stock sizes from `0` to `100` on a grid of `200` points, and over an identical discrete grid of possible harvest values.  
 
 
 
@@ -112,7 +118,8 @@ for the random variable `z_g`, given by
 
 
 ```r
-z_g <- function() 1 + rlnorm(1,0, sigma_g)  # 1+(2*runif(1, 0,  1)-1) * sigma_g
+#z_g <- function() 1 + rlnorm(1,0, sigma_g)  
+z_g <- function() 1+(2*runif(1, 0,  1)-1) * sigma_g
 ```
 
 
@@ -136,8 +143,8 @@ z_i <- function() 1
 
 ```r
 pdfn <- function(P, s){
-  # dunif(P, 1 - s, 1 + s)
-  s + dlnorm(P, 0, s)
+   dunif(P, 1 - s, 1 + s)
+#  dlnorm(P, 0, s)
 }
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g, pdfn)
 ```
@@ -164,7 +171,7 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward
 
 
 ```r
-SDP_Mat2 <- determine_SDP_matrix(f, pars, x_grid, h_grid, 0.01, pdfn)
+SDP_Mat2 <- determine_SDP_matrix(f, pars, x_grid, h_grid, 0.001, pdfn)
 ```
 
 
@@ -197,7 +204,7 @@ q1 <- ggplot(policies, aes(stock, stock - value, color=variable)) + geom_point()
 q1
 ```
 
-![plot of chunk policyfn_plot](http://farm8.staticflickr.com/7113/7680227170_af03905dcc_o.png) 
+![plot of chunk policyfn_plot](figure/policyfn_plot.png) 
 
 
 and the value function (at equilibrium):
@@ -210,7 +217,7 @@ geom_vline(xintercept=opt$S)
 q2
 ```
 
-![plot of chunk valuefn_plot](http://farm9.staticflickr.com/8287/7680227426_37fd83b31d_o.png) 
+![plot of chunk valuefn_plot](figure/valuefn_plot.png) 
 
 
 
@@ -263,7 +270,7 @@ p0 <- ggplot(subset(dt,reps==1)) +
 p0
 ```
 
-![plot of chunk p0](http://farm9.staticflickr.com/8006/7680227760_562ba54ba7_o.png) 
+![plot of chunk p0](figure/p0.png) 
 
 
 
@@ -278,16 +285,12 @@ p1 <- p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 p1
 ```
 
-![plot of chunk p1](http://farm9.staticflickr.com/8016/7680228034_f3630b2223_o.png) 
+![plot of chunk p1](figure/p1.png) 
 
 
 
 # References
 
-<p>Reed WJ (1979).
-&ldquo;Optimal Escapement Levels in Stochastic And Deterministic Harvesting Models.&rdquo;
-<EM>Journal of Environmental Economics And Management</EM>, <B>6</B>.
-ISSN 00950696, <a href="http://dx.doi.org/10.1016/0095-0696(79)90014-7">http://dx.doi.org/10.1016/0095-0696(79)90014-7</a>.
 
 
 

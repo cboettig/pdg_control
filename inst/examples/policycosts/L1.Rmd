@@ -66,6 +66,26 @@ policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT,
                     profit, delta, reward, penalty = penalty)
 ````
 
+## 
+
+Plot the policy function and value function at certain values of previous harvest
+
+``` {r policyfn_plot}
+require(reshape2)
+policies <- melt(data.frame(stock=x_grid, S = x_grid[opt$D[,1]], D = x_grid[det$D[,1]]), id="stock")
+q1 <- ggplot(policies, aes(stock, stock - value, color=variable)) + geom_point() + xlab("stock size") + ylab("escapement") 
+q1
+````
+
+and the value function (at equilibrium):
+
+``` {r valuefn_plot}
+q2 <- qplot(x_grid, opt$V, xlab="stock size", ylab="value") + 
+geom_vline(xintercept=opt$S)
+q2
+````
+
+
 
 ### Simulate 
 
