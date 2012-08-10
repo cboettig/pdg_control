@@ -113,6 +113,7 @@ simulate_optim <- function(f, pars, x_grid, h_grid, x0, D, z_g,
   h <- numeric(OptTime) # optimal havest level
   x_h[1] <- x0  # initial values
   h_prev <- 1 # assume no harvesting happening at start (index of h_grid)
+  h_prev_alt <- 1 # assume no harvesting happening at start (index of h_grid)
   s <- x_h # also track escapement
   x <- x_h # What would happen with no havest
 
@@ -121,6 +122,8 @@ simulate_optim <- function(f, pars, x_grid, h_grid, x0, D, z_g,
   h_alt <- h
   p <- numeric(OptTime)
   fee <- numeric(OptTime)  
+  p_alt <- numeric(OptTime)
+  fee_alt <- numeric(OptTime)  
 
   ## Simulate through time ##
   for(t in 1:(OptTime-1)){
@@ -145,10 +148,13 @@ simulate_optim <- function(f, pars, x_grid, h_grid, x0, D, z_g,
     s[t+1]   <- x_h[t] - q_t # anticipated escapement
     x[t+1]   <- zg * f(x[t], 0, pars) # havest-free dynamics
 
-    p[t] <- profit(x_h[t],h[t])
+    p[t]   <- profit(x_h[t],h[t])
     fee[t] <- penalty(h[t],lastyr)
-    ## Comparison solution
+
+  ## Comparison solution
     if(!is.null(alt_D)){
+   		lastyr_alt <- h_grid[h_prev_alt]
+
       m_alt <- x_alt[t] * zm
       # Current state (is closest to which grid posititon) 
       St_alt <- which.min(abs(x_grid - m_alt)) 
@@ -156,10 +162,18 @@ simulate_optim <- function(f, pars, x_grid, h_grid, x0, D, z_g,
       h_alt[t] <- h_grid[alt_D[St_alt, (t + 1) ]] * zi
       # population grows
       x_alt[t+1] <- zg * f(x_alt[t], h_alt[t], pars) 
+    
+      q_t_alt <- h_grid[D[[h_prev_alt]][St_alt, (t + 1) ]] 
+      h_prev_alt <- which.min(abs(h_grid - q_t_alt))
+
+      p_alt[t]   <- profit(x_alt[t],h_alt[t])
+      fee_alt[t] <- penalty(h_alt[t],lastyr_alt)
+
     }
 }
   # formats output 
   data.frame(time=1:OptTime, fishstock=x_h, harvest=h, 
              unharvested=x, escapement=s, alternate=x_alt,
-             harvest_alt = h_alt, profit_fishing=p, policy_cost=fee) 
+             harvest_alt = h_alt, profit_fishing=p, policy_cost=fee,
+             profit_fishing_alt = p_alt, policy_cost_alt = fee_alt) 
 }

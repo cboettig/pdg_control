@@ -155,13 +155,13 @@ Parkville, Melbourne, VIC 3010, Australia}
 \end{itemize}
 
 
-\subsection{Apples to Apples comparisons: Calibraring the magnitude of the penalty coefficient}
+\subsection{Apples to apples comparisons}
 
 We compare the impact of the different functional forms for the penalty
 function at a value of the penalty scaling parameter in each model that
 induces an equivalent net present value to the stock when optimally
 managed under this penalty. This value represents the expected net
-present value before the costs of policy adjustment are paid.
+present value before the costs of policy adjustment are paid, Figure~\ref{fig:apples}
 
   \begin{figure}
     \begin{center}
@@ -171,6 +171,7 @@ function at a value of the penalty scaling parameter in each model that
 induces an equivalent net present value to the stock when optimally
 managed under this penalty. This value represents the expected net
 present value before the costs of policy adjustment are paid.}
+\label{fig:apples}
 \end{center}
 \end{figure}
 
@@ -187,32 +188,13 @@ present value before the costs of policy adjustment are paid.}
 
   \begin{figure}
     \begin{center}
- \includegraphics[width=.8\textwidth]{figure/7258516896_5c89f034d5_o.png}
- \caption{L1 example}
+      \subfigure[$L_1$]{\includegraphics[width=.45\textwidth]{figure/7258516896_5c89f034d5_o.png}\label{fig:L1}}
+      \subfigure[$L_2$]{\includegraphics[width=.45\textwidth]{figure/7258563112_2f5f9ffecd_o.png}\label{fig:L2}}
+
+      \subfigure[Fixed costs]{\includegraphics[width=.45\textwidth]{figure/7258506664_d6235e5f8e_o.png}\label{fig:fixed}}
+      \subfigure[Asymmetric costs]{\includegraphics[width=.45\textwidth]{figure/7258432026_d6f8179f54_o.png}\label{fig:asym}}
   \end{center}
-\end{figure}
-
-  \begin{figure}
-    \begin{center}
- \includegraphics[width=.8\textwidth]{figure/7258563112_2f5f9ffecd_o.png}
-  \end{center}
- \caption{L2 example}
-\end{figure}
-
-
-  \begin{figure}
-    \begin{center}
- \includegraphics[width=.8\textwidth]{figure/7258506664_d6235e5f8e_o.png}
-  \end{center}
- \caption{Fixed Fee example}
-\end{figure}
-
-
-  \begin{figure}
-    \begin{center}
- \includegraphics[width=.8\textwidth]{figure/7258432026_d6f8179f54_o.png}
-  \end{center}
- \caption{Asymmetric costs example}
+ \caption{Individual realizations of management under each stochastic cost}
 \end{figure}
 
 \subsection{Summary values}
@@ -225,16 +207,11 @@ present value before the costs of policy adjustment are paid.}
 \item  Plot of autocorrelation vs magnitude of penalty, by penalty function.
 \end{itemize}
 
-  \begin{figure}
-    \begin{center}
-    \includegraphics[width=.8\textwidth]{figure/6850042286_ef81b74acc_o.png}
-    \caption{Variance vs magnitude of penalty, by penalty function}
-  \end{center}
-\end{figure}
-  \begin{figure}
-    \begin{center}
-   \includegraphics[width=.8\textwidth]{figure/6996165783_41c9894bdb_o.png}
-    \caption{autocorrelation vs magnitude of penalty, by penalty function}
+\begin{figure}
+  \begin{center}
+    \subfigure[Variance]{\includegraphics[width=.45\textwidth]{figure/6850042286_ef81b74acc_o.png}\label{fig:var}}
+    \subfigure[Autocorrelation]{\includegraphics[width=.45\textwidth]{figure/6996165783_41c9894bdb_o.png}\label{fig:acor}}
+    \caption{Variance and autocorrelation as a function of the magnitude of penalty, by penalty function}
   \end{center}
 \end{figure}
 
