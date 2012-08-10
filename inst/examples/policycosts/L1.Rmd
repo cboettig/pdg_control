@@ -125,10 +125,6 @@ costs <- dt[, sum(policy_cost * (1 - delta)^(time - 1)), by = reps]$V1
 profits <- dt[, sum(profit_fishing * (1 - delta)^(time - 1)), by = reps]$V1
 costs_alt <- dt[, sum(policy_cost_alt * (1 - delta)^(time - 1)), by = reps]$V1
 profits_alt <- dt[, sum(profit_fishing_alt * (1 - delta)^(time - 1)), by = reps]$V1
-
-qplot(costs)
-qplot(profits)
-qplot(profits-costs)
 ````
 
 
