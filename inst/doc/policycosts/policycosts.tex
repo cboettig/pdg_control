@@ -1,20 +1,23 @@
-\documentclass[review, 12pt]{elsarticle}
+\documentclass[authoryear, review, 12pt]{elsarticle}
 \usepackage{amssymb,amsmath,amsfonts,graphicx}
-\usepackage{natbib} % already loaded by elsarticle
 \bibliographystyle{elsarticle-harv}
-\biboptions{sort&compress} % For natbib
+%\usepackage{natbib} % already loaded by elsarticle
+%\biboptions{sort&compress} % For natbib
+%\usepackage{hyperref} % already loaded by elsarticle
+%\hypersetup{breaklinks=true, pdfborder={0 0 0}}
+
 \usepackage[hyphens]{url}
-\usepackage{hyperref} % already loaded by elsarticle
+
 
 \usepackage{lineno}
 \linenumbers
 
 \usepackage{subfigure}
-
 %\usepackage[nomarkers]{endfloat}
-\renewcommand{\listoffigures}{} % but supress these lists
-\renewcommand{\listoftables}{} % supress these lists
-\hypersetup{breaklinks=true, pdfborder={0 0 0}}
+\renewcommand{\listoffigures}{} % but suppress these lists
+\renewcommand{\listoftables}{} % suppress these lists
+
+
 
 %% Redefines the elsarticle footer
 \makeatletter
@@ -24,7 +27,6 @@
 \def\@oddfoot{\it \hfill\today}%
 \let\@evenfoot\@oddfoot}
 \makeatother
-
 % A modified page layout
 \textwidth 6.75in
 \oddsidemargin -0.15in
@@ -38,18 +40,22 @@
 \pagestyle{fancy}
 \pagenumbering{arabic}
 
+\usepackage[pdftex, usenames]{color}
+\definecolor{darkblue}{rgb}{0,0,0.5}
+\definecolor{darkgreen}{rgb}{0,0.5,0}
+\newcommand{\cdb}[1]{{\it \color{darkgreen} #1}}
 
 \begin{document}
 \begin{frontmatter}
 \title{Policy Costs}
 \author[cpb]{C. Boettiger\corref{cor1}}
+\ead{cboettig@ucdavis.edu}
 \author[melbourne]{M. Bode}
 \author[esp]{J. Sanchirico}
 \author[utk-econ]{J. LaRiviera}
 \author[cpb,esp]{A. Hastings}
 \author[utk-eeb]{P. Armsworth}
-\ead{cboettig@ucdavis.edu}
-\cortext[cor1]{Corresponding author, cboettig@ucdavis.edu}
+\cortext[cor1]{Corresponding author}
 \address[cpb]{Center for Population Biology, University of California, Davis, California 95616, USA}
 \address[esp]{Department of Environmental Science \& Policy, University of California, Davis, CA 95616, USA}
 \address[utk-econ]{Department of Economics, University of Tennessee, Knoxville, TN 37996, USA}
@@ -58,6 +64,7 @@
 Parkville, Melbourne, VIC 3010, Australia}
 
 \begin{abstract}
+\cdb{Carl's comments \& questions added in green}
 \end{abstract}
 \begin{keyword}
   optimal control \sep management \sep stochastic dynamic programming \sep fisheries 
@@ -74,10 +81,10 @@ Parkville, Melbourne, VIC 3010, Australia}
   \item Ecosystem management frequently set in terms of policy of quotas. 
   \item Policy relatively static and costly to change
   \item Meanwhile, the natural world is variable
-  \item Optimal solutions tpyically track these shocks, resulting in impractical management recommendations in face of policy costs
+  \item Optimal solutions typically track these shocks, resulting in impractical management recommendations in face of policy costs
 \end{itemize}
 
-\emph{see Figure~\ref{fig:1}}
+(See Figure~\ref{fig:1} which motivates the importance of considering policy costs by comparing a theoretically optimal policy over time to a typical real world policy over time).  
 
 \begin{figure}[ht]
   \begin{center}
@@ -90,7 +97,7 @@ Parkville, Melbourne, VIC 3010, Australia}
   noise, resulting in a highly variable policy.  \ref{fig:1b} shows the
   actual quotas set over the past decade for Bluefin tuna, which show
   great intertia to change despite considerable movement in the stock
-  dynamics.  \emph{Conceptual picture illustrating the need to account
+  dynamics.  \cdb{Conceptual picture illustrating the need to account
   for costs to changing policy. Current images are just placeholders.
   B should be replaced with real data, perhaps tuna quotas from Paul.
   Should stock dynamics actually be shown?}}
@@ -102,23 +109,23 @@ Parkville, Melbourne, VIC 3010, Australia}
 %state of a system. When this control is set in a policy-making process,
 %such as determining a fishing quota, it may be more costly to change
 %the policy in response to new information than to continue with the
-%status quo (Bohm 1974, Xepapadeas 1992).  A management strategy that
+%status quo ~\citep{Bohm1974, Xepapadeas1992}.  A management strategy that
 %is optimal when adjustment costs are free may be costly and inefficient
-%when these costs are present.  Meanwhile, this intertia to policy change
-%introduces a two-fold cost to optimal managment solutions that account
+%when these costs are present.  Meanwhile, this inertia to policy change
+%introduces a two-fold cost to optimal management solutions that account
 %for it: once in direct costs of changing policy, and another in the
 %differences from optimality.
 
 \subsection{Types of real world policy costs}
 
 \begin{itemize}
-\item A discussion of capital adjustment costs, smoothing Singh, Weninger, and Doyle (2006)
-\item Historical context: Discussion of Bohm 1974, Reed 1979, Xepapadeas 1992.
+  \item A discussion of capital adjustment costs, smoothing, \emph{e.g.} \citet{Singh2006}.
+  \item Historical context, \emph{e.g.} discussion of \citep{Bohm1974, Reed1979, Xepapadeas1992}.  
 \end{itemize}
 \subsection{Stochastic fisheries model}
 \begin{itemize}
 \item Historical context of the Reed (1979) model.  
-\item Disucss the importance and relevance of stochastic, discrete time models, which frequently yield highly variable solutions since the policy tracks the shock.  
+\item Discuss the importance and relevance of stochastic, discrete time models, which frequently yield highly variable solutions since the policy tracks the shock.  
 \end{itemize}
 
 
@@ -127,20 +134,31 @@ Parkville, Melbourne, VIC 3010, Australia}
 \subsection{Model setup}
 
 \begin{itemize}
-  \item   Fish population dynamics / state equation.  We will assume Beverton-Holt dynamics
+  \item   Fish population dynamics / state equation.  We will assume Beverton-Holt dynamics,
     \begin{equation} 
-      X_{t+1} = Z_t \frac{A X_t}{1 + B X_t} 
+      X_{t+1} = Z_t \frac{A X_t}{1 + B X_t}, 
     \end{equation}
-    
-    where $Z_t$ gives the stochastic shocks.  $Z_t$ may be distributed log-normally \footnote{though this violates the self-sustaining property of~\citet{Reed1979}, such that the optimal constant-escapement level $S$ in the stochastic model is greater than the optimal escapement in the deterministic scenario.}
+where $Z_t$ gives the stochastic shocks.  $Z_t$ may be distributed log-normally \footnote{though this violates the self-sustaining property of~\citet{Reed1979}, such that the optimal constant-escapement level $S$ in the stochastic model is greater than the optimal escapement in the deterministic scenario.}
 
 \item   Fishing profit function 
   \begin{equation} 
     \Pi_0(x,h) = p h - \left( c_0  + c_1 \frac{h}{x} \right) \frac{h}{x} \label{profit}
   \end{equation}
-  where $h$ is the harvest level, $x$ the stock size, $h/x$ represents fishing effort, $p$ the price per unit harvest.  The coefficient $c_1$ introduces a quadratic cost to effort, a typical way to introduce smoothing~\citep{something}.  For simplicity, we will consider $c_0 = c_1 = 0$.  
+  where $h$ is the harvest level, $x$ the stock size, $h/x$ represents
+  fishing effort, $p$ the price per unit harvest.  The coefficient $c_1$
+  introduces a quadratic cost to effort, a typical way to introduce
+  smoothing~\citep[\emph{e.g.}][]{Singh2006}.  For simplicity, we will consider $c_0 =
+  c_1 = 0$.
 
-\item   Policy cost function: L1, L2, fixed fee, asymmetric, are introduced as modifications to the cost function that depend on the action taken in the previous time-step.  (This makes the previous action part of the state space).   All cost functions are characterized in terms of the coupling coefficent $c_2$.  (Because $c_2$ takes different units and strength of interaction under the different functional forms, it is necessary to calibrate the choice of this coefficient such that these penalties can be compared directly, as described in the next section.)
+\item
+Policy cost function: L1, L2, fixed fee, asymmetric, are introduced
+as modifications to the cost function that depend on the action
+taken in the previous time-step.  (This makes the previous action part
+of the state space).   All cost functions are characterized in terms
+of the coupling coefficient $c_2$.  (Because $c_2$ takes different units
+and strength of interaction under the different functional forms, it is
+necessary to calibrate the choice of this coefficient such that these
+penalties can be compared directly, as described in the next section.)
 
   \begin{align} 
     \Pi_{L_1}(x_t,h_t, h_{t-1}) &= \Pi_0 + c_2 \operatorname{abs}\left( h_t - h_{t-1} \right) \label{L1} \\
@@ -165,26 +183,27 @@ present value before the costs of policy adjustment are paid, Figure~\ref{fig:ap
 
   \begin{figure}
     \begin{center}
-\includegraphics[width=.8\textwidth]{figure/7258601130_c2fc0bcfa4_o.png}
-\caption{\textbf{Net present value} We compare the impact of the different functional forms for the penalty
-function at a value of the penalty scaling parameter in each model that
-induces an equivalent net present value to the stock when optimally
-managed under this penalty. This value represents the expected net
-present value before the costs of policy adjustment are paid.}
+\includegraphics[width=.8\textwidth]{figure/npv0.png}
+\caption{\textbf{Net present value by functional form of penalty.} Horizontal axis shows the coefficient $c_2$ governing the magnitude of the policy cost, while vertical axis shows fraction of the stock value dissipated by the policy cost.  The horizontal line indicates a value of the stock that is 80\% of the adjustment-free value. Selecting the coefficient $c_2$ corresponding to this value in each functional form allows us to make consistent comparisons across the different functional forms of policy costs.  }
 \label{fig:apples}
 \end{center}
 \end{figure}
 
 
 \section{Results}
+\subsection{Characterize and compare functional forms of costs}
 
-\begin{itemize}
-  \item True cost of the Reed optimum under each of the policy cost scenarios.  (Most severe, least severe).   
-  \item How does the choice of penalty function influence the optimal policy? (L2 undershoots, L1 static and then overcompensating)
-  \item How are costs partitioned between policy adjustments and deviation from optimality? 
-  \item What is the influence of assymetric costs?
-  \item Risk sensitivity: does inertia increase or decrease risk to unanticipated shocks?
-\end{itemize}
+Figure~\ref{fig:shapes} shows the impact the adjustment cost has on the optimal policy.  The $L_1$-norm costs tend to avoid small adjustments to the policy, resulting in long periods of constant policy followed by sudden bursts of adjustment.  In contrast, the $L_2$-norm tracks all of the changes made by the cost-free policy, but with smaller magnitude.  The fixed fee only makes large adjustments much like the $L_1$, as expected where the adjustment magnitude does not impact the cost.  Asymmetric ($L_1$) adjustment costs do not appear to show more directional bias than any of the symmetric costs.  Note that while the cost-free optimal strategy corresponds to a constant-escapement policy as derived in~\citet{Reed1979}, any of the policy-cost scenarios deviate from such a policy.  
+    \cdb{
+    \begin{itemize}
+      \item All of these should use the same sequence of shocks.  
+      \item Don't plot all four curves on the same graph.  
+      \item Omit stock dynamics?
+      \item Consider not violating the self-sustaining property, which should also guarantee that fishing never stops.   
+    \end{itemize}
+    }
+
+\cdb{ In terms of a policy set on escapement instead of harvest, our solutions are actually more volatile than~\citet{Reed1979}.  Maybe this leads to a discussion of what the control policy should be defined in terms of (i.e. catch vs escapement)?  Surely the simplicity of the constant-escapement rule has led to it's popularity in some part due because that simplicity avoids adjustment costs?}
 
   \begin{figure}
     \begin{center}
@@ -194,62 +213,87 @@ present value before the costs of policy adjustment are paid.}
       \subfigure[Fixed costs]{\includegraphics[width=.45\textwidth]{figure/7258506664_d6235e5f8e_o.png}\label{fig:fixed}}
       \subfigure[Asymmetric costs]{\includegraphics[width=.45\textwidth]{figure/7258432026_d6f8179f54_o.png}\label{fig:asym}}
   \end{center}
- \caption{Individual realizations of management under each stochastic cost}
+  \caption{Individual realizations of management under the different functional forms of adjustment costs.  \textbf{Green} lines show the cost-free optimal harvest levels, \textbf{black} lines show the corresponding stock dynamics under that management.  \textbf{Purple} lines show the optimal harvest level under the specified adjustment cost, under the same sequence of stochastic shocks as in the cost-free policy.  \textbf{Blue lines} show the resulting stock dynamics.
+  } \label{fig:shapes}
 \end{figure}
 
-\subsection{Summary values}
 
-\begin{itemize}
-\item  Quantifying the difference between policy costs: mean/sd profit from harvest
-\item  mean/sd cost of solution \% reduction in net present value from the  cost (Induced cost)
-\item  mean/sd cost of changing policies (Direct costs)
-\item  Characterizing response of different policy costs: Plot of variance vs magnitude of penalty, by penalty function.
-\item  Plot of autocorrelation vs magnitude of penalty, by penalty function.
-\end{itemize}
+
+\subsection{Responses to increasing costs}
+
+The comparisons shown in Figure~\ref{fig:shapes} are made at a fixed magnitude of the policy cost equal to 80\% of the net present value derived from the cost-free optimal strategy.  The different functional forms may also respond differently to an increasing magnitude of the adjustment cost.  To quantify the extent to which the policy cost decreases the volatility of the proposed policy, we calculate the variance in the fishing quota over time under each policy.  While a decrease in variance is typical of smoothing penalties and the $L_2$-norm, the patterns in Figure~\ref{fig:shapes} suggest that other functional forms still involve the same magnitude of variation, but decrease the frequency of adjustments.  To capture this behavior we calculate the autocorrelation of the policy as the adjustment cost increases.  These curves van be seen in Figure~\ref{fig:summarystats}.  
+
+
+\cdb{Perhaps not clear what is comparable here and what isn't.  Certainly we cannot compare the curves at the same value of $c_2$, as discussed in our apples to apples section.  Not clear that we can even compare the shape of the curves though -- for instance, given the units of $c_2$ for the $L_2$ norm are different than the other norms.  Perhaps the horizontal axis should be converted into percent of net present value of the adjustment free costs first?}
+
+\cdb{Add additional plot: Is value a linear function of policy cost, or is there a sharp transition? }
+%Must be nonlinear somewhere when adjustment costs exceed profits?
+
+
+
 
 \begin{figure}
   \begin{center}
     \subfigure[Variance]{\includegraphics[width=.45\textwidth]{figure/6850042286_ef81b74acc_o.png}\label{fig:var}}
     \subfigure[Autocorrelation]{\includegraphics[width=.45\textwidth]{figure/6996165783_41c9894bdb_o.png}\label{fig:acor}}
-    \caption{Variance and autocorrelation as a function of the magnitude of penalty, by penalty function}
+    \caption{Variance and autocorrelation as a function of the magnitude of penalty, by penalty function}\label{fig:summarystats}
+  \end{center}
+\end{figure}
+
+
+\subsection{Consequences of ignoring policy adjustment costs}
+
+\begin{itemize}
+  \item Distribution of profits and costs under a policy-cost scenario vs profits and costs under Reed solution, by penalty type. Figure~\ref{fig:profits_costs}.
+  \item Distribution of net present value under the policy-cost scenario vs the Reed solution, Figure~\ref{fig:npv_dist}.  
+\end{itemize}
+
+\begin{figure}
+  \begin{center}
+    \subfigure[L1]{\includegraphics[width=.45\textwidth]{figure/7751440758_99645d6e5a_o.png}\label{fig:L1cost}}
+    \caption{Ignoring the cost of policy adjustment results in greater profits from fishing, but even greater costs for adjusting the harvest quotas each year.  Costs and profits are shown for ignoring the adjustment costs (Reed solution, purple and blue) and accounting for the adjustment (green and red).  \cdb{Though only L1 shown for the moment, would probably show all four types.  Possibly a table or box-and-whiskers style plot would be better?}}\label{fig:profits_costs}
+  \end{center}
+\end{figure}
+
+\begin{figure}
+  \begin{center}
+    \subfigure[L1]{\includegraphics[width=.45\textwidth]{figure/7751440918_3b54ff2397_o.png}\label{fig:L1npv_dist}}
+    \caption{\textbf{The impact of ignoring policy costs}.  Distribution of net present value realized over 100 simulations when adjustment costs are ignored (blue), compared to when adjustment costs are optimally accounted for (red). \cdb{Though only L1 shown for the moment, would probably show all four types.  Possibly a table or box-and-whiskers style plot would be better?}}\label{fig:npv_dist}
   \end{center}
 \end{figure}
 
 
 
 
-\section{Discussion}
+Add two-by-two table of net present value accounting for:  ``Adjustment cost in policy calculation'' by ``adjustment cost in reality''?
 
+\cdb{\textbf{Further things to look at?}
+\begin{itemize}
+  \item How are costs partitioned between policy adjustments and deviation from optimality? 
+  \item Risk sensitivity: does policy inertia increase or decrease extinction risk? Does accounting for the policy cost increase or decrease extinction risk?  (only in cases where extinction is possible: \emph{e.g.} in large variance, outside of Reed's self-sustaining range.  Or Allee model)
+\end{itemize}
+}
+
+
+\section{Discussion}
+\cdb{Some possible things to discuss: could add others, could remove some.}
 \begin{itemize}
 \item   Comparison of the optimal policy solution to the Reed model
 \item  Comparison between the different functional forms -- smoothing (L2)
-  non-smoothing (L1), and destablizing (fixed).
-\item   Induced costs (relative to free adjustment) vs direct costs -- why are
-  the induced costs much larger?
-\item   Impact of symmetric vs assymetric costs
-\item   Comparison to deterministic results
-\item   Contrast steady-state results to dynamic solutions under stochastic
-  shocks.
+  non-smoothing (L1), and de-stablizing (fixed).
+\item   Induced costs (relative to free adjustment) vs direct costs (paid for adjusting) 
+\item   Impact of symmetric vs asymmetric costs
+\item   Contrast steady-state results to dynamic solutions under stochastic shocks.
 \end{itemize}
 
+\textbf{Key conclusions:}
+\begin{enumerate}
+  \item \textbf{Lesson for modelers}: Ignoring the reality of policy costs leads to less effective management (decreased value)  (increased extinction risk?)
+  \item \textbf{Lesson for policy makers}: Decreasing adjustment costs not only saves direct costs, but permits higher-value solutions.
+\end{enumerate}
 
-\section{References}
 
-Bohm, Peter. 1974. ``On the Effects of Policy Costs.'' \emph{The Swedish
-Journal of Economics} 76 (mar): 104. doi:10.2307/3439361.
-
-Reed, William J. 1979. ``Optimal escapement levels in stochastic and
-deterministic harvesting models.'' \emph{Journal of Environmental
-Economics and Management} 6 (dec): 350--363.
-doi:10.1016/0095-0696(79)90014-7.
-
-Singh, R., Q. Weninger, and M. Doyle. 2006. ``Fisheries management with
-stock growth uncertainty and costly capital adjustment.'' \emph{Journal
-of Environmental Economics and Management} 52 (sep): 582--599.
-doi:10.1016/j.jeem.2006.02.006.
-
-Xepapadeas, A. P. 1992. ``Environmental policy, adjustment costs, and
-behavior of the firm.'' \emph{Journal of Environmental Economics and
-Management}: 258--275.
+\section*{References}
+\bibliography{outline_refs.bib}
 
 \end{document}
