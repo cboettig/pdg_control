@@ -1,31 +1,24 @@
-`ro tidy=FALSE, warning=FALSE, comment=NA, message=FALSE, verbose=TRUE, cache=TRUE, cache.path="unmanaged_warning/" or`
 
-``` {r  echo=FALSE, cache=FALSE}
-options(device = function(width = 5, height = 5) {
-    pdf(NULL, width = width, height = height)
-})
-````
+
+
+
 
 # Detecting warning signals in an unmanaged system 
 
 This is a precursor exercise to managed_warning.Rmd to calibrate a reasonable set of parameters over which to evaluate the detection.  
 
 
-``` {r  setup, echo=FALSE, cache=FALSE}
-# load required libraries
-require(pdgControl)
-require(reshape2)
-require(ggplot2)
-require(data.table)
-rm(list=ls())
-````
+
+
 
 
 Simulate from the May population dynamics function
 
 
 
-``` {r  simulate }
+
+
+```r
 n <- 5000
 x <- vector(mode="double", length=n)
 a <- x
@@ -36,74 +29,148 @@ for(t in 1:n){
   x[t+1] = z[t] *  x[t] * exp(r * (1 - x[t] / k) - a[t] * x[t] ^ (Q - 1) / (x[t] ^ Q + H ^ Q)) 
   a[t+1] = a[t] + .01
 }
-````
+```
+
+
+
 
 
 
 ### Plot of timeseries 
 
-``` {r  p0}
+
+
+```r
 plot(x, type='l')
-````
+```
+
+![plot of chunk p0](http://farm9.staticflickr.com/8307/7845763086_ff30bc53c4_o.png) 
+
 
 Truncate the timeseries 
 
-``` {r truncate}
+
+
+```r
 y <- x[x > 1.5]
-````
+```
+
+
+
 
 ### Calculate warning signals on the truncated series. 
 
-``` {r libs2}
+
+
+```r
 library(earlywarning)
 dat <- data.frame(time=1:length(y), value=y)
-````
+```
 
-``` {r earlywarning}
+
+
+
+
+
+```r
 acor_tau <- warningtrend(dat, window_autocorr)
 var_tau <- warningtrend(dat, window_var)
-````
+```
+
+
+
 
 ## Model based statistics
 
 
 Fit the models
 
-``` {r modelbased}
+
+
+```r
 A <- stability_model(dat, "OU")
 B <- stability_model(dat, "LSN")
 observed <- -2 * (logLik(A) - logLik(B))
 m <- model$pars["m"]
-````
+```
+
+```
+Error: object 'model' not found
+```
+
+
+
 
 
 Set up a parallel environment
 
-``` {r parallel, include=FALSE}
-library(snow)
-library(methods)
-cl <- makeCluster(20, type = "MPI")
-clusterEvalQ(cl, library(earlywarning))
-```
+
+
 
 
 Evaluate the ROC curve
 
-``` {r roc}
+
+
+```r
 clusterExport(cl, ls())
 clusterExport(cl, list = c("A", "B"))
+```
+
+```
+Error: object 'cl' not found
+```
+
+```r
 reps <- parLapply(cl, 1:500, function(i) compare(A, B))
+```
+
+```
+Error: object 'cl' not found
+```
+
+```r
 lr <- lik_ratios(reps)
+```
+
+```
+Error: object 'reps' not found
+```
+
+```r
 roc <- roc_data(lr)
 ```
 
+```
+Error: object 'lr' not found
+```
+
+
+
+
 Plot results.
 
-``` {r plotroc}
+
+
+```r
 require(ggplot2)
 ggplot(lr) + geom_density(aes(value, fill = simulation), alpha = 0.6) + 
     geom_vline(aes(xintercept = observed))
+```
+
+```
+Error: object 'lr' not found
+```
+
+```r
 ggplot(roc) + geom_line(aes(False.positives, True.positives))
 ```
+
+```
+Error: object 'roc' not found
+```
+
+
+
 
 
