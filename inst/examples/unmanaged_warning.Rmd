@@ -1,7 +1,6 @@
-`ro tidy=FALSE, warning=FALSE, comment=NA, message=FALSE, verbose=TRUE, cache=TRUE, cache.path="managed_warning/" or`
+`ro tidy=FALSE, warning=FALSE, comment=NA, message=FALSE, verbose=TRUE, cache=TRUE, cache.path="unmanaged_warning/" or`
 
 ``` {r  echo=FALSE, cache=FALSE}
-opts_knit$set(upload.fun = socialR::flickr.url)
 options(device = function(width = 5, height = 5) {
     pdf(NULL, width = width, height = height)
 })
