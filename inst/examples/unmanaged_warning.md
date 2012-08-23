@@ -27,7 +27,7 @@ z <- rlnorm(n, 0, .1)
 r = .75; k = 10; a[1]=1.55; H=1; Q = 3
 for(t in 1:n){
   x[t+1] = z[t] *  x[t] * exp(r * (1 - x[t] / k) - a[t] * x[t] ^ (Q - 1) / (x[t] ^ Q + H ^ Q)) 
-  a[t+1] = a[t] + .01
+  a[t+1] = a[t] + .001
 }
 ```
 
@@ -44,7 +44,7 @@ for(t in 1:n){
 plot(x, type='l')
 ```
 
-![plot of chunk p0](http://farm9.staticflickr.com/8307/7845763086_ff30bc53c4_o.png) 
+![plot of chunk p0](http://farm9.staticflickr.com/8426/7847325690_d646752cb4_o.png) 
 
 
 Truncate the timeseries 
@@ -91,84 +91,9 @@ Fit the models
 A <- stability_model(dat, "OU")
 B <- stability_model(dat, "LSN")
 observed <- -2 * (logLik(A) - logLik(B))
-m <- model$pars["m"]
+m <- B$pars["m"]
 ```
 
-```
-Error: object 'model' not found
-```
-
-
-
-
-
-Set up a parallel environment
-
-
-
-
-
-Evaluate the ROC curve
-
-
-
-```r
-clusterExport(cl, ls())
-clusterExport(cl, list = c("A", "B"))
-```
-
-```
-Error: object 'cl' not found
-```
-
-```r
-reps <- parLapply(cl, 1:500, function(i) compare(A, B))
-```
-
-```
-Error: object 'cl' not found
-```
-
-```r
-lr <- lik_ratios(reps)
-```
-
-```
-Error: object 'reps' not found
-```
-
-```r
-roc <- roc_data(lr)
-```
-
-```
-Error: object 'lr' not found
-```
-
-
-
-
-Plot results.
-
-
-
-```r
-require(ggplot2)
-ggplot(lr) + geom_density(aes(value, fill = simulation), alpha = 0.6) + 
-    geom_vline(aes(xintercept = observed))
-```
-
-```
-Error: object 'lr' not found
-```
-
-```r
-ggplot(roc) + geom_line(aes(False.positives, True.positives))
-```
-
-```
-Error: object 'roc' not found
-```
 
 
 
