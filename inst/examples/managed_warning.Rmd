@@ -1,4 +1,4 @@
-`ro tidy=FALSE, warning=FALSE, comment=NA, message=FALSE, verbose=TRUE, cache=TRUE, cache.path="managed_warning2/" or`
+`ro tidy=FALSE, warning=FALSE, comment=NA, message=FALSE, verbose=TRUE, cache=TRUE, cache.path="managed_warning/" or`
 
 ``` {r  echo=FALSE, cache=FALSE}
 opts_knit$set(upload.fun = socialR::flickr.url)
@@ -75,8 +75,7 @@ h_grid <- x_grid
 delta <- 0.05
 xT <- 0
 OptTime <- 200
-sigma_g <- .2
-x0 <- 2
+sigma_g <- .5
 ````
 
 We will determine the optimal solution over a `r OptTime` time step window with boundary condition for stock at `r xT` and discounting rate of `r delta`.  The Reed model considers a stochastic growth model 
@@ -86,7 +85,7 @@ We will determine the optimal solution over a `r OptTime` time step window with 
 for the random variable `z_g`, given by 
 
 ``` {r noise}
-z_g <- function() rlnorm(1, 0, sigma_g)
+z_g <- function() 1+(2*runif(1, 0,  1)-1) * sigma_g
 ````
 
 No other sources of noise enter into the dynamics.  
@@ -99,7 +98,10 @@ z_i <- function() 1
 
 
 ``` {r  SDP_Mat}
-SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
+pdfn <- function(P, s){
+  dunif(P, 1 - s, 1 + s)
+}
+SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g, pdfn)
 ````
 
 
@@ -135,7 +137,7 @@ q2
 
 ``` {r  simulate }
 sims <- lapply(1:100, function(i){
-  ForwardSimulate(f, pars, x_grid, h_grid, x0=x0, opt$D, z_g, z_m, z_i)
+  ForwardSimulate(f, pars, x_grid, h_grid, x0=K, opt$D, z_g, z_m, z_i)
 })
 ````
 
@@ -179,19 +181,19 @@ library(earlywarning)
 ````
 
 ``` {r earlywarning}
-acor_tau <- dt[, 
+acor_tau <- dt[fishstock > 1.5, 
                warningtrend(data.frame(time=time, value=fishstock),
                             window_autocorr),
                by=reps]
 
-var_tau <- dt[, 
+var_tau <- dt[fishstock > 1.5, 
               warningtrend(data.frame(time=time, value=fishstock),
                           window_var),
               by=reps]
 ````
 
 ``` {r modelbased}
-m <- dt[, 
+m <- dt[fishstock > 1.5, 
         stability_model(data.frame(time=time, value=fishstock),
                           "LSN")$pars["m"],
         by=reps]
@@ -207,19 +209,19 @@ ggplot(signals) + geom_histogram(aes(value)) + facet_wrap(~variable, scales="fre
 Calculate warning signals on the same set of shocks in unfished data 
 
 ``` {r earlywarning2}
-acor_tau <- dt[, 
+acor_tau <- dt[unharvested > 1.5, 
                warningtrend(data.frame(time=time, value=unharvested),
                             window_autocorr),
                by=reps]
 
-var_tau <- dt[, 
+var_tau <- dt[unharvested > 1.5, 
               warningtrend(data.frame(time=time, value=unharvested),
                           window_var),
               by=reps]
 ````
 
 ``` {r modelbased2}
-m <- dt[, 
+m <- dt[unharvested > 1.5, 
         stability_model(data.frame(time=time, value=unharvested),
                           "LSN")$pars["m"],
         by=reps]
