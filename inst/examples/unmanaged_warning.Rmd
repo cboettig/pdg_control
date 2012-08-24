@@ -88,13 +88,16 @@ m
 ````
 
 
+
+Compute summary stat versions
+
 ``` {r summarystat_roc} 
 summarystat_roc <- function(A,B, summarystat_functions, reps=200){
   require(plyr)
   require(reshape2)
   Asim <- simulate(A, reps)
   Bsim <- simulate(B, reps)
-  sim <- melt(Asim, id = "time")
+  Asim <- melt(Asim, id = "time")
   Bsim <- melt(Bsim, id = "time")
   names(Asim)[2] <- "rep"
   names(Bsim)[2] <- "rep"
@@ -106,8 +109,8 @@ summarystat_roc <- function(A,B, summarystat_functions, reps=200){
 	tidy <- melt(dat)
 }
 
-tau_dist <- summarystat_roc(A, B, list(var=window_var, acor=window_autocorr))
-head(tau_dist)
+dat <- summarystat_roc(A,B, list(var=window_var, acor=window_autocorr))
+ggplot(dat) + geom_density(aes(value, fill=variable)) + facet_wrap(~L1)
 ```
 
 

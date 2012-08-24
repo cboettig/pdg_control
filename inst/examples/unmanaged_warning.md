@@ -44,7 +44,7 @@ for(t in 1:n){
 plot(x, type='l')
 ```
 
-![plot of chunk p0](http://farm8.staticflickr.com/7109/7853389910_accc5973a0_o.png) 
+![plot of chunk p0](http://farm8.staticflickr.com/7108/7853908652_4ba7454256_o.png) 
 
 
 Truncate the timeseries 
@@ -64,7 +64,7 @@ y <- x[x > 1.5]
 plot(y, type='l')
 ```
 
-![plot of chunk p1](http://farm8.staticflickr.com/7127/7853390098_f564834100_o.png) 
+![plot of chunk p1](http://farm9.staticflickr.com/8303/7853908906_b8a9307171_o.png) 
 
 
 ### Calculate warning signals on the truncated series. 
@@ -140,6 +140,9 @@ m
 
 
 
+Compute summary stat versions
+
+
 
 ```r
 summarystat_roc <- function(A,B, summarystat_functions, reps=200){
@@ -147,7 +150,7 @@ summarystat_roc <- function(A,B, summarystat_functions, reps=200){
   require(reshape2)
   Asim <- simulate(A, reps)
   Bsim <- simulate(B, reps)
-  sim <- melt(Asim, id = "time")
+  Asim <- melt(Asim, id = "time")
   Bsim <- melt(Bsim, id = "time")
   names(Asim)[2] <- "rep"
   names(Bsim)[2] <- "rep"
@@ -159,22 +162,11 @@ summarystat_roc <- function(A,B, summarystat_functions, reps=200){
 	tidy <- melt(dat)
 }
 
-tau_dist <- summarystat_roc(A, B, list(var=window_var, acor=window_autocorr))
+dat <- summarystat_roc(A,B, list(var=window_var, acor=window_autocorr))
+ggplot(dat) + geom_density(aes(value, fill=variable)) + facet_wrap(~L1)
 ```
 
-```
-Error: 'x' is NULL
-```
-
-```r
-head(tau_dist)
-```
-
-```
-Error: object 'tau_dist' not found
-```
-
-
+![plot of chunk summarystat_roc](http://farm9.staticflickr.com/8441/7853909040_3a772c536f_o.png) 
 
 
 
@@ -232,13 +224,13 @@ ggplot(lr) + geom_density(aes(value, fill = simulation), alpha = 0.6) +
     geom_vline(aes(xintercept = observed))
 ```
 
-![plot of chunk plotroc](http://farm9.staticflickr.com/8299/7853390294_d1b6a67098_o.png) 
+![plot of chunk plotroc](http://farm8.staticflickr.com/7108/7853909166_45ecb1af08_o.png) 
 
 ```r
 ggplot(roc) + geom_line(aes(False.positives, True.positives))
 ```
 
-![plot of chunk plotroc](http://farm9.staticflickr.com/8422/7853390446_e6ba698978_o.png) 
+![plot of chunk plotroc](http://farm9.staticflickr.com/8448/7853909274_32a730a48a_o.png) 
 
 
 
