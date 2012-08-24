@@ -66,6 +66,9 @@ dat <- data.frame(time=1:length(y), value=y)
 ``` {r earlywarning}
 acor_tau <- warningtrend(dat, window_autocorr)
 var_tau <- warningtrend(dat, window_var)
+
+acor_tau
+var_tau
 ````
 
 ## Model based statistics
@@ -85,22 +88,39 @@ m
 ````
 
 
+``` {r summarystat_roc} 
+summarystat_roc <- function(A,B, summarystat_functions, reps=200){
+  require(plyr)
+  require(reshape2)
+  Asim <- simulate(A, reps)
+  Bsim <- simulate(B, reps)
+  sim <- melt(Asim, id = "time")
+  Bsim <- melt(Bsim, id = "time")
+  names(Asim)[2] <- "rep"
+  names(Bsim)[2] <- "rep"
+	dat <- lapply(summarystat_functions, function(f){
+	  wsA <- ddply(Asim, "rep", warningtrend, f)
+  	wsB <- ddply(Bsim, "rep", warningtrend, f)
+	  data.frame(null = wsA$tau, test = wsB$tau)
+	})
+	tidy <- melt(dat)
+}
+
+tau_dist <- summarystat_roc(A, B, list(var=window_var, acor=window_autocorr))
+head(tau_dist)
+```
+
+
+
 
 Set up a parallel environment
 
 ``` {r parallel}
-library(snow)
-library(methods)
-#cl <- makeCluster(20, type = "MPI")
-#clusterEvalQ(cl, library(earlywarning))
-#clusterExport(cl, ls())
-#clusterExport(cl, list = c("A", "B"))
 require(snowfall)
 sfInit(par=T, cpu=12)
 sfLibrary(earlywarning)
 sfExportAll() 
 ```
-
 
 Evaluate the ROC curve
 

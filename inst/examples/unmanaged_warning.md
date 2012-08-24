@@ -44,7 +44,7 @@ for(t in 1:n){
 plot(x, type='l')
 ```
 
-![plot of chunk p0](http://farm9.staticflickr.com/8308/7852361626_39fe4343c9_o.png) 
+![plot of chunk p0](http://farm8.staticflickr.com/7109/7853389910_accc5973a0_o.png) 
 
 
 Truncate the timeseries 
@@ -64,7 +64,7 @@ y <- x[x > 1.5]
 plot(y, type='l')
 ```
 
-![plot of chunk p1](http://farm8.staticflickr.com/7255/7852361828_7646663394_o.png) 
+![plot of chunk p1](http://farm8.staticflickr.com/7127/7853390098_f564834100_o.png) 
 
 
 ### Calculate warning signals on the truncated series. 
@@ -84,6 +84,22 @@ dat <- data.frame(time=1:length(y), value=y)
 ```r
 acor_tau <- warningtrend(dat, window_autocorr)
 var_tau <- warningtrend(dat, window_var)
+
+acor_tau
+```
+
+```
+  tau 
+0.908 
+```
+
+```r
+var_tau
+```
+
+```
+    tau 
+-0.5354 
 ```
 
 
@@ -124,17 +140,51 @@ m
 
 
 
+
+```r
+summarystat_roc <- function(A,B, summarystat_functions, reps=200){
+  require(plyr)
+  require(reshape2)
+  Asim <- simulate(A, reps)
+  Bsim <- simulate(B, reps)
+  sim <- melt(Asim, id = "time")
+  Bsim <- melt(Bsim, id = "time")
+  names(Asim)[2] <- "rep"
+  names(Bsim)[2] <- "rep"
+	dat <- lapply(summarystat_functions, function(f){
+	  wsA <- ddply(Asim, "rep", warningtrend, f)
+  	wsB <- ddply(Bsim, "rep", warningtrend, f)
+	  data.frame(null = wsA$tau, test = wsB$tau)
+	})
+	tidy <- melt(dat)
+}
+
+tau_dist <- summarystat_roc(A, B, list(var=window_var, acor=window_autocorr))
+```
+
+```
+Error: 'x' is NULL
+```
+
+```r
+head(tau_dist)
+```
+
+```
+Error: object 'tau_dist' not found
+```
+
+
+
+
+
+
+
 Set up a parallel environment
 
 
 
 ```r
-library(snow)
-library(methods)
-#cl <- makeCluster(20, type = "MPI")
-#clusterEvalQ(cl, library(earlywarning))
-#clusterExport(cl, ls())
-#clusterExport(cl, list = c("A", "B"))
 require(snowfall)
 sfInit(par=T, cpu=12)
 ```
@@ -155,7 +205,6 @@ Library earlywarning loaded.
 ```r
 sfExportAll() 
 ```
-
 
 
 
@@ -183,14 +232,13 @@ ggplot(lr) + geom_density(aes(value, fill = simulation), alpha = 0.6) +
     geom_vline(aes(xintercept = observed))
 ```
 
-![plot of chunk plotroc](http://farm8.staticflickr.com/7269/7852362064_25ca50abda_o.png) 
+![plot of chunk plotroc](http://farm9.staticflickr.com/8299/7853390294_d1b6a67098_o.png) 
 
 ```r
 ggplot(roc) + geom_line(aes(False.positives, True.positives))
 ```
 
-![plot of chunk plotroc](http://farm9.staticflickr.com/8296/7852362266_c600dca742_o.png) 
-
+![plot of chunk plotroc](http://farm9.staticflickr.com/8422/7853390446_e6ba698978_o.png) 
 
 
 
