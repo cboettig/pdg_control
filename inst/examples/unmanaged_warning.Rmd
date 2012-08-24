@@ -52,6 +52,10 @@ Truncate the timeseries
 y <- x[x > 1.5]
 ````
 
+``` {r  p1}
+plot(y, type='l')
+````
+
 ### Calculate warning signals on the truncated series. 
 
 ``` {r libs2}
@@ -87,9 +91,32 @@ Set up a parallel environment
 ``` {r parallel}
 library(snow)
 library(methods)
-cl <- makeCluster(20, type = "MPI")
-clusterEvalQ(cl, library(earlywarning))
+#cl <- makeCluster(20, type = "MPI")
+#clusterEvalQ(cl, library(earlywarning))
+#clusterExport(cl, ls())
+#clusterExport(cl, list = c("A", "B"))
+require(snowfall)
+sfInit(par=T, cpu=12)
+sfLibrary(earlywarning)
+sfExportAll() 
 ```
 
+
+Evaluate the ROC curve
+
+``` {r roc}
+reps <- sfLapply(1:500, function(i) compare(A, B))
+lr <- lik_ratios(reps)
+roc <- roc_data(lr)
+```
+
+Plot results.
+
+``` {r plotroc}
+require(ggplot2)
+ggplot(lr) + geom_density(aes(value, fill = simulation), alpha = 0.6) + 
+    geom_vline(aes(xintercept = observed))
+ggplot(roc) + geom_line(aes(False.positives, True.positives))
+```
 
 

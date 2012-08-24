@@ -44,7 +44,7 @@ for(t in 1:n){
 plot(x, type='l')
 ```
 
-![plot of chunk p0](http://farm9.staticflickr.com/8301/7847417972_d9a11d417d_o.png) 
+![plot of chunk p0](http://farm9.staticflickr.com/8308/7852361626_39fe4343c9_o.png) 
 
 
 Truncate the timeseries 
@@ -56,6 +56,15 @@ y <- x[x > 1.5]
 ```
 
 
+
+
+
+
+```r
+plot(y, type='l')
+```
+
+![plot of chunk p1](http://farm8.staticflickr.com/7255/7852361828_7646663394_o.png) 
 
 
 ### Calculate warning signals on the truncated series. 
@@ -122,121 +131,65 @@ Set up a parallel environment
 ```r
 library(snow)
 library(methods)
-cl <- makeCluster(20, type = "MPI")
+#cl <- makeCluster(20, type = "MPI")
+#clusterEvalQ(cl, library(earlywarning))
+#clusterExport(cl, ls())
+#clusterExport(cl, list = c("A", "B"))
+require(snowfall)
+sfInit(par=T, cpu=12)
 ```
 
 ```
-	20 slaves are spawned successfully. 0 failed.
+R Version:  R version 2.15.0 (2012-03-30) 
+
 ```
 
 ```r
-clusterEvalQ(cl, library(earlywarning))
+sfLibrary(earlywarning)
 ```
 
 ```
-[[1]]
- [1] "earlywarning" "snow"         "Rmpi"         "methods"     
- [5] "stats"        "graphics"     "grDevices"    "utils"       
- [9] "datasets"     "base"        
+Library earlywarning loaded.
+```
 
-[[2]]
- [1] "earlywarning" "snow"         "Rmpi"         "methods"     
- [5] "stats"        "graphics"     "grDevices"    "utils"       
- [9] "datasets"     "base"        
-
-[[3]]
- [1] "earlywarning" "snow"         "Rmpi"         "methods"     
- [5] "stats"        "graphics"     "grDevices"    "utils"       
- [9] "datasets"     "base"        
-
-[[4]]
- [1] "earlywarning" "snow"         "Rmpi"         "methods"     
- [5] "stats"        "graphics"     "grDevices"    "utils"       
- [9] "datasets"     "base"        
-
-[[5]]
- [1] "earlywarning" "snow"         "Rmpi"         "methods"     
- [5] "stats"        "graphics"     "grDevices"    "utils"       
- [9] "datasets"     "base"        
-
-[[6]]
- [1] "earlywarning" "snow"         "Rmpi"         "methods"     
- [5] "stats"        "graphics"     "grDevices"    "utils"       
- [9] "datasets"     "base"        
-
-[[7]]
- [1] "earlywarning" "snow"         "Rmpi"         "methods"     
- [5] "stats"        "graphics"     "grDevices"    "utils"       
- [9] "datasets"     "base"        
-
-[[8]]
- [1] "earlywarning" "snow"         "Rmpi"         "methods"     
- [5] "stats"        "graphics"     "grDevices"    "utils"       
- [9] "datasets"     "base"        
-
-[[9]]
- [1] "earlywarning" "snow"         "Rmpi"         "methods"     
- [5] "stats"        "graphics"     "grDevices"    "utils"       
- [9] "datasets"     "base"        
-
-[[10]]
- [1] "earlywarning" "snow"         "Rmpi"         "methods"     
- [5] "stats"        "graphics"     "grDevices"    "utils"       
- [9] "datasets"     "base"        
-
-[[11]]
- [1] "earlywarning" "snow"         "Rmpi"         "methods"     
- [5] "stats"        "graphics"     "grDevices"    "utils"       
- [9] "datasets"     "base"        
-
-[[12]]
- [1] "earlywarning" "snow"         "Rmpi"         "methods"     
- [5] "stats"        "graphics"     "grDevices"    "utils"       
- [9] "datasets"     "base"        
-
-[[13]]
- [1] "earlywarning" "snow"         "Rmpi"         "methods"     
- [5] "stats"        "graphics"     "grDevices"    "utils"       
- [9] "datasets"     "base"        
-
-[[14]]
- [1] "earlywarning" "snow"         "Rmpi"         "methods"     
- [5] "stats"        "graphics"     "grDevices"    "utils"       
- [9] "datasets"     "base"        
-
-[[15]]
- [1] "earlywarning" "snow"         "Rmpi"         "methods"     
- [5] "stats"        "graphics"     "grDevices"    "utils"       
- [9] "datasets"     "base"        
-
-[[16]]
- [1] "earlywarning" "snow"         "Rmpi"         "methods"     
- [5] "stats"        "graphics"     "grDevices"    "utils"       
- [9] "datasets"     "base"        
-
-[[17]]
- [1] "earlywarning" "snow"         "Rmpi"         "methods"     
- [5] "stats"        "graphics"     "grDevices"    "utils"       
- [9] "datasets"     "base"        
-
-[[18]]
- [1] "earlywarning" "snow"         "Rmpi"         "methods"     
- [5] "stats"        "graphics"     "grDevices"    "utils"       
- [9] "datasets"     "base"        
-
-[[19]]
- [1] "earlywarning" "snow"         "Rmpi"         "methods"     
- [5] "stats"        "graphics"     "grDevices"    "utils"       
- [9] "datasets"     "base"        
-
-[[20]]
- [1] "earlywarning" "snow"         "Rmpi"         "methods"     
- [5] "stats"        "graphics"     "grDevices"    "utils"       
- [9] "datasets"     "base"        
-
+```r
+sfExportAll() 
 ```
 
 
+
+
+
+Evaluate the ROC curve
+
+
+
+```r
+reps <- sfLapply(1:500, function(i) compare(A, B))
+lr <- lik_ratios(reps)
+roc <- roc_data(lr)
+```
+
+
+
+
+Plot results.
+
+
+
+```r
+require(ggplot2)
+ggplot(lr) + geom_density(aes(value, fill = simulation), alpha = 0.6) + 
+    geom_vline(aes(xintercept = observed))
+```
+
+![plot of chunk plotroc](http://farm8.staticflickr.com/7269/7852362064_25ca50abda_o.png) 
+
+```r
+ggplot(roc) + geom_line(aes(False.positives, True.positives))
+```
+
+![plot of chunk plotroc](http://farm9.staticflickr.com/8296/7852362266_c600dca742_o.png) 
 
 
 
