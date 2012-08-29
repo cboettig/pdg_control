@@ -2,6 +2,24 @@
 
 
 
+```
+Error: .onLoad failed in loadNamespace() for 'XML', details: call:
+dyn.load(file, DLLpath = DLLpath, ...)  error: unable to load shared
+object
+'/home/cboettig/R/x86_64-redhat-linux-gnu-library/2.15/XML/libs/XML.so':
+libxmlsec1.so.1: cannot open shared object file: No such file or directory
+```
+
+```
+Error: .onLoad failed in loadNamespace() for 'XML', details: call:
+dyn.load(file, DLLpath = DLLpath, ...)  error: unable to load shared
+object
+'/home/cboettig/R/x86_64-redhat-linux-gnu-library/2.15/XML/libs/XML.so':
+libxmlsec1.so.1: cannot open shared object file: No such file or directory
+```
+
+
+
 
 # Critical transition 
 
@@ -29,7 +47,7 @@ With parameters
 
 
 ```r
-pars <- c(r = .75, k = 10, a=1.7, H=1, Q = 3)
+pars <- c(r = .75, k = 10, a=1, H=1, Q = 3)
 K <- 8 # approx
 ```
 
@@ -88,17 +106,16 @@ h_grid <- x_grid
 
 
 ```r
-delta <- 0.05
+delta <- 0.005
 xT <- 0
-OptTime <- 200
-sigma_g <- .2
-x0 <- 2
+OptTime <- 5000
+sigma_g <- .1
 ```
 
 
 
 
-We will determine the optimal solution over a `200` time step window with boundary condition for stock at `0` and discounting rate of `0.05`.  The Reed model considers a stochastic growth model 
+We will determine the optimal solution over a `5000` time step window with boundary condition for stock at `0` and discounting rate of `0.005`.  The Reed model considers a stochastic growth model 
 
 <div> $$ x_{t+1} = z_g f(x_t) $$ </div> 
 
@@ -107,7 +124,7 @@ for the random variable `z_g`, given by
 
 
 ```r
-z_g <- function() rlnorm(1, 0, sigma_g)
+z_g <- function() rlnorm(1, 0, sigma_g) 
 ```
 
 
@@ -130,7 +147,10 @@ z_i <- function() 1
 
 
 ```r
-SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g)
+pdfn <- function(P, s){
+  dunif(P, 1 - s, 1 + s)
+}
+SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g, pdfn)
 ```
 
 
@@ -164,7 +184,7 @@ geom_point(aes(x,y), data=data.frame(x=opt$S, y=opt$S), col="red")
 q1
 ```
 
-![plot of chunk policyfn_plot](http://farm8.staticflickr.com/7259/7663893314_2a94a34776_o.png) 
+![plot of chunk policyfn_plot](http://farm9.staticflickr.com/8316/7889663888_6c2cc2de08_o.png) 
 
 
 and the value function (at equilibrium):
@@ -177,76 +197,104 @@ geom_vline(xintercept=opt$S)
 q2
 ```
 
-![plot of chunk valuefn_plot](http://farm9.staticflickr.com/8423/7663893784_6556e8a9e9_o.png) 
+![plot of chunk valuefn_plot](http://farm9.staticflickr.com/8309/7889664294_939223f8ac_o.png) 
 
 
 ### Simulate 
 
 
 
+
 ```r
-sims <- lapply(1:100, function(i){
-  ForwardSimulate(f, pars, x_grid, h_grid, x0=x0, opt$D, z_g, z_m, z_i)
-})
+Dt <- 1
+
+ForwardSimulate <- 
+  function(f, pars, x_grid, h_grid, x0, D, z_g,
+         z_m=function(x) 1, z_i = function(x) 1, 
+         profit=NULL){
+
+  OptTime <- dim(D)[2]    # Stopping time
+  x_h <- numeric(OptTime) # population dynamics with harvest
+  h <- numeric(OptTime) # optimal havest level
+  x_h[1] <- x0  # initial values
+  s <- x_h # also track escapement
+  x <- x_h # What would happen with no havest
+  p <- numeric(OptTime)
+
+  ## Simulate through time ##
+  for(t in 1:(OptTime-1)){
+
+    # Move towards collapse
+    pars[3] <- pars[3] + Dt/OptTime
+
+
+
+    # Assess stock, with potential measurement error
+    m_t <- x_h[t] * z_m()
+    # Current state (is closest to which grid posititon) 
+    St <- which.min(abs(x_grid - m_t)) 
+    q_t <- h_grid[D[St, (t + 1) ]] 
+    # Implement harvest/(effort) based on quota with noise 
+    h[t] <- q_t * z_i()
+    # Noise in growth 
+    z <- z_g() 
+    # population grows
+    x_h[t+1] <- z * f(x_h[t], h[t], pars) # with havest
+    s[t+1]   <- x_h[t] - q_t # anticipated escapement
+    x[t+1]   <- z * f(x[t], 0, pars) # havest-free dynamics
+    p[t] <- profit(x_h[t], h[t])
+  }
+  data.frame(time = 1:OptTime, fishstock = x_h, harvest = h,
+             unharvested = x, escapement = s, profit = p) 
+}
+
+dat <- ForwardSimulate(f, pars, x_grid, h_grid, x0=K, opt$D, z_g, z_m, z_i)
+x <- dat$fishstock
 ```
 
 
 
 
 
-## Summarize and plot the results                                                   
 
-R makes it easy to work with this big replicate data set.  We make data tidy (melt), fast (data.tables), and nicely labeled.
+### Plot of timeseries 
 
 
 
 ```r
-dat <- melt(sims, id=names(sims[[1]]))  
-dt <- data.table(dat)
-setnames(dt, "L1", "reps") # names are nice
+plot(x, type='l')
+```
+
+![plot of chunk p0](http://farm9.staticflickr.com/8451/7889664498_8da4534b28_o.png) 
+
+
+Truncate the timeseries 
+
+
+
+```r
+y <- x[x > 1.5]
 ```
 
 
 
 
-### Plots 
-
-
-
-```r
-p0 <- ggplot(subset(dt,reps==1)) +
-  geom_line(aes(time, fishstock)) +
-  geom_abline(intercept=opt$S, slope = 0) +
-  geom_line(aes(time, harvest), col="darkgreen") 
-p0
-```
-
-![plot of chunk p0](http://farm8.staticflickr.com/7122/7663894716_ae900b7252_o.png) 
-
-
-
-This plot summarizes the stock dynamics by visualizing the replicates. Reed's S shown again, along with the dotted line showing the allee threshold, below which the stock will go to zero (unless rescued stochastically). 
-
 
 
 ```r
-p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) + 
-  geom_abline(intercept=xT, slope = 0, lty=2) 
-p1 <- p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
-p1
+plot(y, type='l')
 ```
 
-![plot of chunk p1](http://farm9.staticflickr.com/8016/7663895200_0f45acb508_o.png) 
+![plot of chunk p1](http://farm9.staticflickr.com/8177/7889664738_ae6dc140d5_o.png) 
 
 
-
-
-## Calculate warning signals on managed system 
+### Calculate warning signals on the truncated series. 
 
 
 
 ```r
 library(earlywarning)
+dat <- data.frame(time=1:length(y), value=y)
 ```
 
 
@@ -255,83 +303,156 @@ library(earlywarning)
 
 
 ```r
-acor_tau <- dt[, 
-               warningtrend(data.frame(time=time, value=fishstock),
-                            window_autocorr),
-               by=reps]
+acor_tau <- warningtrend(dat, window_autocorr)
+var_tau <- warningtrend(dat, window_var)
 
-var_tau <- dt[, 
-              warningtrend(data.frame(time=time, value=fishstock),
-                          window_var),
-              by=reps]
+acor_tau
+```
+
+```
+   tau 
+0.9447 
+```
+
+```r
+var_tau
+```
+
+```
+   tau 
+0.6166 
 ```
 
 
 
+
+## Model based statistics
+
+
+Fit the models
 
 
 
 ```r
-m <- dt[, 
-        stability_model(data.frame(time=time, value=fishstock),
-                          "LSN")$pars["m"],
-        by=reps]
+A <- stability_model(dat, "OU")
+B <- stability_model(dat, "LSN")
+observed <- -2 * (logLik(A) - logLik(B))
+m <- B$pars["m"]
+
+
+observed
+```
+
+```
+[1] 344
+```
+
+```r
+m
+```
+
+```
+         m 
+-0.0001701 
 ```
 
 
 
+
+
+
+Compute summary stat versions
 
 
 
 ```r
-signals <- melt(data.frame(var=var_tau$V1, acor=acor_tau$V1, m=m$V1))
-ggplot(signals) + geom_histogram(aes(value)) + facet_wrap(~variable, scales="free")
+summarystat_roc <- function(A,B, summarystat_functions, reps=200){
+  require(plyr)
+  require(reshape2)
+  Asim <- simulate(A, reps)
+  Bsim <- simulate(B, reps)
+  Asim <- melt(Asim, id = "time")
+  Bsim <- melt(Bsim, id = "time")
+  names(Asim)[2] <- "rep"
+  names(Bsim)[2] <- "rep"
+	dat <- lapply(summarystat_functions, function(f){
+	  wsA <- ddply(Asim, "rep", warningtrend, f)
+  	wsB <- ddply(Bsim, "rep", warningtrend, f)
+	  data.frame(null = wsA$tau, test = wsB$tau)
+	})
+	tidy <- melt(dat)
+}
+
+dat <- summarystat_roc(A,B, list(var=window_var, acor=window_autocorr))
+ggplot(dat) + geom_density(aes(value, fill=variable)) + facet_wrap(~L1)
 ```
 
-![plot of chunk summaryplot](http://farm8.staticflickr.com/7267/7665248434_2bd8e43978_o.png) 
+![plot of chunk summarystat_roc](http://farm9.staticflickr.com/8035/7889664938_34fa3fff95_o.png) 
 
 
 
-## Unmanaged warning signals
-Calculate warning signals on the same set of shocks in unfished data 
+
+
+Set up a parallel environment
 
 
 
 ```r
-acor_tau <- dt[, 
-               warningtrend(data.frame(time=time, value=unharvested),
-                            window_autocorr),
-               by=reps]
+require(snowfall)
+sfInit(par=T, cpu=12)
+```
 
-var_tau <- dt[, 
-              warningtrend(data.frame(time=time, value=unharvested),
-                          window_var),
-              by=reps]
+```
+R Version:  R version 2.15.0 (2012-03-30) 
+
+```
+
+```r
+sfLibrary(earlywarning)
+```
+
+```
+Library earlywarning loaded.
+```
+
+```r
+sfExportAll() 
 ```
 
 
 
+
+Evaluate the ROC curve
 
 
 
 ```r
-m <- dt[, 
-        stability_model(data.frame(time=time, value=unharvested),
-                          "LSN")$pars["m"],
-        by=reps]
+reps <- sfLapply(1:500, function(i) compare(A, B))
+lr <- lik_ratios(reps)
+roc <- roc_data(lr)
 ```
 
 
 
+
+Plot results.
 
 
 
 ```r
-signals <- melt(data.frame(var=var_tau$V1, acor=acor_tau$V1, m=m$V1))
-ggplot(signals) + geom_histogram(aes(value)) + facet_wrap(~variable, scales="free")
+require(ggplot2)
+ggplot(lr) + geom_density(aes(value, fill = simulation), alpha = 0.6) + 
+    geom_vline(aes(xintercept = observed))
 ```
 
-![plot of chunk summaryplot2](http://farm9.staticflickr.com/8007/7665945074_642656676e_o.png) 
+![plot of chunk plotroc](http://farm9.staticflickr.com/8445/7889665150_d2f03f6f86_o.png) 
+
+```r
+ggplot(roc) + geom_line(aes(False.positives, True.positives))
+```
+
+![plot of chunk plotroc](http://farm9.staticflickr.com/8442/7889665336_993d71c5d1_o.png) 
+
 
 
 
