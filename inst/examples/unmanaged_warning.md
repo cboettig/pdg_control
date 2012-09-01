@@ -1,31 +1,24 @@
-`ro tidy=FALSE, warning=FALSE, comment=NA, message=FALSE, verbose=TRUE, cache=TRUE, cache.path="unmanaged_warning/" or`
 
-``` {r  echo=FALSE, cache=FALSE}
-options(device = function(width = 5, height = 5) {
-    pdf(NULL, width = width, height = height)
-})
-````
+
+
+
 
 # Detecting warning signals in an unmanaged system 
 
 This is a precursor exercise to managed_warning.Rmd to calibrate a reasonable set of parameters over which to evaluate the detection.  
 
 
-``` {r  setup, echo=FALSE, cache=FALSE}
-# load required libraries
-require(pdgControl)
-require(reshape2)
-require(ggplot2)
-require(data.table)
-rm(list=ls())
-````
+
+
 
 
 Simulate from the May population dynamics function
 
 
 
-``` {r  simulate }
+
+
+```r
 n <- 5000
 x <- vector(mode="double", length=n)
 a <- x
@@ -36,47 +29,90 @@ for(t in 1:n){
   x[t+1] = z[t] *  x[t] * exp(r * (1 - x[t] / k) - a[t] * x[t] ^ (Q - 1) / (x[t] ^ Q + H ^ Q)) 
   a[t+1] = a[t] + 1/5000
 }
-````
+```
+
+
+
 
 
 
 ### Plot of timeseries 
 
-``` {r  p0}
+
+
+```r
 plot(x, type='l')
-````
+```
+
+![plot of chunk p0](http://farm8.staticflickr.com/7108/7853908652_4ba7454256_o.png) 
+
 
 Truncate the timeseries 
 
-``` {r truncate}
-y <- x[x > 1.5]
-````
 
-``` {r  p1}
+
+```r
+y <- x[x > 1.5]
+```
+
+
+
+
+
+
+```r
 plot(y, type='l')
-````
+```
+
+![plot of chunk p1](http://farm9.staticflickr.com/8303/7853908906_b8a9307171_o.png) 
+
 
 ### Calculate warning signals on the truncated series. 
 
-``` {r libs2}
+
+
+```r
 library(earlywarning)
 dat <- data.frame(time=1:length(y), value=y)
-````
+```
 
-``` {r earlywarning}
+
+
+
+
+
+```r
 acor_tau <- warningtrend(dat, window_autocorr)
 var_tau <- warningtrend(dat, window_var)
 
 acor_tau
+```
+
+```
+  tau 
+0.908 
+```
+
+```r
 var_tau
-````
+```
+
+```
+    tau 
+-0.5354 
+```
+
+
+
 
 ## Model based statistics
 
 
 Fit the models
 
-``` {r modelbased}
+
+
+```r
 A <- stability_model(dat, "OU")
 B <- stability_model(dat, "LSN")
 observed <- -2 * (logLik(A) - logLik(B))
@@ -84,14 +120,31 @@ m <- B$pars["m"]
 
 
 observed
+```
+
+```
+[1] 119.8
+```
+
+```r
 m
-````
+```
+
+```
+         m 
+-2.658e-05 
+```
+
+
+
 
 
 
 Compute summary stat versions
 
-``` {r summarystat_roc} 
+
+
+```r
 summarystat_roc <- function(A,B, summarystat_functions, reps=200){
   require(plyr)
   require(reshape2)
@@ -113,33 +166,71 @@ dat <- summarystat_roc(A,B, list(var=window_var, acor=window_autocorr))
 ggplot(dat) + geom_density(aes(value, fill=variable)) + facet_wrap(~L1)
 ```
 
+![plot of chunk summarystat_roc](http://farm9.staticflickr.com/8441/7853909040_3a772c536f_o.png) 
+
+
 
 
 
 Set up a parallel environment
 
-``` {r parallel}
+
+
+```r
 require(snowfall)
 sfInit(par=T, cpu=12)
+```
+
+```
+R Version:  R version 2.15.0 (2012-03-30) 
+
+```
+
+```r
 sfLibrary(earlywarning)
+```
+
+```
+Library earlywarning loaded.
+```
+
+```r
 sfExportAll() 
 ```
 
+
+
+
 Evaluate the ROC curve
 
-``` {r roc}
+
+
+```r
 reps <- sfLapply(1:500, function(i) compare(A, B))
 lr <- lik_ratios(reps)
 roc <- roc_data(lr)
 ```
 
+
+
+
 Plot results.
 
-``` {r plotroc}
+
+
+```r
 require(ggplot2)
 ggplot(lr) + geom_density(aes(value, fill = simulation), alpha = 0.6) + 
     geom_vline(aes(xintercept = observed))
+```
+
+![plot of chunk plotroc](http://farm8.staticflickr.com/7108/7853909166_45ecb1af08_o.png) 
+
+```r
 ggplot(roc) + geom_line(aes(False.positives, True.positives))
 ```
+
+![plot of chunk plotroc](http://farm9.staticflickr.com/8448/7853909274_32a730a48a_o.png) 
+
 
 

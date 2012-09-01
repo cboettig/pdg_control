@@ -206,12 +206,22 @@ All cases
 
 ``` {r runallsims, dependson="simfn"} 
 policyfn <- list(det=det, low=low, g=g, m=m, i=i, gm=gm, gi=gi, mi=mi, gmi=gmi)
-noise <- list( det  = c(0,0,0),        low = c(0.1, .1, .1),  growth = c(lvl, 0, 0),
-               measure  = c(0, lvl, 0),implement = c(0,0,lvl),growth_measure = c(lvl, lvl, 0), 
-               growth_implement = c(lvl, 0, lvl),  measure_implement = c(0, lvl, lvl), all = c(lvl, lvl, lvl)) 
-allcases <- lapply(policyfn, function(policyfn_i){
+noise <- list(det  = c(0,0,0), 
+							low = c(0.1, .1, .1),  
+							grow = c(lvl, 0, 0),
+              meas  = c(0, lvl, 0), 
+							imp = c(0,0,lvl), 
+							gro_meas = c(lvl, lvl, 0),  
+							gro_imp = c(lvl, 0, lvl),  
+							meas_imp = c(0, lvl, lvl), 
+							all = c(lvl, lvl, lvl))
+````
+
+
+``` {r loopoverall}
+ allcases <- lapply(policyfn, function(policyfn_i){
   lapply(noise, function(noise_i){
-    simulatereps(policyfn_i, noise_i[1], noise_i[2], noise_i[3])
+    try(simulatereps(policyfn_i, noise_i[1], noise_i[2], noise_i[3]))
   })
 })
 ````
