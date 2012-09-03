@@ -159,16 +159,40 @@ policy <- melt(data.frame(stock = x_grid, det = det$D[, 1], g = g$D[, 1], m = m$
 ggplot(policy) + geom_line(aes(stock, stock - x_grid[value], color = variable))
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8037/7917927594_e1d5e3618c_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8176/7918039410_04abaac56a_o.png) 
 
 ```r
-dt <- data.table(policy)
-linear <- dt[, approx(stock, stock - x_grid[value], xout = seq(1, 150, length = 20)), 
-    by = variable]
-ggplot(linear) + geom_line(aes(x, y, color = variable))
+dat <- subset(policy, fishstock < 120)
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8305/7917927792_f9f5d7dfb0_o.png) 
+```
+Error: object 'fishstock' not found
+```
+
+```r
+dt <- data.table(dat)
+```
+
+```
+Error: object 'dat' not found
+```
+
+```r
+linear <- dt[, approx(stock, stock - x_grid[value], xout = seq(1, 150, length = 15)), 
+    by = variable]
+```
+
+```
+Error: object 'stock' not found
+```
+
+```r
+ggplot(linear) + geom_smooth(aes(x, y, color = variable))
+```
+
+```
+Error: object 'linear' not found
+```
 
 ```r
 # geom_point(aes(stock, stock-x_grid[value], color=variable)) +
