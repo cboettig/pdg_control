@@ -159,7 +159,7 @@ policy <- melt(data.frame(stock = x_grid, deterministic = det$D[, 1], growth = g
 ggplot(policy) + geom_point(aes(stock, stock - x_grid[value], color = variable))
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8173/7923320004_4fdda3a154_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8441/7923418836_1e76f50676_o.png) 
 
 ```r
 dat <- subset(policy, stock < 140)
@@ -170,7 +170,7 @@ ggplot(linear) + geom_smooth(aes(x, y, color = variable), fill = NA) + xlab("Mea
     ylab("Optimal Expected Escapement")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8308/7923320240_5a94212dce_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8446/7923419128_ab6d7495f8_o.png) 
 
 ```r
 # geom_point(aes(stock, stock-x_grid[value], color=variable)) +
