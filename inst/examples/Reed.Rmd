@@ -105,7 +105,6 @@ z_i <- function() 1
 ``` {r  SDP_Mat}
 pdfn <- function(P, s){
    dunif(P, 1 - s, 1 + s)
-#  dlnorm(P, 0, s)
 }
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g, pdfn)
 ````
