@@ -153,23 +153,24 @@ Library ggplot2 loaded.
 
 ```r
 require(reshape2)
-policy <- melt(data.frame(stock = x_grid, det = det$D[, 1], g = g$D[, 1], m = m$D[, 
-    1], i = i$D[, 1]), id = "stock")
+policy <- melt(data.frame(stock = x_grid, deterministic = det$D[, 1], growth = g$D[, 
+    1], measurement = m$D[, 1], implementation = i$D[, 1]), id = "stock")
 
-ggplot(policy) + geom_line(aes(stock, stock - x_grid[value], color = variable))
+ggplot(policy) + geom_point(aes(stock, stock - x_grid[value], color = variable))
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8296/7918055882_72df8534bb_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8173/7923320004_4fdda3a154_o.png) 
 
 ```r
-dat <- subset(policy, stock < 120)
+dat <- subset(policy, stock < 140)
 dt <- data.table(dat)
 linear <- dt[, approx(stock, stock - x_grid[value], xout = seq(1, 150, length = 15)), 
     by = variable]
-ggplot(linear) + geom_smooth(aes(x, y, color = variable))
+ggplot(linear) + geom_smooth(aes(x, y, color = variable), fill = NA) + xlab("Measured Stock") + 
+    ylab("Optimal Expected Escapement")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8029/7918056070_d4b7cb8cc9_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8308/7923320240_5a94212dce_o.png) 
 
 ```r
 # geom_point(aes(stock, stock-x_grid[value], color=variable)) +
