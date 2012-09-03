@@ -7,7 +7,7 @@
 
 # Calculating the value of information
 
- Implements a numerical version of the SDP described in (Sethi _et. al._ 2005).
+ Implements a numerical version of the SDP described in .
  Compute the optimal solution under different forms of uncertainty.   
 
 
@@ -84,11 +84,11 @@ We use Monte Carlo integration over the noise processes to determine the transit
 
 ```r
 require(snowfall)
-sfInit(parallel = TRUE, cpu = 4)
+sfInit(parallel = TRUE, cpu = 16)
 ```
 
 ```
-R Version:  R version 2.15.1 (2012-06-22) 
+R Version:  R version 2.15.0 (2012-03-30) 
 
 ```
 
@@ -102,7 +102,7 @@ scenario <- function(policy_g, policy_m, policy_i) {
     z_m <- function() 1 + (2 * runif(1, 0, 1) - 1) * policy_m
     z_i <- function() 1 + (2 * runif(1, 0, 1) - 1) * policy_i
     
-    SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps = 1000)
+    SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps = 1e+05)
     opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, 
         reward = 0)
 }
@@ -153,23 +153,26 @@ Library ggplot2 loaded.
 
 ```r
 require(reshape2)
-policy <- melt(data.frame(stock = x_grid, low = low$D[, 1], g = g$D[, 
-    1], m = m$D[, 1], i = i$D[, 1]), id = "stock")
+policy <- melt(data.frame(stock = x_grid, det = det$D[, 1], g = g$D[, 1], m = m$D[, 
+    1], i = i$D[, 1]), id = "stock")
+
+ggplot(policy) + geom_line(aes(stock, stock - x_grid[value], color = variable))
 ```
 
-```
-Error: object 'low' not found
-```
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8037/7917927594_e1d5e3618c_o.png) 
 
 ```r
-
-ggplot(policy) + # geom_point(aes(stock, stock-x_grid[value], color=variable)) +
-geom_smooth(aes(stock, stock - x_grid[value], color = variable)) + 
-    ylab("escapement")
+dt <- data.table(policy)
+linear <- dt[, approx(stock, stock - x_grid[value], xout = seq(1, 150, length = 20)), 
+    by = variable]
+ggplot(linear) + geom_line(aes(x, y, color = variable))
 ```
 
-```
-Error: object 'policy' not found
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8305/7917927792_f9f5d7dfb0_o.png) 
+
+```r
+# geom_point(aes(stock, stock-x_grid[value], color=variable)) +
+# geom_smooth(aes(stock, stock-x_grid[value], color=variable))
 ```
 
 
