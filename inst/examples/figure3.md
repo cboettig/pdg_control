@@ -109,20 +109,25 @@ scenario <- function(policy_g, policy_m, policy_i) {
 ```
 
 
+
+Do the deterministic exactly,
+
+
+```r
+pdfn <- function(P, s) {
+    dunif(P, 1 - s, 1 + s)
+}
+SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g = 0.5, pdfn)
+det <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward = 0)
+```
+
+
 Determine the policies for each of the scenarios (noise combinations).
 
 
 ```r
 lvl <- 0.5
 low <- scenario(0.1, 0.1, 0.1)
-```
-
-```
-Library ggplot2 loaded.
-```
-
-```r
-det <- scenario(0.001, 0, 0)
 ```
 
 ```
@@ -165,25 +170,21 @@ policy <- melt(data.frame(stock = x_grid, deterministic = det$D[, 1], all_low = 
     1], growth = g$D[, 1], measurement = m$D[, 1], implementation = i$D[, 1]), 
     id = "stock")
 
-ggplot(policy) + geom_point(aes(stock, stock - x_grid[value], color = variable))
+ggplot(policy) + geom_point(aes(stock, stock - x_grid[value], color = variable), 
+    shape = "+")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8320/7931811548_617fa3d77a_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8311/7932321418_37f6af0b00_o.png) 
 
 ```r
 dat <- subset(policy, stock < 140)
 dt <- data.table(dat)
 linear <- dt[, approx(stock, stock - x_grid[value], xout = seq(1, 150, length = 15)), 
     by = variable]
-ggplot(linear) + geom_smooth(aes(x, y, color = variable), fill = NA) + xlab("Measured Stock") + 
-    ylab("Optimal Expected Escapement")
+ggplot(linear) + stat_smooth(aes(x, y, color = variable), degree = 1, se = FALSE, 
+    span = 0.3) + xlab("Measured Stock") + ylab("Optimal Expected Escapement")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8440/7931811836_c8bb3ecf8e_o.png) 
-
-```r
-# geom_point(aes(stock, stock-x_grid[value], color=variable)) +
-# geom_smooth(aes(stock, stock-x_grid[value], color=variable))
-```
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8179/7932321680_2664f358bb_o.png) 
 
 

@@ -137,12 +137,12 @@ policy <- melt(data.frame(stock = x_grid, deterministic=det$D[,1], all_low = low
                growth = g$D[,1], measurement = m$D[,1], implementation = i$D[,1]), 
                id = "stock")
 
-ggplot(policy) + geom_point(aes(stock, stock-x_grid[value], color=variable))
+ggplot(policy) + geom_point(aes(stock, stock-x_grid[value], color=variable), shape="+")
 dat <- subset(policy, stock < 140)
 dt <- data.table(dat)
 linear <- dt[,approx(stock, stock-x_grid[value], xout=seq(1,150, length=15)), by=variable]
-ggplot(linear) + geom_smooth(aes(x,y,color=variable), fill=NA) + xlab("Measured Stock") + ylab("Optimal Expected Escapement")
-#  geom_point(aes(stock, stock-x_grid[value], color=variable)) +
-# geom_smooth(aes(stock, stock-x_grid[value], color=variable)) 
+ggplot(linear) + 
+	stat_smooth(aes(x,y,color=variable), degree=1, se=FALSE, span=.3) + 
+	xlab("Measured Stock") + ylab("Optimal Expected Escapement")
 ```
 
