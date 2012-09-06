@@ -1,4 +1,4 @@
-`ro cache=TRUE, warning=FALSE, comment=NA, message=FALSE, cache.path="figure3_det/", verbose=TRUE or`
+`ro cache=TRUE, warning=FALSE, comment=NA, message=FALSE, cache.path="figure3/", verbose=TRUE or`
 
 ``` {r  echo=FALSE, cache=FALSE }
 #opts_knit$set(upload.fun = socialR::flickr.url)
@@ -7,12 +7,7 @@
 #})
 ````
 
-
-
-# Calculating the value of information
-
- Implements a numerical version of the SDP described in `r #knitcitations::citep("10.1016/j.jeem.2004.11.005")`.
- Compute the optimal solution under different forms of uncertainty.   
+## Generate Figure 3 of Sethi et al. 2006
 
 ``` {r  setup, echo=FALSE, cache=FALSE}
 # load required libraries
@@ -21,8 +16,6 @@ require(reshape2)
 require(ggplot2)
 require(data.table)
 rm(list=ls())
-
-
 theme_publish <- theme_set(theme_bw(14))
 theme_publish <- 
   theme_update(legend.key = theme_blank(),legend.position=c(.9,.1),

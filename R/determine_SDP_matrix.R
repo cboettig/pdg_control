@@ -125,7 +125,7 @@ SDP_by_simulation <- function(f, p, x_grid, h_grid, z_g, z_m, z_i, reps = 999){
 
   SDP_Mat <- sfLapply(h_grid, function(h){ 
     mat <- sapply(x_grid, function(x){
-      x_t1 <- replicate(reps, z_g() * z_i() * f(x, z_m() * h, p)) 
+      x_t1 <- replicate(reps, z_g() * z_m() * f(x / z_m(), z_i() * h, p)) 
       a <- mybin( x_t1, binwidth=bw, range=c(lower, upper))$count
       a / sum(a) 
     })
