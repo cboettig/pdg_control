@@ -3,12 +3,7 @@
 
 
 
-
-
-# Calculating the value of information
-
- Implements a numerical version of the SDP described in .
- Compute the optimal solution under different forms of uncertainty.   
+## Generate Figure 3 of Sethi et al. 2006
 
 
 
@@ -174,7 +169,7 @@ ggplot(policy) + geom_point(aes(stock, stock - x_grid[value], color = variable),
     shape = "+")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8311/7932321418_37f6af0b00_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8316/7944013684_6acdd2476f_o.png) 
 
 ```r
 dat <- subset(policy, stock < 140)
@@ -185,6 +180,6 @@ ggplot(linear) + stat_smooth(aes(x, y, color = variable), degree = 1, se = FALSE
     span = 0.3) + xlab("Measured Stock") + ylab("Optimal Expected Escapement")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8179/7932321680_2664f358bb_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8439/7944013904_a7ac3dc393_o.png) 
 
 
