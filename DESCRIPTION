@@ -2,7 +2,7 @@ Package: pdgControl
 Description: Research in optimal control. Examples focus on fisheries
     management.
 Title: Pretty Darn Good Control
-Version: 0.0-1
+Version: 0.0-2
 License: BSD
 Author: Carl Boettiger
 Maintainer: Carl Boettiger, <cboettig@gmail.com>
