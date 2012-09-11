@@ -22,9 +22,7 @@
 #' @export
 SDP_uniform <- function(f, p, x_grid, h_grid, sigma_g,
                         pdfn=function(P, s) dunif(P, 1-s, 1+s),
-                        sigma_m, sigma_i, 
-                        f_int = 
-                         ){
+                        sigma_m, sigma_i, f_int){
   gridsize <- length(x_grid)
   SDP_Mat <- lapply(h_grid, function(h){
     SDP_matrix <- matrix(0, nrow=gridsize, ncol=gridsize)
@@ -32,14 +30,15 @@ SDP_uniform <- function(f, p, x_grid, h_grid, sigma_g,
     for(i in 1:gridsize){ 
       ## Calculate the expected transition  
       x1 <- x_grid[i]
-      x2_expected <- f_int(x1, h, sigma_m, sigma_i,p)
+      x2_expected <- f(x1,h,p)
+      P_of_x2 <- f_int(x1, h, sigma_m, sigma_i, p)
       ## If expected 0, go to 0 with probabilty 1
       if( x2_expected == 0) 
         SDP_matrix[i,1] <- 1  
       else {
         # relative probability of a transition to that state
         ProportionalChance <- x_grid / x2_expected
-        Prob <- pdfn(ProportionalChance, sigma_g)
+        Prob <- P_of_x2 * pdfn(ProportionalChance, sigma_g)
 
         # Store normalized probabilities in row
         SDP_matrix[i,] <- Prob/sum(Prob)
@@ -51,12 +50,12 @@ SDP_uniform <- function(f, p, x_grid, h_grid, sigma_g,
 }
 
 
-require(cubature)
 
-f_int <- function(f,x,q,sigma_m, sigma_i, pars){
+
+int_f <- function(f, x, q, sigma_m, sigma_i, pars){
   g <- function(X) f(X[1], X[2], pars)
-  lower <- c(max(x-sigma_m,0), max(q-sigma_i,0))
-  upper <- c(x+sigma_m, q + sigma_i)
+  lower <- c(max(x - sigma_m, 0), max(q - sigma_i, 0))
+  upper <- c(x + sigma_m, q + sigma_i)
   out <- adaptIntegrate(g, lower, upper)
   out$integral
 }
@@ -64,12 +63,9 @@ f_int <- function(f,x,q,sigma_m, sigma_i, pars){
 
 F <- function(x,q, m, n, pars){
   K <- pars[2]
-  ((q+n-max(0,q-n))*(x+m-max(0,x-m))*(6*x*K-6*q*K-6*n*K+6*m*K+6*max(0,x-m)*K-6*
+  out <- ((q+n-max(0,q-n))*(x+m-max(0,x-m))*(6*x*K-6*q*K-6*n*K+6*m*K+6*max(0,x-m)*K-6*
     max(0,q-n)*K-2*x^2+3*q*x+3*n*x-4*m*x-2*max(0,x-m)*x+3*max(0,q-n)*x-2*q^2-4*n*q+3*m*q+3*
     max(0,x-m)*q-2*max(0,q-n)*q-2*n^2+3*m*n+3*max(0,x-m)*n-2*max(0,q-n)*n-2*m^2-2*max(0,x-m)*m+3*
     max(0,q-n)*m-2*max(0,x-m)^2+3*max(0,q-n)*max(0,x-m)-2*max(0,q-n)^2))/(6*K)
-  
+  max(out,0)
 }
-# Confirm that these give the same value
-# f_int(f, 10, 1, .1, .1, pars)
-# F(10, 1, .1, .1, pars)
