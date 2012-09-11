@@ -3,7 +3,7 @@
 \title{Determine the Stochastic Dynamic Programming matrix.}
 \usage{
   determine_SDP_matrix(f, p, x_grid, h_grid, sigma_g,
-    pdfn = NULL)
+    pdfn = function(P, s) dlnorm(P, 0, s))
 }
 \arguments{
   \item{f}{the growth function of the escapement population
@@ -23,8 +23,8 @@
 
   \item{pdfn}{the probability density function, taking the
   proportional chance of a transition to that state, f(x),
-  and the parameter sigma_g If NULL (default), will use the
-  log normal density.}
+  and the parameter sigma_g By default it will use the log
+  normal density.}
 }
 \value{
   the transition matrix at each value of h in the grid.

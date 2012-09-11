@@ -24,3 +24,4 @@ Collate:
     'profit_functions.R'
     'active_adaptive_simulate.R'
     'find_dp_cautious.R'
+    'SDP_uniform.R'

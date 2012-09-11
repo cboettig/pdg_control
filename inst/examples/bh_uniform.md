@@ -40,7 +40,7 @@ K <- (pars[1] - 1)/pars[2]
 
 
 
-We consider a profits from fishing to be a function of harvest `h` and stock size `x`,  \\( \Pi(x,h) = h - \left( c_0  + c_1 \frac{h}{x} \right) \frac{h}{x} \\), conditioned on \\( h > x \\) and \\(x > 0 \\),
+We consider a profits from fishing to be a function of harvest `h` and stock size `x`,  $ \Pi(x,h) = h - \left( c_0  + c_1 \frac{h}{x} \right) \frac{h}{x} $, conditioned on $ h > x $ and $x > 0 $,
 
 
 
