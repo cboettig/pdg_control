@@ -7,7 +7,7 @@
 ## Parallel for MPI
 ##$ -pe mpi 20 
 ## Parallel for openmp:
-#$ -pe threaded 16
+#$ -pe threaded 4
 ## Output file name
 #$ -o det_figure3.log
 
