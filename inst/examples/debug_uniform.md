@@ -111,12 +111,13 @@ F <- function(x, q, m, n, pars) {
 ```r
 require(cubature)
 # Confirm that these give the same value, and time performance
-system.time(a <- sapply(x_grid, function(x) int_f(f, x, 1, 0.1, 0.1, pars)))
+system.time(a <- sapply(x_grid, function(x) int_f(f, x, 1, 0.1, 0.1, 
+    pars)))
 ```
 
 ```
    user  system elapsed 
-  0.082   0.003   0.084 
+  0.168   0.004   0.171 
 ```
 
 ```r
@@ -125,7 +126,7 @@ system.time(b <- sapply(x_grid, function(x) F(x, 1, 0.1, 0.1, pars)))
 
 ```
    user  system elapsed 
-  0.006   0.000   0.005 
+  0.012   0.000   0.011 
 ```
 
 
@@ -138,7 +139,8 @@ sdp <- SDP_uniform(f, pars, x_grid, h_grid, sigma_g = sigma_g, pdfn = function(P
 
 
 ```r
-uniform <- find_dp_optim(sdp, x_grid, h_grid, OptTime, xT, profit, delta, reward = 0)
+uniform <- find_dp_optim(sdp, x_grid, h_grid, OptTime, xT, profit, 
+    delta, reward = 0)
 ```
 
 
@@ -151,7 +153,8 @@ pdfn <- function(P, s) {
 }
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g = sigma_g, 
     pdfn)
-det <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward = 0)
+det <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, 
+    delta, reward = 0)
 ```
 
 
@@ -161,14 +164,6 @@ det <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward
 Determine the policies for each of the scenarios (noise combinations).
 
 
-```r
-z_g <- function() 1 + (2 * runif(1, 0, 1) - 1) * sigma_g
-z_m <- function() 1 + (2 * runif(1, 0, 1) - 1) * sigma_m
-z_i <- function() 1 + (2 * runif(1, 0, 1) - 1) * sigma_i
-
-SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps = 20000)
-opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward = 0)
-```
 
 
 ### plots
@@ -178,24 +173,26 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward
 
 ```r
 require(reshape2)
-policy <- melt(data.frame(stock = x_grid, deterministic = det$D[, 1], uniform = uniform$D[, 
-    1], mc = opt$D[, 1]), id = "stock")
+# policy <- melt(data.frame(stock = x_grid, deterministic=det$D[,1],
+# uniform = uniform$D[,1], mc=opt$D[,1]), id = 'stock')
+policy <- melt(data.frame(stock = x_grid, deterministic = det$D[, 
+    1], uniform = uniform$D[, 1]), id = "stock")
 
-ggplot(policy) + geom_point(aes(stock, stock - x_grid[value], color = variable), 
+ggplot(policy) + geom_jitter(aes(stock, stock - x_grid[value], color = variable), 
     shape = "+")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8175/7980207053_536721ed11_o.png) 
+![plot of chunk sethiplots](figure/sethiplots1.png) 
 
 ```r
 dat <- subset(policy, stock < 140)
 dt <- data.table(dat)
-linear <- dt[, approx(stock, stock - x_grid[value], xout = seq(1, 150, length = 15)), 
-    by = variable]
-ggplot(linear) + stat_smooth(aes(x, y, color = variable), degree = 1, se = FALSE, 
-    span = 0.3) + xlab("Measured Stock") + ylab("Optimal Expected Escapement")
+linear <- dt[, approx(stock, stock - x_grid[value], xout = seq(1, 
+    150, length = 15)), by = variable]
+ggplot(linear) + stat_smooth(aes(x, y, color = variable), degree = 1, 
+    se = FALSE, span = 0.3) + xlab("Measured Stock") + ylab("Optimal Expected Escapement")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8438/7980207348_30b9b9d431_o.png) 
+![plot of chunk sethiplots](figure/sethiplots2.png) 
 
 

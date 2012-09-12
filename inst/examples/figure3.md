@@ -1,4 +1,4 @@
-
+  
 
 
 
@@ -120,12 +120,13 @@ int_f <- function(f, x, q, sigma_m, sigma_i, pars) {
 ```r
 require(cubature)
 # Confirm that these give the same value, and time performance
-system.time(a <- sapply(x_grid, function(x) int_f(f, x, 1, 0.1, 0.1, pars)))
+system.time(a <- sapply(x_grid, function(x) int_f(f, x, 1, 0.1, 0.1, 
+    pars)))
 ```
 
 ```
    user  system elapsed 
-  0.319   0.007   0.330 
+  0.232   0.008   0.248 
 ```
 
 ```r
@@ -134,7 +135,7 @@ system.time(b <- sapply(x_grid, function(x) F(x, 1, 0.1, 0.1, pars)))
 
 ```
    user  system elapsed 
-  0.021   0.000   0.020 
+  0.012   0.000   0.012 
 ```
 
 
@@ -153,16 +154,20 @@ The policies
 ```r
 stm <- SDP_uniform(f, pars, x_grid, h_grid, sigma_g = 0.5, pdfn = function(P, 
     s) dunif(P, 1 - s, 1 + s), sigma_m = 0, sigma_i = 0, F)
-g <- find_dp_optim(stm, x_grid, h_grid, OptTime, xT, profit, delta, reward = 0)
+g <- find_dp_optim(stm, x_grid, h_grid, OptTime, xT, profit, delta, 
+    reward = 0)
 stm <- SDP_uniform(f, pars, x_grid, h_grid, sigma_g = 0, pdfn = function(P, 
     s) dunif(P, 1 - s, 1 + s), sigma_m = 0.5, sigma_i = 0, F)
-m <- find_dp_optim(stm, x_grid, h_grid, OptTime, xT, profit, delta, reward = 0)
+m <- find_dp_optim(stm, x_grid, h_grid, OptTime, xT, profit, delta, 
+    reward = 0)
 stm <- SDP_uniform(f, pars, x_grid, h_grid, sigma_g = 0, pdfn = function(P, 
     s) dunif(P, 1 - s, 1 + s), sigma_m = 0, sigma_i = 0.5, F)
-i <- find_dp_optim(stm, x_grid, h_grid, OptTime, xT, profit, delta, reward = 0)
+i <- find_dp_optim(stm, x_grid, h_grid, OptTime, xT, profit, delta, 
+    reward = 0)
 stm <- SDP_uniform(f, pars, x_grid, h_grid, sigma_g = 0.1, pdfn = function(P, 
     s) dunif(P, 1 - s, 1 + s), sigma_m = 0.1, sigma_i = 0.1, F)
-low <- find_dp_optim(stm, x_grid, h_grid, OptTime, xT, profit, delta, reward = 0)
+low <- find_dp_optim(stm, x_grid, h_grid, OptTime, xT, profit, delta, 
+    reward = 0)
 ```
 
 
@@ -179,8 +184,10 @@ Do the deterministic exactly,
 pdfn <- function(P, s) {
     dunif(P, 1 - s, 1 + s)
 }
-SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g = 0.5, pdfn)
-det <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward = 0)
+SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g = 0.5, 
+    pdfn)
+det <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, 
+    delta, reward = 0)
 ```
 
 
@@ -195,25 +202,25 @@ det <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward
 
 ```r
 require(reshape2)
-policy <- melt(data.frame(stock = x_grid, deterministic = det$D[, 1], all_low = low$D[, 
-    1], growth = g$D[, 1], measurement = m$D[, 1], implementation = i$D[, 1]), 
-    id = "stock")
+policy <- melt(data.frame(stock = x_grid, deterministic = det$D[, 
+    1], all_low = low$D[, 1], growth = g$D[, 1], measurement = m$D[, 1], implementation = i$D[, 
+    1]), id = "stock")
 
 ggplot(policy) + geom_point(aes(stock, stock - x_grid[value], color = variable), 
     shape = "+")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8032/7980218672_2d78bf5ba9_o.png) 
+![plot of chunk sethiplots](figure/sethiplots1.png) 
 
 ```r
 dat <- subset(policy, stock < 140)
 dt <- data.table(dat)
-linear <- dt[, approx(stock, stock - x_grid[value], xout = seq(1, 150, length = 15)), 
-    by = variable]
-ggplot(linear) + stat_smooth(aes(x, y, color = variable), degree = 1, se = FALSE, 
-    span = 0.3) + xlab("Measured Stock") + ylab("Optimal Expected Escapement")
+linear <- dt[, approx(stock, stock - x_grid[value], xout = seq(1, 
+    150, length = 15)), by = variable]
+ggplot(linear) + stat_smooth(aes(x, y, color = variable), degree = 1, 
+    se = FALSE, span = 0.3) + xlab("Measured Stock") + ylab("Optimal Expected Escapement")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8035/7980218772_c09c5af550_o.png) 
+![plot of chunk sethiplots](figure/sethiplots2.png) 
 
 
