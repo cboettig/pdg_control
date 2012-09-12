@@ -203,7 +203,7 @@ ggplot(policy) + geom_point(aes(stock, stock - x_grid[value], color = variable),
     shape = "+")
 ```
 
-![plot of chunk sethiplots](figure/sethiplots1.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8032/7980218672_2d78bf5ba9_o.png) 
 
 ```r
 dat <- subset(policy, stock < 140)
@@ -214,6 +214,6 @@ ggplot(linear) + stat_smooth(aes(x, y, color = variable), degree = 1, se = FALSE
     span = 0.3) + xlab("Measured Stock") + ylab("Optimal Expected Escapement")
 ```
 
-![plot of chunk sethiplots](figure/sethiplots2.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8035/7980218772_c09c5af550_o.png) 
 
 
