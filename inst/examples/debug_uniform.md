@@ -21,13 +21,17 @@ f <- function(x, h, p) {
 ```
 
 
-With parameters `r` = `1` and `K` = `100`.
+With parameters 
 
 
 ```r
+r <- 1
+K <- 100
 pars <- c(r, K)
 ```
 
+
+`r` = `1` and `K` = `100`.
 
 We consider a profits from fishing to be a function of harvest `h` and stock size `x`,  \\( \Pi(x,h) = h - \left( c_0  + c_1 \frac{h}{x} \right) \frac{h}{x} \\), conditioned on \\( h > x \\) and \\(x > 0 \\),
 
@@ -47,11 +51,11 @@ with price = `1`, `c0` = `0` and `c1` = `0`.
 ```r
 xmin <- 0
 xmax <- 1.5 * K
-grid_n <- 200
+grid_n <- 100
 ```
 
 
-We seek a harvest policy which maximizes the discounted profit from the fishery using a stochastic dynamic programming approach over a discrete grid of stock sizes from `0` to `150` on a grid of `200` points, and over an identical discrete grid of possible harvest values.  
+We seek a harvest policy which maximizes the discounted profit from the fishery using a stochastic dynamic programming approach over a discrete grid of stock sizes from `0` to `150` on a grid of `100` points, and over an identical discrete grid of possible harvest values.  
 
 
 
@@ -67,6 +71,9 @@ h_grid <- x_grid
 delta <- 0.05
 xT <- 0
 OptTime <- 25
+sigma_g <- 0.5
+sigma_m <- 0.5
+sigma_i <- 0.5
 ```
 
 
@@ -74,17 +81,17 @@ We will determine the optimal solution over a `25` time step window with boundar
 
 # Scenarios: 
 
---We use Monte Carlo integration over the noise processes to determine the transition matrix.--
-
-We compute the transition probability analytically, (confirm that this is correct!)
-
-$F(x,q) = \frac{1}{4\sigma_i\sigma_m} \int_{q-\sigma_i}^{q+\sigma_i} dh \int_{x-\sigma_m}^{x+\sigma_m} f(y, h)$
-
-
-We will use the analytic solution
-
 
 ```r
+int_f <- function(f, x, q, sigma_m, sigma_i, pars) {
+    g <- function(X) f(X[1], X[2], pars)
+    lower <- c(max(x - sigma_m, 0), max(q - sigma_i, 0))
+    upper <- c(x + sigma_m, q + sigma_i)
+    out <- adaptIntegrate(g, lower, upper)
+    out$integral
+}
+
+
 F <- function(x, q, m, n, pars) {
     K <- pars[2]
     out <- ((q + n - max(0, q - n)) * (x + m - max(0, x - m)) * (6 * x * K - 
@@ -100,22 +107,6 @@ F <- function(x, q, m, n, pars) {
 ```
 
 
-We can verify our solution is the same as the numerical integral (which is slower to compute)
-
-
-```r
-int_f <- function(f, x, q, sigma_m, sigma_i, pars) {
-    g <- function(X) f(X[1], X[2], pars)
-    lower <- c(max(x - sigma_m, 0), max(q - sigma_i, 0))
-    upper <- c(x + sigma_m, q + sigma_i)
-    out <- adaptIntegrate(g, lower, upper)
-    out$integral
-}
-```
-
-
-
-
 
 ```r
 require(cubature)
@@ -125,7 +116,7 @@ system.time(a <- sapply(x_grid, function(x) int_f(f, x, 1, 0.1, 0.1, pars)))
 
 ```
    user  system elapsed 
-  0.319   0.007   0.330 
+  0.082   0.003   0.084 
 ```
 
 ```r
@@ -134,42 +125,21 @@ system.time(b <- sapply(x_grid, function(x) F(x, 1, 0.1, 0.1, pars)))
 
 ```
    user  system elapsed 
-  0.021   0.000   0.020 
+  0.006   0.000   0.005 
 ```
-
-
 
 
 
 ```r
-require(snowfall)
-sfInit(parallel = TRUE, cpu = 16)
+sdp <- SDP_uniform(f, pars, x_grid, h_grid, sigma_g = sigma_g, pdfn = function(P, 
+    s) dunif(P, 1 - s, 1 + s), sigma_m = sigma_m, sigma_i = sigma_i, F)
 ```
 
-
-The policies
 
 
 ```r
-stm <- SDP_uniform(f, pars, x_grid, h_grid, sigma_g = 0.5, pdfn = function(P, 
-    s) dunif(P, 1 - s, 1 + s), sigma_m = 0, sigma_i = 0, F)
-g <- find_dp_optim(stm, x_grid, h_grid, OptTime, xT, profit, delta, reward = 0)
-stm <- SDP_uniform(f, pars, x_grid, h_grid, sigma_g = 0, pdfn = function(P, 
-    s) dunif(P, 1 - s, 1 + s), sigma_m = 0.5, sigma_i = 0, F)
-m <- find_dp_optim(stm, x_grid, h_grid, OptTime, xT, profit, delta, reward = 0)
-stm <- SDP_uniform(f, pars, x_grid, h_grid, sigma_g = 0, pdfn = function(P, 
-    s) dunif(P, 1 - s, 1 + s), sigma_m = 0, sigma_i = 0.5, F)
-i <- find_dp_optim(stm, x_grid, h_grid, OptTime, xT, profit, delta, reward = 0)
-stm <- SDP_uniform(f, pars, x_grid, h_grid, sigma_g = 0.1, pdfn = function(P, 
-    s) dunif(P, 1 - s, 1 + s), sigma_m = 0.1, sigma_i = 0.1, F)
-low <- find_dp_optim(stm, x_grid, h_grid, OptTime, xT, profit, delta, reward = 0)
+uniform <- find_dp_optim(sdp, x_grid, h_grid, OptTime, xT, profit, delta, reward = 0)
 ```
-
-
-
-
-
-
 
 
 Do the deterministic exactly,
@@ -179,13 +149,26 @@ Do the deterministic exactly,
 pdfn <- function(P, s) {
     dunif(P, 1 - s, 1 + s)
 }
-SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g = 0.5, pdfn)
+SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g = sigma_g, 
+    pdfn)
 det <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward = 0)
 ```
 
 
 
 
+
+Determine the policies for each of the scenarios (noise combinations).
+
+
+```r
+z_g <- function() 1 + (2 * runif(1, 0, 1) - 1) * sigma_g
+z_m <- function() 1 + (2 * runif(1, 0, 1) - 1) * sigma_m
+z_i <- function() 1 + (2 * runif(1, 0, 1) - 1) * sigma_i
+
+SDP_Mat <- SDP_by_simulation(f, pars, x_grid, h_grid, z_g, z_m, z_i, reps = 20000)
+opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward = 0)
+```
 
 
 ### plots
@@ -195,15 +178,14 @@ det <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward
 
 ```r
 require(reshape2)
-policy <- melt(data.frame(stock = x_grid, deterministic = det$D[, 1], all_low = low$D[, 
-    1], growth = g$D[, 1], measurement = m$D[, 1], implementation = i$D[, 1]), 
-    id = "stock")
+policy <- melt(data.frame(stock = x_grid, deterministic = det$D[, 1], uniform = uniform$D[, 
+    1], mc = opt$D[, 1]), id = "stock")
 
 ggplot(policy) + geom_point(aes(stock, stock - x_grid[value], color = variable), 
     shape = "+")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8032/7980218672_2d78bf5ba9_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8175/7980207053_536721ed11_o.png) 
 
 ```r
 dat <- subset(policy, stock < 140)
@@ -214,6 +196,6 @@ ggplot(linear) + stat_smooth(aes(x, y, color = variable), degree = 1, se = FALSE
     span = 0.3) + xlab("Measured Stock") + ylab("Optimal Expected Escapement")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8035/7980218772_c09c5af550_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8438/7980207348_30b9b9d431_o.png) 
 
 
