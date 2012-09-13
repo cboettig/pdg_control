@@ -71,8 +71,8 @@ h_grid <- x_grid
 delta <- 0.05
 xT <- 0
 OptTime <- 25
-sigma_g <- 0.5
-sigma_m <- 0.5
+sigma_g <- 1e-04
+sigma_m <- 0
 sigma_i <- 0.5
 ```
 
@@ -80,32 +80,6 @@ sigma_i <- 0.5
 We will determine the optimal solution over a `25` time step window with boundary condition for stock at `0` and discounting rate of `0.05`.  
 
 # Scenarios: 
-
-
-```r
-int_f <- function(f, x, q, sigma_m, sigma_i, pars) {
-    g <- function(X) f(X[1], X[2], pars)
-    lower <- c(max(x - sigma_m, 0), max(q - sigma_i, 0))
-    upper <- c(x + sigma_m, q + sigma_i)
-    out <- adaptIntegrate(g, lower, upper)
-    out$integral
-}
-
-
-F <- function(x, q, m, n, pars) {
-    K <- pars[2]
-    out <- ((q + n - max(0, q - n)) * (x + m - max(0, x - m)) * (6 * x * K - 
-        6 * q * K - 6 * n * K + 6 * m * K + 6 * max(0, x - m) * K - 6 * max(0, 
-        q - n) * K - 2 * x^2 + 3 * q * x + 3 * n * x - 4 * m * x - 2 * max(0, 
-        x - m) * x + 3 * max(0, q - n) * x - 2 * q^2 - 4 * n * q + 3 * m * q + 
-        3 * max(0, x - m) * q - 2 * max(0, q - n) * q - 2 * n^2 + 3 * m * n + 
-        3 * max(0, x - m) * n - 2 * max(0, q - n) * n - 2 * m^2 - 2 * max(0, 
-        x - m) * m + 3 * max(0, q - n) * m - 2 * max(0, x - m)^2 + 3 * max(0, 
-        q - n) * max(0, x - m) - 2 * max(0, q - n)^2))/(6 * K)
-    max(out, 0)
-}
-```
-
 
 
 ```r
@@ -117,7 +91,7 @@ system.time(a <- sapply(x_grid, function(x) int_f(f, x, 1, 0.1, 0.1,
 
 ```
    user  system elapsed 
-  0.168   0.004   0.171 
+  7.592   0.020   7.647 
 ```
 
 ```r
@@ -126,7 +100,7 @@ system.time(b <- sapply(x_grid, function(x) F(x, 1, 0.1, 0.1, pars)))
 
 ```
    user  system elapsed 
-  0.012   0.000   0.011 
+  0.012   0.000   0.014 
 ```
 
 

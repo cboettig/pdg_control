@@ -76,8 +76,8 @@ h_grid <- x_grid
 delta <- 0.05
 xT <- 0
 OptTime <- 25
-sigma_g <- .5
-sigma_m <- .5
+sigma_g <- .0001
+sigma_m <- .0
 sigma_i <- .5
 ````
 
