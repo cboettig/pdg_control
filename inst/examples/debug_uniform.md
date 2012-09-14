@@ -41,7 +41,7 @@ With purely growth noise, a row of the matrix is given by the probability densit
 
 In general this convolution can be non-trivial to compute, but in the case of uniformly distributed harvest error of $\pm \sigma_i$ around some quota $q$, and uniform measurement error of $\pm \sigma_m$ around the true stock size $x$, the integrals can be written as, 
 
-<div> $$ \frac{1}{(q+\sigma_i) - \max(q-\sigma_i,0)} \frac{1}{(x+\sigma_m) - \max(x-\sigma_m,0)} \int_{\max(q-\sigma_i,0)}^{q+\sigma_i} dh \int_{\max(y-\sigma_h,0)}^{y+\sigma_h} dy P(x_{t+1}, f(y, h)) $$ </div>
+<div> $$ \frac{\int_{\max(q-\sigma_i,0)}^{q+\sigma_i} dh \int_{\max(y-\sigma_h,0)}^{y+\sigma_h} dy P(x_{t+1}, f(y, h))}{\left((q+\sigma_i) - \max(q-\sigma_i,0)\right) \left((x+\sigma_m) - \max(x-\sigma_m,0)\right)} $$ </div>
 
 Note we enforce the simple non-negative boundary on stock and harvest.  
 
@@ -132,7 +132,7 @@ system.time(a <- sapply(x_grid, function(x) int_f(f, x, 1, 0.1, 0.1,
 
 ```
    user  system elapsed 
-  7.444   0.000   7.394 
+  7.505   0.000   7.477 
 ```
 
 ```r
@@ -149,7 +149,7 @@ ggplot(data.frame(x = x_grid, a = a, b = b)) + geom_line(aes(x, a),
     col = "red") + geom_line(aes(x, b), lty = 2)
 ```
 
-![plot of chunk unnamed-chunk-6](http://farm9.staticflickr.com/8443/7986666475_3fce0b9e96_o.png) 
+![plot of chunk unnamed-chunk-6](http://farm9.staticflickr.com/8460/7986896686_81f0b9ee12_o.png) 
 
 
 Note that as the uncertainy gets small, we recover the original transition probability $f$:
@@ -208,8 +208,8 @@ delta <- 0.05
 xT <- 0
 OptTime <- 25
 sigma_g <- 0.1
-sigma_m <- 0.5
-sigma_i <- 0.5
+sigma_m <- 0.01
+sigma_i <- 0.01
 ```
 
 
@@ -278,7 +278,7 @@ ggplot(policy) + geom_jitter(aes(stock, stock - x_grid[value], color = variable)
     shape = "+")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8456/7986667113_28574bc620_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8319/7986887903_9689a5f7db_o.png) 
 
 ```r
 dat <- subset(policy, stock < 140)
@@ -289,6 +289,6 @@ ggplot(linear) + stat_smooth(aes(x, y, color = variable), degree = 1,
     se = FALSE, span = 0.3) + xlab("Measured Stock") + ylab("Optimal Expected Escapement")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8031/7986675144_095fd50f94_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8295/7986887957_d9a19d86ea_o.png) 
 
 

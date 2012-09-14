@@ -50,7 +50,7 @@ With purely growth noise, a row of the matrix is given by the probability densit
 
 In general this convolution can be non-trivial to compute, but in the case of uniformly distributed harvest error of $\pm \sigma_i$ around some quota $q$, and uniform measurement error of $\pm \sigma_m$ around the true stock size $x$, the integrals can be written as, 
 
-<div> $$ \frac{1}{(q+\sigma_i) - \max(q-\sigma_i,0)} \frac{1}{(x+\sigma_m) - \max(x-\sigma_m,0)} \int_{\max(q-\sigma_i,0)}^{q+\sigma_i} dh \int_{\max(y-\sigma_h,0)}^{y+\sigma_h} dy P(x_{t+1}, f(y, h)) $$ </div>
+<div> $$ \frac{\int_{\max(q-\sigma_i,0)}^{q+\sigma_i} dh \int_{\max(y-\sigma_h,0)}^{y+\sigma_h} dy P(x_{t+1}, f(y, h))}{\left((q+\sigma_i) - \max(q-\sigma_i,0)\right) \left((x+\sigma_m) - \max(x-\sigma_m,0)\right)} $$ </div>
 
 Note we enforce the simple non-negative boundary on stock and harvest.  
 
@@ -132,8 +132,8 @@ delta <- 0.05
 xT <- 0
 OptTime <- 25
 sigma_g <- .1
-sigma_m <- .5
-sigma_i <- .5
+sigma_m <- .01
+sigma_i <- .01
 ````
 
 
