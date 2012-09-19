@@ -90,11 +90,7 @@ system.time(a <- sapply(x_grid, function(x) int_f(f, x, 1, 0.1, 0.1, pars)))
 
 ```
    user  system elapsed 
-<<<<<<< HEAD
- 14.213   0.012  14.268 
-=======
-  7.068   0.001   7.070 
->>>>>>> 132d647726d0795092f2bba3224f0f71cae81ec7
+  6.406   0.003   6.411 
 ```
 
 ```r
@@ -103,7 +99,7 @@ system.time(b <- sapply(x_grid, function(x) F(x, 1, 0.1, 0.1, pars)))
 
 ```
    user  system elapsed 
-  0.024   0.000   0.026 
+  0.012   0.000   0.013 
 ```
 
 
@@ -172,7 +168,7 @@ ggplot(policy) + geom_point(aes(stock, stock - x_grid[value], color = variable),
     shape = "+")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8176/7981123243_97e20a5319_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8036/8003932834_76cf56efa7_o.png) 
 
 ```r
 dat <- subset(policy, stock < 140)
@@ -183,6 +179,6 @@ ggplot(linear) + stat_smooth(aes(x, y, color = variable), degree = 1, se = FALSE
     span = 0.3) + xlab("Measured Stock") + ylab("Optimal Expected Escapement")
 ```
 
-![plot of chunk sethiplots](http://farm9.staticflickr.com/8174/7981123341_9359b6bf1b_o.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8175/8003932063_43baaa511c_o.png) 
 
 
