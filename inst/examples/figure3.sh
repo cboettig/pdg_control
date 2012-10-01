@@ -7,9 +7,9 @@
 ## Parallel for MPI
 ##$ -pe mpi 20 
 ## Parallel for openmp:
-#$ -pe threaded 4
+#$ -pe threaded 16
 ## Output file name
-#$ -o det_figure3.log
+#$ -o figure3.log
 
 module load gcc openmpi R 
 Rscript -e "source('~/.Rprofile'); library('knitr'); knit('figure3.Rmd')" 
