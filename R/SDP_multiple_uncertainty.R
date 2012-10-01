@@ -24,7 +24,7 @@ SDP_multiple_uncertainty <- function(f, p, x_grid, h_grid, sigma_g,
                           else 
                           dunif(P,mu*(1-s),mu*(1+s))
                           },
-                        sigma_m, sigma_i){
+                        sigma_m, sigma_i, debug=FALSE){
   
     gridsize <- length(x_grid)
     
@@ -55,18 +55,19 @@ SDP_multiple_uncertainty <- function(f, p, x_grid, h_grid, sigma_g,
                        MoreArgs = list(sigma=sigma_i, g=function(x) max(x-h, 0), pdfn=pdfn)), nrow = gridsize)
     for(i in 1:gridsize)
       I[i,] = I[i,]/sum(I[i,])
-    out <- F %*% M %*% I
+    out <- I %*% M %*% F
     for(i in 1:gridsize)
       out[i,] = out[i,]/sum(out[i,])
     
     
     ## Debug Testing!
+    if(debug){
     F <- matrix(mapply(transition, m_grid$x, m_grid$y, 
                        MoreArgs = list(sigma=sigma_g, g=function(x) f(x,h,p), pdfn=pdfn)), nrow = gridsize)
     for(i in 1:gridsize) # normalize
       F[i,] = F[i,]/sum(F[i,])
     out <- F 
-    
+    }
     
     out
   })
