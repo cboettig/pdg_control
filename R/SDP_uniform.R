@@ -85,7 +85,7 @@ int_f <- function(f, x, q, sigma_m, sigma_i, pars){
 
 #' Analytic solution to int_f for logistic model
 #' @export
-F <- function(x,q, m, n, pars){
+F_integral <- function(x,q, m, n, pars){
   K <- pars[2]
   m <- K*m
   n <- K*n # scale noise by K
