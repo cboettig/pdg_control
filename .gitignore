@@ -1,3 +1,10 @@
+.gitignore
+.Rhistory
+.Rbuildignore
 *.png
 *.rda
-.Rproj.user
+*.Rproj.user
+*.Rproj
+*.jpg
+*.fff
+*.pdf
