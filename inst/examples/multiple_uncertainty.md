@@ -156,7 +156,7 @@ ggplot(subset(policy, stock < 120)) + geom_jitter(aes(stock, stock -
     x_grid[value], color = variable), shape = "+")
 ```
 
-![plot of chunk sethiplots](figure/sethiplots1.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8322/8045378722_329bc5d1b2_o.png) 
 
 ```r
 
@@ -168,6 +168,6 @@ ggplot(linear) + stat_smooth(aes(x, y, color = variable), degree = 1,
     se = FALSE, span = 0.3) + xlab("Measured Stock") + ylab("Optimal Expected Escapement")
 ```
 
-![plot of chunk sethiplots](figure/sethiplots2.png) 
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8459/8045372039_744cd53bc1_o.png) 
 
 
