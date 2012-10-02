@@ -1,4 +1,4 @@
-`ro cache=FALSE, warning=FALSE, comment=NA, message=FALSE, cache.path="debug/", verbose=TRUE or`
+`ro cache=FALSE, warning=FALSE, comment=NA, message=FALSE, cache.path="cache/multiple_uncertainty/", verbose=TRUE or`
 
 ``` {r  setup, echo=FALSE, cache=FALSE}
 require(pdgControl)
@@ -7,9 +7,11 @@ require(ggplot2)
 require(data.table)
 rm(list=ls())
 theme_publish <- theme_set(theme_bw(14))
-theme_publish <- theme_update(legend.key = theme_blank(),legend.position=c(.9,.1),
-        panel.grid.major=theme_blank(),panel.grid.minor=theme_blank(),
-        plot.background=theme_blank(), legend.title=theme_blank())
+theme_publish <- theme_update(
+        # panel.grid.major=theme_blank(),panel.grid.minor=theme_blank(),
+        legend.title=theme_blank(), 
+        panel.background = theme_rect(fill = "transparent",colour = NA), 
+        plot.background = theme_rect(fill = "transparent",colour = NA))
 ````
 
 ``` {r  echo=FALSE, cache=FALSE }
@@ -30,7 +32,7 @@ The central calculation to accomodating additional sources of uncertainty is the
 ``` {r }
 xmin <- 0
 xmax <- 150
-grid_n <- 200
+grid_n <- 150
 ````
 
 We seek a harvest policy which maximizes the discounted profit from the fishery using a stochastic dynamic programming approach over a discrete grid of stock sizes from `r xmin` to `r xmax` on a grid of `r grid_n` points, and over an identical discrete grid of possible harvest values.  
@@ -89,9 +91,9 @@ Additional parameters
 delta <- 0.05
 xT <- 0
 OptTime <- 25
-sigma_g <- .2
-sigma_m <- .2
-sigma_i <- .2
+sigma_g <- 0.5
+sigma_m <- 0.5
+sigma_i <- 0.5
 ````
 
 
@@ -127,9 +129,8 @@ mult <- find_dp_optim(sdp, x_grid, h_grid, OptTime, xT, profit, delta, reward=0)
 Compare to the former method:
 
 ```{r deterministic}
-pdfn_old <- function(P,s) dunif(P, 1-s, 1+s)
-SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g = sigma_g, pdfn_old)
-det <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward=0)
+det_mat <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, 0, pdfn, 0, 0)
+det <- find_dp_optim(det_mat, x_grid, h_grid, OptTime, xT, profit, delta, reward=0)
 ````
 
 
