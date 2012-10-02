@@ -1,0 +1,8 @@
+*.Rhistory
+*.Rproj
+*.jpg
+*.html
+*.png
+*.tex
+*.pdf
+cache/

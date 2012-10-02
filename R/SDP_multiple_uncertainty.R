@@ -26,7 +26,7 @@ SDP_multiple_uncertainty <- function(f, p, x_grid, h_grid, sigma_g,
                           },
                         sigma_m, sigma_i, debug=FALSE){
   
-    gridsize <- length(x_grid)
+    
     
     transition <- function(x, y, sigma, g, pdfn){ # function for an entry of the matrix
       if(sigma > 0 )
@@ -38,8 +38,9 @@ SDP_multiple_uncertainty <- function(f, p, x_grid, h_grid, sigma_g,
       }
       P
     }
-    
     m_grid <- expand.grid(x=x_grid, y=x_grid)
+    gridsize <- length(x_grid)
+    
     F <- matrix(mapply(transition, m_grid$x, m_grid$y, 
                        MoreArgs = list(sigma=sigma_g, g=function(x) f(x,0,p), pdfn=pdfn)), nrow = gridsize)
     M <- matrix(mapply(transition, m_grid$x, m_grid$y,
@@ -60,15 +61,7 @@ SDP_multiple_uncertainty <- function(f, p, x_grid, h_grid, sigma_g,
       out[i,] = out[i,]/sum(out[i,])
     
     
-    ## Debug Testing!
-    if(debug){
-    F <- matrix(mapply(transition, m_grid$x, m_grid$y, 
-                       MoreArgs = list(sigma=sigma_g, g=function(x) f(x,h,p), pdfn=pdfn)), nrow = gridsize)
-    for(i in 1:gridsize) # normalize
-      F[i,] = F[i,]/sum(F[i,])
-    out <- F 
-    }
-    
+      
     out
   })
   SDP_Mat
