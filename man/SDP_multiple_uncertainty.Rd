@@ -3,8 +3,10 @@
 \title{Determine the SDP matrix for uniform noise under multiple uncertainty}
 \usage{
   SDP_multiple_uncertainty(f, p, x_grid, h_grid, sigma_g,
-    pdfn = function(P, mu, s) dunif(P, mu - s, mu + s),
-    sigma_m, sigma_i, f_int)
+    pdfn = function(P, mu, s) {     if (mu == 0) 
+            if (P == 0)              1         else 0
+        else dunif(P, mu * (1 - s), mu * (1 + s)) },
+    sigma_m, sigma_i, debug = FALSE)
 }
 \arguments{
   \item{f}{the growth function of the escapement population

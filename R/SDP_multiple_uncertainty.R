@@ -14,6 +14,7 @@
 #' @param sigma_m is the half-width of the uniform measurement error (assumes uniform distribution)
 #' @param sigma_i is the half-width of the implementation noise (always assumes uniform distribution)
 #' @export
+#' @import parallel
 SDP_multiple_uncertainty <- function(f, p, x_grid, h_grid, sigma_g,
                         pdfn=function(P, mu, s){
                           if(mu==0)
