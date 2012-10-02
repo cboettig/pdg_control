@@ -62,7 +62,7 @@ with price = `r price`, `c0` = `r c0` and `c1` = `r c1`.
 
 ``` {r }
 xmin <- 0
-xmax <- K
+xmax <- K*1.5
 grid_n <- 200
 ````
 
@@ -79,7 +79,7 @@ h_grid <- x_grid
 delta <- 0.05
 xT <- 0
 OptTime <- 25
-sigma_g <- .2
+sigma_g <- .1
 ````
 
 We will determine the optimal solution over a `r OptTime` time step window with boundary condition for stock at `r xT` and discounting rate of `r delta`.  The Reed model considers a stochastic growth model 
@@ -89,23 +89,17 @@ We will determine the optimal solution over a `r OptTime` time step window with 
 for the random variable `z_g`, given by 
 
 ``` {r noise}
-#z_g <- function() 1 + rlnorm(1,0, sigma_g)  
-z_g <- function() 1+(2*runif(1, 0,  1)-1) * sigma_g
+z_g <- function() 1 + rlnorm(1,0, sigma_g)  
+pdfn <- function(P, s) dlnorm(P, 0, s)
+
+#z_g <- function() 1+(2*runif(1, 0,  1)-1) * sigma_g
+#pdfn <- function(P, s)  dunif(P, 1 - s, 1 + s)
 ````
 
-No other sources of noise enter into the dynamics.  
-
-``` {r othernoise}
-z_m <- function() 1
-z_i <- function() 1
-````
 
 
 
 ``` {r  SDP_Mat}
-pdfn <- function(P, s){
-   dunif(P, 1 - s, 1 + s)
-}
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g, pdfn)
 ````
 
@@ -158,6 +152,14 @@ q2
 
 ### Simulate 
 Now we'll simulate 100 replicates of this stochastic process under the Reed optimal harvest policy determined above.
+
+No other sources of noise enter into the dynamics.  
+
+``` {r othernoise}
+z_m <- function() 1
+z_i <- function() 1
+````
+
 
 ``` {r  simulate }
 sims <- lapply(1:100, function(i){

@@ -1,10 +1,10 @@
-\name{SDP_uniform}
-\alias{SDP_uniform}
+\name{SDP_multiple_uncertainty}
+\alias{SDP_multiple_uncertainty}
 \title{Determine the SDP matrix for uniform noise under multiple uncertainty}
 \usage{
-  SDP_uniform(f, p, x_grid, h_grid, sigma_g,
-    pdfn = function(P, s) dunif(P, 1 - s, 1 + s), sigma_m,
-    sigma_i, f_int)
+  SDP_multiple_uncertainty(f, p, x_grid, h_grid, sigma_g,
+    pdfn = function(P, mu, s) dunif(P, mu - s, mu + s),
+    sigma_m, sigma_i, f_int)
 }
 \arguments{
   \item{f}{the growth function of the escapement population
@@ -30,22 +30,10 @@
 
   \item{sigma_i}{is the half-width of the implementation
   noise (always assumes uniform distribution)}
-
-  \item{f_int}{is the function given by the analytic
-  solution, $F(x,q) = \frac{1}{4\sigma_i\sigma_m}
-  \int_{q-\sigma_i}^{q+\sigma_i} dh
-  \int_{x-\sigma_m}^{x+\sigma_m} f(y, h)$ For logistic map
-  $f(y,h) = 2 (y-h) \left(1-\frac{y-h}{2K}\right)$, this
-  is:
-
-  (where we've used m = $\sigma_m$, n = $\sigma_i$ for
-  simplicity of Roman notation)}
 }
 \description{
   Computes the transition matrix under the case of growth
   noise, implementation errors in harvesting, and
-  meaurement errors in the stock assessment.  Assumes noise
-  sources are distributed by uniform distributions to
-  obtain analytic transition probability densities.
+  meaurement errors in the stock assessment.
 }
 
