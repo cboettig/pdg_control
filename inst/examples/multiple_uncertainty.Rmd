@@ -31,8 +31,8 @@ The central calculation to accomodating additional sources of uncertainty is the
 
 ``` {r }
 xmin <- 0
-xmax <- 150
-grid_n <- 150
+xmax <- 300
+grid_n <- 300
 ````
 
 We seek a harvest policy which maximizes the discounted profit from the fishery using a stochastic dynamic programming approach over a discrete grid of stock sizes from `r xmin` to `r xmax` on a grid of `r grid_n` points, and over an identical discrete grid of possible harvest values.  
