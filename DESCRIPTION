@@ -13,7 +13,7 @@ Imports:
     cubature,
     expm,
     ggplot2,
-    snowfall
+    parallel
 Collate:
     'plots.R'
     'population_models.R'

@@ -18,12 +18,12 @@ The central calculation to accomodating additional sources of uncertainty is the
 
 ```r
 xmin <- 0
-xmax <- 150
-grid_n <- 150
+xmax <- 300
+grid_n <- 300
 ```
 
 
-We seek a harvest policy which maximizes the discounted profit from the fishery using a stochastic dynamic programming approach over a discrete grid of stock sizes from `0` to `150` on a grid of `150` points, and over an identical discrete grid of possible harvest values.  
+We seek a harvest policy which maximizes the discounted profit from the fishery using a stochastic dynamic programming approach over a discrete grid of stock sizes from `0` to `300` on a grid of `300` points, and over an identical discrete grid of possible harvest values.  
 
 
 
@@ -127,6 +127,10 @@ mult <- find_dp_optim(sdp, x_grid, h_grid, OptTime, xT, profit, delta,
     reward = 0)
 ```
 
+```
+Error: incorrect number of dimensions
+```
+
 
 Compare to the former method:
 
@@ -151,22 +155,54 @@ require(reshape2)
 
 policy <- melt(data.frame(stock = x_grid, deterministic = det$D[, 
     1], new = mult$D[, 1]), id = "stock")
+```
+
+```
+Error: object 'mult' not found
+```
+
+```r
 ggplot(subset(policy, stock < 120)) + geom_jitter(aes(stock, stock - 
     x_grid[value], color = variable), shape = "+")
 ```
 
-![plot of chunk sethiplots](figure/sethiplots1.png) 
+```
+Error: object 'policy' not found
+```
 
 ```r
 
 dat <- subset(policy, stock < 120)
+```
+
+```
+Error: object 'policy' not found
+```
+
+```r
 dt <- data.table(dat)
+```
+
+```
+Error: object 'dat' not found
+```
+
+```r
 linear <- dt[, approx(stock, stock - x_grid[value], xout = seq(1, 
     120, length = 15)), by = variable]
+```
+
+```
+Error: object 'stock' not found
+```
+
+```r
 ggplot(linear) + stat_smooth(aes(x, y, color = variable), degree = 1, 
     se = FALSE, span = 0.3) + xlab("Measured Stock") + ylab("Optimal Expected Escapement")
 ```
 
-![plot of chunk sethiplots](figure/sethiplots2.png) 
+```
+Error: object 'linear' not found
+```
 
 
