@@ -18,12 +18,12 @@ The central calculation to accomodating additional sources of uncertainty is the
 
 ```r
 xmin <- 0
-xmax <- 300
+xmax <- 200
 grid_n <- 40
 ```
 
 
-We seek a harvest policy which maximizes the discounted profit from the fishery using a stochastic dynamic programming approach over a discrete grid of stock sizes from `0` to `300` on a grid of `40` points, and over an identical discrete grid of possible harvest values.  
+We seek a harvest policy which maximizes the discounted profit from the fishery using a stochastic dynamic programming approach over a discrete grid of stock sizes from `0` to `200` on a grid of `40` points, and over an identical discrete grid of possible harvest values.  
 
 
 
@@ -88,9 +88,6 @@ Additional parameters
 delta <- 0.05
 xT <- 0
 OptTime <- 25
-sigma_g <- 0.5
-sigma_m <- 0
-sigma_i <- 0
 ```
 
 
@@ -116,19 +113,18 @@ We will determine the optimal solution over a `25` time step window with boundar
 
 
 ```r
-sdp <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, sigma_g, 
-    pdfn, sigma_m, sigma_i)
-```
-
-
-
-```r
-mult <- find_dp_optim(sdp, x_grid, h_grid, OptTime, xT, profit, delta, 
-    reward = 0)
-```
-
-```
-Error: incorrect number of dimensions
+sdp_g <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, 0.5, pdfn, 
+    0, 0)
+sdp_m <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, 0, pdfn, 
+    0.5, 0)
+sdp_i <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, 0, pdfn, 
+    0, 0.5)
+opt_g <- find_dp_optim(sdp_g, x_grid, h_grid, OptTime, xT, profit, 
+    delta, reward = 0)
+opt_m <- find_dp_optim(sdp_m, x_grid, h_grid, OptTime, xT, profit, 
+    delta, reward = 0)
+opt_i <- find_dp_optim(sdp_i, x_grid, h_grid, OptTime, xT, profit, 
+    delta, reward = 0)
 ```
 
 
@@ -152,57 +148,26 @@ det <- find_dp_optim(det_mat, x_grid, h_grid, OptTime, xT, profit,
 
 ```r
 require(reshape2)
-
+XMAX <- 140
 policy <- melt(data.frame(stock = x_grid, deterministic = det$D[, 
-    1], new = mult$D[, 1]), id = "stock")
+    1], growth = opt_g$D[, 1], meas = opt_m$D[, 1], imp = opt_i$D[, 1]), id = "stock")
+ggplot(subset(policy, stock < XMAX)) + geom_jitter(aes(stock, stock - 
+    x_grid[value], color = variable))
 ```
 
-```
-Error: object 'mult' not found
-```
-
-```r
-ggplot(subset(policy, stock < 120)) + geom_jitter(aes(stock, stock - 
-    x_grid[value], color = variable), shape = "+")
-```
-
-```
-Error: object 'policy' not found
-```
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8461/8054863108_df3a89e328_o.png) 
 
 ```r
 
-dat <- subset(policy, stock < 120)
-```
-
-```
-Error: object 'policy' not found
-```
-
-```r
+dat <- subset(policy, stock < XMAX)
 dt <- data.table(dat)
-```
-
-```
-Error: object 'dat' not found
-```
-
-```r
 linear <- dt[, approx(stock, stock - x_grid[value], xout = seq(1, 
-    120, length = 15)), by = variable]
-```
-
-```
-Error: object 'stock' not found
-```
-
-```r
+    XMAX, length = 15)), by = variable]
 ggplot(linear) + stat_smooth(aes(x, y, color = variable), degree = 1, 
-    se = FALSE, span = 0.3) + xlab("Measured Stock") + ylab("Optimal Expected Escapement")
+    se = FALSE, span = 0.3) + geom_jitter(aes(x, y, color = variable), shpae = "+") + 
+    xlab("Measured Stock") + ylab("Optimal Expected Escapement")
 ```
 
-```
-Error: object 'linear' not found
-```
+![plot of chunk sethiplots](http://farm9.staticflickr.com/8460/8054863186_4c49389f2b_o.png) 
 
 
