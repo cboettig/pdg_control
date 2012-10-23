@@ -48,7 +48,7 @@ With purely growth noise, a row of the matrix is given by the probability densit
 
 
 
-We assume a simple function like logistic growth, \\(f(s) = r s (1-s/K) + s \\), where \\(s = x - h\\),
+We assume a simple function like logistic growth, $f(s) = r s (1-s/K) + s$, where $s = x - h$,
 
 ``` {r }
 f <- function(x,h,p){
@@ -142,7 +142,6 @@ require(reshape2)
 XMAX <- 140
 policy <- melt(data.frame(stock = x_grid, deterministic=det$D[,1], growth = opt_g$D[,1], meas = opt_m$D[,1], imp = opt_i$D[,1]), id = "stock")
 ggplot(subset(policy, stock < XMAX)) + geom_jitter(aes(stock, stock-x_grid[value], color=variable))
-
 dat <- subset(policy, stock < XMAX)
 dt <- data.table(dat)
 linear <- dt[,approx(stock, stock-x_grid[value], xout=seq(1,XMAX, length=15)), by=variable]

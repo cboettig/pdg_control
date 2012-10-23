@@ -175,6 +175,23 @@ penalties can be compared directly, as described in the next section.)
 
 \subsection{Apples to apples comparisons}
 
+% From Jake: 
+
+The fact that there is no uniform metric for comparing different functional forms of the penalty function complicates identifying the implications of various penalty functions on optimal management.  Put another way, it is unclear what parameter values should be used for each functional form in order to compare the relative effect of each penalty function on optimal management.  
+To address this issue, consider the following rule for comparing functional forms inspired by Bovenberg, Goulder and Gurnery (2005) and Bovenberg, Goulder and Jacobsen (2008).  By definition, adding a constraint, in the form of a penalty function, to the social planner’s objective function will reduce the NPV of the resource in addition to affecting the optimal management policy.  For example, each individual penalty function equation (3)-(6) is multiplied by a constant C2.  As the magnitude of the penalty function increases (e.g., C2 increases), the NPV value of the resource decreases.  Importantly, though, the rate at which the NPV is affected by a given increase in magnitude of the penalty function is different for different penalty functions.  One way to compare the relative impact of penalty functions on optimal management is to choose parameters for the penalty function that imply the same level of NPV conditional on optimal management. 
+
+Figure 2 shows this comparison criterion graphically.  Each curve plots the percentage change in NPV relative to the unconstrained problem for a given penalty function over different magnitudes of that penalty function, C2, given optimal management.  There are two important features in Figure 2.  First, the optimal management policy is not constant across penalty function.  This will be discussed in detail below.  Second, the rate of change in NPV as a function of the magnitude of the penalty function varies both within and across policies.  For example, the existence of a relatively small L2 penalty function dramatically affects the resource’s value initially but there is little marginal effect on NPV for relatively large L2 penalty functions.  Conversely, the rate of change in NPV for the fixed penalty function is roughly constant over all ranges of penalty function magnitudes.  
+
+To compare the impact of penalty functions on optimal management, we select penalty magnitudes that make the resource worth 80\% of its unconstrained value.   The dashed vertical lines in Figure 2 map the needed penalty function magnitude, C2, to each penalty function such that the resource is worth 80\% of its unconstrained value when optimally managed.  We choose 80\% somewhat arbitrarily but the method is applicable to any NPV level and the qualitative effects on management are robust for other levels.  
+
+Bovenberg, AL, Goulder LH, and Gurney DJ (2005).  “Efficiency Costs of Meeting Industry-Distributional  Constraints Under Environmental Permits and Taxes” RAND Journal of Economics. 36(4): 951-  971.
+
+Bovenberg, AL, Goulder LH, and Jacobsen MR (2008).  “Costs of Alternative Policy Instruments in the    Presence of Industry Compensation Requirements” Journal of Public Economics. 92: 1236-1253.
+
+%% end-Jake
+
+
+
 We compare the impact of the different functional forms for the penalty
 function at a value of the penalty scaling parameter in each model that
 induces an equivalent net present value to the stock when optimally

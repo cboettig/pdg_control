@@ -53,8 +53,11 @@ SDP_multiple_uncertainty <- function(f, p, x_grid, h_grid, sigma_g,
     
   # Cycle over action space (harvest level)
   SDP_Mat <- lapply(h_grid, function(h){
+
+    ## I is incorrect, it isn't x-h that experiences the noise, but h 
     I <- matrix(mapply(transition, m_grid$x, m_grid$y, 
                        MoreArgs = list(sigma=sigma_i, g=function(x) max(x-h, 0), pdfn=pdfn)), nrow = gridsize)
+
     for(i in 1:gridsize)
       I[i,] = I[i,]/sum(I[i,])
     out <- I %*% M %*% F
