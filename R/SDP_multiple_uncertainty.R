@@ -1,6 +1,6 @@
-#' Determine the SDP matrix for uniform noise under multiple uncertainty
+#' SDP under multiple uncertainty
 #'
-#' Computes the transition matrix under the case of growth noise, 
+#' Computes the SDP solution under the case of growth noise, 
 #' implementation errors in harvesting, and meaurement errors in 
 #' the stock assessment.  
 #'
@@ -9,67 +9,61 @@
 #' @param p the parameters of the growth function
 #' @param x_grid the discrete values allowed for the population size, x
 #' @param h_grid the discrete values of harvest levels to optimize over
-#' @param sigma_g is the shape parameter (width) of the multiplicitive growth noise 
-#' @param pdfn is the shape of the growth noise, which need not be uniform (is by default)
-#' @param sigma_m is the half-width of the uniform measurement error (assumes uniform distribution)
-#' @param sigma_i is the half-width of the implementation noise (always assumes uniform distribution)
+#' @param sigma is the shape parameters for noise distribution (sigma_g, sigma_m, sigma_i) (default is no noise)
+#' @param pdfn is the probability density function (same functional form is used for growth, measure, implement).  (Default is uniform)
+#' @param profit is the profit function (defaults to the realized harvest)
+#' @return The D matrix giving the optimal harvest for each possible state in each timestep.  
+#' Hence the optimal policy at time t is given by the policy function D[,t].  
+#' Values of D[,t] correspond to the index of h_grid.  Indices of of D[,t] correspond to states in y_grid.  
 #' @export
-#' @import parallel
-SDP_multiple_uncertainty <- function(f, p, x_grid, h_grid, sigma_g,
-                        pdfn=function(P, mu, s){
-                          if(mu==0)
-                            if(P == 0)
-                              1
-                            else 
-                              0
-                          else 
-                          dunif(P,mu*(1-s),mu*(1+s))
-                          },
-                        sigma_m, sigma_i, debug=FALSE){
+SDP_multiple_uncertainty <- function(f, p, x_grid, h_grid, Tmax = 20,
+                                     sigmas =c(sigma_g=0, sigma_m=0, sigma_i=0), 
+                                     pdfn = unif_pdfn, profit = function(x,h) min(x, h)){
   
+    ## Initialize stuff
+    sigma_g <- sigmas['sigma_g']      
+    sigma_m <- sigmas['sigma_m']
+    sigma_i <- sigmas['sigma_i']
+    D <- matrix(NA, nrow=length(x_grid), ncol=Tmax)  
+        
+    ## Compute the transition matrices 
+    P <- outer(x_grid, h_grid, profit)
+    F <- outer(x_grid, f(x_grid, 0, p), pdfn, sigma_g)
+    M <- outer(x_grid, x_grid, pdfn, sigma_m)
+    I <- outer(h_grid, h_grid, pdfn, sigma_i)
     
-    
-    transition <- function(x, y, sigma, g, pdfn){ # function for an entry of the matrix
-      if(sigma > 0 )
-        P <- pdfn(y, g(x), sigma)
-      else {
-        bin_y <-  x_grid[which.min(abs(x_grid - y))]
-        bin_fx <- x_grid[which.min(abs(x_grid - g(x)))]
-        P <- as.integer(bin_fx == bin_y)
-      }
-      P
-    }
-    m_grid <- expand.grid(x=x_grid, y=x_grid)
-    gridsize <- length(x_grid)
-    
-    F <- matrix(mapply(transition, m_grid$x, m_grid$y, 
-                       MoreArgs = list(sigma=sigma_g, g=function(x) f(x,0,p), pdfn=pdfn)), nrow = gridsize)
-    M <- matrix(mapply(transition, m_grid$x, m_grid$y,
-                       MoreArgs = list(sigma=sigma_m, g=function(x) x, pdfn=pdfn)), nrow = gridsize)
-    for(i in 1:gridsize){ # normalize
-      F[i,] = F[i,]/sum(F[i,])
-      M[i,] = M[i,]/sum(M[i,])
+    # If no uncertainty in measure or implement
+    V <- P
+    for(t in 1:Tmax){
+      D[,(Tmax-t+1)] <- apply(V, 1, which.max)
+      V <- P + delta * F %*% V %*% D[, (Tmax-t+1)]  
     }
     
-  # Cycle over action space (harvest level)
-  SDP_Mat <- lapply(h_grid, function(h){
-
-    ## I is incorrect, it isn't x-h that experiences the noise, but h 
-    I <- matrix(mapply(transition, m_grid$x, m_grid$y, 
-                       MoreArgs = list(sigma=sigma_i, g=function(x) max(x-h, 0), pdfn=pdfn)), nrow = gridsize)
-
-    for(i in 1:gridsize)
-      I[i,] = I[i,]/sum(I[i,])
-    out <- I %*% M %*% F
-    for(i in 1:gridsize)
-      out[i,] = out[i,]/sum(out[i,])
+    # Uncertainty 
+  #  Ep <- M %*% P %*% I
+  #  U <- t(M) %*% F %*% M 
+        
+  #  V <- Ep
+  #  for(t in 1:Tmax){
+  #    D[,(Tmax-t+1)] <- apply(V, 1, which.max)
+  #    V <- Ep + delta * U %*% V %*% I %*% D[, (Tmax-t+1)]  
+  #  }
     
-    
-      
-    out
-  })
-  SDP_Mat
+    D
 }
 
 
-
+unif_pdfn <- function(P, mu, s){
+  if(mu==0){
+    if(P == 0){
+      1
+    } else {
+      0
+  } else if(sigma > 0){
+    dunif(P, mu*(1-s), mu*(1+s))
+  } else { #sigma == 0
+    bin_y <-  x_grid[which.min(abs(x_grid - P))]
+    bin_fx <- x_grid[which.min(abs(x_grid - mu))]
+    as.integer(bin_fx == bin_y)
+  }
+}

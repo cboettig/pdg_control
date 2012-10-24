@@ -21,14 +21,13 @@
 #' @export
 find_dp_multiple_uncertainty <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, 
                           delta, reward=0){
-
  
   ## Initialize space for the matrices
   gridsize <- length(x_grid)
   HL <- length(h_grid)
   D <- matrix(NA, nrow=gridsize, ncol=OptTime)
   V <- rep(0,gridsize) # initialize BC,
-
+  
   # give a fixed reward for having value larger than xT at the end. 
   V[x_grid >= xT] <- reward # a "scrap value" for x(T) >= xT
 
