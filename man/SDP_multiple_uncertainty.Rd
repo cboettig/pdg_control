@@ -1,12 +1,10 @@
 \name{SDP_multiple_uncertainty}
 \alias{SDP_multiple_uncertainty}
-\title{Determine the SDP matrix for uniform noise under multiple uncertainty}
+\title{SDP under multiple uncertainty}
 \usage{
-  SDP_multiple_uncertainty(f, p, x_grid, h_grid, sigma_g,
-    pdfn = function(P, mu, s) {     if (mu == 0) 
-            if (P == 0)              1         else 0
-        else dunif(P, mu * (1 - s), mu * (1 + s)) },
-    sigma_m, sigma_i, debug = FALSE)
+  SDP_multiple_uncertainty(f, p, x_grid, h_grid, Tmax = 20,
+    sigmas = c(sigma_g = 0, sigma_m = 0, sigma_i = 0),
+    pdfn = unif_pdfn, profit = function(x, h) min(x, h))
 }
 \arguments{
   \item{f}{the growth function of the escapement population
@@ -21,21 +19,27 @@
   \item{h_grid}{the discrete values of harvest levels to
   optimize over}
 
-  \item{sigma_g}{is the shape parameter (width) of the
-  multiplicitive growth noise}
+  \item{sigma}{is the shape parameters for noise
+  distribution (sigma_g, sigma_m, sigma_i) (default is no
+  noise)}
 
-  \item{pdfn}{is the shape of the growth noise, which need
-  not be uniform (is by default)}
+  \item{pdfn}{is the probability density function (same
+  functional form is used for growth, measure, implement).
+  (Default is uniform)}
 
-  \item{sigma_m}{is the half-width of the uniform
-  measurement error (assumes uniform distribution)}
-
-  \item{sigma_i}{is the half-width of the implementation
-  noise (always assumes uniform distribution)}
+  \item{profit}{is the profit function (defaults to the
+  realized harvest)}
+}
+\value{
+  The D matrix giving the optimal harvest for each possible
+  state in each timestep. Hence the optimal policy at time
+  t is given by the policy function D[,t]. Values of D[,t]
+  correspond to the index of h_grid.  Indices of of D[,t]
+  correspond to states in y_grid.
 }
 \description{
-  Computes the transition matrix under the case of growth
-  noise, implementation errors in harvesting, and
-  meaurement errors in the stock assessment.
+  Computes the SDP solution under the case of growth noise,
+  implementation errors in harvesting, and meaurement
+  errors in the stock assessment.
 }
 
