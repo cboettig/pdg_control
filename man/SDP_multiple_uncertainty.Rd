@@ -2,9 +2,9 @@
 \alias{SDP_multiple_uncertainty}
 \title{SDP under multiple uncertainty}
 \usage{
-  SDP_multiple_uncertainty(f, p, x_grid, h_grid, Tmax = 20,
+  SDP_multiple_uncertainty(f, p, x_grid, h_grid, Tmax = 25,
     sigmas = c(sigma_g = 0, sigma_m = 0, sigma_i = 0),
-    pdfn = unif_pdfn, profit = function(x, h) min(x, h))
+    pdfn = unif_pdfn, profit = function(x, h) pmin(x, h))
 }
 \arguments{
   \item{f}{the growth function of the escapement population
