@@ -8,9 +8,7 @@ require(ggplot2)
 require(data.table)
 ````
 
-``` {r  echo=FALSE, cache=FALSE }
-opts_knit$set(upload.fun = rfigshare::fs_embed)
-````
+
 
 
 
@@ -100,7 +98,7 @@ pars <- c(1.5, 0.05)
 K <- (pars[1] - 1)/pars[2]
 xmin <- 0
 xmax <- 1.5 * K
-n_x <- 20
+n_x <- 120
 n_h <- n_x
 x_grid <- seq(xmin, xmax, length = n_x)  
 h_grid <- seq(xmin, xmax, length = n_h)
