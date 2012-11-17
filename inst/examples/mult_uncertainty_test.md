@@ -171,16 +171,25 @@ out <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, OptTime,
 ```
 
 
+
+```r
+new <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, OptTime, 
+    sigmas = c(sigma_g = 0.3, sigma_m = 0, sigma_i = 0), pdfn = pdfn)
+m <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, OptTime, sigmas = c(sigma_g = 0.3, 
+    sigma_m = 0.3, sigma_i = 0), pdfn = pdfn)
+i <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, OptTime, sigmas = c(sigma_g = 0.3, 
+    sigma_m = 0, sigma_i = 0.3), pdfn = pdfn)
+```
+
+
 Plot the policy function (in terms of escapement, `x-h`, rather than harvest `h`) at equilibrium (first time-step):
 
 
 ```r
 require(reshape2)
 policies <- melt(data.frame(stock = x_grid, old = x_grid[opt$D[, 
-    1]], new = x_grid[out$D[, 1]]), id = "stock")
-# policies <- melt(data.frame(stock=x_grid, old = x_grid[opt$D[,1]], new =
-# x_grid[new$D[,1]], meas = x_grid[m$D[,1]], imp = x_grid[i$D[,1]]),
-# id='stock')
+    1]], new = x_grid[new$D[, 1]], meas = x_grid[m$D[, 1]], imp = x_grid[i$D[, 
+    1]]), id = "stock")
 ```
 
 

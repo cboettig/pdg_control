@@ -37,9 +37,6 @@ SDP_multiple_uncertainty <- function(f, p, x_grid, h_grid, Tmax = 25,
                                      sigmas =c(sigma_g=0, sigma_m=0, sigma_i=0), 
                                      pdfn = pdfn, profit = function(x,h) pmin(x, h)){
   
-  
-Tmax = 25
-sigmas =c (sigma_g=.3, sigma_m=0.3, sigma_i=0.3)
 
     sigma_g <- sigmas['sigma_g']      
     sigma_m <- sigmas['sigma_m']
@@ -63,7 +60,7 @@ sigmas =c (sigma_g=.3, sigma_m=0.3, sigma_i=0.3)
         mu <- sum(sapply(1:n_x, function(x)
           f(x_grid[x],h_grid,p) %*% I[q,] *  M[y,x])) # Implementation & Measurement error
         if(mu==0)
-          out[1] <- 1 ## Wow, really? should we be applying noise to the f*I*M product or the f?  
+          out[1] <- 1   
         else 
           out <- dlnorm(x_grid/mu, 0, sigma_g)
         out/sum(out)
@@ -145,9 +142,13 @@ pdfn <- Vectorize(FUN)
 ```
 
 ```{r mult_uncertainty}
-new <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, OptTime, sigmas = c(sigma_g=sigma_g, sigma_m=0, sigma_i=0), pdfn=pdfn)  
-m <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, OptTime, sigmas = c(sigma_g=sigma_g, sigma_m=0.1, sigma_i=0), pdfn=pdfn)
-i <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, OptTime, sigmas = c(sigma_g=sigma_g, sigma_m=0, sigma_i=0.1), pdfn=pdfn)
+out <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, OptTime, sigmas = c(sigma_g=0.3, sigma_m=0.3, sigma_i=0.3), pdfn=pdfn)  
+```
+
+```{r noisetypes}
+new <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, OptTime, sigmas = c(sigma_g=0.3, sigma_m=0, sigma_i=0), pdfn=pdfn)  
+m <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, OptTime, sigmas = c(sigma_g=0.3, sigma_m=0.3, sigma_i=0), pdfn=pdfn)  
+i <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, OptTime, sigmas = c(sigma_g=0.3, sigma_m=0, sigma_i=0.3), pdfn=pdfn)  
 ```
 
 Plot the policy function (in terms of escapement, `x-h`, rather than harvest `h`) at equilibrium (first time-step):
@@ -162,6 +163,3 @@ q1 <- ggplot(policies, aes(stock, stock - value, color=variable)) + geom_point()
 q1
 ```
 
-```{r}
-rbind(opt$D[,1], new$D[,1], m$D[,1], i$D[,1])
-```
