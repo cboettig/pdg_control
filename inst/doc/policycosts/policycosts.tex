@@ -44,6 +44,7 @@
 \definecolor{darkblue}{rgb}{0,0,0.5}
 \definecolor{darkgreen}{rgb}{0,0.5,0}
 \newcommand{\cdb}[1]{{\it \color{darkgreen} #1}}
+\newcommand{\pa}[1]{{\it \color{darkblue} #1}}
 
 \begin{document}
 \begin{frontmatter}
@@ -259,6 +260,58 @@ The comparisons shown in Figure~\ref{fig:shapes} are made at a fixed magnitude o
 
 
 \subsection{Consequences of ignoring policy adjustment costs}
+
+\pa{
+   
+  \textbf{Option 1.}
+
+  We don’t include do a section 3.3. I’m not convinced the paper needs one. Some of this I think is a tension between a focus in the paper on :
+
+  A.      ``What are the effects of including policy adjustment costs on optimal policy recommendations at all?''
+
+  Vs.
+
+  B.      ``Given that there will be costs to adjusting policies but we don’t know just what form these will take, what are the consequences of different cost formulations''
+
+
+
+  If we focus the paper on question B there is less need for a section 3.3 at least as Carl has that section currently entitled (``Consequences of ignoring policy adjustment costs'' – which is not really a statement about functional forms).
+   
+
+  \textbf{Option 2.}
+
+  We include a version of the results Carl currently shows in his Fig 5 and 6 for the L1 penalty, but we include it also for the other penalty function forms – e.g. using Carl’s suggestion of a box-whisker plot.
+   
+  Reminder - The two figures compare the performance of the optimal policy when accounting for the policy adjustment costs (maximizing $\Pi_{L_1}$) with what the optimal policy recommendation one would arrive if ignoring these costs (maximizing $\Pi_0$) WHEN scoring the performance of the two control recommendations against $\Pi_{L_1}$.
+   
+  Fig. 5 shows the breakdown into how the gross yield (ph) and adjustment cost ($c_2 abs(h_t-h_{t-1})$) separately. The policy ignoring costs of policy adjustment gets higher gross yields by tracking the variations more closely but also incurs (even) higher policy adjustment costs. Fig 6 combines the two bits to show the effect on net present value.
+   
+  This option would let one answer:
+
+  i)                    What is the consequence of ignoring policy adjustment costs when they are present?
+
+  ii)                   It also answers Jim’s suggested reversal of that question, I think, namely: what is the consequence of assuming adjustment costs are present when in fact they are absent? (I think this is just the difference between the gross yields / the turquoise and red shaded areas in Fig 5).
+
+  iii)                 And then how do these things vary for each of the different functional forms?
+
+   
+  \textbf{Option 3}
+
+
+  We populate a table that organizes columns by the ``Actual functional form of adjustment costs'' and the rows into ``Assumed functional form of adjustment costs.'' The types of functional form in both columns and rows would then run ``None, $L_1$, $L_2$ etc.''
+   
+  IF we denote the optimal control for objective function $NPV_i$ as being $h^*_i$, then I would populate the Table with the proportions
+  $NPV_i(h^*_j) / NPV_i(h^*_i)$
+  (i.e. what proportion of the available NPV you still get if assuming the wrong functional form for the adjustment costs).
+   
+  The inclusion of the comparison against None means that all of what was being talked about for Option 2 would be captured. In addition it would provide a robustness check on a policy recommendation if uncertain of either the presence of policy adjustment costs or functional form that they should adopt. Specifically, by comparing across rows one could ascertain whether assuming one choice of functional form was likely to lead to large efficiency costs should other assumptions about adjustment costs prove correct. Similarly one could compare across columns to see if one form were particularly problematic in reality.
+   
+  I don’t know if those are clear – you need to get mired into the document once again a bit to parse it out. I’ll happily discuss with anyone in a bid to shed more light.
+   
+  Discussion of these options and alternative suggestions invited.
+}
+
+
 
 \begin{itemize}
   \item Distribution of profits and costs under a policy-cost scenario vs profits and costs under Reed solution, by penalty type. Figure~\ref{fig:profits_costs}.
