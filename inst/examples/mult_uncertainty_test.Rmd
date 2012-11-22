@@ -141,7 +141,10 @@ FUN <- function(P, mu, s){
   if(mu == 0){
     as.integer(P == 0)
   } else if(s > 0){
-    if(mu > 0) dunif(P, mu * (1 - s), mu * (1 + s))
+    if(mu > 0){
+      dlnorm(P, mu, s)
+      #dunif(P, mu * (1 - s), mu * (1 + s))
+    }
   }
   else { # delta spike
     P <- snap_to_grid(P, x_grid)

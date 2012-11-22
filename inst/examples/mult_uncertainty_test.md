@@ -75,9 +75,6 @@ SDP_multiple_uncertainty <- function(f, p, x_grid, h_grid, Tmax = 25,
                 I[q, ] * M[y, x]))  # Implementation & Measurement error
             if (mu == 0) 
                 out[1] <- 1 else {
-                # f_pdfn <- function(P, s) dlnorm(P, 0, s) ## Log-Normal Noise f_pdfn <-
-                # function(P, s) dunif(P, 1 - s, 1 + s) ## Uniform Noise
-                # ProportionalChance <- x_grid / mu
                 out <- pdfn(x_grid, mu, sigma_g)
                 if (sum(out) == 0) 
                   out[1] = 1
@@ -160,8 +157,10 @@ FUN <- function(P, mu, s) {
     if (mu == 0) {
         as.integer(P == 0)
     } else if (s > 0) {
-        if (mu > 0) 
-            dunif(P, mu * (1 - s), mu * (1 + s))
+        if (mu > 0) {
+            dlnorm(P, mu, s)
+            # dunif(P, mu * (1 - s), mu * (1 + s))
+        }
     } else {
         # delta spike
         P <- snap_to_grid(P, x_grid)
