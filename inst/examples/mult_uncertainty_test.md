@@ -23,6 +23,7 @@ Test multiple uncertainty function
 
 
 
+
 ## Current version of the multiple uncertainty function
 
 
@@ -47,7 +48,7 @@ Test multiple uncertainty function
 #' function D[,t].  Values of D[,t] correspond to the index of h_grid.
 #' Indices of of D[,t] correspond to states in y_grid.  @export
 SDP_multiple_uncertainty <- function(f, p, x_grid, h_grid, Tmax = 25, 
-    sigmas = c(sigma_g = 0, sigma_m = 0, sigma_i = 0), pdfn = pdfn, profit = function(x, 
+    sigmas = c(sigma_g = 0.3, sigma_m = 0, sigma_i = 0), pdfn = pdfn, profit = function(x, 
         h) pmin(x, h)) {
     
     
@@ -73,7 +74,15 @@ SDP_multiple_uncertainty <- function(f, p, x_grid, h_grid, Tmax = 25,
             mu <- sum(sapply(1:n_x, function(x) f(x_grid[x], h_grid, p) %*% 
                 I[q, ] * M[y, x]))  # Implementation & Measurement error
             if (mu == 0) 
-                out[1] <- 1 else out <- dlnorm(x_grid/mu, 0, sigma_g)
+                out[1] <- 1 else {
+                # f_pdfn <- function(P, s) dlnorm(P, 0, s) ## Log-Normal Noise f_pdfn <-
+                # function(P, s) dunif(P, 1 - s, 1 + s) ## Uniform Noise
+                # ProportionalChance <- x_grid / mu
+                out <- pdfn(x_grid, mu, sigma_g)
+                if (sum(out) == 0) 
+                  out[1] = 1
+                out
+            }
             out/sum(out)
         }))
     })
@@ -116,7 +125,7 @@ pars <- c(1.5, 0.05)
 K <- (pars[1] - 1)/pars[2]
 xmin <- 0
 xmax <- 1.5 * K
-n_x <- 120
+n_x <- 200
 n_h <- n_x
 x_grid <- seq(xmin, xmax, length = n_x)
 h_grid <- seq(xmin, xmax, length = n_h)
@@ -200,6 +209,6 @@ q1 <- ggplot(policies, aes(stock, stock - value, color = variable)) +
 q1
 ```
 
-![plot of chunk policyfunctions](http://carlboettiger.info/assets/figures/2012-11-17-f6c225f69f-policyfunctions.png) 
+![plot of chunk policyfunctions](figure/policyfunctions.png) 
 
 
