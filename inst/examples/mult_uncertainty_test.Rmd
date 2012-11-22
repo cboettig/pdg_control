@@ -44,10 +44,10 @@ SDP_multiple_uncertainty <- function(f, p, x_grid, h_grid, Tmax = 25,
                                      sigmas =c(sigma_g=0.3, sigma_m=0, sigma_i=0), 
                                      pdfn = pdfn, profit = function(x,h) pmin(x, h)){
   
-
-    sigma_g <- sigmas['sigma_g']      
-    sigma_m <- sigmas['sigma_m']
-    sigma_i <- sigmas['sigma_i']
+# sigmas = c(0.2, 0.2, .0)
+    sigma_g <- sigmas[1]      
+    sigma_m <- sigmas[2]
+    sigma_i <- sigmas[3]
     n_x <- length(x_grid)
     n_h <- length(h_grid)
     D <- matrix(NA, nrow=n_x, ncol=Tmax)  
@@ -55,36 +55,37 @@ SDP_multiple_uncertainty <- function(f, p, x_grid, h_grid, Tmax = 25,
     ## Compute the transition matrices 
     P <-  outer(x_grid, h_grid, profit) 
     M <- rownorm( outer(x_grid, x_grid, pdfn, sigma_m) )
-    I <- rownorm( outer(h_grid, h_grid, pdfn, sigma_i) )
+    I <- rownorm( outer(h_grid, h_grid, pdfn, sigma_i) )  
     
+
     
-    
-    
-    # integrate over uncertainty in I and X 
     F <- lapply(1:n_h, function(q){  
       t(sapply(1:n_x, function(y){
         out <- numeric(n_x)
         mu <- sum(sapply(1:n_x, function(x)
           f(x_grid[x],h_grid,p) %*% I[q,] *  M[y,x])) # Implementation & Measurement error
-        if(mu==0)
+        # Handle special cases
+        if(snap_to_grid(mu,x_grid)==0){
           out[1] <- 1   
-        else {
+        } else {
          out <- pdfn(x_grid, mu, sigma_g)
-         if(sum(out) == 0)
-           out[1] = 1
-         out
         }
         out/sum(out)
       }))
     })
     
+    
+    # n_y by n_x, given y %*% n_x by n_h %*% n_h by n_q, given q
     Ep <- M %*% P %*% t(I)
     V <- Ep
     for(t in 1:Tmax){
-      D[,(Tmax-t+1)] <- apply(V, 1, which.max)
-      v_t <- apply(V, 1, max) # vector of current values
+      D[,(Tmax-t+1)] <- apply(V, 1, which.max) 
+      ## q can often exceed y, if fishing is free, there might be more x than you think.  
+      #if(any(pmin(D[,(Tmax-t+1)], 1:n_h) !=  D[,(Tmax-t+1)])) stop()
+      #v_t <- sapply(1:n_h, function(i) V[i,D[i,(Tmax-t+1)]]) # Look-up value given by which.max
+      v_t <- apply(V, 1, max) # vector of current values 
       V <- sapply(1:n_h, function(j){ # updated value matrix
-        Ep[,j] + (1-delta) * M %*% F[[j]] %*% v_t
+        Ep[,j] + (1-delta) * t(M) %*% F[[j]] %*% v_t
       })
     }
     list(D=D, M=M, I=I, P=P, Ep=Ep, V=V, F=F)
@@ -106,20 +107,22 @@ f <- function(x, h, p){
   A * s/(1 + B * s)
 }
 profit = function(x,h) pmin(x, h)
-
+#profit <- profit_harvest(price=1, c0 = 0, c1=0) 
 
 pars <- c(1.5, 0.05)
 K <- (pars[1] - 1)/pars[2]
 xmin <- 0
 xmax <- 1.5 * K
-n_x <- 200
+n_x <- 100
 n_h <- n_x
 x_grid <- seq(xmin, xmax, length = n_x)  
 h_grid <- seq(xmin, xmax, length = n_h)
 delta <- 0.05
 xT <- 0
 OptTime <- 25
-sigma_g <- 0.5
+
+
+sigma_g=0.1
 ````
 
 
@@ -142,34 +145,31 @@ FUN <- function(P, mu, s){
     as.integer(P == 0)
   } else if(s > 0){
     if(mu > 0){
-      dlnorm(P, mu, s)
+      dlnorm(P/mu, 0, s)
       #dunif(P, mu * (1 - s), mu * (1 + s))
     }
   }
   else { # delta spike
     P <- snap_to_grid(P, x_grid)
     mu <- snap_to_grid(mu, x_grid)
-    as.integer(P == mu)
+    as.numeric(as.integer(P == mu))
   }
 }
 pdfn <- Vectorize(FUN)
 ```
 
-```{r mult_uncertainty}
-out <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, OptTime, sigmas = c(sigma_g=0.3, sigma_m=0.3, sigma_i=0.3), pdfn=pdfn)  
-```
 
 ```{r noisetypes}
-new <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, OptTime, sigmas = c(sigma_g=0.3, sigma_m=0, sigma_i=0), pdfn=pdfn)  
-m <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, OptTime, sigmas = c(sigma_g=0.3, sigma_m=0.3, sigma_i=0), pdfn=pdfn)  
-i <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, OptTime, sigmas = c(sigma_g=0.3, sigma_m=0, sigma_i=0.3), pdfn=pdfn)  
+g <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, OptTime, sigmas = c(sigma_g=sigma_g, sigma_m=0, sigma_i=0), pdfn=pdfn)  
+m <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, OptTime, sigmas = c(sigma_g=0.03, sigma_m=0.1, sigma_i=0), pdfn=pdfn)  
+i <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, OptTime, sigmas = c(sigma_g=0.03, sigma_m=0, sigma_i=0.1), pdfn=pdfn)  
 ```
 
 Plot the policy function (in terms of escapement, `x-h`, rather than harvest `h`) at equilibrium (first time-step):
 
 ```{r policyfn_data}
 require(reshape2)
-policies <- melt(data.frame(stock=x_grid, old = x_grid[opt$D[,1]], new = x_grid[new$D[,1]], meas = x_grid[m$D[,1]], imp = x_grid[i$D[,1]]), id="stock")
+policies <- melt(data.frame(stock=x_grid, old = x_grid[opt$D[,1]], g = x_grid[g$D[,1]], meas = x_grid[m$D[,1]], imp = x_grid[i$D[,1]]), id="stock")
 ```
 
 ```{r policyfunctions}
