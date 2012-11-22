@@ -135,7 +135,7 @@ xT <- 0
 OptTime <- 25
 
 
-sigma_g = 0.1
+sigma_g = 0.3
 ```
 
 
@@ -184,9 +184,9 @@ pdfn <- Vectorize(FUN)
 g <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, OptTime, sigmas = c(sigma_g = sigma_g, 
     sigma_m = 0, sigma_i = 0), pdfn = pdfn)
 m <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, OptTime, sigmas = c(sigma_g = 0.03, 
-    sigma_m = 0.1, sigma_i = 0), pdfn = pdfn)
+    sigma_m = 0.3, sigma_i = 0), pdfn = pdfn)
 i <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, OptTime, sigmas = c(sigma_g = 0.03, 
-    sigma_m = 0, sigma_i = 0.1), pdfn = pdfn)
+    sigma_m = 0, sigma_i = 0.3), pdfn = pdfn)
 ```
 
 
@@ -208,6 +208,6 @@ q1 <- ggplot(policies, aes(stock, stock - value, color = variable)) +
 q1
 ```
 
-![plot of chunk policyfunctions](http://carlboettiger.info/assets/figures/2012-11-22-e277e62433-policyfunctions.png) 
+![plot of chunk policyfunctions](http://carlboettiger.info/assets/figures/2012-11-22-11f7d70977-policyfunctions.png) 
 
 
