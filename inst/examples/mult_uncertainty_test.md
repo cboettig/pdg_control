@@ -18,6 +18,10 @@ Test multiple uncertainty function
 ## Loading required package: data.table
 ```
 
+```
+## data.table 1.8.6 For help type: help("data.table")
+```
+
 
 
 
@@ -66,17 +70,25 @@ SDP_multiple_uncertainty <- function(f, p, x_grid, h_grid, Tmax = 25,
     
     
     
+    # Much faster to fill out f calls as a matrix ahead of time.
+    f_matrix <- outer(x_grid, h_grid, f, p)
+    # Fill out uncertainty in transitions first
+    G <- outer(x_grid, x_grid, pdfn, sigma_g)
+    
     F <- lapply(1:n_h, function(q) {
         t(sapply(1:n_x, function(y) {
             out <- numeric(n_x)
-            mu <- sum(sapply(1:n_x, function(x) f(x_grid[x], h_grid, p) %*% 
-                I[q, ] * M[y, x]))  # Implementation & Measurement error
+            mu <- M[y, ] %*% f_matrix %*% I[q, ]
             # Handle special cases
             if (snap_to_grid(mu, x_grid) == 0) {
                 #
                 out[1] <- 1
             } else {
-                out <- pdfn(x_grid, mu, sigma_g)
+                # out <- pdfn(x_grid, mu, sigma_g) ## All computational time spent here.
+                # could be done by look-up:
+                mu_i <- which.min(abs(x_grid - mu))  ## snap mu to grid first
+                out <- G[, mu_i]  ## then do this by table look-up
+                ## Not identical but very close.
             }
             out/sum(out)
         }))
@@ -88,7 +100,7 @@ SDP_multiple_uncertainty <- function(f, p, x_grid, h_grid, Tmax = 25,
     V <- Ep
     for (t in 1:Tmax) {
         D[, (Tmax - t + 1)] <- apply(V, 1, which.max)
-        ## q can often exceed y, if fishing is free, there might be more x than
+        ## q can often exceed y: if fishing is free, there might be more x than
         ## you think. if(any(pmin(D[,(Tmax-t+1)], 1:n_h) != D[,(Tmax-t+1)]))
         ## stop() v_t <- sapply(1:n_h, function(i) V[i,D[i,(Tmax-t+1)]]) # Look-up
         ## value given by which.max
@@ -126,7 +138,7 @@ pars <- c(1.5, 0.05)
 K <- (pars[1] - 1)/pars[2]
 xmin <- 0
 xmax <- 1.5 * K
-n_x <- 100
+n_x <- 150
 n_h <- n_x
 x_grid <- seq(xmin, xmax, length = n_x)
 h_grid <- seq(xmin, xmax, length = n_h)
@@ -164,8 +176,8 @@ FUN <- function(P, mu, s) {
         as.integer(P == 0)
     } else if (s > 0) {
         if (mu > 0) {
-            dlnorm(P/mu, 0, s)
-            # dunif(P, mu * (1 - s), mu * (1 + s))
+            # dlnorm(P/mu, 0, s)
+            dunif(P, mu * (1 - s), mu * (1 + s))
         }
     } else {
         # delta spike
@@ -183,8 +195,18 @@ pdfn <- Vectorize(FUN)
 ```r
 g <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, OptTime, sigmas = c(sigma_g = sigma_g, 
     sigma_m = 0, sigma_i = 0), pdfn = pdfn)
+```
+
+
+
+```r
 m <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, OptTime, sigmas = c(sigma_g = 0.03, 
     sigma_m = 0.3, sigma_i = 0), pdfn = pdfn)
+```
+
+
+
+```r
 i <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, OptTime, sigmas = c(sigma_g = 0.03, 
     sigma_m = 0, sigma_i = 0.3), pdfn = pdfn)
 ```
@@ -208,6 +230,6 @@ q1 <- ggplot(policies, aes(stock, stock - value, color = variable)) +
 q1
 ```
 
-![plot of chunk policyfunctions](http://carlboettiger.info/assets/figures/2012-11-22-11f7d70977-policyfunctions.png) 
+![plot of chunk policyfunctions](http://carlboettiger.info/assets/figures/2012-11-22-f151258fe1-policyfunctions.png) 
 
 
