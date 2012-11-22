@@ -208,6 +208,6 @@ q1 <- ggplot(policies, aes(stock, stock - value, color = variable)) +
 q1
 ```
 
-![plot of chunk policyfunctions](figure/policyfunctions.png) 
+![plot of chunk policyfunctions](http://carlboettiger.info/assets/figures/2012-11-22-11cc07db2c-policyfunctions.png) 
 
 
