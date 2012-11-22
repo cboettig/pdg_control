@@ -95,7 +95,7 @@ SDP_multiple_uncertainty <- function(f, p, x_grid, h_grid, Tmax = 25,
         v_t <- apply(V, 1, max)  # vector of current values
         V <- sapply(1:n_h, function(j) {
             # updated value matrix
-            Ep[, j] + (1 - delta) * t(M) %*% F[[j]] %*% v_t
+            Ep[, j] + (1 - delta) * M %*% F[[j]] %*% v_t
         })
     }
     list(D = D, M = M, I = I, P = P, Ep = Ep, V = V, F = F)
@@ -208,6 +208,6 @@ q1 <- ggplot(policies, aes(stock, stock - value, color = variable)) +
 q1
 ```
 
-![plot of chunk policyfunctions](http://carlboettiger.info/assets/figures/2012-11-22-11cc07db2c-policyfunctions.png) 
+![plot of chunk policyfunctions](http://carlboettiger.info/assets/figures/2012-11-22-e277e62433-policyfunctions.png) 
 
 
