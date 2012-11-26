@@ -2,25 +2,6 @@ Test multiple uncertainty function
 
   
 
-```
-## Loading required package: pdgControl
-```
-
-```
-## Loading required package: reshape2
-```
-
-```
-## Loading required package: ggplot2
-```
-
-```
-## Loading required package: data.table
-```
-
-```
-## data.table 1.8.6 For help type: help("data.table")
-```
 
 
 
@@ -168,9 +149,8 @@ New way:
 
 
 ```r
-# Uniform pdf where width scales with mean (probably better way to do
-# that) And handles degenerate/delta fn cases such as no width and zero
-# mean
+# Uniform pdf where width scales with mean (probably better way to do that) And handles degenerate/delta fn cases such as no
+# width and zero mean
 FUN <- function(P, mu, s) {
     if (mu == 0) {
         as.integer(P == 0)
@@ -193,22 +173,22 @@ pdfn <- Vectorize(FUN)
 
 
 ```r
-g <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, OptTime, sigmas = c(sigma_g = sigma_g, 
-    sigma_m = 0, sigma_i = 0), pdfn = pdfn)
+g <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, OptTime, sigmas = c(sigma_g = sigma_g, sigma_m = 0, sigma_i = 0), 
+    pdfn = pdfn)
 ```
 
 
 
 ```r
-m <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, OptTime, sigmas = c(sigma_g = 0.03, 
-    sigma_m = 0.3, sigma_i = 0), pdfn = pdfn)
+m <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, OptTime, sigmas = c(sigma_g = 0.03, sigma_m = 0.3, sigma_i = 0), 
+    pdfn = pdfn)
 ```
 
 
 
 ```r
-i <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, OptTime, sigmas = c(sigma_g = 0.03, 
-    sigma_m = 0, sigma_i = 0.3), pdfn = pdfn)
+i <- SDP_multiple_uncertainty(f, pars, x_grid, h_grid, OptTime, sigmas = c(sigma_g = 0.03, sigma_m = 0, sigma_i = 0.3), 
+    pdfn = pdfn)
 ```
 
 
@@ -217,19 +197,17 @@ Plot the policy function (in terms of escapement, `x-h`, rather than harvest `h`
 
 ```r
 require(reshape2)
-policies <- melt(data.frame(stock = x_grid, old = x_grid[opt$D[, 
-    1]], g = x_grid[g$D[, 1]], meas = x_grid[m$D[, 1]], imp = x_grid[i$D[, 1]]), 
-    id = "stock")
+policies <- melt(data.frame(stock = x_grid, old = x_grid[opt$D[, 1]], g = x_grid[g$D[, 1]], meas = x_grid[m$D[, 1]], 
+    imp = x_grid[i$D[, 1]]), id = "stock")
 ```
 
 
 
 ```r
-q1 <- ggplot(policies, aes(stock, stock - value, color = variable)) + 
-    geom_point() + xlab("stock size") + ylab("escapement")
+q1 <- ggplot(policies, aes(stock, stock - value, color = variable)) + geom_point() + xlab("stock size") + ylab("escapement")
 q1
 ```
 
-![plot of chunk policyfunctions](http://carlboettiger.info/assets/figures/2012-11-22-f151258fe1-policyfunctions.png) 
+![plot of chunk policyfunctions](http://carlboettiger.info/assets/figures/2012-11-23-bcf87363db-policyfunctions.png) 
 
 

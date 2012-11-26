@@ -11,6 +11,7 @@ require(data.table)
 ```{r plotting, include=FALSE}
 opts_knit$set(upload.fun = socialR::notebook.url)
 opts_chunk$set(dev.args=list(bg="transparent"))
+theme_update(plot.background = element_rect(fill = "transparent",colour = NA))
 ```
 
 
