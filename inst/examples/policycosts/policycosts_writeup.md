@@ -36,7 +36,7 @@ pars <- c(1.5, 0.05)  # parameters for the state equation
 K <- (pars[1] - 1)/pars[2]  # Carrying capacity (for reference
 xT <- 0  # boundary conditions
 x0 <- K
-profit <- profit_harvest(price = 10, c0 = 30, c1 = 0)
+profit <- profit_harvest(price = 10, c0 = 0, c1 = 0)
 x_grid <- seq(0.01, 1.2 * K, length = gridsize)
 h_grid <- seq(0.01, 0.8 * K, length = gridsize)
 ```
@@ -145,7 +145,7 @@ p0 <- ggplot(dt) + geom_line(aes(time, alternate), col = "grey20",
 p0
 ```
 
-![plot of chunk unnamed-chunk-4](http://carlboettiger.info/assets/figures/2012-11-27-53566cf746-unnamed-chunk-4.png) 
+![plot of chunk unnamed-chunk-4](http://carlboettiger.info/assets/figures/2012-11-27-89f3cb4cfe-unnamed-chunk-4.png) 
 
 
 
@@ -156,7 +156,7 @@ p1 <- ggplot(dt) + geom_line(aes(time, alternate), col = "grey20",
 p1
 ```
 
-![plot of chunk unnamed-chunk-5](http://carlboettiger.info/assets/figures/2012-11-27-53566cf746-unnamed-chunk-5.png) 
+![plot of chunk unnamed-chunk-5](http://carlboettiger.info/assets/figures/2012-11-27-89f3cb4cfe-unnamed-chunk-5.png) 
 
 
 
@@ -167,6 +167,6 @@ p2 <- ggplot(dt) + geom_line(aes(time, harvest_alt), col = "grey20",
 p2
 ```
 
-![plot of chunk unnamed-chunk-6](http://carlboettiger.info/assets/figures/2012-11-27-53566cf746-unnamed-chunk-6.png) 
+![plot of chunk unnamed-chunk-6](http://carlboettiger.info/assets/figures/2012-11-27-89f3cb4cfe-unnamed-chunk-6.png) 
 
 
