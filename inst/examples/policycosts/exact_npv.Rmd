@@ -20,7 +20,7 @@ require(data.table)
 ``` {r pars  }
 delta <- 0.05     # economic discounting rate
 OptTime <- 50     # stopping time
-gridsize <- 100   # gridsize (discretized population)
+gridsize <- 50   # gridsize (discretized population)
 sigma_g <- 0.2    # Noise in population growth
 sigma_m <- 0.     # noise in stock assessment measurement
 sigma_i <- 0.     # noise in implementation of the quota
@@ -31,8 +31,8 @@ reward <- 0       # bonus for satisfying the boundary condition
 
 ``` {r noise_dists }
 z_g <- function() rlnorm(1,  0, sigma_g) # mean 1
-z_m <- function() rlnorm(1,  0, sigma_m) # mean 1
-z_i <- function() rlnorm(1,  0, sigma_i) # mean 1
+z_m <- function() 1
+z_i <- function() 1
 ````
 
 
@@ -69,13 +69,13 @@ Calculate the transition matrix and intialize the the list of penalty functions 
 ``` {r  SDP}
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g )
 penaltyfns <- list(L2=L2, L1=L1, asy=asymmetric, fixed=fixed, asy2=free_increase)
-c2 <- seq(0, 22, length.out = 30)
+c2 <- seq(0, 10, length.out = 30)
 ````
 
 This can take a while, so we use explicit parallelization, 
 ``` {r  parallel}
 require(snowfall)
-sfInit(cpu=16, parallel=T)
+sfInit(cpu=3, parallel=T)
 sfLibrary(pdgControl)
 sfExportAll()
 ````
