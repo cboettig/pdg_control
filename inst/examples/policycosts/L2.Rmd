@@ -1,7 +1,9 @@
 `ro fig.width=10, fig.height=7, message=FALSE, comment=NA, cache=TRUE, verbose=TRUE, cache.path="L2/" or`
 
 ``` {r setup, include=FALSE, cache=FALSE}
-opts_knit$set(upload.fun = socialR::flickr.url)
+opts_knit$set(upload.fun = socialR::notebook.url)
+opts_chunk$set(dev.args=list(bg="transparent"))
+theme_update(plot.background = element_rect(fill = "transparent",colour = NA))
 options(device = function(width=5, height=5) pdf(NULL, width = width, height = height))
 ````
 
