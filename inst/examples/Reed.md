@@ -7,7 +7,15 @@
 
  * Author [Carl Boettiger](http://carlboettiger.info), <cboettig@gmail.com>
  * License: [CC0](http://creativecommons.org/publicdomain/zero/1.0/)
- * Description:  Implements a numerical version of the SDP described in Reed, (1979).
+ * Description:  Implements a numerical version of the SDP described in 
+
+```
+
+Error in read.bib(bibfile) : unable to open file to read
+
+```
+
+.
 
 
 
