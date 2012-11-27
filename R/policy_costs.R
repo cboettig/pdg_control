@@ -107,7 +107,9 @@ optim_policy <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit,
 #' @export
 simulate_optim <- function(f, pars, x_grid, h_grid, x0, D, z_g,
                             z_m, z_i, alt_D = NULL, OptTime = dim(D[[1]])[2],
-                            profit, penalty){
+                            profit, penalty, seed=NULL){
+  if(!is.null(seed))
+    set.seed(seed)
   # initialize variables with initial conditions
   x_h <- numeric(OptTime) # population dynamics with harvest
   h <- numeric(OptTime) # optimal havest level
