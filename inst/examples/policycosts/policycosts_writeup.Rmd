@@ -63,7 +63,7 @@ c2 <- seq(0, 10, length.out = 30)
 This can take a while, so we use explicit parallelization, 
 ``` {r  parallel}
 require(snowfall)
-sfInit(cpu=8, parallel=T)
+sfInit(cpu=2, parallel=T)
 sfLibrary(pdgControl)
 sfExportAll()
 ````
@@ -165,7 +165,7 @@ quad_costs <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, quad_profit, de
 ```
 
 
-``` {r simulate_policy, dependson=c(-1,-2,-3,-4,-5,-6)}
+``` {r simulate_policy, dependson=c("L1", "L2", "free_increase", "free_decrease", "fixed", "quad_costs")}
 sims <- list(
   L1 = simulate_optim(f, pars, x_grid, h_grid, x0, 
                       L1_policy$D, z_g, z_m, z_i, 
