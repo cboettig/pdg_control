@@ -63,7 +63,7 @@ c2 <- seq(0, 10, length.out = 30)
 This can take a while, so we use explicit parallelization, 
 ``` {r  parallel}
 require(snowfall)
-sfInit(cpu=2, parallel=T)
+sfInit(cpu=8, parallel=T)
 sfLibrary(pdgControl)
 sfExportAll()
 ````
