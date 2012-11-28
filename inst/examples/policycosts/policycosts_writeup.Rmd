@@ -54,7 +54,7 @@ free_decrease <- function(c2) function(h, h_prev)  c2 * max(h - h_prev, 0) # dec
 fixed <-  function(c2) function(h, h_prev) c2 * as.numeric( !(h == h_prev) )
 L2 <- function(c2) function(h, h_prev)  c2 * (h - h_prev) ^ 2
 none <- function(h, h_prev)  0
-penaltyfns <- list(L2=L2, L1=L1, asy=asymmetric, fixed=fixed, asy2=free_increase)
+penaltyfns <- list(L2=L2, L1=L1, free_decrease=free_decrease, fixed=fixed, free_increase=free_increase)
 c2 <- seq(0, 10, length.out = 30)
 ````
 
