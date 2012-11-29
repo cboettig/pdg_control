@@ -10,11 +10,12 @@ require(data.table)
 ```
 
 ```{r graphing-options, include=FALSE}
-opts_knit$set(upload.fun = socialR::notebook.url)
+#opts_knit$set(upload.fun = socialR::notebook.url)
 opts_chunk$set(dev.args=list(bg="transparent"))
-theme_set(theme_bw())
 theme_update(panel.background = element_rect(fill = "transparent",colour = NA),
-             plot.background = element_rect(fill = "transparent",colour = NA))
+             panel.grid.major=element_line(colour="transparent"),
+             panel.grid.minor=element_line(colour="transparent")
+             )
 ```
 
 
@@ -63,7 +64,7 @@ c2 <- seq(0, 10, length.out = 30)
 This can take a while, so we use explicit parallelization, 
 ``` {r  parallel}
 require(snowfall)
-sfInit(cpu=8, parallel=T)
+sfInit(cpu=3, parallel=T)
 sfLibrary(pdgControl)
 sfExportAll()
 ````
@@ -202,13 +203,13 @@ setnames(dt, "L1", "penalty_fn") # names are nice
 
 ``` {r p0, dependson="tidy"}
 p0 <- ggplot(dt) +
-  geom_line(aes(time, alternate), col="grey20", lwd=1) +
-  geom_line(aes(time, fishstock, col=penalty_fn, lty=penalty_fn))+ 
+  geom_line(aes(time, harvest_alt), col="grey20", lwd=1) +
+  geom_line(aes(time, harvest, col=penalty_fn, lty=penalty_fn))+ 
   labs(x="time", y="stock size", title = "Stock Dynamics")
 p0
 ```
 
-```{r p1, dependson="tidy"}
+```{r p1, dependson="tidy", fig.width=12}
 p1 <- ggplot(dt) +
   geom_line(aes(time, alternate), col="grey20", lwd=1) +
   geom_line(aes(time, fishstock), col=rgb(0,0,1,.8)) + facet_wrap(~penalty_fn) + 
@@ -216,7 +217,7 @@ p1 <- ggplot(dt) +
 p1
 ```
 
-```{r p2, dependson="tidy"}
+```{r p2, dependson="tidy", fig.width=12}
 p2 <- ggplot(dt) +
   geom_line(aes(time, harvest_alt), col="grey20", lwd=1)  +
   geom_line(aes(time, harvest), col=rgb(0,0,1,.8)) + 
