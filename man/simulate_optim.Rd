@@ -4,7 +4,7 @@
 \usage{
   simulate_optim(f, pars, x_grid, h_grid, x0, D, z_g, z_m,
     z_i, alt_D = NULL, OptTime = dim(D[[1]])[2], profit,
-    penalty)
+    penalty, seed = NULL)
 }
 \arguments{
   \item{f}{the growth function of the escapement population

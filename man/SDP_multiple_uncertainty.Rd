@@ -4,7 +4,7 @@
 \usage{
   SDP_multiple_uncertainty(f, p, x_grid, h_grid, Tmax = 25,
     sigmas = c(sigma_g = 0, sigma_m = 0, sigma_i = 0),
-    pdfn = unif_pdfn, profit = function(x, h) pmin(x, h))
+    pdfn = pdfn, profit = function(x, h) pmin(x, h))
 }
 \arguments{
   \item{f}{the growth function of the escapement population
