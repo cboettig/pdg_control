@@ -60,7 +60,7 @@ This can take a while, so we use explicit parallelization,
 
 ```r
 require(snowfall)
-sfInit(cpu = 8, parallel = T)
+sfInit(cpu = 3, parallel = T)
 ```
 
 ```
@@ -118,30 +118,168 @@ dat <- cbind(policies, quad)
 Tidy up the data and plot the net present value (before the penalty has been paid) relative to that achieved when managed without a penalty.  
 
 
+```r
+npv0 <- dat[1, 3]
+npv0
+```
+
+```
+free_decrease 
+         1148 
+```
+
+```r
+dat <- data.frame(c2 = c2, dat)
+dat <- melt(dat, id = "c2")
+ggplot(dat, aes(c2, value, col = variable)) + geom_point() + geom_line()
+```
+
+![plot of chunk npv-plot](http://carlboettiger.info/assets/figures/2012-11-30-35312d97e3-npv-plot.png) 
+
+
+Find the value of `c2` that brings each penalty closest to 75% of the cost-free adjustment value:
+
+
+```r
+ggplot(dat, aes(c2, (npv0 - value)/npv0, col = variable)) + geom_point() + geom_line()
+```
+
+![plot of chunk apples_plot](http://carlboettiger.info/assets/figures/2012-11-30-35312d97e3-apples_plot.png) 
+
+
+
+```r
+closest <- function(x, v) {
+    which.min(abs(v - x))
+}
+dt <- data.table(dat)
+index <- dt[, closest(0.25, (npv0 - value)/value), by = variable]
+apples <- c2[index$V1]
+names(apples) = index$variable
+apples
+```
+
+```
+           L2            L1 free_decrease         fixed free_increase 
+        8.621         5.862         0.000        10.000         0.000 
+         quad 
+        3.793 
+```
 
 
 
 
+## Results
+
+Solve the policy cost for the specified penalty function
+
+
+```r
+L2_policy <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, 
+    reward, penalty = L2(apples["L2"]))
+```
+
+
+
+```r
+fixed_policy <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, 
+    reward, penalty = fixed(apples["fixed"]))
+```
+
+
+
+```r
+L1_policy <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, 
+    reward, penalty = L1(apples["L1"]))
+```
+
+
+
+```r
+free_increase_policy <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, 
+    delta, reward, penalty = free_increase(apples["free_increase"]))
+```
+
+
+
+```r
+free_decrease_policy <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, 
+    delta, reward, penalty = free_decrease(apples["free_decrease"]))
+```
+
+
+We also compare to the case in which costs of harvesting increase quadratically with effort; a common approach to create smoother policies.  
+
+
+```r
+quad_profit <- profit_harvest(price = 10, c0 = 30, c1 = apples["quad"])
+quad_costs <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, quad_profit, 
+    delta, reward, penalty = none)
+```
 
 
 
 
+```r
+sims <- list(L1 = simulate_optim(f, pars, x_grid, h_grid, x0, L1_policy$D, z_g, 
+    z_m, z_i, opt$D, profit = profit, penalty = L1(apples["L1"]), seed = seed), 
+    L2 = simulate_optim(f, pars, x_grid, h_grid, x0, L2_policy$D, z_g, z_m, 
+        z_i, opt$D, profit = profit, penalty = L2(apples["L2"]), seed = seed), 
+    fixed = simulate_optim(f, pars, x_grid, h_grid, x0, fixed_policy$D, z_g, 
+        z_m, z_i, opt$D, profit = profit, penalty = fixed(apples["fixed"]), 
+        seed = seed), increase = simulate_optim(f, pars, x_grid, h_grid, x0, 
+        free_increase_policy$D, z_g, z_m, z_i, opt$D, profit = profit, penalty = free_increase(apples["increase"]), 
+        seed = seed), decrease = simulate_optim(f, pars, x_grid, h_grid, x0, 
+        free_decrease_policy$D, z_g, z_m, z_i, opt$D, profit = profit, penalty = free_decrease(apples["decrease"]), 
+        seed = seed), quad = simulate_optim(f, pars, x_grid, h_grid, x0, free_decrease_policy$D, 
+        z_g, z_m, z_i, opt$D, profit = quad_profit, penalty = none, seed = seed))
+```
 
 
 
 
+```r
+# Make data tidy (melt), fast (data.tables), and nicely labeled.
+dat <- melt(sims, id = names(sims[[1]]))
+dt <- data.table(dat)
+setnames(dt, "L1", "penalty_fn")  # names are nice
+```
+
+
+# Plots 
 
 
 
 
+```r
+p0 <- ggplot(dt) + geom_line(aes(time, harvest_alt), col = "grey20", lwd = 1) + 
+    geom_line(aes(time, harvest, col = penalty_fn, lty = penalty_fn)) + labs(x = "time", 
+    y = "stock size", title = "Stock Dynamics")
+p0
+```
+
+![plot of chunk p0](http://carlboettiger.info/assets/figures/2012-11-30-35312d97e3-p0.png) 
 
 
 
+```r
+p1 <- ggplot(dt) + geom_line(aes(time, alternate), col = "grey20", lwd = 1) + 
+    geom_line(aes(time, fishstock), col = rgb(0, 0, 1, 0.8)) + facet_wrap(~penalty_fn) + 
+    labs(x = "time", y = "stock size", title = "Stock Dynamics")
+p1
+```
+
+![plot of chunk p1](http://carlboettiger.info/assets/figures/2012-11-30-35312d97e3-p1.png) 
 
 
 
+```r
+p2 <- ggplot(dt) + geom_line(aes(time, harvest_alt), col = "grey20", lwd = 1) + 
+    geom_line(aes(time, harvest), col = rgb(0, 0, 1, 0.8)) + facet_wrap(~penalty_fn) + 
+    labs(x = "time", y = "havest intensity (fish taken)", title = "Harvest Policy Dynamics")
+p2
+```
 
-
-
+![plot of chunk p2](http://carlboettiger.info/assets/figures/2012-11-30-35312d97e3-p2.png) 
 
 
