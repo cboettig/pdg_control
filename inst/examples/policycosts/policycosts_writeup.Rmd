@@ -4,7 +4,7 @@ opts_chunk$set(cache=TRUE, cache.path="policycosts-cache-c0-0/")
 
 ```{r}
 profit <- profit_harvest(price = 10, c0 = 0, c1 = 0)
-c2 <- seq(0, 20, length.out = 30)
+c2 <- seq(0, 20, length.out = 40)
 ```
 
 ```{r run, results="hide"}

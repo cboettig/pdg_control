@@ -1,14 +1,14 @@
 ```{r cache-options, include=FALSE}
-opts_chunk$set(cache=TRUE, cache.path="policycosts-cache-c0-0/")
+opts_chunk$set(cache=TRUE, cache.path="policycosts-cache-c0-30/")
 ```
 
 ```{r}
-profit <- profit_harvest(price = 10, c0 = 0, c1 = 0)
-c2 <- seq(0, 20, length.out = 30)
+profit <- profit_harvest(price = 10, c0 = 30, c1 = 0)
+c2 <- seq(0, 20, length.out = 40)
 ```
 
 ```{r run, results="hide"}
-knit("policycosts.Rmd", "policycosts_c0_0.md")
+knit("policycosts.Rmd", "policycosts_c0_30.md")
 ```
 
 ## Results
