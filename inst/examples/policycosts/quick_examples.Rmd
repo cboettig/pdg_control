@@ -5,6 +5,10 @@ require(ggplot2)
 require(data.table)
 ```
 
+```{r cache-options, include=FALSE}
+opts_chunk$set(cache=TRUE, cache.path="quick_examples/")
+```
+
 ```{r graphing-options, include=FALSE}
 opts_knit$set(upload.fun = socialR::notebook.url)
 opts_chunk$set(dev.args=list(bg="transparent"), tidy=FALSE, comment=NA, message=FALSE)
