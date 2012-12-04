@@ -112,22 +112,8 @@ quad <-
                         profit, delta, reward, penalty = none, 
                         effort_penalty)
 })
-policies <- c(policies, quad=list(quad))
+dat <- cbind(policies, quad)
 ````
-
-
-Extract the policy cost
-
-```{r}
-i <- which(x_grid > K)[1]
-dat <- 
-lapply(policies, function(penalty) 
-  sapply(penalty, function(c2_run)
-    max(c2_run$penalty_free_V[i,]) 
-  )
-)
-```
-
 
 Tidy up the data and plot the net present value (before the penalty has been paid) relative to that achieved when managed without a penalty.  
 
