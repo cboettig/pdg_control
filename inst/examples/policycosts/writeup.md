@@ -303,28 +303,34 @@ p2
 
 
 ```r
-source("fig4_helper_fun.R")
+frac_lost <- seq(0,1, length=20)
+tmp <- lapply(frac_lost, fig4, ls())
+out <- melt(tmp, id=c("reps", "var", "acor"))
+colnames(out) = c("reps", "var", "acor", "nothing", "penalty", "index")
+out <- cbind(out[c(1,2,3,5)], fraction = frac_lost[out$index])
+out <- data.table(out)
+
+Ev = out[,mean(var),by=c('penalty', 'fraction')]
+SDv = out[,sd(var),by=c('penalty', 'fraction')]
+Ea = out[,mean(acor),by=c('penalty', 'fraction')]
+SDa = out[,sd(acor),by=c('penalty', 'fraction')]
+
+tmp2 <- data.table(penalty = Ev$penalty, fraction = Ev$fraction, Ev = Ev$V1, Ea = Ea$V1, SDv=SDv$V1, SDa = SDa$V1)
+
+Fig4a <- ggplot(tmp2, aes(fraction, Ev, ymin=Ev-SDv, ymax=Ev+SDv, col=penalty)) + 
+  #geom_ribbon(aes(fill=penalty, col=NA), lwd=0, alpha=.1) + 
+  geom_line() + xlab("Fraction of NPV lost to costs")
+Fig4a
 ```
 
-```
-Warning: cannot open file 'fig4_helper_fun.R': No such file or directory
-```
-
-```
-Error: cannot open the connection
-```
+![plot of chunk Figure4](figure/Figure41.png) 
 
 ```r
-frac_lost <- seq(0.1,0.9, length=5)
-out <- lapply(frac_lost, fig4, ls())
-out <- melt(out)
-colnames(out) = c("statistic", "penalty", "value", "index")
-out <- cbind(out[1:3], fraction__npv_lost = frac_lost[out$index])
-Figure4 <- ggplot(out) + geom_point(aes(fraction_npv_lost, value, col=penalty)) + geom_line(aes(fraction, value, col=penalty)) + facet_wrap(~statistic, scales="free_y")
-Figure4
+Fig4b <- ggplot(tmp2, aes(fraction, Ea, ymin=Ea-SDa, ymax=Ea+SDa, col=penalty)) + 
+  #geom_ribbon(aes(fill=penalty, col=NA), lwd=0, alpha=.1) + 
+  geom_line() + xlab("Fraction of NPV lost to costs")
+Fig4b
 ```
 
-```
-Error: object 'fraction_npv_lost' not found
-```
+![plot of chunk Figure4](figure/Figure42.png) 
 

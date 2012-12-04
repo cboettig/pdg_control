@@ -32,14 +32,7 @@
   noise (always assumes uniform distribution)}
 
   \item{f_int}{is the function given by the analytic
-  solution, $F(x,q) = \frac{1}{4\sigma_i\sigma_m}
-  \int_{q-\sigma_i}^{q+\sigma_i} dh
-  \int_{x-\sigma_m}^{x+\sigma_m} f(y, h)$ For logistic map
-  $f(y,h) = 2 (y-h) \left(1-\frac{y-h}{2K}\right)$, this
-  is:
-
-  (where we've used m = $\sigma_m$, n = $\sigma_i$ for
-  simplicity of Roman notation)}
+  solution,}
 }
 \description{
   Computes the transition matrix under the case of growth
