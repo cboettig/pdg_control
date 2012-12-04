@@ -20,7 +20,7 @@ theme_set(theme_notebook)
 
 ```{r}
 profit <- profit_harvest(price = price, c0 = c0, c1 = c1)
-c2 <- exp(seq(0, log(21), length.out = 20))-1
+c2 <- exp(seq(0, log(price), length.out = 32))-1
 ```
 
 
@@ -99,7 +99,7 @@ Quadratic costs on fishing effort have to be done separately,
 ``` {r  quadcosts, dependson="bigloop"}
 quad <- 
   sapply(c2, function(c2){
-  effort_penalty = function(x,h) c2 * h / x
+  effort_penalty = function(x,h) ( c2 * h / x) / price
   policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
                         profit, delta, reward, penalty = fixed(0), 
                         effort_penalty)

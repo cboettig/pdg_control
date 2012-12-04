@@ -3,29 +3,29 @@ opts_chunk$set(cache=TRUE, cache.path="policycosts-cache-c0-0/", fig.path="figur
 ```
 
 
-```{r}
-price = 1
+```{r price}
+price = 10
 c0 = 0
 c1 = 0
 ```
 
 
-```{r run, results="hide"}
+```{r run, results="hide", dependson="price"}
 knit("policycosts.Rmd", "policycosts_c0_0.md")
 ```
 
 ## Results
 
-```{r }
+```{r dependson="run"}
 apples_plot
 ````
 
-```{r}
+```{r dependson="run"}
 apples
 ```
 
 
-```{r fig.width=12}
+```{r fig.width=12, dependson="run"}
 p1 
 p2
 ```

@@ -11,7 +11,7 @@ This file is called by `policycosts_writeup.Rmd`.  First it calibrates the apple
 
 ```r
 profit <- profit_harvest(price = price, c0 = c0, c1 = c1)
-c2 <- exp(seq(0, log(21), length.out = 20))-1
+c2 <- exp(seq(0, log(price), length.out = 32))-1
 ```
 
 
@@ -121,7 +121,7 @@ Quadratic costs on fishing effort have to be done separately,
 ```r
 quad <- 
   sapply(c2, function(c2){
-  effort_penalty = function(x,h) c2 * h / x
+  effort_penalty = function(x,h) ( c2 * h / x) / price
   policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
                         profit, delta, reward, penalty = fixed(0), 
                         effort_penalty)
@@ -142,7 +142,7 @@ npv0
 
 ```
 free_decrease 
-        29.74 
+        297.4 
 ```
 
 ```r
@@ -173,9 +173,9 @@ apples
 
 ```
            L2            L1 free_decrease         fixed free_increase 
-       1.2282        0.6172        0.0000        2.6035        0.0000 
+        9.000         7.003         0.000         9.000         0.000 
          quad 
-       0.1738 
+        8.284 
 ```
 
 
@@ -310,8 +310,8 @@ v
 ```
    penalty_fn     V1
 1:         L1 1.2883
-2:         L2 0.3594
-3:      fixed 3.2000
+2:         L2 0.3326
+3:      fixed 6.3564
 4:   increase 2.1817
 5:   decrease 2.1817
 6:       quad 2.1817
@@ -324,8 +324,8 @@ a
 ```
    penalty_fn        V1
 1:         L1 -0.002454
-2:         L2  0.274166
-3:      fixed -0.002632
+2:         L2  0.202069
+3:      fixed -0.261002
 4:   increase -0.152705
 5:   decrease -0.152705
 6:       quad -0.152705

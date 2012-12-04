@@ -4,7 +4,7 @@
 
 
 ```r
-price = 1
+price = 10
 c0 = 0
 c1 = 0
 ```
@@ -35,7 +35,7 @@ knit("policycosts.Rmd", "policycosts_c0_0.md")
 apples_plot
 ```
 
-![plot of chunk unnamed-chunk-2](http://carlboettiger.info/assets/figures/2012-12-03-950b1ea246-c0-unnamed-chunk-2.png) 
+![plot of chunk unnamed-chunk-1](http://carlboettiger.info/assets/figures/2012-12-04-ef79a6c9f4-c0-unnamed-chunk-1.png) 
 
 
 
@@ -45,9 +45,9 @@ apples
 
 ```
 ##            L2            L1 free_decrease         fixed free_increase 
-##        1.2282        0.6172        0.0000        2.6035        0.0000 
+##         9.000         7.003         0.000         9.000         0.000 
 ##          quad 
-##        0.1738
+##         8.284
 ```
 
 
@@ -57,13 +57,13 @@ apples
 p1
 ```
 
-![plot of chunk unnamed-chunk-4](http://carlboettiger.info/assets/figures/2012-12-03-950b1ea246-c0-unnamed-chunk-41.png) 
+![plot of chunk unnamed-chunk-3](http://carlboettiger.info/assets/figures/2012-12-04-ef79a6c9f4-c0-unnamed-chunk-31.png) 
 
 ```r
 p2
 ```
 
-![plot of chunk unnamed-chunk-4](http://carlboettiger.info/assets/figures/2012-12-03-950b1ea246-c0-unnamed-chunk-42.png) 
+![plot of chunk unnamed-chunk-3](http://carlboettiger.info/assets/figures/2012-12-04-ef79a6c9f4-c0-unnamed-chunk-32.png) 
 
 
 
