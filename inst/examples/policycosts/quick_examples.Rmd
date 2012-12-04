@@ -13,8 +13,10 @@ opts_chunk$set(cache=TRUE, cache.path="quick_examples/")
 opts_knit$set(upload.fun = socialR::notebook.url)
 opts_chunk$set(dev.args=list(bg="transparent"), tidy=FALSE, comment=NA, message=FALSE)
 theme_notebook <- theme_grey() + 
-                  theme(plot.background = element_rect(fill = "transparent",colour = NA),
-                        panel.grid.minor=element_line(colour="transparent"))
+                  theme(plot.background = 
+                          element_rect(fill = "transparent",colour = NA),
+                        panel.grid.minor = 
+                          element_line(colour = "transparent"))
 theme_set(theme_notebook)
 ```
 
@@ -64,6 +66,8 @@ penaltyfns <- list(L2=L2, L1=L1, free_decrease=free_decrease, fixed=fixed, free_
 ````
 
 
+
+
 ```{r apples}
 apples <- c(L2=1.034, L1=1.724, free_decrease=1.724, fixed=8.276, free_increase=1.724)
 xtable(apples)
@@ -106,6 +110,7 @@ quad_costs <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, quad_profit, de
 
 
 ``` {r simulate_policy, dependson=c("L1", "L2", "free_increase", "free_decrease", "fixed", "quad_costs")}
+seed
 sims <- list(
   L1 = simulate_optim(f, pars, x_grid, h_grid, x0, 
                       L1_policy$D, z_g, z_m, z_i, 
@@ -145,6 +150,7 @@ p0 <- ggplot(dt) +
   geom_line(aes(time, harvest_alt), col="grey20", lwd=1) +
   geom_line(aes(time, harvest, col=penalty_fn, lty=penalty_fn))+ 
   labs(x="time", y="stock size", title = "Stock Dynamics")
+
 p0
 ```
 
@@ -153,6 +159,7 @@ p1 <- ggplot(dt) +
   geom_line(aes(time, alternate), col="grey20", lwd=1) +
   geom_line(aes(time, fishstock), col=rgb(0,0,1,.8)) + facet_wrap(~penalty_fn) + 
   labs(x="time", y="stock size", title = "Stock Dynamics")
+
 p1
 ```
 
@@ -162,6 +169,7 @@ p2 <- ggplot(dt) +
   geom_line(aes(time, harvest), col=rgb(0,0,1,.8)) + 
   facet_wrap(~penalty_fn) + 
   labs(x="time", y="havest intensity (fish taken)", title = "Harvest Policy Dynamics")
+
 p2
 ````
 
