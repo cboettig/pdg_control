@@ -11,14 +11,14 @@ require(pdgControl)
 ```
 
 ```r
-profit <- profit_harvest(price = 10, c0 = 30, c1 = 0)
+profit <- profit_harvest(price = 10, c0 = 0, c1 = 0)
 c2 <- exp(seq(0, log(21), length.out = 20)) - 1
 ```
 
 
 
 ```r
-knit("policycosts.Rmd", "policycosts_c0_30.md")
+knit("policycosts.Rmd", "policycosts_c0_0.md")
 ```
 
 ```
@@ -29,7 +29,7 @@ knit("policycosts.Rmd", "policycosts_c0_30.md")
 
 ```
 ## output file:
-## /home/cboettig/Computing/pdgControl/inst/examples/policycosts/policycosts_c0_30.md
+## /home/cboettig/Computing/pdgControl/inst/examples/policycosts/policycosts_c0_0.md
 ```
 
 
@@ -52,9 +52,9 @@ apples
 
 ```
 ##            L2            L1 free_decrease         fixed free_increase 
-##        1.2282        2.6035        0.0000       14.2419        0.0000 
+##       11.9852        7.0293        0.0000       20.0000        0.0000 
 ##          quad 
-##        0.1738
+##        0.8983
 ```
 
 
