@@ -579,7 +579,7 @@ p0 <- ggplot(dt) + geom_line(aes(time, harvest_alt), col = "grey20", lwd = 1) +
 p0
 ```
 
-![plot of chunk p0](figure/p0.png) 
+![plot of chunk p0](http://carlboettiger.info/assets/figures/2012-12-03-dcbd468eda-p0.png) 
 
 
 
@@ -591,7 +591,7 @@ p1 <- ggplot(dt) + geom_line(aes(time, alternate), col = "grey20", lwd = 1) +
 p1
 ```
 
-![plot of chunk p1](figure/p1.png) 
+![plot of chunk p1](http://carlboettiger.info/assets/figures/2012-12-03-dcbd468eda-p1.png) 
 
 
 
@@ -603,7 +603,7 @@ p2 <- ggplot(dt) + geom_line(aes(time, harvest_alt), col = "grey20", lwd = 1) +
 p2
 ```
 
-![plot of chunk p2](figure/p2.png) 
+![plot of chunk p2](http://carlboettiger.info/assets/figures/2012-12-03-dcbd468eda-p2.png) 
 
 
 
