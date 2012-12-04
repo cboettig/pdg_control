@@ -19,7 +19,7 @@ free_decrease_policy <- policies$free_decrease[[apples_index["free_decrease"]]]$
 quad_policy <- policies$quad[[apples_index["quad"]]]$D
 
 quad_profit <- profit_harvest(price = price, c0 = c0, c1 = apples["quad"]) 
-sims <- lapply(1:10, function(reps) list(
+sims <- lapply(1:50, function(reps) list(
   L1 = simulate_optim(f, pars, x_grid, h_grid, x0, 
                       L1_policy, z_g, z_m, z_i, 
                       opt$D, profit=profit, penalty=L1(apples["L1"])), 
