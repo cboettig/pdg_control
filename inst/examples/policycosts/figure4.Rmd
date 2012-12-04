@@ -134,7 +134,7 @@ closest <- function(x, v){
   which.min(abs(v-x))
 }
 dt <- data.table(dat)
-index <- dt[,closest(.25, (npv0-value)/value), by=variable]
+index <- dt[,closest(.25, (npv0-value)/npv0), by=variable]
 apples <- c2[index$V1]
 names(apples) = index$variable
 apples
