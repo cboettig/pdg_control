@@ -1,4 +1,8 @@
 
+This file is called by `policycosts_writeup.Rmd`.  First it calibrates the apples-to-apples comparison level for each penalty function, and then generates sample plots by penalty function, illustrating the resulting stock dynamics and harvest quota dynamics.  The file needs a `profit` function to be specified and the grid of `c2` values over which we search to find the coefficient introducing the 25% reduction in Net Present Value (npv).  
+
+
+
 
 
 
@@ -38,9 +42,9 @@ sfExportAll()
 
 ```r
 seed <- 123                 # Random seed (replicable results)
-delta <- 0.01               # economic discounting rate
-OptTime <- 100              # stopping time
-gridsize <- 100              # grid size for fish stock and harvest rate (discretized population)
+delta <- 0.05               # economic discounting rate
+OptTime <- 20              # stopping time
+gridsize <- 50              # grid size for fish stock and harvest rate (discretized population)
 sigma_g <- 0.2              # Noise in population growth
 reward <- 0                 # bonus for satisfying the boundary condition
 z_g <- function() rlnorm(1,  0, sigma_g) # mean 1
@@ -86,9 +90,9 @@ penaltyfns <- list(L2=L2, L1=L1, free_decrease=free_decrease, fixed=fixed, free_
 
 ```r
 policies <- 
-sfSapply(penaltyfns, function(penalty){
+sapply(penaltyfns, function(penalty){
   policies <- 
-  sapply(c2, function(c2){
+  sfSapply(c2, function(c2){
       policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
                         profit, delta, reward, penalty = penalty(c2))
       i <- which(x_grid > K)[1]
@@ -108,7 +112,7 @@ Quadratic costs on fishing effort have to be done separately,
 ```r
 quad <- 
   sapply(c2, function(c2){
-  effort_penalty = function(x,h) .1*c2*h/x
+  effort_penalty = function(x,h) c2 * h / x
   policycost <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
                         profit, delta, reward, penalty = fixed(0), 
                         effort_penalty)
@@ -129,7 +133,7 @@ npv0
 
 ```
 free_decrease 
-         1197 
+        297.4 
 ```
 
 ```r
@@ -148,7 +152,9 @@ Find the value of `c2` that brings each penalty closest to 75% of the cost-free 
 ggplot(dat, aes(c2, (npv0-value)/npv0, col=variable)) + geom_point() + geom_line()
 ```
 
-![plot of chunk apples_plot](figure/apples_plot.png) 
+```
+Error: object 'npv0' not found
+```
 
 
 
@@ -157,7 +163,7 @@ closest <- function(x, v){
   which.min(abs(v-x))
 }
 dt <- data.table(dat)
-index <- dt[,closest(.25, (npv0-value)/value), by=variable]
+index <- dt[,closest(.25, (npv0-value)/npv0), by=variable]
 apples <- c2[index$V1]
 names(apples) = index$variable
 apples
@@ -165,12 +171,16 @@ apples
 
 ```
            L2            L1 free_decrease         fixed free_increase 
-        9.231         5.641         0.000        15.385         0.000 
+      11.9852        7.0293        0.0000       20.0000        0.0000 
          quad 
-        4.103 
+       0.8983 
 ```
 
 
+
+```r
+save(list=ls(), file="policycosts.rda")
+```
 
 
 ## Results
@@ -284,5 +294,41 @@ p2 <- ggplot(dt) +
   facet_wrap(~penalty_fn) + 
   labs(x="time", y="havest intensity (fish taken)", title = "Harvest Policy Dynamics")
 ```
+
+
+Calculate statistics of variance and autocorrelation for Figure 4.  
+
+
+```r
+v <- dt[,var(harvest), by=penalty_fn]
+a <- dt[,acf(harvest, lag.max=1, plot=F)$acf[2], by=penalty_fn]
+v
+```
+
+```
+   penalty_fn     V1
+1:         L1 1.2883
+2:         L2 0.3164
+3:      fixed 3.0709
+4:   increase 2.1817
+5:   decrease 2.1817
+6:       quad 2.1817
+```
+
+```r
+a
+```
+
+```
+   penalty_fn        V1
+1:         L1 -0.002454
+2:         L2  0.181100
+3:      fixed -0.002632
+4:   increase -0.152705
+5:   decrease -0.152705
+6:       quad -0.152705
+```
+
+
 
 
