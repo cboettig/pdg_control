@@ -183,11 +183,7 @@ To address this issue, consider the following rule for comparing functional form
 
 Figure 2 shows this comparison criterion graphically.  Each curve plots the percentage change in NPV relative to the unconstrained problem for a given penalty function over different magnitudes of that penalty function, C2, given optimal management.  There are two important features in Figure 2.  First, the optimal management policy is not constant across penalty function.  This will be discussed in detail below.  Second, the rate of change in NPV as a function of the magnitude of the penalty function varies both within and across policies.  For example, the existence of a relatively small L2 penalty function dramatically affects the resource’s value initially but there is little marginal effect on NPV for relatively large L2 penalty functions.  Conversely, the rate of change in NPV for the fixed penalty function is roughly constant over all ranges of penalty function magnitudes.  
 
-To compare the impact of penalty functions on optimal management, we select penalty magnitudes that make the resource worth 80\% of its unconstrained value.   The dashed vertical lines in Figure 2 map the needed penalty function magnitude, C2, to each penalty function such that the resource is worth 80\% of its unconstrained value when optimally managed.  We choose 80\% somewhat arbitrarily but the method is applicable to any NPV level and the qualitative effects on management are robust for other levels.  
-
-Bovenberg, AL, Goulder LH, and Gurney DJ (2005).  “Efficiency Costs of Meeting Industry-Distributional  Constraints Under Environmental Permits and Taxes” RAND Journal of Economics. 36(4): 951-  971.
-
-Bovenberg, AL, Goulder LH, and Jacobsen MR (2008).  “Costs of Alternative Policy Instruments in the    Presence of Industry Compensation Requirements” Journal of Public Economics. 92: 1236-1253.
+To compare the impact of penalty functions on optimal management, we select penalty magnitudes that make the resource worth 75\% of its unconstrained value.   The dashed vertical lines in Figure 2 map the needed penalty function magnitude, C2, to each penalty function such that the resource is worth 75\% of its unconstrained value when optimally managed.  We choose 75\% somewhat arbitrarily but the method is applicable to any NPV level and the qualitative effects on management are robust for other levels.  
 
 %% end-Jake
 
@@ -211,38 +207,30 @@ present value before the costs of policy adjustment are paid, Figure~\ref{fig:ap
 \section{Results}
 \subsection{Characterize and compare functional forms of costs}
 
-Figure~\ref{fig:shapes} shows the impact the adjustment cost has on the optimal policy.  The $L_1$-norm costs tend to avoid small adjustments to the policy, resulting in long periods of constant policy followed by sudden bursts of adjustment.  In contrast, the $L_2$-norm tracks all of the changes made by the cost-free policy, but with smaller magnitude.  The fixed fee only makes large adjustments much like the $L_1$, as expected where the adjustment magnitude does not impact the cost.  Asymmetric ($L_1$) adjustment costs do not appear to show more directional bias than any of the symmetric costs.  Note that while the cost-free optimal strategy corresponds to a constant-escapement policy as derived in~\citet{Reed1979}, any of the policy-cost scenarios deviate from such a policy.  
-    \cdb{
-    \begin{itemize}
-      \item All of these should use the same sequence of shocks.  
-      \item Don't plot all four curves on the same graph.  
-      \item Omit stock dynamics?
-      \item Consider not violating the self-sustaining property, which should also guarantee that fishing never stops.   
-    \end{itemize}
-    }
+Figure~\ref{fig:shapes} shows the impact the adjustment cost has on the optimal policy.   Each panel is generated against the same sequence of random shocks so that they can be compared directly.  In each case, the optimal solution without any adjustment cost is shown in black and the policy induced by optimization under the given adjustment penalty is overlaid in blue.  The $L_1$ panel of Figure~\ref{fig:shapes} shows a pattern typical of the $L_1$-norm, which tends to avoid small adjustments to the policy, resulting in long periods of constant policy followed by sudden bursts of adjustment. This results in a relatively step-like policy pattern.  In contrast, the $L_2$-norm tracks all of the changes made by the cost-free policy, but with smaller magnitude.  This results in a smoother curve that undershoots the larger oscillations seen in the cost-free optimum, but results in a policy that changes incrementally each interval.  The fixed fee only makes large adjustments $L_1$, as expected where the adjustment magnitude does not impact the cost.  Where the $L_1$ norm attempts to accomidate the large oscillations at the end with a constant quota in between the extremes, the fixed cost takes the opposite approach of one very large swing.  Asymmetric ($L_1$) adjustment costs attempt to track the optimal solution, and can end up with larger fees than anticipated.  \cdb{Not quite sure why we get this pattern in the asymmetrics!}
 
-\cdb{ In terms of a policy set on escapement instead of harvest, our solutions are actually more volatile than~\citet{Reed1979}.  Maybe this leads to a discussion of what the control policy should be defined in terms of (i.e. catch vs escapement)?  Surely the simplicity of the constant-escapement rule has led to it's popularity in some part due because that simplicity avoids adjustment costs?}
+The resulting stock dynamics are more similar to the optimal solution (Figure S1).   
 
-  \begin{figure}
+\cdb{ In terms of a policy set on escapement instead of harvest, our solutions are actually more volatile than~\citet{Reed1979}.  Maybe this leads to a discussion of what the control policy should be defined in terms of (i.e. catch vs escapement)?  Surely the simplicity of the constant-escapement rule has led to it's popularity in some part due because that simplicity avoids adjustment costs?  We should consider a parameter range where the solution has less chatter?  Parameters that actually satisify the \citet{Reed1979} self-sustaining condition?}
+
+\begin{figure}
     \begin{center}
-      \subfigure[$L_1$]{\includegraphics[width=.45\textwidth]{figure/7258516896_5c89f034d5_o.png}\label{fig:L1}}
-      \subfigure[$L_2$]{\includegraphics[width=.45\textwidth]{figure/7258563112_2f5f9ffecd_o.png}\label{fig:L2}}
-
-      \subfigure[Fixed costs]{\includegraphics[width=.45\textwidth]{figure/7258506664_d6235e5f8e_o.png}\label{fig:fixed}}
-      \subfigure[Asymmetric costs]{\includegraphics[width=.45\textwidth]{figure/7258432026_d6f8179f54_o.png}\label{fig:asym}}
+      \includegraphics[width=\textwidth]{figure/2012-12-04-8f1e7b92fa-Figure3.png}
   \end{center}
-  \caption{Individual realizations of management under the different functional forms of adjustment costs.  \textbf{Green} lines show the cost-free optimal harvest levels, \textbf{black} lines show the corresponding stock dynamics under that management.  \textbf{Purple} lines show the optimal harvest level under the specified adjustment cost, under the same sequence of stochastic shocks as in the cost-free policy.  \textbf{Blue lines} show the resulting stock dynamics.
-  } \label{fig:shapes}
+  \caption{Individual realizations of management under the different functional forms of adjustment costs.} \label{fig:shapes}
 \end{figure}
 
 
 
 \subsection{Responses to increasing costs}
 
-The comparisons shown in Figure~\ref{fig:shapes} are made at a fixed magnitude of the policy cost equal to 80\% of the net present value derived from the cost-free optimal strategy.  The different functional forms may also respond differently to an increasing magnitude of the adjustment cost.  To quantify the extent to which the policy cost decreases the volatility of the proposed policy, we calculate the variance in the fishing quota over time under each policy.  While a decrease in variance is typical of smoothing penalties and the $L_2$-norm, the patterns in Figure~\ref{fig:shapes} suggest that other functional forms still involve the same magnitude of variation, but decrease the frequency of adjustments.  To capture this behavior we calculate the autocorrelation of the policy as the adjustment cost increases.  These curves van be seen in Figure~\ref{fig:summarystats}.  
+The comparisons shown in Figure~\ref{fig:shapes} are made at a fixed magnitude of the policy cost equal to 25\% of the net present value derived from the cost-free optimal strategy. The different functional forms may also respond differently to an increasing magnitude of the adjustment cost.  To quantify the extent to which the policy cost decreases the volatility of the proposed policy, we calculate the variance in the fishing quota over time under each policy. The variance is averaged over 50 replicates, and recalculated at each of 20 different intensities ranging from 0 (no cost) to 1 (NPV reduced to zero by the adjustment costs)The variance is averaged over 50 replicates, and recalculated at each of 20 different intensities ranging from 0 (no cost) to 1 (NPV reduced to zero, by the adjustment costs), shown in Figure~\ref{fig:summarystats}. \cdb{Correction: not actually zero, just to max reduction (usually what is obtained by constant quota).  Should indicate where this asymptote has occurred)}. 
+
+The variance is always smallest in $L_2$, which creates relatively smooth policies, and largest in the fixed cost, which creates highly volatile adjustments (Figure~\ref{fig:var}).  Stronger penalties further shrink the variance of the $L_2$ norm and the smoothing quadratic costs on effort, while provoking even higher variance in the fixed cost solution.  The $L_1$ solution does not become either more or less variable as costs increase.  
+
+The autocorrelation of the policies also captures the qualitative pattern observed in the individual replicates (Figure~\ref{fig:acor}).  The $L_2$ norm shows postively auto-correlated patterns, since a series of small increases is often required in lieu of a single large adjustment in the cost-free solution.  The other penalties tend to have more oscillatory solutions, leading to a negative autocorrelation.  
 
 
-\cdb{Perhaps not clear what is comparable here and what isn't.  Certainly we cannot compare the curves at the same value of $c_2$, as discussed in our apples to apples section.  Not clear that we can even compare the shape of the curves though -- for instance, given the units of $c_2$ for the $L_2$ norm are different than the other norms.  Perhaps the horizontal axis should be converted into percent of net present value of the adjustment free costs first?}
 
 \cdb{Add additional plot: Is value a linear function of policy cost, or is there a sharp transition? }
 %Must be nonlinear somewhere when adjustment costs exceed profits?
@@ -252,8 +240,8 @@ The comparisons shown in Figure~\ref{fig:shapes} are made at a fixed magnitude o
 
 \begin{figure}
   \begin{center}
-    \subfigure[Variance]{\includegraphics[width=.45\textwidth]{figure/6850042286_ef81b74acc_o.png}\label{fig:var}}
-    \subfigure[Autocorrelation]{\includegraphics[width=.45\textwidth]{figure/6996165783_41c9894bdb_o.png}\label{fig:acor}}
+    \subfigure[Variance]{\includegraphics[width=.45\textwidth]{figure/2012-12-04-8f1e7b92fa-Figure41.png}\label{fig:var}}
+    \subfigure[Autocorrelation]{\includegraphics[width=.45\textwidth]{figure/2012-12-04-8f1e7b92fa-Figure42.png}\label{fig:acor}}
     \caption{Variance and autocorrelation as a function of the magnitude of penalty, by penalty function}\label{fig:summarystats}
   \end{center}
 \end{figure}
@@ -364,6 +352,10 @@ Add two-by-two table of net present value accounting for:  ``Adjustment cost in 
 
 
 \section*{References}
+
+Bovenberg, AL, Goulder LH, and Gurney DJ (2005).  “Efficiency Costs of Meeting Industry-Distributional  Constraints Under Environmental Permits and Taxes” RAND Journal of Economics. 36(4): 951-  971.
+
+Bovenberg, AL, Goulder LH, and Jacobsen MR (2008).  “Costs of Alternative Policy Instruments in the    Presence of Industry Compensation Requirements” Journal of Public Economics. 92: 1236-1253.
 \bibliography{outline_refs.bib}
 
 \end{document}
