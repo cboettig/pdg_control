@@ -38,9 +38,9 @@ theme_set(theme_notebook)
 
 ```{r setup}
 seed <- 123                 # Random seed (replicable results)
-delta <- 0.01               # economic discounting rate
-OptTime <- 100              # stopping time
-gridsize <- 100              # grid size for fish stock and harvest rate (discretized population)
+delta <- 0.05               # economic discounting rate
+OptTime <- 20               # stopping time
+gridsize <- 50              # grid size for fish stock and harvest rate (discretized population)
 sigma_g <- 0.2              # Noise in population growth
 reward <- 0                 # bonus for satisfying the boundary condition
 z_g <- function() rlnorm(1,  0, sigma_g) # mean 1
@@ -88,9 +88,10 @@ sfExportAll()
 
 ``` {r  bigloop, dependson=c("setup", "reed", "fees")}
 policies <- lapply(penaltyfns, function(penalty){
-  sfLapply(c2, function(c2)
-      optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
+  sfLapply(c2, function(c2){
+      policy <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
                    profit, delta, reward, penalty = penalty(c2))
+      }
   )
 })
 ````
