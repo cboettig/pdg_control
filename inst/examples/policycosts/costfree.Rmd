@@ -8,12 +8,12 @@ require(data.table)
 
 
 ```{r cache-options, include=FALSE}
-opts_chunk$set(cache=TRUE, cache.path="figure4/")
+opts_chunk$set(cache=TRUE, cache.path="costfree/")
 ```
 
 ``` {r}
 price = 10
-c0 = 30
+c0 = 0
 profit <- profit_harvest(price = price, c0 = c0, c1 = 0)
 c2 <- exp(seq(0, log(21), length.out = 20))-1
 ```
@@ -24,7 +24,7 @@ c2 <- exp(seq(0, log(21), length.out = 20))-1
 
 
 ```{r graphing-options, include=FALSE}
-#opts_knit$set(upload.fun = socialR::notebook.url)
+opts_knit$set(upload.fun = socialR::notebook.url)
 opts_chunk$set(dev.args=list(bg="transparent"),
                tidy=FALSE, comment=NA, message=FALSE)
 theme_notebook <- theme_grey() + 
@@ -245,13 +245,28 @@ p2
 
 
 
-```{r}
-source("fig4_helper_fun.R")
-frac_lost <- seq(0,1, length=5)
-out <- lapply(frac_lost, fig4, ls())
-out <- melt(out)
-colnames(out) = c("statistic", "penalty", "value", "index")
-out <- cbind(out[1:3], fraction = frac_lost[out$index])
-Figure4 <- ggplot(out) + geom_line(aes(fraction, value, col=penalty)) + facet_wrap(~statistic)
-Figure4
+```{r Figure4}
+frac_lost <- seq(0,1, length=20)
+tmp <- lapply(frac_lost, fig4, ls())
+out <- melt(tmp, id=c("reps", "var", "acor"))
+colnames(out) = c("reps", "var", "acor", "nothing", "penalty", "index")
+out <- cbind(out[c(1,2,3,5)], fraction = frac_lost[out$index])
+out <- data.table(out)
+
+Ev = out[,mean(var),by=c('penalty', 'fraction')]
+SDv = out[,sd(var),by=c('penalty', 'fraction')]
+Ea = out[,mean(acor),by=c('penalty', 'fraction')]
+SDa = out[,sd(acor),by=c('penalty', 'fraction')]
+
+tmp2 <- data.table(penalty = Ev$penalty, fraction = Ev$fraction, Ev = Ev$V1, Ea = Ea$V1, SDv=SDv$V1, SDa = SDa$V1)
+
+Fig4a <- ggplot(tmp2, aes(fraction, Ev, ymin=Ev-SDv, ymax=Ev+SDv, col=penalty)) + 
+  geom_ribbon(aes(fill=penalty, col=NA), lwd=0, alpha=.05) + 
+  geom_line() + xlab("Fraction of NPV lost to costs")
+
+Fig4b <- ggplot(tmp2, aes(fraction, Ea, ymin=Ea-SDa, ymax=Ea+SDa, col=penalty)) + 
+  geom_ribbon(aes(fill=penalty, col=NA), lwd=0, alpha=.05) + 
+  geom_line() + xlab("Fraction of NPV lost to costs")
+Fig4a
+Fig4b
 ````
