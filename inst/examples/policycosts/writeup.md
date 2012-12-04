@@ -159,7 +159,7 @@ fees <- melt(fees, id="c2")
 ggplot(fees, aes(c2, value, col=variable)) + geom_point() + geom_line()
 ```
 
-![plot of chunk npv-plot](figure/npv-plot.png) 
+![plot of chunk npv-plot](http://carlboettiger.info/assets/figures/2012-12-04-8f1e7b92fa-npv-plot.png) 
 
 
 Find the value of `c2` that brings each penalty closest to 75% of the cost-free adjustment value:
@@ -169,7 +169,7 @@ Find the value of `c2` that brings each penalty closest to 75% of the cost-free 
 ggplot(fees, aes(c2, (npv0-value)/npv0, col=variable)) + geom_point() + geom_line()
 ```
 
-![plot of chunk apples_plot](figure/apples_plot.png) 
+![plot of chunk apples_plot](http://carlboettiger.info/assets/figures/2012-12-04-8f1e7b92fa-apples_plot.png) 
 
 
 
@@ -295,7 +295,7 @@ p2 <- ggplot(dt) +
 p2
 ```
 
-![plot of chunk Figure3](figure/Figure3.png) 
+![plot of chunk Figure3](http://carlboettiger.info/assets/figures/2012-12-04-8f1e7b92fa-Figure3.png) 
 
 
 
@@ -318,19 +318,20 @@ SDa = out[,sd(acor),by=c('penalty', 'fraction')]
 tmp2 <- data.table(penalty = Ev$penalty, fraction = Ev$fraction, Ev = Ev$V1, Ea = Ea$V1, SDv=SDv$V1, SDa = SDa$V1)
 
 Fig4a <- ggplot(tmp2, aes(fraction, Ev, ymin=Ev-SDv, ymax=Ev+SDv, col=penalty)) + 
-  #geom_ribbon(aes(fill=penalty, col=NA), lwd=0, alpha=.1) + 
+  geom_ribbon(aes(fill=penalty, col=NA), lwd=0, alpha=.05) + 
+  geom_line() + xlab("Fraction of NPV lost to costs")
+
+Fig4b <- ggplot(tmp2, aes(fraction, Ea, ymin=Ea-SDa, ymax=Ea+SDa, col=penalty)) + 
+  geom_ribbon(aes(fill=penalty, col=NA), lwd=0, alpha=.05) + 
   geom_line() + xlab("Fraction of NPV lost to costs")
 Fig4a
 ```
 
-![plot of chunk Figure4](figure/Figure41.png) 
+![plot of chunk Figure4](http://carlboettiger.info/assets/figures/2012-12-04-8f1e7b92fa-Figure41.png) 
 
 ```r
-Fig4b <- ggplot(tmp2, aes(fraction, Ea, ymin=Ea-SDa, ymax=Ea+SDa, col=penalty)) + 
-  #geom_ribbon(aes(fill=penalty, col=NA), lwd=0, alpha=.1) + 
-  geom_line() + xlab("Fraction of NPV lost to costs")
 Fig4b
 ```
 
-![plot of chunk Figure4](figure/Figure42.png) 
+![plot of chunk Figure4](http://carlboettiger.info/assets/figures/2012-12-04-8f1e7b92fa-Figure42.png) 
 
