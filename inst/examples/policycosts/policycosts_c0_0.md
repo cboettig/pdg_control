@@ -1,6 +1,5 @@
 
-This file is called by `policycosts_writeup.Rmd`.  First it calibrates the apples-to-apples comparison level for each penalty function, and then generates sample plots by penalty function, illustrating the resulting stock dynamics and harvest quota dynamics.  The file needs a `profit` function to be specified and the grid of `c2` values over which we search to find the coefficient introducing the 25% reduction in Net Present Value (npv).  
-
+This file is called by `policycosts_writeup.Rmd`.  First it calibrates the apples-to-apples comparison level for each penalty function, and then generates sample plots by penalty function, illustrating the resulting stock dynamics and harvest quota dynamics.  
 
 
 
@@ -11,30 +10,10 @@ This file is called by `policycosts_writeup.Rmd`.  First it calibrates the apple
 
 
 ```r
-require(snowfall)
-sfInit(cpu=16, parallel=T)
+profit <- profit_harvest(price = price, c0 = c0, c1 = c1)
+c2 <- exp(seq(0, log(21), length.out = 20))-1
 ```
 
-```
-R Version:  R version 2.15.2 (2012-10-26) 
-
-```
-
-```r
-sfLibrary(pdgControl)
-```
-
-```
-Library pdgControl loaded.
-```
-
-```
-Warning: 'keep.source' is deprecated and will be ignored
-```
-
-```r
-sfExportAll()
-```
 
 
 
@@ -85,6 +64,36 @@ penaltyfns <- list(L2=L2, L1=L1, free_decrease=free_decrease, fixed=fixed, free_
 
 ## Apples to Apples levels
 
+
+
+
+```r
+require(snowfall)
+sfInit(cpu=16, parallel=T)
+```
+
+```
+R Version:  R version 2.15.2 (2012-10-26) 
+
+```
+
+```r
+sfLibrary(pdgControl)
+```
+
+```
+Library pdgControl loaded.
+```
+
+```
+Warning: 'keep.source' is deprecated and will be ignored
+```
+
+```r
+sfExportAll()
+```
+
+
 ### Loop over penalty functions and magnitudes
 
 
@@ -133,27 +142,20 @@ npv0
 
 ```
 free_decrease 
-        297.4 
+        29.74 
 ```
 
 ```r
 dat <- data.frame(c2=c2,dat)
 dat <- melt(dat, id="c2")
-ggplot(dat, aes(c2, value, col=variable)) + geom_point() + geom_line()
 ```
-
-![plot of chunk npv-plot](figure/npv-plot.png) 
 
 
 Find the value of `c2` that brings each penalty closest to 75% of the cost-free adjustment value:
 
 
 ```r
-ggplot(dat, aes(c2, (npv0-value)/npv0, col=variable)) + geom_point() + geom_line()
-```
-
-```
-Error: object 'npv0' not found
+apples_plot <- ggplot(dat, aes(c2, (max(value)-value)/max(value), col=variable)) + geom_point() + geom_line()
 ```
 
 
@@ -171,9 +173,9 @@ apples
 
 ```
            L2            L1 free_decrease         fixed free_increase 
-      11.9852        7.0293        0.0000       20.0000        0.0000 
+       1.2282        0.6172        0.0000        2.6035        0.0000 
          quad 
-       0.8983 
+       0.1738 
 ```
 
 
@@ -223,7 +225,7 @@ We also compare to the case in which costs of harvesting increase quadratically 
 
 
 ```r
-quad_profit <- profit_harvest(price = 10, c0 = 30, c1 = apples["quad"]) 
+quad_profit <- profit_harvest(price = 10, c0 = c0, c1 = apples["quad"]) 
 quad_costs <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, quad_profit, delta, reward, penalty =  none)
 ```
 
@@ -308,8 +310,8 @@ v
 ```
    penalty_fn     V1
 1:         L1 1.2883
-2:         L2 0.3164
-3:      fixed 3.0709
+2:         L2 0.3594
+3:      fixed 3.2000
 4:   increase 2.1817
 5:   decrease 2.1817
 6:       quad 2.1817
@@ -322,7 +324,7 @@ a
 ```
    penalty_fn        V1
 1:         L1 -0.002454
-2:         L2  0.181100
+2:         L2  0.274166
 3:      fixed -0.002632
 4:   increase -0.152705
 5:   decrease -0.152705
