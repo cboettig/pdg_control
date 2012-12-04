@@ -1,12 +1,14 @@
 ```{r cache-options, include=FALSE}
-opts_chunk$set(cache=TRUE, cache.path="policycosts-cache-c0-30/")
+opts_chunk$set(cache=TRUE, cache.path="policycosts-cache-c0-30/", fig.path="figure/c30-")
 ```
 
+
 ```{r}
-require(pdgControl)
-profit <- profit_harvest(price = 10, c0 = 30, c1 = 0)
-c2 <- exp(seq(0, log(21), length.out = 20))-1
+price = 1
+c0 = 30
+c1 = 0
 ```
+
 
 ```{r run, results="hide"}
 knit("policycosts.Rmd", "policycosts_c0_30.md")
@@ -15,7 +17,7 @@ knit("policycosts.Rmd", "policycosts_c0_30.md")
 ## Results
 
 ```{r }
-ggplot(dat, aes(c2, (npv0-value)/npv0, col=variable)) + geom_point() + geom_line()
+apples_plot
 ````
 
 ```{r}
@@ -23,13 +25,8 @@ apples
 ```
 
 
-``` {r }
-p0
-```
-
 ```{r fig.width=12}
 p1 
 p2
 ```
-
 
