@@ -13,7 +13,7 @@ opts_chunk$set(cache=TRUE, cache.path="figure4/")
 
 ``` {r}
 profit <- profit_harvest(price = 10, c0 = 30, c1 = 0)
-c2 <- seq(0, 20, length.out = 40)
+c2 <- exp(seq(0, log(21), length.out = 20))-1
 ```
 
 
