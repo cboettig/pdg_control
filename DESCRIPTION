@@ -26,3 +26,4 @@ Collate:
     'find_dp_cautious.R'
     'SDP_uniform.R'
     'SDP_multiple_uncertainty.R'
+    'fig4_helper_fn.R'
