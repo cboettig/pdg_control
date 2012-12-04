@@ -1,4 +1,5 @@
 ``` {r libraries, include=FALSE}
+rm(list=ls())
 require(pdgControl)
 require(reshape2)
 require(ggplot2)
@@ -32,13 +33,6 @@ theme_notebook <- theme_grey() +
 theme_set(theme_notebook)
 ```
 
-
-``` {r  parallel}
-require(snowfall)
-sfInit(cpu=16, parallel=T)
-sfLibrary(pdgControl)
-sfExportAll()
-````
 
 
 
@@ -81,6 +75,14 @@ penaltyfns <- list(L2=L2, L1=L1, free_decrease=free_decrease, fixed=fixed, free_
 ````
 
 ## Apples to Apples levels
+
+``` {r  parallel}
+require(snowfall)
+sfInit(cpu=16, parallel=T)
+sfLibrary(pdgControl)
+sfExportAll()
+````
+
 
 ### Loop over penalty functions and magnitudes
 
