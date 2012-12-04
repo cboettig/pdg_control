@@ -120,7 +120,7 @@ Extract the policy cost
 
 ```{r}
 i <- which(x_grid > K)[1]
-dat <- 
+fees <- 
 lapply(policies, function(penalty) 
   sapply(penalty, function(c2_run)
     max(c2_run$penalty_free_V[i,]) 
@@ -132,35 +132,37 @@ lapply(policies, function(penalty)
 Tidy up the data and plot the net present value (before the penalty has been paid) relative to that achieved when managed without a penalty.  
 
 ``` {r npv-plot, dependson="quadcosts"}
-npv0 <- max(dat$L1) # all have same max, at c2=0 
+npv0 <- max(fees$L1) # all have same max, at c2=0 
 npv0
-dat <- data.frame(c2=c2,dat)
-dat <- melt(dat, id="c2")
-ggplot(dat, aes(c2, value, col=variable)) + geom_point() + geom_line()
+fees <- data.frame(c2=c2,fees)
+fees <- melt(fees, id="c2")
+ggplot(fees, aes(c2, value, col=variable)) + geom_point() + geom_line()
 ````
 
 Find the value of `c2` that brings each penalty closest to 75% of the cost-free adjustment value:
 
 ```{r apples_plot, dependson="quadcosts"}
-ggplot(dat, aes(c2, (npv0-value)/npv0, col=variable)) + geom_point() + geom_line()
+ggplot(fees, aes(c2, (npv0-value)/npv0, col=variable)) + geom_point() + geom_line()
 ````
+
+
+
+
+
+
 
 ```{r apples, dependson="quadcosts"}
 closest <- function(x, v){
   which.min(abs(v-x))
 }
-dt <- data.table(dat)
-index <- dt[,closest(.25, (npv0-value)/npv0), by=variable]
+dt_npv <- data.table(fees)
+index <- dt_npv[,closest(0.25, (npv0-value)/npv0), by=variable]
 apples_index <- index$V1
 names(apples_index) = index$variable
 apples <- c2[index$V1]
 names(apples) = index$variable
 apples
 ````
-
-
-
-## Results
 
 Solve the policy cost for the specified penalty function
 
@@ -205,6 +207,22 @@ dt <- data.table(dat)
 setnames(dt, "L1", "penalty_fn") # names are nice
 ````
 
+
+
+```{r}
+v <- dt[,var(harvest), by="penalty_fn"]
+var <- v$V1
+names(var) <- v$penalty_fn
+acor <- dt[,acf(harvest, plot=F)$acf[2], by="penalty_fn"]$V1
+names(acor) <- names(var)
+out <- rbind(var=var, a=acor)
+out
+```
+
+
+
+
+
 # Plots 
 
 
@@ -227,5 +245,13 @@ p2
 
 
 
-
-
+```{r}
+source("fig4_helper_fun.R")
+frac_lost <- seq(0,1, length=5)
+out <- lapply(frac_lost, fig4, ls())
+out <- melt(out)
+colnames(out) = c("statistic", "penalty", "value", "index")
+out <- cbind(out[1:3], fraction = frac_lost[out$index])
+Figure4 <- ggplot(out) + geom_line(aes(fraction, value, col=penalty)) + facet_wrap(~statistic)
+Figure4
+````

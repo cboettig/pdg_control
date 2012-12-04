@@ -69,8 +69,7 @@ penaltyfns <- list(L2=L2, L1=L1, free_decrease=free_decrease, fixed=fixed, free_
 
 
 ```{r apples}
-apples <- c(L2=1.034, L1=1.724, free_decrease=1.724, fixed=8.276, free_increase=1.724)
-xtable(apples)
+apples <- c(L2=1.034, L1=1.724, free_decrease=1.724, fixed=8.276, free_increase=1.724, quad)=
 ````
 
 

@@ -10,7 +10,7 @@
 price = 10
 c0 = 30
 profit <- profit_harvest(price = price, c0 = c0, c1 = 0)
-c2 <- exp(seq(0, log(21), length.out = 20)) - 1
+c2 <- exp(seq(0, log(21), length.out = 20))-1
 ```
 
 
@@ -75,18 +75,6 @@ penaltyfns <- list(L2=L2, L1=L1, free_decrease=free_decrease, fixed=fixed, free_
 ```r
 require(snowfall)
 sfInit(cpu=8, parallel=T)
-```
-
-```
-Warning: Unknown option on commandline: options(encoding
-```
-
-```
-R Version:  R version 2.15.2 (2012-10-26) 
-
-```
-
-```r
 sfLibrary(pdgControl)
 ```
 
@@ -143,7 +131,7 @@ Extract the policy cost
 
 ```r
 i <- which(x_grid > K)[1]
-dat <- 
+fees <- 
 lapply(policies, function(penalty) 
   sapply(penalty, function(c2_run)
     max(c2_run$penalty_free_V[i,]) 
@@ -157,7 +145,7 @@ Tidy up the data and plot the net present value (before the penalty has been pai
 
 
 ```r
-npv0 <- max(dat$L1) # all have same max, at c2=0 
+npv0 <- max(fees$L1) # all have same max, at c2=0 
 npv0
 ```
 
@@ -166,9 +154,9 @@ npv0
 ```
 
 ```r
-dat <- data.frame(c2=c2,dat)
-dat <- melt(dat, id="c2")
-ggplot(dat, aes(c2, value, col=variable)) + geom_point() + geom_line()
+fees <- data.frame(c2=c2,fees)
+fees <- melt(fees, id="c2")
+ggplot(fees, aes(c2, value, col=variable)) + geom_point() + geom_line()
 ```
 
 ![plot of chunk npv-plot](figure/npv-plot.png) 
@@ -178,10 +166,16 @@ Find the value of `c2` that brings each penalty closest to 75% of the cost-free 
 
 
 ```r
-ggplot(dat, aes(c2, (npv0-value)/npv0, col=variable)) + geom_point() + geom_line()
+ggplot(fees, aes(c2, (npv0-value)/npv0, col=variable)) + geom_point() + geom_line()
 ```
 
 ![plot of chunk apples_plot](figure/apples_plot.png) 
+
+
+
+
+
+
 
 
 
@@ -189,8 +183,8 @@ ggplot(dat, aes(c2, (npv0-value)/npv0, col=variable)) + geom_point() + geom_line
 closest <- function(x, v){
   which.min(abs(v-x))
 }
-dt <- data.table(dat)
-index <- dt[,closest(.25, (npv0-value)/npv0), by=variable]
+dt_npv <- data.table(fees)
+index <- dt_npv[,closest(0.25, (npv0-value)/npv0), by=variable]
 apples_index <- index$V1
 names(apples_index) = index$variable
 apples <- c2[index$V1]
@@ -199,27 +193,21 @@ apples
 ```
 
 ```
-           L2            L1 free_decrease         fixed free_increase 
-        1.228         2.603         0.000        14.242         0.000 
-         quad 
-        2.603 
+           L2            L1 free_decrease         fixed free_increase          quad 
+        1.228         2.603         0.000        14.242         0.000         2.603 
 ```
 
-
-
-
-## Results
 
 Solve the policy cost for the specified penalty function
 
 
 ```r
-L2_policy <- policies$L2[[apples_index["L2"]]]$D[[1]]
-L1_policy <- policies$L1[[apples_index["L1"]]]$D[[1]]
-fixed_policy <- policies$fixed[[apples_index["fixed"]]]$D[[1]]
-free_increase_policy <- policies$free_increase[[apples_index["free_increase"]]]$D[[1]]
-free_decrease_policy <- policies$free_decrease[[apples_index["free_decrease"]]]$D[[1]]
-quad_policy <- policies$quad[[apples_index["quad"]]]$D[[1]]
+L2_policy <- policies$L2[[apples_index["L2"]]]$D
+L1_policy <- policies$L1[[apples_index["L1"]]]$D
+fixed_policy <- policies$fixed[[apples_index["fixed"]]]$D
+free_increase_policy <- policies$free_increase[[apples_index["free_increase"]]]$D
+free_decrease_policy <- policies$free_decrease[[apples_index["free_decrease"]]]$D
+quad_policy <- policies$quad[[apples_index["quad"]]]$D
 ```
 
 
@@ -248,43 +236,42 @@ sims <- list(
 )
 ```
 
-```
-Error: invalid 'length' argument
-```
-
 
 
 
 ```r
 #Make data tidy (melt), fast (data.tables), and nicely labeled.
 dat <- melt(sims, id=names(sims[[1]]))  
-```
-
-```
-Error: object 'sims' not found
-```
-
-```r
 dt <- data.table(dat)
 setnames(dt, "L1", "penalty_fn") # names are nice
 ```
 
-```
-Error: Items of 'old' not found in column names: L1
-```
-
-
-# Plots 
 
 
 
 
 ```r
-p0 <- ggplot(dt) +
-  geom_line(aes(time, harvest_alt), col="grey20", lwd=1) +
-  geom_line(aes(time, harvest, col=penalty_fn, lty=penalty_fn))+ 
-  labs(x="time", y="stock size", title = "Stock Dynamics")
+v <- dt[,var(harvest), by="penalty_fn"]
+var <- v$V1
+names(var) <- v$penalty_fn
+acor <- dt[,acf(harvest, plot=F)$acf[2], by="penalty_fn"]$V1
+names(acor) <- names(var)
+out <- rbind(var=var, a=acor)
+out
 ```
+
+```
+          L1     L2   fixed increase decrease    quad
+var 3.076184 0.8466 10.1432   6.1348   6.1348  1.6863
+a   0.005186 0.2210 -0.1972  -0.3741  -0.3741 -0.1726
+```
+
+
+
+
+
+
+# Plots 
 
 
 
@@ -303,6 +290,37 @@ p2 <- ggplot(dt) +
   geom_line(aes(time, harvest), col=rgb(0,0,1,.8)) + 
   facet_wrap(~penalty_fn) + 
   labs(x="time", y="havest intensity (fish taken)", title = "Harvest Policy Dynamics")
+p2
 ```
 
+![plot of chunk Figure3](figure/Figure3.png) 
+
+
+
+
+
+
+```r
+source("fig4_helper_fun.R")
+```
+
+```
+Warning: cannot open file 'fig4_helper_fun.R': No such file or directory
+```
+
+```
+Error: cannot open the connection
+```
+
+```r
+frac_lost <- seq(0,1, length=5)
+out <- lapply(frac_lost, fig4, ls())
+out <- melt(out)
+colnames(out) = c("statistic", "penalty", "value", "index")
+out <- cbind(out[1:3], fraction = frac_lost[out$index])
+Figure4 <- ggplot(out) + geom_line(aes(fraction, value, col=penalty)) + facet_wrap(~statistic)
+Figure4
+```
+
+![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4.png) 
 
