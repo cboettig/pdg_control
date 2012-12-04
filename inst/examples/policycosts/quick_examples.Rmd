@@ -29,9 +29,9 @@ profit <- profit_harvest(price = 10, c0 = 30, c1 = 0)
 
 ```{r setup}
 seed <- 123                 # Random seed (replicable results)
-delta <- 0.01               # economic discounting rate
-OptTime <- 100              # stopping time
-gridsize <- 100              # grid size for fish stock and harvest rate (discretized population)
+delta <- 0.05               # economic discounting rate
+OptTime <- 20            # stopping time
+gridsize <- 50              # grid size for fish stock and harvest rate (discretized population)
 sigma_g <- 0.2              # Noise in population growth
 reward <- 0                 # bonus for satisfying the boundary condition
 z_g <- function() rlnorm(1,  0, sigma_g) # mean 1
@@ -173,3 +173,7 @@ p2 <- ggplot(dt) +
 p2
 ````
 
+```{r}
+dt[,var(harvest), by="penalty_fn"]
+dt[,acf(harvest, plot=F)$acf[2], by="penalty_fn"]
+```

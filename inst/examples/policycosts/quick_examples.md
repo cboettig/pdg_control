@@ -1,15 +1,27 @@
 
 
+
+
+
+
+
+
+
+
+
 ```r
 profit <- profit_harvest(price = 10, c0 = 30, c1 = 0)
 ```
 
 
+
+
+
 ```r
 seed <- 123  # Random seed (replicable results)
-delta <- 0.01  # economic discounting rate
-OptTime <- 100  # stopping time
-gridsize <- 100  # grid size for fish stock and harvest rate (discretized population)
+delta <- 0.05  # economic discounting rate
+OptTime <- 20  # stopping time
+gridsize <- 50  # grid size for fish stock and harvest rate (discretized population)
 sigma_g <- 0.2  # Noise in population growth
 reward <- 0  # bonus for satisfying the boundary condition
 z_g <- function() rlnorm(1, 0, sigma_g)  # mean 1
@@ -113,6 +125,421 @@ quad_costs <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, quad_profit,
     delta, reward, penalty = none)
 ```
 
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning: no non-missing arguments to max; returning -Inf
+```
+
+```
+## Error: incorrect number of dimensions
+```
+
+
+
+
+```r
+seed
+```
+
+```
+## [1] 123
+```
+
 ```r
 sims <- list(L1 = simulate_optim(f, pars, x_grid, h_grid, x0, L1_policy$D, z_g, 
     z_m, z_i, opt$D, profit = profit, penalty = L1(apples["L1"]), seed = seed), 
@@ -152,7 +579,7 @@ p0 <- ggplot(dt) + geom_line(aes(time, harvest_alt), col = "grey20", lwd = 1) +
 p0
 ```
 
-![plot of chunk p0](http://carlboettiger.info/assets/figures/2012-12-03-f4cdec09eb-p0.png) 
+![plot of chunk p0](figure/p0.png) 
 
 
 
@@ -164,7 +591,7 @@ p1 <- ggplot(dt) + geom_line(aes(time, alternate), col = "grey20", lwd = 1) +
 p1
 ```
 
-![plot of chunk p1](http://carlboettiger.info/assets/figures/2012-12-03-f4cdec09eb-p1.png) 
+![plot of chunk p1](figure/p1.png) 
 
 
 
@@ -176,6 +603,35 @@ p2 <- ggplot(dt) + geom_line(aes(time, harvest_alt), col = "grey20", lwd = 1) +
 p2
 ```
 
-![plot of chunk p2](http://carlboettiger.info/assets/figures/2012-12-03-f4cdec09eb-p2.png) 
+![plot of chunk p2](figure/p2.png) 
 
+
+
+```r
+dt[, var(harvest), by = "penalty_fn"]
+```
+
+```
+##      penalty_fn     V1
+## [1,]         L1 2.4812
+## [2,]         L2 0.8432
+## [3,]      fixed 6.3245
+## [4,]   increase 3.3895
+## [5,]   decrease 3.4727
+## [6,]       quad 3.4727
+```
+
+```r
+dt[, acf(harvest, plot = F)$acf[2], by = "penalty_fn"]
+```
+
+```
+##      penalty_fn        V1
+## [1,]         L1 -0.004028
+## [2,]         L2  0.331892
+## [3,]      fixed -0.175964
+## [4,]   increase -0.099655
+## [5,]   decrease -0.201945
+## [6,]       quad -0.201945
+```
 
