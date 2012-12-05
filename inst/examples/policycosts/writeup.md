@@ -171,7 +171,7 @@ fees <- melt(fees, id = "c2")
 ggplot(fees, aes(c2, value, col = variable)) + geom_point() + geom_line()
 ```
 
-![plot of chunk npv-plot](figure/npv-plot.png) 
+![plot of chunk npv-plot](http://carlboettiger.info/assets/figures/2012-12-05-72dc8741fb-npv-plot.png) 
 
 
 Find the value of `c2` that brings each penalty closest to 75% of the cost-free adjustment value:
@@ -182,7 +182,7 @@ ggplot(fees, aes(c2, (npv0 - value)/npv0, col = variable)) + geom_point() +
     geom_line()
 ```
 
-![plot of chunk apples_plot](figure/apples_plot.png) 
+![plot of chunk apples_plot](http://carlboettiger.info/assets/figures/2012-12-05-72dc8741fb-apples_plot.png) 
 
 
 
@@ -289,7 +289,7 @@ p1 <- ggplot(dt) + geom_line(aes(time, alternate), col = "grey20",
 p1
 ```
 
-![plot of chunk p1](figure/p1.png) 
+![plot of chunk p1](http://carlboettiger.info/assets/figures/2012-12-05-72dc8741fb-p1.png) 
 
 
 
@@ -300,7 +300,7 @@ p2 <- ggplot(dt) + geom_line(aes(time, harvest_alt), col = "grey20",
 p2
 ```
 
-![plot of chunk Figure3](figure/Figure3.png) 
+![plot of chunk Figure3](http://carlboettiger.info/assets/figures/2012-12-05-72dc8741fb-Figure3.png) 
 
 
 # Figure 4
@@ -421,13 +421,13 @@ Fig4b <- ggplot(harvest_trends, aes(fraction, Ea, ymin = Ea - SDa,
 Fig4a
 ```
 
-![plot of chunk Figure4](figure/Figure41.png) 
+![plot of chunk Figure4](http://carlboettiger.info/assets/figures/2012-12-05-72dc8741fb-Figure41.png) 
 
 ```r
 Fig4b
 ```
 
-![plot of chunk Figure4](figure/Figure42.png) 
+![plot of chunk Figure4](http://carlboettiger.info/assets/figures/2012-12-05-72dc8741fb-Figure42.png) 
 
 
 
@@ -446,13 +446,13 @@ FigS4b <- ggplot(fishstock_trends, aes(fraction, Ea, ymin = Ea -
 FigS4a
 ```
 
-![plot of chunk Figure4S](figure/Figure4S1.png) 
+![plot of chunk Figure4S](http://carlboettiger.info/assets/figures/2012-12-05-72dc8741fb-Figure4S1.png) 
 
 ```r
 FigS4b
 ```
 
-![plot of chunk Figure4S](figure/Figure4S2.png) 
+![plot of chunk Figure4S](http://carlboettiger.info/assets/figures/2012-12-05-72dc8741fb-Figure4S2.png) 
 
 
 
