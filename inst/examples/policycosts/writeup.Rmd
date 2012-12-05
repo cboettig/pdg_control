@@ -35,8 +35,7 @@ theme_notebook <- theme_grey() +
 theme_set(theme_notebook)
 ```
 
-
-
+  
 
 ```{r setup}
 seed <- 123                 # Random seed (replicable results)
@@ -80,7 +79,7 @@ penaltyfns <- list(L2=L2, L1=L1, free_decrease=free_decrease, fixed=fixed, free_
 
 ``` {r  parallel}
 require(snowfall)
-sfInit(cpu=8, parallel=T)
+sfInit(cpu=2, parallel=T)
 sfLibrary(pdgControl)
 sfExportAll()
 ````
@@ -245,9 +244,11 @@ p2
 
 # Figure 4
 
+```{r}
+frac_lost <- seq(0,1, length=20)
+```
 
-
-```{r helperfn1}
+```{r helper_fn_1}
 fig4 <- function(fraction_lost){
 closest <- function(x, v){
   which.min(abs(v-x))
@@ -258,6 +259,7 @@ apples_index <- index$V1
 names(apples_index) = index$variable
 apples <- c2[index$V1]
 names(apples) = index$variable
+
 L2_policy <- policies$L2[[apples_index["L2"]]]$D
 L1_policy <- policies$L1[[apples_index["L1"]]]$D
 fixed_policy <- policies$fixed[[apples_index["fixed"]]]$D
@@ -298,7 +300,7 @@ sims <- lapply(1:50, function(reps) list(
 ```
 
 
-```{r} 
+```{r helper_fn_2} 
 # Helper functions to extract the summary stats in different variables
 stats_harvest <- function(dt){
 v <- dt[,var(harvest), by=c("penalty_fn", "reps")]
@@ -318,7 +320,7 @@ df
 ```
 
 
-```{r helper2}
+```{r helper_fn_3}
 #' a simple function for reorganizing the data over the different "faction-lost" levels
 get_trends <- function(tmp2){
   out <- melt(tmp2, id=c("reps", "var", "acor"))
@@ -339,12 +341,13 @@ get_trends <- function(tmp2){
 
 
 
-```{r Figure4}
-frac_lost <- seq(0,1, length=20)
+```{r Figure4_harvest}
 sims_at_each_apple <- lapply(frac_lost, fig4)
 harvest_stats <- lapply(sims_at_each_apple, stats_harvest)
-havest_trends <- get_trends(harvest_stats)
+harvest_trends <- get_trends(harvest_stats)
+```
 
+```{r Figure4}
 Fig4a <- ggplot(harvest_trends, 
                 aes(fraction, Ev, ymin=Ev-SDv, ymax=Ev+SDv, col=penalty)) + 
   geom_ribbon(aes(fill=penalty, col=NA), lwd=0, alpha=.05) + 
@@ -359,7 +362,7 @@ Fig4b
 ````
 
 
-```{r}
+```{r Figure4S}
 fishstock_stats <- lapply(sims_at_each_apple, stats_fishstock)
 fishstock_trends <- get_trends(fishstock_stats)
 
