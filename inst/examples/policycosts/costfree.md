@@ -1,21 +1,16 @@
-``` {r libraries, include=FALSE}
-rm(list=ls())
-require(pdgControl)
-require(reshape2)
-require(ggplot2)
-require(data.table)
-```
 
 
-```{r cache-options, include=FALSE}
-opts_chunk$set(cache=TRUE, cache.path="costfree/")
-```
 
-``` {r}
+
+
+
+
+
+```r
 price = 10
 c0 = 0
 profit <- profit_harvest(price = price, c0 = c0, c1 = 0)
-c2 <- exp(seq(0, log(21), length.out = 20))-1
+c2 <- exp(seq(0, log(21), length.out = 20)) - 1
 ```
 
 
@@ -23,22 +18,15 @@ c2 <- exp(seq(0, log(21), length.out = 20))-1
 
 
 
-```{r graphing-options, include=FALSE}
-opts_knit$set(upload.fun = socialR::notebook.url)
-opts_chunk$set(dev.args=list(bg="transparent"),
-               tidy=FALSE, comment=NA, message=FALSE)
-theme_notebook <- theme_grey() + 
-                  theme(plot.background = 
-                          element_rect(fill = "transparent",colour = NA),
-                        panel.grid.minor = 
-                          element_line(colour = "transparent"))
-theme_set(theme_notebook)
-```
 
 
 
 
-```{r setup}
+
+
+
+
+```r
 seed <- 123                 # Random seed (replicable results)
 delta <- 0.05               # economic discounting rate
 OptTime <- 20               # stopping time
@@ -55,18 +43,22 @@ xT <- 0                     # boundary conditions
 x0 <- K
 x_grid <- seq(0.01, 1.2 * K, length = gridsize)  
 h_grid <- seq(0.01, 0.8 * K, length = gridsize)  
-````
+```
 
 
-```{r reed, dependson="setup"}
+
+
+```r
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g )
 opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, 
                      profit, delta, reward=reward)
-````
+```
 
 
 
-``` {r fees}
+
+
+```r
 L1 <- function(c2) function(h, h_prev)  c2 * abs(h - h_prev) 
 free_increase <- function(c2) function(h, h_prev)  c2 * abs(min(h - h_prev, 0)) # increasing harvest is free
 free_decrease <- function(c2) function(h, h_prev)  c2 * max(h - h_prev, 0) # decreasing harvest is free
@@ -74,21 +66,48 @@ fixed <-  function(c2) function(h, h_prev) c2 * as.numeric( !(h == h_prev) )
 L2 <- function(c2) function(h, h_prev)  c2 * (h - h_prev) ^ 2
 none <- function(h, h_prev)  0
 penaltyfns <- list(L2=L2, L1=L1, free_decrease=free_decrease, fixed=fixed, free_increase=free_increase)
-````
+```
+
 
 ## Apples to Apples levels
 
-``` {r  parallel}
+
+```r
 require(snowfall)
 sfInit(cpu=8, parallel=T)
+```
+
+```
+Warning: Unknown option on commandline: options(encoding
+```
+
+```
+R Version:  R version 2.15.2 (2012-10-26) 
+
+```
+
+```r
 sfLibrary(pdgControl)
+```
+
+```
+Library pdgControl loaded.
+```
+
+```
+Warning: 'keep.source' is deprecated and will be ignored
+```
+
+```r
 sfExportAll()
-````
+```
+
 
 
 ### Loop over penalty functions and magnitudes
 
-``` {r  bigloop, dependson=c("setup", "reed", "fees")}
+
+```r
 policies <- lapply(penaltyfns, function(penalty){
   sfLapply(c2, function(c2){
       policy <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
@@ -96,7 +115,8 @@ policies <- lapply(penaltyfns, function(penalty){
       }
   )
 })
-````
+```
+
 
 Note that `optim_policy` has been updated to return the equilibrium value of profits from fish harvests before the adjustment costs have been paid, `penalty_free_V`.  This containst the values for all possible states, we simply evaluate it at the carrying capacity (which is our initial condition.)  The index in `x_grid` that corresponds to the carrying capacity (initial condition) `i` indicates this.  
 
@@ -104,7 +124,8 @@ Note that `optim_policy` has been updated to return the equilibrium value of pro
 
 Quadratic costs on fishing effort have to be done separately,
 
-``` {r  quadcosts, dependson="bigloop"}
+
+```r
 quad <- 
   sfLapply(c2, function(c2){
   effort_penalty = function(x,h) (c2 * h / x) / price
@@ -113,12 +134,14 @@ quad <-
                         effort_penalty)
 })
 policies <- c(policies, quad=list(quad))
-````
+```
+
 
 
 Extract the policy cost
 
-```{r}
+
+```r
 i <- which(x_grid > K)[1]
 fees <- 
 lapply(policies, function(penalty) 
@@ -129,21 +152,36 @@ lapply(policies, function(penalty)
 ```
 
 
+
 Tidy up the data and plot the net present value (before the penalty has been paid) relative to that achieved when managed without a penalty.  
 
-``` {r npv-plot, dependson="quadcosts"}
+
+```r
 npv0 <- max(fees$L1) # all have same max, at c2=0 
 npv0
+```
+
+```
+[1] 297.4
+```
+
+```r
 fees <- data.frame(c2=c2,fees)
 fees <- melt(fees, id="c2")
 ggplot(fees, aes(c2, value, col=variable)) + geom_point() + geom_line()
-````
+```
+
+![plot of chunk npv-plot](http://carlboettiger.info/assets/figures/2012-12-05-25e6f1c1a5-npv-plot.png) 
+
 
 Find the value of `c2` that brings each penalty closest to 75% of the cost-free adjustment value:
 
-```{r apples_plot, dependson="quadcosts"}
+
+```r
 ggplot(fees, aes(c2, (npv0-value)/npv0, col=variable)) + geom_point() + geom_line()
-````
+```
+
+![plot of chunk apples_plot](http://carlboettiger.info/assets/figures/2012-12-05-25e6f1c1a5-apples_plot.png) 
 
 
 
@@ -151,7 +189,9 @@ ggplot(fees, aes(c2, (npv0-value)/npv0, col=variable)) + geom_point() + geom_lin
 
 
 
-```{r apples, dependson="quadcosts"}
+
+
+```r
 closest <- function(x, v){
   which.min(abs(v-x))
 }
@@ -162,11 +202,20 @@ names(apples_index) = index$variable
 apples <- c2[index$V1]
 names(apples) = index$variable
 apples
-````
+```
+
+```
+           L2            L1 free_decrease         fixed free_increase 
+       11.985         7.029         0.000        20.000         0.000 
+         quad 
+        8.425 
+```
+
 
 Solve the policy cost for the specified penalty function
 
-``` {r policynames}
+
+```r
 L2_policy <- policies$L2[[apples_index["L2"]]]$D
 L1_policy <- policies$L1[[apples_index["L1"]]]$D
 fixed_policy <- policies$fixed[[apples_index["fixed"]]]$D
@@ -175,7 +224,9 @@ free_decrease_policy <- policies$free_decrease[[apples_index["free_decrease"]]]$
 quad_policy <- policies$quad[[apples_index["quad"]]]$D
 ```
 
-``` {r simulate_policy, dependson="policynames"}
+
+
+```r
 quad_profit <- profit_harvest(price = price, c0 = c0, c1 = apples["quad"]) 
 sims <- list(
   L1 = simulate_optim(f, pars, x_grid, h_grid, x0, 
@@ -197,19 +248,23 @@ sims <- list(
                             quad_policy, z_g, z_m, z_i, 
                             opt$D, profit=quad_profit, penalty= none, seed=seed)
 )
-````
+```
 
 
-``` {r tidy, dependson="simulate_policy"}
+
+
+```r
 #Make data tidy (melt), fast (data.tables), and nicely labeled.
 dat <- melt(sims, id=names(sims[[1]]))  
 dt <- data.table(dat)
 setnames(dt, "L1", "penalty_fn") # names are nice
-````
+```
 
 
 
-```{r}
+
+
+```r
 v <- dt[,var(harvest), by="penalty_fn"]
 var <- v$V1
 names(var) <- v$penalty_fn
@@ -219,6 +274,13 @@ out <- rbind(var=var, a=acor)
 out
 ```
 
+```
+           L1     L2     fixed increase decrease    quad
+var  1.288336 0.3164  3.070880   2.1817   2.1817  2.9102
+a   -0.002454 0.1811 -0.002632  -0.1527  -0.1527 -0.1037
+```
+
+
 
 
 
@@ -226,30 +288,39 @@ out
 # Plots 
 
 
-```{r p1, dependson="tidy", fig.width=12}
+
+```r
 p1 <- ggplot(dt) +
   geom_line(aes(time, alternate), col="grey20", lwd=1) +
   geom_line(aes(time, fishstock), col=rgb(0,0,1,.8)) + facet_wrap(~penalty_fn) + 
   labs(x="time", y="stock size", title = "Stock Dynamics")
 ```
 
-```{r Figure3, dependson="tidy", fig.width=12}
+
+
+```r
 p2 <- ggplot(dt) +
   geom_line(aes(time, harvest_alt), col="grey20", lwd=1)  +
   geom_line(aes(time, harvest), col=rgb(0,0,1,.8)) + 
   facet_wrap(~penalty_fn) + 
   labs(x="time", y="havest intensity (fish taken)", title = "Harvest Policy Dynamics")
 p2
-````
+```
+
+![plot of chunk Figure3](http://carlboettiger.info/assets/figures/2012-12-05-25e6f1c1a5-Figure3.png) 
+
 
 
 # Figure 4
 
-```{r}
+
+```r
 frac_lost <- seq(0,1, length=20)
 ```
 
-```{r helper_fn_1}
+
+
+```r
 fig4 <- function(fraction_lost){
 closest <- function(x, v){
   which.min(abs(v-x))
@@ -301,7 +372,9 @@ sims <- lapply(1:50, function(reps) list(
 ```
 
 
-```{r helper_fn_2} 
+
+
+```r
 # Helper functions to extract the summary stats in different variables
 stats_harvest <- function(dt){
 v <- dt[,var(harvest), by=c("penalty_fn", "reps")]
@@ -321,7 +394,9 @@ df
 ```
 
 
-```{r helper_fn_3}
+
+
+```r
 #' a simple function for reorganizing the data over the different "faction-lost" levels
 get_trends <- function(tmp2){
   out <- melt(tmp2, id=c("reps", "var", "acor"))
@@ -342,13 +417,17 @@ get_trends <- function(tmp2){
 
 
 
-```{r Figure4_harvest}
+
+
+```r
 sims_at_each_apple <- lapply(frac_lost, fig4)
 harvest_stats <- lapply(sims_at_each_apple, stats_harvest)
 harvest_trends <- get_trends(harvest_stats)
 ```
 
-```{r Figure4}
+
+
+```r
 Fig4a <- ggplot(harvest_trends, 
                 aes(fraction, Ev, ymin=Ev-SDv, ymax=Ev+SDv, col=penalty)) + 
   geom_ribbon(aes(fill=penalty, col=NA), lwd=0, alpha=.05) + 
@@ -359,11 +438,20 @@ Fig4b <- ggplot(harvest_trends,
   geom_ribbon(aes(fill=penalty, col=NA), lwd=0, alpha=.05) + 
   geom_line() + xlab("Fraction of NPV lost to costs")
 Fig4a
+```
+
+![plot of chunk Figure4](http://carlboettiger.info/assets/figures/2012-12-05-25e6f1c1a5-Figure41.png) 
+
+```r
 Fig4b
-````
+```
+
+![plot of chunk Figure4](http://carlboettiger.info/assets/figures/2012-12-05-25e6f1c1a5-Figure42.png) 
 
 
-```{r Figure4S}
+
+
+```r
 fishstock_stats <- lapply(sims_at_each_apple, stats_fishstock)
 fishstock_trends <- get_trends(fishstock_stats)
 
@@ -377,8 +465,16 @@ FigS4b <- ggplot(fishstock_trends,
   geom_ribbon(aes(fill=penalty, col=NA), lwd=0, alpha=.05) + 
   geom_line() + xlab("Fraction of NPV lost to costs")
 FigS4a
+```
+
+![plot of chunk Figure4S](http://carlboettiger.info/assets/figures/2012-12-05-25e6f1c1a5-Figure4S1.png) 
+
+```r
 FigS4b
 ```
+
+![plot of chunk Figure4S](http://carlboettiger.info/assets/figures/2012-12-05-25e6f1c1a5-Figure4S2.png) 
+
 
 
 
