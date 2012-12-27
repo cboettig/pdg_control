@@ -3,7 +3,7 @@
 \title{SDP under multiple uncertainty}
 \usage{
   SDP_multiple_uncertainty(f, p, x_grid, h_grid, Tmax = 25,
-    sigmas = c(sigma_g = 0, sigma_m = 0, sigma_i = 0),
+    sigmas = c(sigma_g = 0.3, sigma_m = 0, sigma_i = 0),
     pdfn = pdfn, profit = function(x, h) pmin(x, h))
 }
 \arguments{

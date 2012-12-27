@@ -1,29 +1,13 @@
-Package: pdgControl
+Package: multipleuncertainty
 Description: Research in optimal control. Examples focus on fisheries
     management.
-Title: Pretty Darn Good Control
-Version: 0.0-2
+Title: Multiple Uncertainty
+Version: 0.0-1
 License: BSD
 Author: Carl Boettiger
 Maintainer: Carl Boettiger, <cboettig@gmail.com>
-URL: https://github.com/cboettig/pdg_control
-BugReports: https://github.com/cboettig/pdg_control/issues
-Imports:
-    Hmisc,
-    cubature,
-    expm,
-    ggplot2,
-    snowfall
+URL: https://github.com/cboettig/multiple_uncertainty
+BugReports: https://github.com/cboettig/multiple_uncertainty/issues
 Collate:
-    'plots.R'
-    'population_models.R'
-    'ForwardSimulate.R'
-    'determine_SDP_matrix.R'
-    'find_dp_optim.R'
-    'policy_costs.R'
-    'profit_functions.R'
     'active_adaptive_simulate.R'
-    'find_dp_cautious.R'
-    'SDP_uniform.R'
-    'SDP_multiple_uncertainty.R'
-    'fig4_helper_fn.R'
+    'multiple_uncertainty.R'

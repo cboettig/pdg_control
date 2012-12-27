@@ -17,13 +17,12 @@
 #' Values of D[,t] correspond to the index of h_grid.  Indices of of D[,t] correspond to states in y_grid.  
 #' @export
 SDP_multiple_uncertainty <- function(f, p, x_grid, h_grid, Tmax = 25,
-                                     sigmas =c(sigma_g=0, sigma_m=0, sigma_i=0), 
+                                     sigmas =c(sigma_g=0.3, sigma_m=0, sigma_i=0), 
                                      pdfn = pdfn, profit = function(x,h) pmin(x, h)){
   
-    ## Initialize stuff
-    sigma_g <- sigmas['sigma_g']      
-    sigma_m <- sigmas['sigma_m']
-    sigma_i <- sigmas['sigma_i']
+    sigma_g <- sigmas[1]      
+    sigma_m <- sigmas[2]
+    sigma_i <- sigmas[3]
     n_x <- length(x_grid)
     n_h <- length(h_grid)
     D <- matrix(NA, nrow=n_x, ncol=Tmax)  
@@ -31,34 +30,47 @@ SDP_multiple_uncertainty <- function(f, p, x_grid, h_grid, Tmax = 25,
     ## Compute the transition matrices 
     P <-  outer(x_grid, h_grid, profit) 
     M <- rownorm( outer(x_grid, x_grid, pdfn, sigma_m) )
-    I <- rownorm( outer(h_grid, h_grid, pdfn, sigma_i) )
+    I <- rownorm( outer(h_grid, h_grid, pdfn, sigma_i) )  
     
-    # integrate over uncertainty in I and X 
+
+    
+    # Much faster to fill out f calls as a matrix ahead of time.  
+    f_matrix <- outer(x_grid, h_grid, f, p)
+    # Fill out uncertainty in transitions first
+    G <- outer(x_grid, x_grid, pdfn, sigma_g)
+    
     F <- lapply(1:n_h, function(q){  
       t(sapply(1:n_x, function(y){
         out <- numeric(n_x)
-        mu <- sum(sapply(1:n_x, function(x)
-          f(x_grid[x],h_grid,p) %*% 
-            I[q,] *  # Implementation error
-            M[x,y])) # Measurement error
-        if(mu==0)
-          out[1] <- 1
-        else 
-          out <- dlnorm(x_grid/mu, 0, sigma_g)
+        mu <- M[y,] %*% f_matrix %*% I[q,] 
+        # Handle special cases
+        if(snap_to_grid(mu,x_grid)==0){ # 
+          out[1] <- 1   
+        } else {
+        #out <- pdfn(x_grid, mu, sigma_g)  ## All computational time spent here.  could be done by look-up:
+         mu_i <- which.min(abs(x_grid - mu)) ## snap mu to grid first
+         out <- G[,mu_i]   ## then do this by table look-up
+         ## Not identical but very close.  
+        }
         out/sum(out)
       }))
     })
     
-    Ep <- M %*% P %*% I
+    
+    # n_y by n_x, given y %*% n_x by n_h %*% n_h by n_q, given q
+    Ep <- M %*% P %*% t(I)
     V <- Ep
     for(t in 1:Tmax){
-      D[,(Tmax-t+1)] <- apply(V, 1, which.max)
-      v_t <- apply(V, 1, max) # vector of current values
+      D[,(Tmax-t+1)] <- apply(V, 1, which.max) 
+      ## q can often exceed y: if fishing is free, there might be more x than you think.  In such cases it is worth attempting to fish extra, and we shouldn't exert q < y.  
+      #if(any(pmin(D[,(Tmax-t+1)], 1:n_h) !=  D[,(Tmax-t+1)])) stop()
+      #v_t <- sapply(1:n_h, function(i) V[i,D[i,(Tmax-t+1)]]) # Look-up value given by which.max
+      v_t <- apply(V, 1, max) # vector of current values 
       V <- sapply(1:n_h, function(j){ # updated value matrix
         Ep[,j] + (1-delta) * M %*% F[[j]] %*% v_t
       })
     }
-    D
+    list(D=D, M=M, I=I, P=P, Ep=Ep, V=V, F=F)
 }
   
 # row-normalize the probability distribution
@@ -67,57 +79,25 @@ rownorm <- function(M) t(apply(M, 1, function(x) x/sum(x)))
 # binning routine (vectorized)
 snap_to_grid <- function(x, grid) sapply(x, function(x) grid[which.min(abs(grid - x))])   
 
+ 
+
 # Uniform pdf where width scales with mean (probably better way to do that)
 # And handles degenerate/delta fn cases such as no width and zero mean
 FUN <- function(P, mu, s){
   if(mu == 0){
     as.integer(P == 0)
   } else if(s > 0){
-    if(mu > 0) dunif(P, mu * (1 - s), mu * (1 + s))
+    if(mu > 0){
+      #dlnorm(P/mu, 0, s)
+      dunif(P, mu * (1 - s), mu * (1 + s))
+    }
   }
   else { # delta spike
     P <- snap_to_grid(P, x_grid)
     mu <- snap_to_grid(mu, x_grid)
-    as.integer(P == mu)
+    as.numeric(as.integer(P == mu))
   }
 }
 pdfn <- Vectorize(FUN)
 
-
-############## DEPRECATED SCRATCH ###########
-
-dummy_attempts <- function(){
-    #F <- rownorm( outer(x_grid, f(x_grid, 0, p), pdfn, sigma_g) ) # has fatal cases where there are values of f(x) for which no x can get within +/- f(x)*sigma_g of  
-    ## This is  the F without uncertainty in current state (measurement, growth).  Alternately, use this F[[1]] (e.g. h=0) and the Q matrix below
-    F <- lapply(h_grid, function(h){
-      t(sapply(f(x_grid,h,p), function(y){
-        out <- numeric(n_x)
-        if(y==0)
-          out[1] <- 1
-        else 
-         out <- dlnorm(x_grid/y, 0, sigma_g)
-        out/sum(out)
-      }))
-    })
-    F2 <- determine_SDP_matrix(f, p, x_grid, h_grid, sigma_g, pdfn=function(P, s) dlnorm(P, 0, s))  
-    ## Without uncertainty in measure or growth, here's the SDP algorithm:
-    V <- P
-    for(t in 1:Tmax){
-      D[,(Tmax-t+1)] <- apply(V, 1, which.max)
-      v_t <- apply(V, 1, max) # vector of current values
-      V <- sapply(1:n_h, function(j){ # updated value matrix
-        P[,j] + (1-delta) * F[[j]] %*% v_t
-      })
-    }
-    D   
-    ## Q  is the map that multiplies F[[1]] to account for implmentation uncertainty.  
-    ## This calculation is super slow.  In principle should work but is not matching up.  Probably need to transpose something to correct for the sapplys
-    Q <- lapply(1:n_h, function(q)
-      sapply(1:n_x, function(s)
-        sapply(1:n_x, function(x)
-          sum(sapply(1:n_h, function(h) 
-            (x_grid[s] == pmax(x_grid[x]-h_grid[h],0)) * I[q,h]
-    )))))
-   
-}
 
