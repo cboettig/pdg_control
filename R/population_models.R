@@ -159,14 +159,48 @@ Ricker <- function(x,h,p){
 #' @param h harvesting effort on parrotfish
 #' @param p c(a, g, T, gamma, r, d, s, K)
 #'            1  2  3     4   5  6  7  8
+#' @references Blackwood et al. (2011) doi:10.1890/10-2195.1
+#' @details 
+#' $$\begin{align}
+#' \frac{dM}{dt} = aMC - \frac{g(P) M}{M+T} + \gamma M T \\
+#' \frac{dC}{dt} = rTC - dC - a M C \\
+#' \frac{dP}{dt} = sP \left( 1- \frac{P}{\beta K(C) } \right) - h P 
+#' \end{align}$$
 #' @export
-coral <- function(x, h, p){
+coral <- function(x, h, p = c(a = 0.1, g = 1, T = , gamma = 0.8, r = 1, d = 0.44, s= 0.49, K = 1)){
  x_t1 <- p[1] * x[1] * x[2] + p[2] * x[3] * x[1] / (x[1] + p[3]) + p[4] * p[3] * x[1]
  x_t2 <- (p[5] * p[3] - p[6] - p[1] * x[1]  ) * x[2] 
  x_t3 <- p[7] * x[3] * (1 - x[3] / (p[8] * x[2])) - h * x[3]
  c(x_t1, x_t2, x_t3)
 }
+                  
 
+
+#' Coral-Parrotfish model
+#' @param x vector of population levels: macroalgae, coral, parrotfish
+#' @param h harvesting effort on parrotfish
+#' @param p c(a, g, gamma, r, d)
+#' @param dt descrization scale
+#' @references Mumby et al. (2007) doi:10.1038/nature06252
+#' Blackwood et al. (2011) doi:10.1890/10-2195.1
+#' @details 
+#' $$\begin{align}
+#' \frac{dM}{dt} = aMC - \frac{(g-h) M}{M+T} + \gamma M T \\
+#' \frac{dC}{dt} = rTC - dC - a M C \\
+#' T = 1 - M - C
+#' \end{align}$$
+#' @export
+mumby <- function(x, h, p= c(a = 0.1, g = .5, gamma = 0.8, r = 1, d = 0.44), dt=0.025){
+  M <- x[1] # Macroalgae
+  C <- x[2] # Corals
+  a <- p[1] # algal growth rate
+  g <- p[2] # grazing rate (reduced by harvesting)
+  gamma <- p[3] # algal colinization of dead tufts
+  r <- p[4] # Coral growth rate
+  d <- p[5] # Coral death rate
+  M_t <- M * exp( dt * (a * M * C - (g - h) * M / (M + (1-M-C)) + gamma * M * (1-M-C)) )
+  C_t <- C * exp( dt * (r * (1-M-C) * C - d * C - a * M * C) )
+  c(M_t, C_t)
 
 
 

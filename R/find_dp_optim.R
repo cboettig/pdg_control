@@ -53,7 +53,9 @@ find_dp_optim <- function(SDP_Mat, x_grid, h_grid, OptTime, xT, profit,
     V <- out[1,]                        # The new value-to-go
     D[,OptTime-time+1] <- out[2,]       # The index positions
   }
-
+  # check for convergence in V
+  
+  
   # Reed derives a const escapement policy saying to fish the pop down to
   # the largest population for which you shouldn't harvest: 
   ReedThreshold <- x_grid[max(which(D[,1] == 1))]
