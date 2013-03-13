@@ -201,7 +201,7 @@ mumby <- function(x, h, p= c(a = 0.1, g = .5, gamma = 0.8, r = 1, d = 0.44), dt=
   M_t <- M * exp( dt * (a * M * C - (g - h) * M / (M + (1-M-C)) + gamma * M * (1-M-C)) )
   C_t <- C * exp( dt * (r * (1-M-C) * C - d * C - a * M * C) )
   c(M_t, C_t)
-
+}
 
 
 
