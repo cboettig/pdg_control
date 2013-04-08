@@ -20,18 +20,22 @@
 #'  and what the escapement ("unharvested"). 
 #' @export
 ForwardSimulate <- function(f, pars, x_grid, h_grid, x0, D, z_g,
-                            z_m=function(x) 1, z_i = function(x) 1, 
-                            profit=NULL){
+                            z_m = function(x) 1, z_i = function(x) 1, 
+                            profit = NULL, OptTime = NULL){
   # initialize variables with initial conditions
-  OptTime <- dim(D)[2]    # Stopping time
+  if(is.null(OptTime)) 
+    OptTime <- dim(D)[2]    # Stopping time
   x_h <- numeric(OptTime) # population dynamics with harvest
-  h <- numeric(OptTime) # optimal havest level
-  x_h[1] <- x0  # initial values
+  h <- numeric(OptTime)   # optimal havest level
+  x_h[1] <- x0            # initial values
   
   s <- x_h # also track escapement
   x <- x_h # What would happen with no havest
   p <- numeric(OptTime)
  
+  ## If given a stationary policy, replicate it throughout.  
+  if(!is.matrix(D))
+    D <- sapply(1:OptTime, function(i) D)
     
   ## Simulate through time ##
   for(t in 1:(OptTime-1)){
