@@ -1,4 +1,4 @@
-
+`ro cache=FALSE, tidy=FALSE, warning=FALSE, comment=NA, message=FALSE, verbose=TRUE or`
 
 
 
@@ -7,17 +7,27 @@
 
  * Author [Carl Boettiger](http://carlboettiger.info), <cboettig@gmail.com>
  * License: [CC0](http://creativecommons.org/publicdomain/zero/1.0/)
- * Description:  Implements a numerical version of the SDP described in 
+ * Description:  Implements a numerical version of the SDP described in <span class="showtooltip" title="Reed W (1979). Optimal Escapement Levels in Stochastic And
+Deterministic Harvesting Models. _Journal of Environmental
+Economics And Management_, *6*, pp. 350-363. ISSN 00950696, 
+http://dx.doi.org/10.1016/0095-0696(79)90014-7."><a href="http://dx.doi.org/10.1016/0095-0696(79)90014-7">Reed (1979)</a></span> .
+
 
 ```
-
-Error in read.bib(bibfile) : unable to open file to read
-
+## Loading required package: pdgControl
 ```
 
-.
+```
+## Loading required package: reshape2
+```
 
+```
+## Loading required package: ggplot2
+```
 
+```
+## Loading required package: data.table
+```
 
 
 
@@ -25,22 +35,25 @@ Chose the state equation / population dynamics function
 
 
 ```r
-f <- function (x, h, p) 
-{
- sapply(x, function(x){
-  	S = max(x - h, 0)
-  	p[1] * S * (1 - S/p[2]) + S
-  })
+f <- function(x, h, p) {
+    sapply(x, function(x) {
+        S = max(x - h, 0)
+        p[1] * S * (1 - S/p[2]) + S
+    })
 }
 ```
 
 
-With parameters `K` = `100` and `r` = `1`.
-
 
 ```r
+r <- 1
+K <- 100
 pars <- c(r, K)
 ```
+
+
+
+With parameters `K` = 100 and `r` = 1.
 
 
 We consider a profits from fishing to be a function of harvest `h` and stock size `x`,  
@@ -55,28 +68,28 @@ conditioned on h > x and x > 0,
 price <- 1
 c0 <- 0
 c1 <- 0
-profit <- profit_harvest(price=price, c0 = c0, c1=c1) 
+profit <- profit_harvest(price = price, c0 = c0, c1 = c1)
 ```
 
 
-with price = `1`, `c0` = `0` and `c1` = `0`. 
+with price = 1, `c0` = 0 and `c1` = 0. 
 
 
 
 ```r
 xmin <- 0
-xmax <- K*1.5
+xmax <- K * 1.5
 grid_n <- 200
 ```
 
 
-We seek a harvest policy which maximizes the discounted profit from the fishery using a stochastic dynamic programming approach over a discrete grid of stock sizes from `0` to `150` on a grid of `200` points, and over an identical discrete grid of possible harvest values.  
+We seek a harvest policy which maximizes the discounted profit from the fishery using a stochastic dynamic programming approach over a discrete grid of stock sizes from 0 to 150 on a grid of 200 points, and over an identical discrete grid of possible harvest values.  
 
 
 
 ```r
-x_grid <- seq(xmin, xmax, length = grid_n)  
-h_grid <- x_grid  
+x_grid <- seq(xmin, xmax, length = grid_n)
+h_grid <- x_grid
 ```
 
 
@@ -86,11 +99,11 @@ h_grid <- x_grid
 delta <- 0.05
 xT <- 0
 OptTime <- 25
-sigma_g <- .1
+sigma_g <- 0.1
 ```
 
 
-We will determine the optimal solution over a `25` time step window with boundary condition for stock at `0` and discounting rate of `0.05`.  The Reed model considers a stochastic growth model 
+We will determine the optimal solution over a 25 time step window with boundary condition for stock at 0 and discounting rate of 0.05.  The Reed model considers a stochastic growth model 
 
 <div> $$ x_{t+1} = z_g f(x_t) $$ </div> 
 
@@ -98,11 +111,11 @@ for the random variable `z_g`, given by
 
 
 ```r
-z_g <- function() 1 + rlnorm(1,0, sigma_g)  
+z_g <- function() 1 + rlnorm(1, 0, sigma_g)
 pdfn <- function(P, s) dlnorm(P, 0, s)
 
-#z_g <- function() 1+(2*runif(1, 0,  1)-1) * sigma_g
-#pdfn <- function(P, s)  dunif(P, 1 - s, 1 + s)
+# z_g <- function() 1+(2*runif(1, 0, 1)-1) * sigma_g pdfn <- function(P,
+# s) dunif(P, 1 - s, 1 + s)
 ```
 
 
@@ -111,7 +124,8 @@ pdfn <- function(P, s) dlnorm(P, 0, s)
 
 
 ```r
-SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g, pdfn)
+SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g, 
+    pdfn)
 ```
 
 
@@ -121,7 +135,18 @@ Bellman's algorithm to compute the optimal solution for all possible trajectorie
 
 
 ```r
-opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward=0)
+opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, 
+    delta, reward = 0)
+```
+
+
+
+Stationary optimal policy:  
+
+
+```r
+s_opt <- value_iteration(SDP_Mat, x_grid, h_grid, OptTime = 1000, 
+    xT, profit, delta)
 ```
 
 
@@ -130,7 +155,8 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, profit, delta, reward
 
 
 ```r
-SDP_Mat2 <- determine_SDP_matrix(f, pars, x_grid, h_grid, 0.001, pdfn)
+SDP_Mat2 <- determine_SDP_matrix(f, pars, x_grid, h_grid, 0.001, 
+    pdfn)
 ```
 
 
@@ -138,7 +164,8 @@ Bellman's algorithm to compute the optimal solution for all possible trajectorie
 
 
 ```r
-det <- find_dp_optim(SDP_Mat2, x_grid, h_grid, OptTime, xT, profit, delta, reward=0)
+det <- find_dp_optim(SDP_Mat2, x_grid, h_grid, OptTime, xT, profit, 
+    delta, reward = 0)
 ```
 
 
@@ -152,24 +179,26 @@ Plot the policy function (in terms of escapement, `x-h`, rather than harvest `h`
 
 ```r
 require(reshape2)
-policies <- melt(data.frame(stock=x_grid, S = x_grid[opt$D[,1]], D = x_grid[det$D[,1]]), id="stock")
-q1 <- ggplot(policies, aes(stock, stock - value, color=variable)) + geom_point() + xlab("stock size") + ylab("escapement") 
+policies <- melt(data.frame(stock = x_grid, S = x_grid[opt$D[, 1]], 
+    D = x_grid[det$D[, 1]], Stationary = x_grid[s_opt$D]), id = "stock")
+q1 <- ggplot(policies, aes(stock, stock - value, color = variable)) + 
+    geom_point(alpha = 0.5) + xlab("stock size") + ylab("escapement")
 q1
 ```
 
-![plot of chunk policyfn_plot](figure/policyfn_plot.png) 
+![plot of chunk policyfn_plot](http://farm9.staticflickr.com/8546/8632839432_9d0cdc753f_o.png) 
 
 
 and the value function (at equilibrium):
 
 
 ```r
-q2 <- qplot(x_grid, opt$V, xlab="stock size", ylab="value") + 
-geom_vline(xintercept=opt$S)
+q2 <- qplot(x_grid, opt$V, xlab = "stock size", ylab = "value") + 
+    geom_vline(xintercept = opt$S)
 q2
 ```
 
-![plot of chunk valuefn_plot](figure/valuefn_plot.png) 
+![plot of chunk valuefn_plot](http://farm9.staticflickr.com/8117/8631733075_4f28f7f2cc_o.png) 
 
 
 
@@ -191,8 +220,8 @@ z_i <- function() 1
 
 
 ```r
-sims <- lapply(1:100, function(i){
-  ForwardSimulate(f, pars, x_grid, h_grid, x0=K, opt$D, z_g, z_m, z_i)
+sims <- lapply(1:100, function(i) {
+    ForwardSimulate(f, pars, x_grid, h_grid, x0 = K, opt$D, z_g, z_m, z_i)
 })
 ```
 
@@ -206,9 +235,9 @@ R makes it easy to work with this big replicate data set.  We make data tidy (me
 
 
 ```r
-dat <- melt(sims, id=names(sims[[1]]))  
+dat <- melt(sims, id = names(sims[[1]]))
 dt <- data.table(dat)
-setnames(dt, "L1", "reps") # names are nice
+setnames(dt, "L1", "reps")  # names are nice
 ```
 
 
@@ -218,14 +247,13 @@ Let's begin by looking at the dynamics of a single replicate. The line shows Ree
 
 
 ```r
-p0 <- ggplot(subset(dt,reps==1)) +
-  geom_line(aes(time, fishstock)) +
-  geom_abline(intercept=opt$S, slope = 0) +
-  geom_line(aes(time, harvest), col="darkgreen") 
+p0 <- ggplot(subset(dt, reps == 1)) + geom_line(aes(time, fishstock)) + 
+    geom_abline(intercept = opt$S, slope = 0) + geom_line(aes(time, harvest), 
+    col = "darkgreen")
 p0
 ```
 
-![plot of chunk p0](figure/p0.png) 
+![plot of chunk p0](http://farm9.staticflickr.com/8533/8632839792_408e804a67_o.png) 
 
 
 
@@ -233,13 +261,13 @@ This plot summarizes the stock dynamics by visualizing the replicates. Reed's S 
 
 
 ```r
-p1 <- ggplot(dt) + geom_abline(intercept=opt$S, slope = 0) + 
-  geom_abline(intercept=xT, slope = 0, lty=2) 
+p1 <- ggplot(dt) + geom_abline(intercept = opt$S, slope = 0) + geom_abline(intercept = xT, 
+    slope = 0, lty = 2)
 p1 <- p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 p1
 ```
 
-![plot of chunk p1](figure/p1.png) 
+![plot of chunk p1](http://farm9.staticflickr.com/8123/8632839978_d93993eb69_o.png) 
 
 
 
