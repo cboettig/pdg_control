@@ -4,7 +4,7 @@
 \usage{
   ForwardSimulate(f, pars, x_grid, h_grid, x0, D, z_g,
     z_m = function(x) 1, z_i = function(x) 1,
-    profit = NULL)
+    profit = NULL, OptTime = NULL)
 }
 \arguments{
   \item{f}{the growth function of the escapement population

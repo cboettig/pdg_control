@@ -26,3 +26,7 @@ Collate:
     'find_dp_cautious.R'
     'SDP_uniform.R'
     'fig4_helper_fn.R'
+    'SDP_by_simulation.R'
+    'integrate_SDP_matrix.R'
+    'parameter_uncertainty_SDP.R'
+    'value_iteration.R'
