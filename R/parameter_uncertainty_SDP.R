@@ -1,15 +1,15 @@
 #' Computes the transition matrix under the case of parametric uncertainty
 #'
 #' @param f the growth function of the escapement population (x-h)
-#'   should be a function of f(t, y, p), with parameters p
-#' @param p the parameters of the growth function
+#'   should be a function of f(t, y, pardist[i,]), with parameters
 #' @param x_grid the discrete values allowed for the population size, x
 #' @param h_grid the discrete values of harvest levels to optimize over
 #' @param pardist a matrix with columns as variables and rows as the 
 #' Monte Carlo samples from the posterior
+#' @param sigma_g_index column number containing growth noise
+#' @param n_mc number of monte carlo replicates to sample
 #' @export
-#' #FIXME: pardist should be in "long" format of par_posterior, allow for variable parameter numbers
-parameter_uncertainty_SDP <- function(f, p, x_grid, h_grid, pardist, n_mc = 100){
+parameter_uncertainty_SDP <- function(f, x_grid, h_grid, pardist, sigma_g_index, n_mc = 100){
   lapply(h_grid, function(h){ # for each h
     # Set up monte carlo sampling 
     d <- dim(pardist)
@@ -18,9 +18,10 @@ parameter_uncertainty_SDP <- function(f, p, x_grid, h_grid, pardist, n_mc = 100)
     F_true <- 
       sapply(x_grid, function(x_t){           # For each x_t  
         bypar <- sapply(indices, function(i){ # For each parameter value
-          p <- unname(pardist[i,c(2,1,3)])    # Parameters for the mean, at current sample 
-          mu <- f(x_t,h,p)                    # expected x_{t+1} 
-          est_sigma_g <- pardist[i,4]         # Variance parameter         
+          
+          mu <- f(x_t, h, pardist[i,])                    # expected x_{t+1} 
+          est_sigma_g <- pardist[i,sigma_g_index]         # Variance parameter
+          
           # Calculate the probability density
           if(snap_to_grid(mu,x_grid) < x_grid[2]){ # handle the degenerate case 
             out <- numeric(length(x_grid))

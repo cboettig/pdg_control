@@ -2,15 +2,13 @@
 \alias{parameter_uncertainty_SDP}
 \title{Computes the transition matrix under the case of parametric uncertainty}
 \usage{
-  parameter_uncertainty_SDP(f, p, x_grid, h_grid, pardist,
-    n_mc = 100)
+  parameter_uncertainty_SDP(f, x_grid, h_grid, pardist,
+    sigma_g_index, n_mc = 100)
 }
 \arguments{
   \item{f}{the growth function of the escapement population
-  (x-h) should be a function of f(t, y, p), with parameters
-  p}
-
-  \item{p}{the parameters of the growth function}
+  (x-h) should be a function of f(t, y, pardist[i,]), with
+  parameters}
 
   \item{x_grid}{the discrete values allowed for the
   population size, x}
@@ -20,6 +18,11 @@
 
   \item{pardist}{a matrix with columns as variables and
   rows as the Monte Carlo samples from the posterior}
+
+  \item{sigma_g_index}{column number containing growth
+  noise}
+
+  \item{n_mc}{number of monte carlo replicates to sample}
 }
 \description{
   Computes the transition matrix under the case of
