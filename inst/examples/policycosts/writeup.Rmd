@@ -1,4 +1,11 @@
 
+``` {r libraries, message=FALSE, warning=FALSE}
+rm(list=ls())
+require(pdgControl)
+require(reshape2)
+require(ggplot2)
+require(data.table)
+```
 
 
 ```{r cache-options, include=FALSE}
@@ -23,22 +30,12 @@ c2 <- exp(seq(0, log(21), length.out = 20))-1
 
 
 
-Clean the workspace and load the required libraries.
-
-``` {r libraries}
-rm(list=ls())
-require(pdgControl)
-require(reshape2)
-require(ggplot2)
-require(data.table)
-```
-
 
 
 ```{r graphing-options, include=FALSE}
-opts_knit$set(upload.fun = socialR::flickr.url)
+#opts_knit$set(upload.fun = socialR::flickr.url)
 opts_chunk$set(dev.args=list(bg="transparent"),
-               tidy=FALSE, comment=NA, message=FALSE)
+               tidy=FALSE, comment=NA, message=FALSE, warning=FALSE)
 theme_notebook <- theme_grey() + 
                   theme(plot.background = 
                           element_rect(fill = "transparent",colour = NA),
@@ -49,9 +46,8 @@ theme_set(theme_notebook)
 
 
 
-This block defines the various parameters 
-and nuisance parameters we need to specify our
-optimal control problem. 
+This block defines the various parameters and nuisance parameters we
+need to specify our optimal control problem.
 
 
 ```{r setup}
@@ -74,7 +70,10 @@ h_grid <- seq(0.01, 0.8 * K, length = gridsize)
 ````
 
 
-Given these parameters, we can determine the optimal solution under the classic assumption of "adjustment-free" costs, where there is no penalty for adjusting the value of the control (harvest) at each decision step (year).  
+Given these parameters, we can determine the optimal solution under the
+classic assumption of "adjustment-free" costs, where there is no penalty
+for adjusting the value of the control (harvest) at each decision step
+(year).
 
 
 ```{r reed, dependson="setup"}
@@ -100,23 +99,21 @@ penaltyfns <- list(L2=L2, L1=L1, free_decrease=free_decrease, fixed=fixed, free_
 
 ## Apples to Apples levels
 
-Before we can start comparing solutions induced
-under each of these costs, we need to scale them
-appropriately (e.g. the coefficient $c_2$ has 
-different units and a different magnitude of 
-effect when multiplied by quadratic differences
-$(h_{t} - h_{t-1})^2$ then when multiplied by 
-linear differences $h_{t} - h_{t-1}$.  
+Before we can start comparing solutions induced under each of these
+costs, we need to scale them appropriately (e.g. the coefficient $c_2$
+has different units and a different magnitude of effect when multiplied
+by quadratic differences $(h_{t} - h_{t-1})^2$ then when multiplied by
+linear differences $h_{t} - h_{t-1}$.
 
 
-To do so we loop over a grid of $c_2$ values and
-determine the net present value under each functional 
-form of adjustment costs for each $c_2$ in our grid.  
+To do so we loop over a grid of $c_2$ values and determine the net
+present value under each functional form of adjustment costs for each
+$c_2$ in our grid.
 
 
 ``` {r  parallel}
 require(snowfall)
-sfInit(cpu=2, parallel=T)
+sfInit(cpu=16, parallel=T)
 sfLibrary(pdgControl)
 sfExportAll()
 ````
@@ -134,7 +131,18 @@ policies <- lapply(penaltyfns, function(penalty){
 })
 ````
 
-Note that `optim_policy` has been updated to return the equilibrium value of profits from fish harvests before the adjustment costs have been paid, `penalty_free_V`.  This contains the values for all possible states, we simply evaluate it at the carrying capacity (which is our initial condition.)  The index in `x_grid` that corresponds to the carrying capacity (initial condition) `i` indicates this.  
+Note that `optim_policy` has been updated to return the equilibrium value
+of profits from fish harvests before the adjustment costs have been paid,
+`penalty_free_V`, as well as the total value `V`. Initially we based the 
+comparison on matching `penalty_free_V`, now the economists recommend we
+simply use the total net present value resulting, `V`.  
+
+
+
+The value matrices returned in either case contain the values for all possible states,
+we simply evaluate it at the carrying capacity (which is our initial
+condition.)  The index in `x_grid` that corresponds to the carrying
+capacity (initial condition) `i` indicates this.
 
 
 We also do the the classical quadratic costs on fishing effort separately,
@@ -151,20 +159,21 @@ policies <- c(policies, quad=list(quad))
 ````
 
 
-Extract the policy cost
+Extract the policy cost 
 
 ```{r}
 i <- which(x_grid > K)[1]
 fees <- 
 lapply(policies, function(penalty) 
   sapply(penalty, function(c2_run)
-    max(c2_run$penalty_free_V[i,]) 
+    max(c2_run$V[i,]) # Would be penalty_free_V originally 
   )
 )
 ```
 
 
-Tidy up the data and plot the net present value (before the penalty has been paid) relative to that achieved when managed without a penalty.  
+Tidy up the data and plot the net present value (before the penalty has
+been paid) relative to that achieved when managed without a penalty.
 
 ``` {r npv-plot, dependson="quadcosts"}
 npv0 <- max(fees$L1) # all have same max, at c2=0 
