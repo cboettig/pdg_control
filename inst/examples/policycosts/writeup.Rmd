@@ -1,15 +1,18 @@
-``` {r libraries, include=FALSE}
-rm(list=ls())
-require(pdgControl)
-require(reshape2)
-require(ggplot2)
-require(data.table)
-```
+
 
 
 ```{r cache-options, include=FALSE}
 opts_chunk$set(cache=TRUE, cache.path="writeup/")
 ```
+
+Define the parameters of our cost function. We will 
+consider a fixed price and fixed $c_0$ cost per unit effort.  
+An additional "policy cost" is introduced through the $c_2$
+coefficient, which can take a range of values. We will loop
+over this range for each of the functional forms of the policy
+cost, in order to choose coefficients $c_2$ in each case
+that are comparable.  
+
 
 ``` {r}
 price = 10
@@ -20,11 +23,20 @@ c2 <- exp(seq(0, log(21), length.out = 20))-1
 
 
 
+Clean the workspace and load the required libraries.
+
+``` {r libraries}
+rm(list=ls())
+require(pdgControl)
+require(reshape2)
+require(ggplot2)
+require(data.table)
+```
 
 
 
 ```{r graphing-options, include=FALSE}
-opts_knit$set(upload.fun = socialR::notebook.url)
+opts_knit$set(upload.fun = socialR::flickr.url)
 opts_chunk$set(dev.args=list(bg="transparent"),
                tidy=FALSE, comment=NA, message=FALSE)
 theme_notebook <- theme_grey() + 
@@ -35,7 +47,12 @@ theme_notebook <- theme_grey() +
 theme_set(theme_notebook)
 ```
 
-  
+
+
+This block defines the various parameters 
+and nuisance parameters we need to specify our
+optimal control problem. 
+
 
 ```{r setup}
 seed <- 123                 # Random seed (replicable results)
@@ -57,12 +74,17 @@ h_grid <- seq(0.01, 0.8 * K, length = gridsize)
 ````
 
 
+Given these parameters, we can determine the optimal solution under the classic assumption of "adjustment-free" costs, where there is no penalty for adjusting the value of the control (harvest) at each decision step (year).  
+
+
 ```{r reed, dependson="setup"}
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g )
 opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, 
                      profit, delta, reward=reward)
 ````
 
+
+Now we introduce the functional forms for each of the adjustment costs,
 
 
 ``` {r fees}
@@ -75,7 +97,22 @@ none <- function(h, h_prev)  0
 penaltyfns <- list(L2=L2, L1=L1, free_decrease=free_decrease, fixed=fixed, free_increase=free_increase)
 ````
 
+
 ## Apples to Apples levels
+
+Before we can start comparing solutions induced
+under each of these costs, we need to scale them
+appropriately (e.g. the coefficient $c_2$ has 
+different units and a different magnitude of 
+effect when multiplied by quadratic differences
+$(h_{t} - h_{t-1})^2$ then when multiplied by 
+linear differences $h_{t} - h_{t-1}$.  
+
+
+To do so we loop over a grid of $c_2$ values and
+determine the net present value under each functional 
+form of adjustment costs for each $c_2$ in our grid.  
+
 
 ``` {r  parallel}
 require(snowfall)
@@ -97,11 +134,10 @@ policies <- lapply(penaltyfns, function(penalty){
 })
 ````
 
-Note that `optim_policy` has been updated to return the equilibrium value of profits from fish harvests before the adjustment costs have been paid, `penalty_free_V`.  This containst the values for all possible states, we simply evaluate it at the carrying capacity (which is our initial condition.)  The index in `x_grid` that corresponds to the carrying capacity (initial condition) `i` indicates this.  
+Note that `optim_policy` has been updated to return the equilibrium value of profits from fish harvests before the adjustment costs have been paid, `penalty_free_V`.  This contains the values for all possible states, we simply evaluate it at the carrying capacity (which is our initial condition.)  The index in `x_grid` that corresponds to the carrying capacity (initial condition) `i` indicates this.  
 
 
-
-Quadratic costs on fishing effort have to be done separately,
+We also do the the classical quadratic costs on fishing effort separately,
 
 ``` {r  quadcosts, dependson="bigloop"}
 quad <- 
