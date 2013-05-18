@@ -1,5 +1,4 @@
 
-
 ```r
 rm(list = ls())
 require(pdgControl)
@@ -284,7 +283,6 @@ library(xtable)
 print(xtable(print_npv), type="html")
 ```
 
-```
 <!-- html table generated in R 2.15.2 by xtable 1.7-1 package -->
 <!-- Sat May 18 14:31:39 2013 -->
 <TABLE border=1>
@@ -295,12 +293,7 @@ print(xtable(print_npv), type="html")
   <TR> <TD align="right"> 4 </TD> <TD> fixed </TD> <TD align="right"> 91.58 </TD> <TD align="right"> 50.05 </TD> <TD align="right"> 0.09 </TD> </TR>
   <TR> <TD align="right"> 5 </TD> <TD> free_increase </TD> <TD align="right"> 182.98 </TD> <TD align="right"> 100.00 </TD> <TD align="right"> 100.00 </TD> </TR>
   <TR> <TD align="right"> 6 </TD> <TD> quad </TD> <TD align="right"> 90.20 </TD> <TD align="right"> 49.29 </TD> <TD align="right"> -1.41 </TD> </TR>
-   </TABLE>
-```
-
-```r
-#pandoc.table(print_npv)
-```
+ </TABLE>
 
 
 
