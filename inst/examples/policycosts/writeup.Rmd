@@ -1,4 +1,5 @@
-``` {r libraries, include=FALSE}
+
+``` {r libraries, message=FALSE, warning=FALSE}
 rm(list=ls())
 require(pdgControl)
 require(reshape2)
@@ -11,22 +12,38 @@ require(data.table)
 opts_chunk$set(cache=TRUE, cache.path="writeup/")
 ```
 
-``` {r}
+Define the parameters of our cost function. We will 
+consider a fixed price and fixed $c_0$ cost per unit effort.  
+An additional "policy cost" is introduced through the $c_2$
+coefficient, which can take a range of values. We will loop
+over this range for each of the functional forms of the policy
+cost, in order to choose coefficients $c_2$ in each case
+that are comparable.  
+
+
+``` {r profit_model}
 price = 10
 c0 = 30
 profit <- profit_harvest(price = price, c0 = c0, c1 = 0)
-c2 <- exp(seq(0, log(21), length.out = 20))-1
 ```
 
+```{r c2_grid}
+c2 <- exp(seq(0, log(41), length.out = 40))-1
+c2 <- seq(0, 40, length.out=100)
+```
 
+```{r reduction}
+reduction <- 0.5 
+```
 
+We will compare when transaction costs have reduced the value to `(1-reduction) * adjustment_cost_free_value`
 
 
 
 ```{r graphing-options, include=FALSE}
-opts_knit$set(upload.fun = socialR::notebook.url)
+#opts_knit$set(upload.fun = socialR::flickr.url)
 opts_chunk$set(dev.args=list(bg="transparent"),
-               tidy=FALSE, comment=NA, message=FALSE)
+               tidy=FALSE, comment=NA, message=FALSE, warning=FALSE)
 theme_notebook <- theme_grey() + 
                   theme(plot.background = 
                           element_rect(fill = "transparent",colour = NA),
@@ -35,7 +52,11 @@ theme_notebook <- theme_grey() +
 theme_set(theme_notebook)
 ```
 
-  
+
+
+This block defines the various parameters and nuisance parameters we
+need to specify our optimal control problem.
+
 
 ```{r setup}
 seed <- 123                 # Random seed (replicable results)
@@ -57,29 +78,50 @@ h_grid <- seq(0.01, 0.8 * K, length = gridsize)
 ````
 
 
-```{r reed, dependson="setup"}
+Given these parameters, we can determine the optimal solution under the
+classic assumption of "adjustment-free" costs, where there is no penalty
+for adjusting the value of the control (harvest) at each decision step
+(year).
+
+
+```{r reed, dependson=c("setup", "profit_model")}
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g )
 opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, 
                      profit, delta, reward=reward)
 ````
 
 
+Now we introduce the functional forms for each of the adjustment costs,
+
 
 ``` {r fees}
 L1 <- function(c2) function(h, h_prev)  c2 * abs(h - h_prev) 
-free_increase <- function(c2) function(h, h_prev)  c2 * abs(min(h - h_prev, 0)) # increasing harvest is free
-free_decrease <- function(c2) function(h, h_prev)  c2 * max(h - h_prev, 0) # decreasing harvest is free
+free_increase <- function(c2) function(h, h_prev)  c2 * abs(pmin(h - h_prev, 0)) # increasing harvest is free
+free_decrease <- function(c2) function(h, h_prev)  c2 * pmax(h - h_prev, 0) # decreasing harvest is free
 fixed <-  function(c2) function(h, h_prev) c2 * as.numeric( !(h == h_prev) )
 L2 <- function(c2) function(h, h_prev)  c2 * (h - h_prev) ^ 2
 none <- function(h, h_prev)  0
 penaltyfns <- list(L2=L2, L1=L1, free_decrease=free_decrease, fixed=fixed, free_increase=free_increase)
 ````
 
+
 ## Apples to Apples levels
+
+Before we can start comparing solutions induced under each of these
+costs, we need to scale them appropriately (e.g. the coefficient $c_2$
+has different units and a different magnitude of effect when multiplied
+by quadratic differences $(h_{t} - h_{t-1})^2$ then when multiplied by
+linear differences $h_{t} - h_{t-1}$.
+
+
+To do so we loop over a grid of $c_2$ values and determine the net
+present value under each functional form of adjustment costs for each
+$c_2$ in our grid.
+
 
 ``` {r  parallel}
 require(snowfall)
-sfInit(cpu=2, parallel=T)
+sfInit(cpu=16, parallel=T)
 sfLibrary(pdgControl)
 sfExportAll()
 ````
@@ -87,7 +129,7 @@ sfExportAll()
 
 ### Loop over penalty functions and magnitudes
 
-``` {r  bigloop, dependson=c("setup", "reed", "fees")}
+``` {r  bigloop, dependson=c("setup", "reed", "fees", "profit_model", "c2_grid")}
 policies <- lapply(penaltyfns, function(penalty){
   sfLapply(c2, function(c2){
       policy <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
@@ -97,11 +139,21 @@ policies <- lapply(penaltyfns, function(penalty){
 })
 ````
 
-Note that `optim_policy` has been updated to return the equilibrium value of profits from fish harvests before the adjustment costs have been paid, `penalty_free_V`.  This containst the values for all possible states, we simply evaluate it at the carrying capacity (which is our initial condition.)  The index in `x_grid` that corresponds to the carrying capacity (initial condition) `i` indicates this.  
+Note that `optim_policy` has been updated to return the equilibrium value
+of profits from fish harvests before the adjustment costs have been paid,
+`penalty_free_V`, as well as the total value `V`. Initially we based the 
+comparison on matching `penalty_free_V`, now the economists recommend we
+simply use the total net present value resulting, `V`.  
 
 
 
-Quadratic costs on fishing effort have to be done separately,
+The value matrices returned in either case contain the values for all possible states,
+we simply evaluate it at the carrying capacity (which is our initial
+condition.)  The index in `x_grid` that corresponds to the carrying
+capacity (initial condition) `i` indicates this.
+
+
+We also do the the classical quadratic costs on fishing effort separately,
 
 ``` {r  quadcosts, dependson="bigloop"}
 quad <- 
@@ -115,20 +167,20 @@ policies <- c(policies, quad=list(quad))
 ````
 
 
-Extract the policy cost
+Extract the policy cost 
 
-```{r}
+```{r, dependson="quadcosts"}
 i <- which(x_grid > K)[1]
 fees <- 
 lapply(policies, function(penalty) 
   sapply(penalty, function(c2_run)
-    max(c2_run$penalty_free_V[i,]) 
+    max(c2_run$V[i,]) # Would be penalty_free_V originally   ## this isn't correct for asym cases
   )
 )
 ```
 
 
-Tidy up the data and plot the net present value (before the penalty has been paid) relative to that achieved when managed without a penalty.  
+Tidy up the data and plot the net present value relative to that achieved when managed without a penalty.
 
 ``` {r npv-plot, dependson="quadcosts"}
 npv0 <- max(fees$L1) # all have same max, at c2=0 
@@ -138,30 +190,49 @@ fees <- melt(fees, id="c2")
 ggplot(fees, aes(c2, value, col=variable)) + geom_point() + geom_line()
 ````
 
-Find the value of `c2` that brings each penalty closest to 75% of the cost-free adjustment value:
+Alternative version of plot, showing a ratio
 
 ```{r apples_plot, dependson="quadcosts"}
 ggplot(fees, aes(c2, (npv0-value)/npv0, col=variable)) + geom_point() + geom_line()
 ````
 
 
+Find the value of `c2` that brings each penalty closest to 75% of the cost-free adjustment value:
 
-
-
-
-
-```{r apples, dependson="quadcosts"}
+```{r apples, dependson=c("quadcosts", "reduction")}
 closest <- function(x, v){
   which.min(abs(v-x))
 }
 dt_npv <- data.table(fees)
-index <- dt_npv[,closest(0.25, (npv0-value)/npv0), by=variable]
+index <- dt_npv[,closest(reduction, (npv0-value)/npv0), by=variable]
 apples_index <- index$V1
 names(apples_index) = index$variable
 apples <- c2[index$V1]
 names(apples) = index$variable
 apples
 ````
+
+
+How close has each of these actually gotten to `r 100*reduction`% reduction to NPV0 (which is `r (1-reduction) * npv0`)?
+
+```{r print_npv, dependson="apples"}
+setkey(dt_npv, variable)
+values <- apply(index, 1, function(x) dt_npv[x[1], ][as.integer(x[2]), ]$value)
+
+percent.error <- (values - ((1-reduction)*npv0)) / ((1-reduction)*npv0)* 100
+
+print_npv <- data.frame(model=index$variable, "value realized"=values, 
+                        "percent of npv0" = 100*values/npv0, "percent error"=percent.error)
+
+
+```
+
+```{r npv_table, dependson="print_npv"} 
+library(xtable)
+print(xtable(print_npv), type="html")
+#pandoc.table(print_npv)
+```
+
 
 Solve the policy cost for the specified penalty function
 
@@ -174,7 +245,7 @@ free_decrease_policy <- policies$free_decrease[[apples_index["free_decrease"]]]$
 quad_policy <- policies$quad[[apples_index["quad"]]]$D
 ```
 
-``` {r simulate_policy, dependson="policynames"}
+``` {r simulate_policy, dependson=c("policynames", "apples")}
 quad_profit <- profit_harvest(price = price, c0 = c0, c1 = apples["quad"]) 
 sims <- list(
   L1 = simulate_optim(f, pars, x_grid, h_grid, x0, 
@@ -217,8 +288,6 @@ names(acor) <- names(var)
 out <- rbind(var=var, a=acor)
 out
 ```
-
-
 
 
 

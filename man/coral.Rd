@@ -17,10 +17,9 @@
   Coral-Parrotfish model
 }
 \details{
-  $$\begin{align} \frac{dM}{dt} = aMC - \frac{g(P) M}{M+T}
-  + \gamma M T \\ \frac{dC}{dt} = rTC - dC - a M C \\
-  \frac{dP}{dt} = sP \left( 1- \frac{P}{\beta K(C) }
-  \right) - h P \end{align}$$
+  \deqn{ \frac{dM}{dt} = aMC - \frac{g(P) M}{M+T} + \gamma
+  M T \\ \frac{dC}{dt} = rTC - dC - a M C \\ \frac{dP}{dt}
+  = sP \left( 1- \frac{P}{\beta K(C) } \right) - h P }{}
 }
 \references{
   Blackwood et al. (2011) doi:10.1890/10-2195.1

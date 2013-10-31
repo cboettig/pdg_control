@@ -29,8 +29,8 @@ BevHolt <- function(x, h, p){
   A <- p[1] 
   B <- p[2] 
   sapply(x, function(x){ # use sapply so fn accepts vector-valued x
-    x <- max(0, x)
-    max(0, A * x/(1 + B * x))
+    x <- pmax(0, x)
+    pmax(0, A * x/(1 + B * x))
   })
 }
 
@@ -52,8 +52,8 @@ BevHolt_effort <- function(x, h, p){
   A <- p[1] 
   B <- p[2] 
   sapply(S, function(x){ # use sapply so fn accepts vector-valued x
-    x <- max(0, x)
-    max(0, A * x/(1 + B * x))
+    x <- pmax(0, x)
+    pmax(0, A * x/(1 + B * x))
   })
 }
 
@@ -78,8 +78,8 @@ BevHolt_effort <- function(x, h, p){
 #' @export
 Myers <- function(x, h, p){
  sapply(x, function(x){
-   x <- max(0, x - h) 
-  max(0, p[1] * x ^ p[2] / (1 + x ^ p[2] / p[3]) )
+   x <- pmax(0, x - h) 
+  pmax(0, p[1] * x ^ p[2] / (1 + x ^ p[2] / p[3]) )
  })
 }
 
@@ -95,7 +95,7 @@ Myers <- function(x, h, p){
 #'   x = p[1] * p[3] / 2 - sqrt( (p[1] * p[3]) ^ 2 - 4 * p[3] ) / 2 
 #' @export
 Myer_harvest <- function(x, h, p){
-   sapply(x, function(x) max(0, p[1] * x ^ p[2] / (1 + x ^ p[2] / p[3])  - h))
+   sapply(x, function(x) pmax(0, p[1] * x ^ p[2] / (1 + x ^ p[2] / p[3])  - h))
 }
 
 
@@ -115,7 +115,7 @@ Myer_harvest <- function(x, h, p){
 #' @export
 May <- function(x, h, p){
   sapply(x, function(x){
-         s <- max(x - h, 0) # escapement
+         s <- pmax(x - h, 0) # escapement
          r <- as.numeric(p[1])
          K <- as.numeric(p[2])
          a <- as.numeric(p[3])
@@ -134,7 +134,7 @@ May <- function(x, h, p){
 #' @export
 RickerAllee <- function(x, h, p){
   sapply(x, function(x){ 
-    x <- max(0,x-h)
+    x <- pmax(0,x-h)
     x * exp(p[1] * (1 - x / p[2]) * (x - p[3]) / p[2] ) 
   })
 }
@@ -148,8 +148,8 @@ RickerAllee <- function(x, h, p){
 #' @export
 Ricker <- function(x,h,p){
   sapply(x, function(x){ 
-    x <- max(0, x-h) 
-    max(0, x * exp(p[1] * (1 - x / p[2] )) )
+    x <- pmax(0, x-h) 
+    pmax(0, x * exp(p[1] * (1 - x / p[2] )) )
   })
 }
 
@@ -161,11 +161,11 @@ Ricker <- function(x,h,p){
 #'            1  2  3     4   5  6  7  8
 #' @references Blackwood et al. (2011) doi:10.1890/10-2195.1
 #' @details 
-#' $$\begin{align}
+#' \deqn{
 #' \frac{dM}{dt} = aMC - \frac{g(P) M}{M+T} + \gamma M T \\
 #' \frac{dC}{dt} = rTC - dC - a M C \\
 #' \frac{dP}{dt} = sP \left( 1- \frac{P}{\beta K(C) } \right) - h P 
-#' \end{align}$$
+#' }{}
 #' @export
 coral <- function(x, h, p = c(a = 0.1, g = 1, T = , gamma = 0.8, r = 1, d = 0.44, s= 0.49, K = 1)){
  x_t1 <- p[1] * x[1] * x[2] + p[2] * x[3] * x[1] / (x[1] + p[3]) + p[4] * p[3] * x[1]
@@ -184,11 +184,11 @@ coral <- function(x, h, p = c(a = 0.1, g = 1, T = , gamma = 0.8, r = 1, d = 0.44
 #' @references Mumby et al. (2007) doi:10.1038/nature06252
 #' Blackwood et al. (2011) doi:10.1890/10-2195.1
 #' @details 
-#' $$\begin{align}
+#' \deqn{
 #' \frac{dM}{dt} = aMC - \frac{(g-h) M}{M+T} + \gamma M T \\
 #' \frac{dC}{dt} = rTC - dC - a M C \\
 #' T = 1 - M - C
-#' \end{align}$$
+#' }{}
 #' @export
 mumby <- function(x, h, p= c(a = 0.1, g = .5, gamma = 0.8, r = 1, d = 0.44), dt=0.025){
   M <- x[1] # Macroalgae
