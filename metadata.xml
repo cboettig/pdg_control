@@ -1,0 +1,138 @@
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1" xmlns:ds="eml://ecoinformatics.org/dataset-2.1.1" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:stmml="http://www.xml-cml.org/schema/stmml-1.1" packageId="urn:uuid:a3ab83b7-780e-4bf3-be0f-fc20c9da4791" system="uuid">
+  <dataset>
+    <title>metadata</title>
+    <creator>
+      <individualName>
+        <givenName>Carl</givenName>
+        <surName>Boettiger</surName>
+      </individualName>
+      <electronicMailAddress>cboettig@ropensci.org</electronicMailAddress>
+    </creator>
+    <pubDate>2013-10-16</pubDate>
+    <intellectualRights>&lt;a rel='license' property='http://creativecommons.org/ns#license' href='http://creativecommons.org/publicdomain/zero/1.0/'&gt;CC0&lt;/a&gt;</intellectualRights>
+    <contact>
+      <individualName>
+        <givenName>Carl</givenName>
+        <surName>Boettiger</surName>
+      </individualName>
+      <electronicMailAddress>cboettig@ropensci.org</electronicMailAddress>
+    </contact>
+    <dataTable>
+      <entityName>metadata</entityName>
+      <physical>
+        <objectName>metadata.csv</objectName>
+        <size>12304</size>
+        <characterEncoding>C</characterEncoding>
+        <dataFormat>
+          <textFormat>
+            <numHeaderLines>1</numHeaderLines>
+            <numFooterLines>0</numFooterLines>
+            <recordDelimiter>\r\n</recordDelimiter>
+            <attributeOrientation>column</attributeOrientation>
+            <simpleDelimited>
+              <fieldDelimiter>,</fieldDelimiter>
+            </simpleDelimited>
+          </textFormat>
+        </dataFormat>
+      </physical>
+      <attributeList>
+        <attribute>
+          <attributeName>stock_size</attributeName>
+          <attributeDefinition>the initial stock size, (arbitrary units)</attributeDefinition>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>tonnes</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>value</attributeName>
+          <attributeDefinition>Expected net present value</attributeDefinition>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dollar/dollar</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>c2</attributeName>
+          <attributeDefinition>the coefficient scaling the magnitude of the adjustment costs</attributeDefinition>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>model dependent units</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>model</attributeName>
+          <attributeDefinition>the model</attributeDefinition>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>L1</code>
+                    <definition>linear adjustment costs model</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>L2</code>
+                    <definition>quadratic adjustment costs model</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>fixed</code>
+                    <definition>fixed transaction fee for every adjustment</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>npv0</attributeName>
+          <attributeDefinition>the net present value of the stock size if there where no adjustment costs</attributeDefinition>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dollar/dollar</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>sigma_g</attributeName>
+          <attributeDefinition>the environmental noise level (sigma parameter in multiplicative log-normal noise)</attributeDefinition>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>tonnes</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+      </attributeList>
+      <caseSensitive>yes</caseSensitive>
+      <numberOfRecords>180</numberOfRecords>
+    </dataTable>
+  </dataset>
+</eml:eml>
