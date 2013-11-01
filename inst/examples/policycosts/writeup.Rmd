@@ -33,7 +33,7 @@ c2 <- seq(0, 40, length.out=100)
 ```
 
 ```{r reduction}
-reduction <- 0.5 
+reduction <- 0.25 
 ```
 
 We will compare when transaction costs have reduced the value to `(1-reduction) * adjustment_cost_free_value`
@@ -197,7 +197,7 @@ ggplot(fees, aes(c2, (npv0-value)/npv0, col=variable)) + geom_point() + geom_lin
 ````
 
 
-Find the value of `c2` that brings each penalty closest to 75% of the cost-free adjustment value:
+Find the value of `c2` that brings each penalty closest to `r reduction*100`% of the cost-free adjustment value:
 
 ```{r apples, dependson=c("quadcosts", "reduction")}
 closest <- function(x, v){
@@ -247,12 +247,10 @@ quad_policy <- policies$quad[[apples_index["quad"]]]$D
 
 
 
-
-
 ``` {r simulate_policy, dependson=c("policynames", "apples")}
 quad_profit <- profit_harvest(price = price, c0 = c0, c1 = apples["quad"]) 
 
-reps <- 1:10
+reps <- 1:100
 names(reps) = paste("rep", 1:10, sep="_")
 sims <- list(
   L1 = lapply(reps, function(x) simulate_optim(f, pars, x_grid, h_grid, x0, 
@@ -310,28 +308,35 @@ setnames(dt_free, "L1", "penalty_fn") # names are nice
 ```{r}
 
 # Profit when accounting for penalty when present
-optimal_cost <- dt[, sum(profit_fishing), by=penalty_fn ] 
+optimal_cost <- dt[, sum(profit_fishing - policy_cost), by=penalty_fn ] 
 # Profit when ignoring penalty when present
-ignore_when_present <- dt[, sum(profit_fishing_alt), by=penalty_fn] 
+ignore_when_present <- dt[, sum(profit_fishing_alt - policy_cost_alt), by=penalty_fn] 
 # Profit when assuming penalty when it is absent
-assume_when_absent <- dt_free[, sum(profit_fishing), by=penalty_fn]
+assume_when_absent <- dt_free[, sum(profit_fishing - policy_cost), by=penalty_fn]
 # Profit when ignoring penalty when it is absent
-optimal_free <- dt_free[, sum(profit_fishing_alt), by=penalty_fn]
+optimal_free <- dt_free[, sum(profit_fishing_alt - policy_cost_alt), by=penalty_fn]
 
 # Normalize by the optimal 
-ignore_when_present$V1 <- ignore_when_present$V1/optimal_cost$V1
-assume_when_absent$V1 <- assume_when_absent$V1/optimal_free$V1
+#ignore_when_present$V1 <- ignore_when_present$V1/optimal_cost$V1
+#assume_when_absent$V1 <- assume_when_absent$V1/optimal_free$V1
 
 # Name and merge columns
 setnames(ignore_when_present, "V1", "ignore_cost")
 setnames(assume_when_absent, "V1", "assume_cost")
 error_costs = merge(ignore_when_present, assume_when_absent, "penalty_fn")
 
+print_npv # theoretically acheivable profits under these costs
+optimal_cost$V1/optimal_free$V1 # actually realized 
+
 error_costs
 
 ```
 
 
+```{r error_costs_table} 
+print(xtable(error_costs), type="html")
+#pandoc.table(print_npv)
+```
 
 
 
