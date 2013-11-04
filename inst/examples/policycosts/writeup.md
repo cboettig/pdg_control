@@ -329,7 +329,7 @@ quad_policy <- policies$quad[[apples_index["quad"]]]$D
 ```r
 quad_profit <- profit_harvest(price = price, c0 = c0, c1 = apples["quad"]) 
 
-reps <- 1:10
+reps <- 1:100
 names(reps) = paste("rep", 1:10, sep="_")
 sims <- list(
   L1 = lapply(reps, function(x) simulate_optim(f, pars, x_grid, h_grid, x0, 
@@ -408,14 +408,37 @@ setnames(ignore_when_present, "V1", "ignore_cost")
 setnames(assume_when_absent, "V1", "assume_cost")
 error_costs = merge(ignore_when_present, assume_when_absent, "penalty_fn")
 
+print_npv  # theoretically acheivable profits under these costs
+```
+
+```
+##           model value.realized percent.of.npv0 percent.error
+## 1            L2          134.7           73.63       -1.8278
+## 2            L1          137.8           75.28        0.3776
+## 3 free_decrease          183.0          100.00       33.3333
+## 4         fixed          137.9           75.38        0.5013
+## 5 free_increase          183.0          100.00       33.3333
+## 6          quad          136.5           74.59       -0.5465
+```
+
+```r
+optimal_cost$V1/optimal_free$V1  # actually realized
+```
+
+```
+## [1] 6.770 7.772 5.599
+```
+
+```r
+
 error_costs
 ```
 
 ```
 ##    penalty_fn ignore_cost assume_cost
-## 1:         L1      1045.0        1886
-## 2:         L2       356.5        1821
-## 3:      fixed      1017.7        2101
+## 1:         L1       10450        1886
+## 2:         L2        3565        1821
+## 3:      fixed       10177        2101
 ```
 
 
