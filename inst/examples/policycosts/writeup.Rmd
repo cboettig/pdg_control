@@ -328,7 +328,7 @@ error_costs = merge(ignore_when_present, assume_when_absent, "penalty_fn")
 print_npv # theoretically acheivable profits under these costs
 optimal_cost$V1/optimal_free$V1 # actually realized 
 
-error_costs
+cbind(error_costs, sigma_g = sigma_g, reduction = reduction)
 
 ```
 
@@ -341,7 +341,7 @@ print(xtable(error_costs), type="html")
 
 
 
-
+<!--
 
 
 ### additional plots based on simulations under the correct model
@@ -524,7 +524,7 @@ FigS4b
 
 
 
-
+-->
 
 
 
