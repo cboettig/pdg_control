@@ -16,11 +16,10 @@ df3 <- melt(df2, id=who)
 names(df3) <- c("penalty_fn", "sigma_g", "reduction", "variable", "value", "fraction_variable", "fraction")
 
 df3$reduction <- as.factor(df3$reduction)
-#ggplot(df3) + geom_line(aes(sigma_g, value, col=penalty_fn, lty=variable)) + facet_wrap(~reduction) 
-ggplot(df3) + geom_line(aes(sigma_g, value, col=reduction, lty=variable)) + facet_wrap(~penalty_fn) 
+ggplot(df3) + geom_line(aes(sigma_g, value, col=reduction, lty=variable)) + facet_wrap(~penalty_fn, scales="free_y") 
 ```
 
 
 ```{r results="asis"}
-print(xtable::xtable(df3), type="html")
+print(xtable::xtable(df), type="html")
 ```
