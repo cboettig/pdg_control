@@ -24,7 +24,7 @@ ggplot(df3) + geom_line(aes(sigma_g, value, col = reduction, lty = variable)) +
     facet_wrap(~penalty_fn, scales = "free_y")
 ```
 
-![plot of chunk unnamed-chunk-2](http://farm3.staticflickr.com/2824/10693026176_93c699f820_o.png) 
+![plot of chunk unnamed-chunk-2](http://farm3.staticflickr.com/2859/10693227993_57a058bab3_o.png) 
 
 
 
@@ -34,7 +34,7 @@ print(xtable::xtable(df), type = "html")
 ```
 
 <!-- html table generated in R 3.0.2 by xtable 1.7-1 package -->
-<!-- Tue Nov  5 12:13:38 2013 -->
+<!-- Tue Nov  5 12:14:28 2013 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> penalty_fn </TH> <TH> ignore_cost </TH> <TH> ignore_fraction </TH> <TH> assume_cost </TH> <TH> assume_fraction </TH> <TH> sigma_g </TH> <TH> reduction </TH>  </TR>
   <TR> <TD align="right"> 1 </TD> <TD> L1 </TD> <TD align="right"> 14536.09 </TD> <TD align="right"> 1.00 </TD> <TD align="right"> 16857.61 </TD> <TD align="right"> 1.00 </TD> <TD align="right"> 0.05 </TD> <TD align="right"> 0.10 </TD> </TR>
