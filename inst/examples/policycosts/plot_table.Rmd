@@ -1,0 +1,26 @@
+
+```{r}
+opts_knit$set(upload.fun = socialR::flickr.url)
+```
+
+```{r}
+require(ggplot2)
+df <- read.csv("output.csv")
+df <- df[2:8]
+
+require(reshape2)
+who <- c("penalty_fn", "ignore_fraction", "assume_fraction", "sigma_g", "reduction")
+df2 <- melt(df, id=who)
+who <- c("penalty_fn", "sigma_g", "reduction", "variable", "value")
+df3 <- melt(df2, id=who)
+names(df3) <- c("penalty_fn", "sigma_g", "reduction", "variable", "value", "fraction_variable", "fraction")
+
+df3$reduction <- as.factor(df3$reduction)
+#ggplot(df3) + geom_line(aes(sigma_g, value, col=penalty_fn, lty=variable)) + facet_wrap(~reduction) 
+ggplot(df3) + geom_line(aes(sigma_g, value, col=reduction, lty=variable)) + facet_wrap(~penalty_fn) 
+```
+
+
+```{r results="asis"}
+print(xtable::xtable(df3), type="html")
+```
