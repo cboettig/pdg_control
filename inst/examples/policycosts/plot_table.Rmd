@@ -1,9 +1,9 @@
 
-```{r}
+```{r settings, include=FALSE}
 opts_knit$set(upload.fun = socialR::flickr.url)
 ```
 
-```{r fig.width=12}
+```{r fig.width=12, echo=FALSE}
 require(ggplot2)
 df <- read.csv("output.csv")
 df <- df[2:8]
@@ -20,6 +20,6 @@ ggplot(df3) + geom_line(aes(sigma_g, value, col=reduction, lty=variable)) + face
 ```
 
 
-```{r results="asis"}
+```{r results="asis", echo=FALSE}
 print(xtable::xtable(df), type="html")
 ```
