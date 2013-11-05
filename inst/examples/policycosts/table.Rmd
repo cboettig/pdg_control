@@ -173,7 +173,7 @@ ratio <- function(npv0, value){
   which.min(abs(v-x))
   }
 
-fees[,ratio(npv0, value), by="model"]
+fees[a,ratio(npv0, value), by="model"]
 
 a = ddply(fees, .(npv0, value), ratio)
 

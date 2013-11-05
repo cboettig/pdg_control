@@ -33,7 +33,7 @@ c2 <- seq(0, 40, length.out=100)
 ```
 
 ```{r reduction}
-reduction <- 0.5 
+reduction <- 0.25 
 ```
 
 We will compare when transaction costs have reduced the value to `(1-reduction) * adjustment_cost_free_value`
@@ -41,7 +41,7 @@ We will compare when transaction costs have reduced the value to `(1-reduction) 
 
 
 ```{r graphing-options, include=FALSE}
-#opts_knit$set(upload.fun = socialR::flickr.url)
+opts_knit$set(upload.fun = socialR::flickr.url)
 opts_chunk$set(dev.args=list(bg="transparent"),
                tidy=FALSE, comment=NA, message=FALSE, warning=FALSE)
 theme_notebook <- theme_grey() + 
@@ -121,7 +121,7 @@ $c_2$ in our grid.
 
 ``` {r  parallel}
 require(snowfall)
-sfInit(cpu=16, parallel=T)
+sfInit(cpu=8, parallel=T)
 sfLibrary(pdgControl)
 sfExportAll()
 ````
@@ -197,7 +197,7 @@ ggplot(fees, aes(c2, (npv0-value)/npv0, col=variable)) + geom_point() + geom_lin
 ````
 
 
-Find the value of `c2` that brings each penalty closest to 75% of the cost-free adjustment value:
+Find the value of `c2` that brings each penalty closest to `r reduction*100`% of the cost-free adjustment value:
 
 ```{r apples, dependson=c("quadcosts", "reduction")}
 closest <- function(x, v){
@@ -245,37 +245,107 @@ free_decrease_policy <- policies$free_decrease[[apples_index["free_decrease"]]]$
 quad_policy <- policies$quad[[apples_index["quad"]]]$D
 ```
 
+
+
 ``` {r simulate_policy, dependson=c("policynames", "apples")}
 quad_profit <- profit_harvest(price = price, c0 = c0, c1 = apples["quad"]) 
+
+reps <- 1:100
+names(reps) = paste("rep", 1:10, sep="_")
 sims <- list(
-  L1 = simulate_optim(f, pars, x_grid, h_grid, x0, 
+  L1 = lapply(reps, function(x) simulate_optim(f, pars, x_grid, h_grid, x0, 
                       L1_policy, z_g, z_m, z_i, 
-                      opt$D, profit=profit, penalty=L1(apples["L1"]), seed=seed), 
-  L2 = simulate_optim(f, pars, x_grid, h_grid, x0, 
+                      opt$D, profit=profit, penalty=L1(apples["L1"]), seed=seed)), 
+  L2 = lapply(reps, function(x) simulate_optim(f, pars, x_grid, h_grid, x0, 
                       L2_policy, z_g, z_m, z_i, 
-                      opt$D, profit=profit, penalty=L2(apples["L2"]), seed=seed),
-  fixed = simulate_optim(f, pars, x_grid, h_grid, x0, 
+                      opt$D, profit=profit, penalty=L2(apples["L2"]), seed=seed)),
+  fixed = lapply(reps, function(x) simulate_optim(f, pars, x_grid, h_grid, x0, 
                          fixed_policy, z_g, z_m, z_i, 
-                         opt$D, profit=profit, penalty=fixed(apples["fixed"]), seed=seed),
-  increase = simulate_optim(f, pars, x_grid, h_grid, x0, 
-                            free_increase_policy, z_g, z_m, z_i, 
-                            opt$D, profit=profit, penalty= free_increase(apples["increase"]), seed=seed),
-  decrease = simulate_optim(f, pars, x_grid, h_grid, x0, 
-                            free_decrease_policy, z_g, z_m, z_i, 
-                            opt$D, profit=profit, penalty= free_decrease(apples["decrease"]), seed=seed),
-  quad = simulate_optim(f, pars, x_grid, h_grid, x0, 
-                            quad_policy, z_g, z_m, z_i, 
-                            opt$D, profit=quad_profit, penalty= none, seed=seed)
+                         opt$D, profit=profit, penalty=fixed(apples["fixed"]), seed=seed))
+  
 )
 ````
 
 
 ``` {r tidy, dependson="simulate_policy"}
 #Make data tidy (melt), fast (data.tables), and nicely labeled.
-dat <- melt(sims, id=names(sims[[1]]))  
+dat <- melt(sims, id=names(sims[[1]][[1]]))  
 dt <- data.table(dat)
+setnames(dt, "L2", "replicate") # names are nice
 setnames(dt, "L1", "penalty_fn") # names are nice
 ````
+
+
+
+
+
+
+
+```{r }
+sims_free <- list(
+  L1 = lapply(reps, function(x) simulate_optim(f, pars, x_grid, h_grid, x0, 
+                      L1_policy, z_g, z_m, z_i, 
+                      opt$D, profit=profit, penalty=none, seed=seed)), 
+  L2 = lapply(reps, function(x) simulate_optim(f, pars, x_grid, h_grid, x0, 
+                      L2_policy, z_g, z_m, z_i, 
+                      opt$D, profit=profit, penalty=none, seed=seed)),
+  fixed = lapply(reps, function(x) simulate_optim(f, pars, x_grid, h_grid, x0, 
+                         fixed_policy, z_g, z_m, z_i, 
+                         opt$D, profit=profit, penalty=none, seed=seed))
+)
+````
+
+
+``` {r }
+#Make data tidy (melt), fast (data.tables), and nicely labeled.
+free <- melt(sims_free, id=names(sims_free[[1]][[1]]))  
+dt_free <- data.table(free)
+setnames(dt_free, "L2", "replicate") # names are nice
+setnames(dt_free, "L1", "penalty_fn") # names are nice
+````
+
+
+```{r}
+
+# Profit when accounting for penalty when present
+optimal_cost <- dt[, sum(profit_fishing - policy_cost), by=penalty_fn ] 
+# Profit when ignoring penalty when present
+ignore_when_present <- dt[, sum(profit_fishing_alt - policy_cost_alt), by=penalty_fn] 
+# Profit when assuming penalty when it is absent
+assume_when_absent <- dt_free[, sum(profit_fishing - policy_cost), by=penalty_fn]
+# Profit when ignoring penalty when it is absent
+optimal_free <- dt_free[, sum(profit_fishing_alt - policy_cost_alt), by=penalty_fn]
+
+# Normalize by the optimal 
+#ignore_when_present$V1 <- ignore_when_present$V1/optimal_cost$V1
+#assume_when_absent$V1 <- assume_when_absent$V1/optimal_free$V1
+
+# Name and merge columns
+setnames(ignore_when_present, "V1", "ignore_cost")
+setnames(assume_when_absent, "V1", "assume_cost")
+error_costs = merge(ignore_when_present, assume_when_absent, "penalty_fn")
+
+print_npv # theoretically acheivable profits under these costs
+optimal_cost$V1/optimal_free$V1 # actually realized 
+
+cbind(error_costs, sigma_g = sigma_g, reduction = reduction)
+
+```
+
+
+```{r error_costs_table} 
+print(xtable(error_costs), type="html")
+#pandoc.table(print_npv)
+```
+
+
+
+
+<!--
+
+
+### additional plots based on simulations under the correct model
+
 
 
 
@@ -454,7 +524,7 @@ FigS4b
 
 
 
-
+-->
 
 
 
