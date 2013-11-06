@@ -202,12 +202,13 @@ df <- melt(out, id=who)
 df
 ```
 
-```{r}
+```{r results="asis"}
 #df <- df[1:5]
 library(xtable)
 print(xtable(df), type="html")
 writeLines(print(xtable(df)), "output.md")
 system("pandoc output.md -o output.pdf")
+write.csv(df, "output.csv")
 ```
 
 ```{r}
