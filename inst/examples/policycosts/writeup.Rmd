@@ -93,12 +93,10 @@ Now we introduce the functional forms for each of the adjustment costs,
 
 ``` {r fees}
 L1 <- function(c2) function(h, h_prev)  c2 * abs(h - h_prev) 
-free_increase <- function(c2) function(h, h_prev)  c2 * abs(pmin(h - h_prev, 0)) # increasing harvest is free
-free_decrease <- function(c2) function(h, h_prev)  c2 * pmax(h - h_prev, 0) # decreasing harvest is free
 fixed <-  function(c2) function(h, h_prev) c2 * as.numeric( !(h == h_prev) )
 L2 <- function(c2) function(h, h_prev)  c2 * (h - h_prev) ^ 2
 none <- function(h, h_prev)  0
-penaltyfns <- list(L2=L2, L1=L1, free_decrease=free_decrease, fixed=fixed, free_increase=free_increase)
+penaltyfns <- list(L2=L2, L1=L1, fixed=fixed)
 ````
 
 
@@ -219,9 +217,7 @@ How close has each of these actually gotten to `r 100*reduction`% reduction to N
 ```{r print_npv, dependson="apples"}
 setkey(dt_npv, variable)
 values <- apply(index, 1, function(x) dt_npv[x[1], ][as.integer(x[2]), ]$value)
-
 percent.error <- (values - ((1-reduction)*npv0)) / ((1-reduction)*npv0)* 100
-
 print_npv <- data.frame(model=index$variable, "value realized"=values, 
                         "percent of npv0" = 100*values/npv0, "percent error"=percent.error)
 
@@ -241,28 +237,27 @@ Solve the policy cost for the specified penalty function
 L2_policy <- policies$L2[[apples_index["L2"]]]$D
 L1_policy <- policies$L1[[apples_index["L1"]]]$D
 fixed_policy <- policies$fixed[[apples_index["fixed"]]]$D
-#free_increase_policy <- policies$free_increase[[apples_index["free_increase"]]]$D
-#free_decrease_policy <- policies$free_decrease[[apples_index["free_decrease"]]]$D
-#quad_policy <- policies$quad[[apples_index["quad"]]]$D
 ```
 
 
 
 ``` {r simulate_policy, dependson=c("policynames", "apples")}
-quad_profit <- profit_harvest(price = price, c0 = c0, c1 = apples["quad"]) 
 
 reps <- 1:100
-names(reps) = paste("rep", 1:10, sep="_")
+names(reps) = paste("rep", 1:length(reps), sep="_") # treat as a factor
+seeds <- 1:100
+
+
 sims <- list(
   L1 = lapply(reps, function(x) simulate_optim(f, pars, x_grid, h_grid, x0, 
                       L1_policy, z_g, z_m, z_i, 
-                      opt$D, profit=profit, penalty=L1(apples["L1"]), seed=seed)), 
+                      opt$D, profit=profit, penalty=L1(apples["L1"]), seed=seeds[x])), 
   L2 = lapply(reps, function(x) simulate_optim(f, pars, x_grid, h_grid, x0, 
                       L2_policy, z_g, z_m, z_i, 
-                      opt$D, profit=profit, penalty=L2(apples["L2"]), seed=seed)),
+                      opt$D, profit=profit, penalty=L2(apples["L2"]), seed=seeds[x])),
   fixed = lapply(reps, function(x) simulate_optim(f, pars, x_grid, h_grid, x0, 
                          fixed_policy, z_g, z_m, z_i, 
-                         opt$D, profit=profit, penalty=fixed(apples["fixed"]), seed=seed))
+                         opt$D, profit=profit, penalty=fixed(apples["fixed"]), seed=seeds[x]))
   
 )
 ````
@@ -278,21 +273,17 @@ setnames(dt, "L1", "penalty_fn") # names are nice
 
 
 
-
-
-
-
 ```{r }
 sims_free <- list(
   L1 = lapply(reps, function(x) simulate_optim(f, pars, x_grid, h_grid, x0, 
                       L1_policy, z_g, z_m, z_i, 
-                      opt$D, profit=profit, penalty=none, seed=seed)), 
+                      opt$D, profit=profit, penalty=none, seed=seeds[x])), 
   L2 = lapply(reps, function(x) simulate_optim(f, pars, x_grid, h_grid, x0, 
                       L2_policy, z_g, z_m, z_i, 
-                      opt$D, profit=profit, penalty=none, seed=seed)),
+                      opt$D, profit=profit, penalty=none, seed=seeds[x])),
   fixed = lapply(reps, function(x) simulate_optim(f, pars, x_grid, h_grid, x0, 
                          fixed_policy, z_g, z_m, z_i, 
-                         opt$D, profit=profit, penalty=none, seed=seed))
+                         opt$D, profit=profit, penalty=none, seed=seeds[x]))
 )
 ````
 
@@ -366,18 +357,19 @@ out
 
 
 ```{r p1, dependson="tidy", fig.width=12}
-p1 <- ggplot(dt) +
+p1 <- ggplot(subset(dt, replicate %in% names(reps)[1:5])) +
   geom_line(aes(time, alternate), col="grey20", lwd=1) +
-  geom_line(aes(time, fishstock), col=rgb(0,0,1,.8)) + facet_wrap(~penalty_fn) + 
+  geom_line(aes(time, fishstock), col=rgb(0,0,1,.8)) + 
+  facet_grid(replicate~penalty_fn) + 
   labs(x="time", y="stock size", title = "Stock Dynamics")
 p1
 ```
 
 ```{r Figure3, dependson="tidy", fig.width=12}
-p2 <- ggplot(dt) +
+p2 <- ggplot(subset(dt, replicate %in% names(reps)[1:5])) +
   geom_line(aes(time, harvest_alt), col="grey20", lwd=1)  +
   geom_line(aes(time, harvest), col=rgb(0,0,1,.8)) + 
-  facet_wrap(~penalty_fn) + 
+  facet_grid(replicate~penalty_fn) + 
   labs(x="time", y="havest intensity (fish taken)", title = "Harvest Policy Dynamics")
 p2
 ````
