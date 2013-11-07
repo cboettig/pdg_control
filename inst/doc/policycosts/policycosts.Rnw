@@ -113,7 +113,7 @@ theme_set(theme_bw())
 
 \begin{figure}
 <<Figure_1>>=
-ggplot(fees, aes(c2, (npv0-value)/npv0, col=variable)) + geom_point() + geom_line()
+ggplot(fees, aes(c2, (npv0-value)/npv0, col=variable)) + geom_point() + geom_line()+theme_bw()
 @
 
 \caption{\textbf{Expected net present value by functional form of penalty.} Horizontal axis shows the coefficient $c_i$ governing the magnitude of the policy cost, while vertical axis shows fraction of the maximum expected net present value dissipated by the policy cost.  The horizontal line indicates a value of the stock that is 80\% of the maximum expected value in the absence of policy adjustment costs, $NPV_0({\bf h_0^*})$. Selecting the coefficient $c_i$ corresponding to this value in each functional form allows us to make consistent comparisons across the different functional forms of policy costs.  }
@@ -132,7 +132,7 @@ p2 <- ggplot(subset(dt, replicate %in% names(reps)[1:5])) +
   geom_line(aes(time, harvest), col=rgb(0,0,1,.8)) + 
   facet_grid(replicate~penalty_fn) + 
   labs(x="time", y="havest intensity (fish taken)", title = "Harvest Policy Dynamics")
-p2
+p2+theme_bw()
 @
   \caption{Individual realizations of optimal harvesting strategy under the different functional forms of adjustment costs.}
 \end{figure}
@@ -145,7 +145,7 @@ p1 <- ggplot(subset(dt, replicate %in% names(reps)[1:5])) +
   geom_line(aes(time, fishstock), col=rgb(0,0,1,.8)) + 
   facet_grid(replicate~penalty_fn) + 
   labs(x="time", y="stock size", title = "Stock Dynamics")
-p1
+p1+theme_bw()
 @
   \caption{Individual realizations of optimal stock size strategy under the different functional forms of adjustment costs.}
 \end{figure}
@@ -270,7 +270,7 @@ df3 <- melt(df2, id=who)
 names(df3) <- c("penalty_fn", "sigma_g", "reduction", "variable", "value", "fraction_variable", "fraction")
 
 df3$reduction <- as.factor(df3$reduction)
-ggplot(df3) + geom_line(aes(sigma_g, value, col=reduction, lty=variable)) + facet_wrap(~penalty_fn, scales="free_y") 
+ggplot(df3) + geom_line(aes(sigma_g, value, col=reduction, lty=variable)) + facet_wrap(~penalty_fn, scales="free_y", ncol=1) 
 @
 \end{figure}
 
