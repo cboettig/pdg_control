@@ -1,59 +1,4 @@
-\documentclass{article}\usepackage{graphicx, color}
-%% maxwidth is the original width if it is less than linewidth
-%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
-\makeatletter
-\def\maxwidth{ %
-  \ifdim\Gin@nat@width>\linewidth
-    \linewidth
-  \else
-    \Gin@nat@width
-  \fi
-}
-\makeatother
-
-\definecolor{fgcolor}{rgb}{0.2, 0.2, 0.2}
-\newcommand{\hlnumber}[1]{\textcolor[rgb]{0,0,0}{#1}}%
-\newcommand{\hlfunctioncall}[1]{\textcolor[rgb]{0.501960784313725,0,0.329411764705882}{\textbf{#1}}}%
-\newcommand{\hlstring}[1]{\textcolor[rgb]{0.6,0.6,1}{#1}}%
-\newcommand{\hlkeyword}[1]{\textcolor[rgb]{0,0,0}{\textbf{#1}}}%
-\newcommand{\hlargument}[1]{\textcolor[rgb]{0.690196078431373,0.250980392156863,0.0196078431372549}{#1}}%
-\newcommand{\hlcomment}[1]{\textcolor[rgb]{0.180392156862745,0.6,0.341176470588235}{#1}}%
-\newcommand{\hlroxygencomment}[1]{\textcolor[rgb]{0.43921568627451,0.47843137254902,0.701960784313725}{#1}}%
-\newcommand{\hlformalargs}[1]{\textcolor[rgb]{0.690196078431373,0.250980392156863,0.0196078431372549}{#1}}%
-\newcommand{\hleqformalargs}[1]{\textcolor[rgb]{0.690196078431373,0.250980392156863,0.0196078431372549}{#1}}%
-\newcommand{\hlassignement}[1]{\textcolor[rgb]{0,0,0}{\textbf{#1}}}%
-\newcommand{\hlpackage}[1]{\textcolor[rgb]{0.588235294117647,0.709803921568627,0.145098039215686}{#1}}%
-\newcommand{\hlslot}[1]{\textit{#1}}%
-\newcommand{\hlsymbol}[1]{\textcolor[rgb]{0,0,0}{#1}}%
-\newcommand{\hlprompt}[1]{\textcolor[rgb]{0.2,0.2,0.2}{#1}}%
-
-\usepackage{framed}
-\makeatletter
-\newenvironment{kframe}{%
- \def\at@end@of@kframe{}%
- \ifinner\ifhmode%
-  \def\at@end@of@kframe{\end{minipage}}%
-  \begin{minipage}{\columnwidth}%
- \fi\fi%
- \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
- \colorbox{shadecolor}{##1}\hskip-\fboxsep
-     % There is no \\@totalrightmargin, so:
-     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
- \MakeFramed {\advance\hsize-\width
-   \@totalleftmargin\z@ \linewidth\hsize
-   \@setminipage}}%
- {\par\unskip\endMakeFramed%
- \at@end@of@kframe}
-\makeatother
-
-\definecolor{shadecolor}{rgb}{.97, .97, .97}
-\definecolor{messagecolor}{rgb}{0, 0, 0}
-\definecolor{warningcolor}{rgb}{1, 0, 1}
-\definecolor{errorcolor}{rgb}{1, 0, 0}
-\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
-
-\usepackage{alltt}
-\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\documentclass{article}
 
 \begin{document}
 %\SweaveOpts{concordance=TRUE, echo=FALSE}
@@ -151,18 +96,25 @@ To compare the impact of penalty functions on optimal management across the diff
 
 Other parameters in the model are chosen - HOW? 
 
-
-
+<<settings, echo=FALSE, warning=FALSE>>=
+require(knitr)
+opts_chunk$set(echo=FALSE, dev="pdf", cache=FALSE, warning=FALSE)
+require(pdgControl)
+require(reshape2)
+require(ggplot2)
+require(data.table)
+require(plyr)
+require(xtable)
+load("writeup.rda")
+theme_set(theme_bw())
+@
 
 
 
 \begin{figure}
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
-\includegraphics[width=\maxwidth]{figure/Figure_1} 
-
-\end{knitrout}
-
+<<Figure_1>>=
+ggplot(fees, aes(c2, (npv0-value)/npv0, col=variable)) + geom_point() + geom_line()
+@
 
 \caption{\textbf{Expected net present value by functional form of penalty.} Horizontal axis shows the coefficient $c_i$ governing the magnitude of the policy cost, while vertical axis shows fraction of the maximum expected net present value dissipated by the policy cost.  The horizontal line indicates a value of the stock that is 80\% of the maximum expected value in the absence of policy adjustment costs, $NPV_0({\bf h_0^*})$. Selecting the coefficient $c_i$ corresponding to this value in each functional form allows us to make consistent comparisons across the different functional forms of policy costs.  }
 \end{figure}
@@ -174,23 +126,27 @@ Figure 2 shows the impact that the adjustment cost has on the optimal policy.   
 When considering the first formulation of policy adjustment costs ($\Pi_1$), the first  panel of Figure 2 shows a typical pattern, in which the optimal policy tends to avoid small policy adjustments, resulting in long periods of constant policy followed by sudden bursts of adjustment. This results in a relatively step-like policy pattern.  In contrast, the second formulation $\Pi_2$ disproportionately penalizes large policy adjustments. The corresponding optimal policy tracks all of the changes made by the cost-free policy, but with smaller magnitude.  This results in a smoother $h_t$ curve, one that undershoots the larger oscillations seen in the cost-free optimum in favor of a policy that changes incrementally each yearl.  Finally, the optimal policy for the third, `fixed fee' formulation ($\Pi_3$) only makes large adjustments, as one might expect, because the magnitude of the adjustment made is not reflected in the resulting penalty.  Whereas the optimal solution for $\Pi_1$ attempts to accommodate the large oscillations at the end of the period shown (time steps $t=47-49$) with a constant quota in between the extremes, the fixed fee version takes the opposite approach of one very large swing. MORE DETAILING TO COME WHEN WE HAVE THE FIGURES
 
 \begin{figure}
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
-\includegraphics[width=\maxwidth]{figure/Figure_2} 
-
-\end{knitrout}
-
+<<Figure_2, fig.width=12>>=
+p2 <- ggplot(subset(dt, replicate %in% names(reps)[1:5])) +
+  geom_line(aes(time, harvest_alt), col="grey20", lwd=1)  +
+  geom_line(aes(time, harvest), col=rgb(0,0,1,.8)) + 
+  facet_grid(replicate~penalty_fn) + 
+  labs(x="time", y="havest intensity (fish taken)", title = "Harvest Policy Dynamics")
+p2
+@
   \caption{Individual realizations of optimal harvesting strategy under the different functional forms of adjustment costs.}
 \end{figure}
 
 
 \begin{figure}
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
-\includegraphics[width=\maxwidth]{figure/Figure_3} 
-
-\end{knitrout}
-
+<<Figure_3, fig.width=12>>=
+p1 <- ggplot(subset(dt, replicate %in% names(reps)[1:5])) +
+  geom_line(aes(time, alternate), col="grey20", lwd=1) +
+  geom_line(aes(time, fishstock), col=rgb(0,0,1,.8)) + 
+  facet_grid(replicate~penalty_fn) + 
+  labs(x="time", y="stock size", title = "Stock Dynamics")
+p1
+@
   \caption{Individual realizations of optimal stock size strategy under the different functional forms of adjustment costs.}
 \end{figure}
 
@@ -201,23 +157,30 @@ The comparisons shown in Figure 2 are for one realization (i.e. a particular seq
 We see that TO COME WHEN WE HAVE THE FIGURES
 
 \begin{figure}
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
-\includegraphics[width=\maxwidth]{figure/Figure_4a} 
+<<Figure_4a>>=
+Fig4a <- ggplot(harvest_trends, 
+                aes(fraction, Ev, ymin=Ev-SDv, ymax=Ev+SDv, col=penalty)) + 
+  geom_ribbon(aes(fill=penalty, col=NA), lwd=0, alpha=.05) + 
+  geom_line() + 
+  xlab("Fraction of NPV lost to costs") +
+  scale_x_continuous(limits=c(0, 0.4))
 
-\end{knitrout}
+Fig4b <- ggplot(harvest_trends, 
+                aes(fraction, Ea, ymin=Ea-SDa, ymax=Ea+SDa, col=penalty)) + 
+  geom_ribbon(aes(fill=penalty, col=NA), lwd=0, alpha=.05) + 
+  geom_line() + xlab("Fraction of NPV lost to costs")+
+  scale_x_continuous(limits=c(0, 0.4)) 
+Fig4a
 
+@
 
 \caption*{Figure 4a: Variance of optimal harvest rates through time as a function of size of adjustment penalties, the latter being calculated as percentage of the maximum expected NPV in the basic case with no policy adjustment costs. }
 \end{figure}
 
 \begin{figure}
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
-\includegraphics[width=\maxwidth]{figure/Figure_4b} 
-
-\end{knitrout}
-
+<<Figure_4b>>=
+Fig4b
+@
 \caption*{Figure 4b: Autocorrelation of optimal harvest rates through time as a function of size of adjustment penalties, the latter being calculated as percentage of the maximum expected NPV in the basic case with no policy adjustment costs. }
 \end{figure}
 
@@ -226,23 +189,33 @@ We see that TO COME WHEN WE HAVE THE FIGURES
 
 
 \begin{figure}
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
-\includegraphics[width=\maxwidth]{figure/Figure_5a} 
+<<Figure_5a>>=
+fishstock_stats <- lapply(sims_at_each_apple, stats_fishstock)
+fishstock_trends <- get_trends(fishstock_stats)
 
-\end{knitrout}
+Fig5a <- ggplot(fishstock_trends, 
+                aes(fraction, Ev, ymin=Ev-SDv, ymax=Ev+SDv, col=penalty)) + 
+  geom_ribbon(aes(fill=penalty, col=NA), lwd=0, alpha=.05) + 
+  geom_line() + xlab("Fraction of NPV lost to costs")+
+  scale_x_continuous(limits=c(0, 0.4)) 
 
+Fig5b <- ggplot(fishstock_trends, 
+                aes(fraction, Ea, ymin=Ea-SDa, ymax=Ea+SDa, col=penalty)) + 
+  geom_ribbon(aes(fill=penalty, col=NA), lwd=0, alpha=.05) + 
+  geom_line() + xlab("Fraction of NPV lost to costs") +
+  scale_x_continuous(limits=c(0, 0.4)) 
+Fig5a
+
+
+@
 
 \caption*{Figure 5a: Variance of optimal stock sizes through time as a function of size of adjustment penalties, the latter being calculated as percentage of the maximum expected NPV in the basic case with no policy adjustment costs. }
 \end{figure}
 
 \begin{figure}
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
-\includegraphics[width=\maxwidth]{figure/Figure_5b} 
-
-\end{knitrout}
-
+<<Figure_5b>>=
+Fig5b
+@
 \caption*{Figure 5b: Autocorrelation of optimal stock sizes through time as a function of size of adjustment penalties, the latter being calculated as percentage of the maximum expected NPV in the basic case with no policy adjustment costs. }
 \end{figure}
 
@@ -270,27 +243,35 @@ Histograms for the different contributions labelled $[1]-[4]$ here when taken ac
 In contrast, the cost of ignoring policy adjustment costs when in fact they are present is given by subtracting the second infinite sum from the first (contributions $([1]-[2])-([3]-[4]))$ in the equations. These costs are positive because the lost revenues from not tracking stock variations as closely are smaller than the penalties of policy adjustment that are incurred if managers try to track stock variations more tightly.
 
 \begin{figure}
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Using\ \ as id variables}}\end{kframe}
-\includegraphics[width=\maxwidth]{figure/Figure_6} 
-
-\end{knitrout}
-
+<<Figure_6>>=
+totals <- data.frame(
+profit_under_penalty = dt[,sum(profit_fishing), by='replicate']$V1,
+cost_under_penalty = dt[,sum(policy_cost), by='replicate']$V1,
+profit_without_penalty = dt[,sum(profit_fishing_alt), by='replicate']$V1,
+costs_ignoring_penalty = dt[,sum(policy_cost_alt), by='replicate']$V1)
+totals <- melt(totals)
+ggplot(totals) + geom_density(aes(value, fill=variable), alpha=.7)
+@
 
 \caption{Ignoring the cost of policy adjustment results in greater profits from fishing, but even greater costs for adjusting the harvest quotas each year.}
 \end{figure}
 
 
 \begin{figure}
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
-\includegraphics[width=\maxwidth]{figure/Figure_7} 
+<<Figure_7>>=
+require(ggplot2)
+df <- read.csv("output.csv")
+df <- df[2:8]
+require(reshape2)
+who <- c("penalty_fn", "ignore_fraction", "assume_fraction", "sigma_g", "reduction")
+df2 <- melt(df, id=who)
+who <- c("penalty_fn", "sigma_g", "reduction", "variable", "value")
+df3 <- melt(df2, id=who)
+names(df3) <- c("penalty_fn", "sigma_g", "reduction", "variable", "value", "fraction_variable", "fraction")
 
-\end{knitrout}
-
+df3$reduction <- as.factor(df3$reduction)
+ggplot(df3) + geom_line(aes(sigma_g, value, col=reduction, lty=variable)) + facet_wrap(~penalty_fn, scales="free_y") 
+@
 \end{figure}
 
 
@@ -299,46 +280,11 @@ In contrast, the cost of ignoring policy adjustment costs when in fact they are 
 Table 1 compares these different contributions, namely the $NPV$ lost by assuming policy adjustment costs when none are present (first entry in each cell, $[1]-[3]$ in the equations)) and the $NPV$ lost when ignoring policy adjustment costs when they are present (second entry in each cell of the table, contributions $([1]-[2])-([3]-[4]))$ in the equations) across the three different functional forms. Specifically, the table shows how these values change as we vary the severity of policy adjustment costs and the underlying environmental variability. In each case, values are shown as percentages of the maximum expected $NPV$ in the base case where no policy adjustment costs apply or are assumed to apply $NPV_0({\bf h_0^*})$.
 
 
-% latex table generated in R 3.0.2 by xtable 1.7-1 package
-% Wed Nov  6 20:44:17 2013
-\begin{table}[ht]
-\centering
-\begin{tabular}{rlrrrrrr}
-  \hline
- & penalty\_fn & ignore\_cost & ignore\_fraction & assume\_cost & assume\_fraction & sigma\_g & reduction \\ 
-  \hline
-1 & L1 & 14536.09 & 1.00 & 16857.61 & 1.00 & 0.05 & 0.10 \\ 
-  2 & L2 & 11020.10 & 0.76 & 15538.44 & 0.92 & 0.05 & 0.10 \\ 
-  3 & fixed & 13584.97 & 0.92 & 17582.78 & 1.05 & 0.05 & 0.10 \\ 
-  4 & L1 & 9273.66 & 1.09 & 17561.81 & 1.04 & 0.05 & 0.20 \\ 
-  5 & L2 & 11020.10 & 0.76 & 15538.44 & 0.92 & 0.05 & 0.20 \\ 
-  6 & fixed & 8332.45 & 0.84 & 17401.82 & 1.03 & 0.05 & 0.20 \\ 
-  7 & L1 & -641.78 & 0.21 & 15451.25 & 0.92 & 0.05 & 0.30 \\ 
-  8 & L2 & -272586.11 & -24.90 & 11567.12 & 0.69 & 0.05 & 0.30 \\ 
-  9 & fixed & -1213.01 & -0.46 & 15519.95 & 0.92 & 0.05 & 0.30 \\ 
-  10 & L1 & 18281.97 & 1.01 & 20973.56 & 0.99 & 0.20 & 0.10 \\ 
-  11 & L2 & 12462.51 & 0.72 & 19392.85 & 0.91 & 0.20 & 0.10 \\ 
-  12 & fixed & 16691.94 & 1.03 & 20143.80 & 0.95 & 0.20 & 0.10 \\ 
-  13 & L1 & 12788.95 & 0.96 & 20663.21 & 0.97 & 0.20 & 0.20 \\ 
-  14 & L2 & 12462.51 & 0.72 & 19392.85 & 0.91 & 0.20 & 0.20 \\ 
-  15 & fixed & 12399.01 & 0.88 & 21289.21 & 1.00 & 0.20 & 0.20 \\ 
-  16 & L1 & 9099.48 & 0.73 & 19999.07 & 0.94 & 0.20 & 0.30 \\ 
-  17 & L2 & -6337.76 & -0.39 & 17765.33 & 0.83 & 0.20 & 0.30 \\ 
-  18 & fixed & 7399.01 & 0.62 & 21969.84 & 1.03 & 0.20 & 0.30 \\ 
-  19 & L1 & 30227.43 & 1.07 & 31377.07 & 0.94 & 0.50 & 0.10 \\ 
-  20 & L2 & 33472.18 & 1.00 & 33472.18 & 1.00 & 0.50 & 0.10 \\ 
-  21 & fixed & 28926.73 & 1.09 & 30500.85 & 0.91 & 0.50 & 0.10 \\ 
-  22 & L1 & 24157.93 & 1.10 & 31767.92 & 0.95 & 0.50 & 0.20 \\ 
-  23 & L2 & 19091.31 & 0.93 & 29225.46 & 0.87 & 0.50 & 0.20 \\ 
-  24 & fixed & 23573.19 & 1.02 & 30069.80 & 0.90 & 0.50 & 0.20 \\ 
-  25 & L1 & 21086.12 & 1.12 & 32035.93 & 0.96 & 0.50 & 0.30 \\ 
-  26 & L2 & 19091.31 & 0.93 & 29225.46 & 0.87 & 0.50 & 0.30 \\ 
-  27 & fixed & 17209.56 & 0.85 & 32946.24 & 0.98 & 0.50 & 0.30 \\ 
-   \hline
-\end{tabular}
-\end{table}
-
-
+<<Table_1, results="asis">>=
+df4 <- df[c(1,2,4,6,7)]
+df4 <- plyr::arrange(df4, penalty_fn)
+print(xtable::xtable(df))
+@
 
 
 Overall cost of assuming policy adjustment costs apply when they are absent (first value) or from ignoring them when they are present (second value). These overall costs are shown for different severities of policy adjustment costs (columns) and levels of environmental variability (rows) and for three different functional forms for policy adjustment costs ($\Pi_i$ for $ i=1-3$). Values expressed as percentages of the maximum expected net present value when no policy adjustment costs apply and this is known to managers ($ NPV_0 ({\bf h_0^*}) $). 
