@@ -112,7 +112,7 @@ theme_set(theme_bw())
 
 
 \begin{figure}
-<<Figure_1>>=
+<<Figure_1, cache=FALSE>>=
 ggplot(fees, aes(c2, (npv0-value)/npv0, col=variable)) + geom_point() + geom_line()+theme_bw()
 @
 
@@ -261,17 +261,16 @@ ggplot(totals) + geom_density(aes(value, fill=variable), alpha=.7)
 <<Figure_7>>=
 require(ggplot2)
 df <- read.csv("output.csv")
-df <- df[2:8]
-require(reshape2)
-who <- c("penalty_fn", "ignore_fraction", "assume_fraction", "sigma_g", "reduction")
-df2 <- melt(df, id=who)
-who <- c("penalty_fn", "sigma_g", "reduction", "variable", "value")
-df3 <- melt(df2, id=who)
-names(df3) <- c("penalty_fn", "sigma_g", "reduction", "variable", "value", "fraction_variable", "fraction")
-
+df2 <- df[c("penalty_fn", "ignore_cost", "assume_cost", "sigma_g", "reduction")] # subset
+df3 <- reshape2::melt(df2, id = c("penalty_fn", "sigma_g", "reduction")) 
 df3$reduction <- as.factor(df3$reduction)
-ggplot(df3) + geom_line(aes(sigma_g, value, col=reduction, lty=variable)) + facet_wrap(~penalty_fn, scales="free_y", ncol=1) 
-@
+ggplot(df3) + 
+  geom_line(aes(sigma_g, value, col=reduction, lty=variable)) +
+  #facet_grid(reduction~penalty_fn, scales="free")
+  facet_wrap(~penalty_fn, scales="free_y", ncol=1) +
+  scale_y_continuous(limits=c(-3e4,3e4))
+
+  @
 \end{figure}
 
 

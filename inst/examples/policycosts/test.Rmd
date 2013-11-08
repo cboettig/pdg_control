@@ -9,7 +9,7 @@ require(data.table)
 
 
 ```{r cache-options, include=FALSE}
-opts_chunk$set(cache=TRUE, cache.path="writeup/")
+opts_chunk$set(cache=TRUE, cache.path="test/")
 opts_knit$set(upload.fun=socialR::flickr.url)
 ```
 
@@ -60,7 +60,7 @@ seed <- 123                 # Random seed (replicable results)
 delta <- 0.05               # economic discounting rate
 OptTime <- 20               # stopping time
 gridsize <- 50              # grid size for fish stock and harvest rate (discretized population)
-sigma_g <- 0.2              # Noise in population growth
+sigma_g <- 0.5            # Noise in population growth
 reward <- 0                 # bonus for satisfying the boundary condition
 z_g <- function() rlnorm(1,  0, sigma_g) # mean 1
 z_m <- function() 1         # No measurement noise, 
