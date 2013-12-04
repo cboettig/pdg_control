@@ -1,22 +1,21 @@
 
-``` {r libraries, message=FALSE, warning=FALSE}
+## ----libraries, message=FALSE, warning=FALSE-----------------------------
 rm(list=ls())
 require(pdgControl)
 require(reshape2)
 require(ggplot2)
 require(data.table)
-```
 
 
-```{r cache-options, include=FALSE}
+## ----cache-options, include=FALSE----------------------------------------
 opts_chunk$set(cache=TRUE, cache.path="errors_table/", tidy=FALSE)
-```
 
-```{r}
+
+## ------------------------------------------------------------------------
 start <- Sys.time()
-```
 
-``` {r defs}
+
+## ----defs----------------------------------------------------------------
 compute_error_table <- function(r, sigma){
 reduction_range = c(.1, .2, .3)
 reduction <- reduction_range[r]
@@ -121,9 +120,9 @@ error_costs <- cbind(error_costs, sigma_g = sigma_g, reduction = reduction)
 error_costs 
 }
 
-```
 
-```{r compute_table}
+
+## ----compute_table-------------------------------------------------------
 sigmas <- c(0.01, 0.1, 0.2)
 reductions <- 1:3
 out <- lapply(sigmas, function(s){
@@ -135,17 +134,18 @@ out <- lapply(sigmas, function(s){
 who <- names(out[[1]][[1]])
 df <- melt(out, id=who)              
 df
-```
 
-```{r results="asis"}
+
+## ----results="asis"------------------------------------------------------
 #df <- df[1:5]
 library(xtable)
 print(xtable(df), type="html")
 writeLines(print(xtable(df)), "output.md")
 system("pandoc output.md -o output.pdf")
 write.csv(df, "output.csv")
-```
 
-```{r}
+
+## ------------------------------------------------------------------------
 Sys.time() - start 
-```
+
+

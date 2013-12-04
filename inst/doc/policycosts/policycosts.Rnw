@@ -2,6 +2,25 @@
 
 \begin{document}
 %\SweaveOpts{concordance=TRUE, echo=FALSE}
+<<settings, echo=FALSE, warning=FALSE>>=
+require(knitr)
+opts_chunk$set(echo=FALSE, dev="pdf", cache=FALSE, warning=FALSE)
+require(pdgControl)
+require(reshape2)
+require(ggplot2)
+require(data.table)
+require(plyr)
+require(xtable)
+#load("writeup.rda")
+theme_set(theme_bw())
+@
+
+<<maincode, echo=FALSE, warning=FALSE>>=
+source("writeup.R")
+@
+<<errortable, echo=FALSE, warning=FALSE>>=
+source("errors_table.R")
+@
 
 \title{Optimal management of a stochastically varying population when policy adjustment is costly} 
 
@@ -95,20 +114,6 @@ Figure 1 shows the calibration graphically.  Each curve plots the change in maxi
 To compare the impact of penalty functions on optimal management across the different functional forms, we select penalty cost coefficients that induce the same reduction in maximum expected NPV. For example, the dashed vertical lines in Figure 1 map the needed cost coefficient $c_i$, for each penalty function, such that the fishery is worth 80\% of its unconstrained value when optimally managed. 
 
 Other parameters in the model are chosen - HOW? 
-
-<<settings, echo=FALSE, warning=FALSE>>=
-require(knitr)
-opts_chunk$set(echo=FALSE, dev="pdf", cache=FALSE, warning=FALSE)
-require(pdgControl)
-require(reshape2)
-require(ggplot2)
-require(data.table)
-require(plyr)
-require(xtable)
-load("writeup.rda")
-theme_set(theme_bw())
-@
-
 
 
 \begin{figure}
