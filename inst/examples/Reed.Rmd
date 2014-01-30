@@ -24,18 +24,19 @@ Chose the state equation / population dynamics function
 ``` {r }
 #f <- RickerAllee
 #pars <- c(2, K, 5)
-f <- BevHolt
-pars <- c(2,4)
-K <- (pars[1]-1)/pars[2]
 
-#K <- 100
-#pars <- c(1,K)
-#f <- function(x,h,p){
-#  sapply(x, function(x){
- #   S = max(x - h, 0)
-#    p[1] * S * (1 - S/p[2]) + S
-#  })
-#}
+#f <- BevHolt
+#pars <- c(2,4)
+#K <- (pars[1]-1)/pars[2]
+
+K <- 100
+pars <- c(1,K)
+f <- function(x,h,p){
+  sapply(x, function(x){
+    S = max(x - h, 0)
+    p[1] * S * (1 - S/p[2]) + S
+  })
+}
 
 ````
 
@@ -86,10 +87,10 @@ for the random variable `z_g`, given by
 
 ``` {r noise}
 #z_g <- function() 1 + rlnorm(1,0, sigma_g)  
-pdfn <- function(P, s) dlnorm(P, 0, s)
+#pdfn <- function(P, s) dlnorm(P, 0, s)
 
-#z_g <- function() 1+(2*runif(1, 0,  1)-1) * sigma_g
-#pdfn <- function(P, s)  dunif(P, 1 - s, 1 + s)
+z_g <- function() 1+(2*runif(1, 0,  1)-1) * sigma_g
+pdfn <- function(P, s)  dunif(P, 1 - s, 1 + s)
 ````
 
 
@@ -156,7 +157,7 @@ q2
 ````
 
 
-
+<!--
 
 
 ### Simulate 
@@ -218,5 +219,5 @@ p1
 # knitcitations::bibliography("html")
 ````
 
-
+-->
 
