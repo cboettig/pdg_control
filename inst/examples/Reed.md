@@ -23,13 +23,15 @@ Chose the state equation / population dynamics function
 #K <- (pars[1]-1)/pars[2]
 
 K <- 100
-pars <- c(1,K)
-f <- function(x,h,p){
-  sapply(x, function(x){
-    S = max(x - h, 0)
-    p[1] * S * (1 - S/p[2]) + S
-  })
-}
+pars <- c(1.1,K)
+f <- Ricker
+
+#f <- function(x,h,p){
+#  sapply(x, function(x){
+#    S = max(x - h, 0)
+#    p[1] * S * (1 - S/p[2]) + S
+#  })
+#}
 ```
 
 
@@ -116,7 +118,7 @@ opt$S
 ```
 
 ```
-[1] 51.26
+[1] 42.96
 ```
 
 
@@ -166,7 +168,7 @@ q1 <- ggplot(policies, aes(stock, stock - value, color=variable)) + geom_point(a
 q1
 ```
 
-![plot of chunk policyfn_plot](http://farm4.staticflickr.com/3677/12227479605_0c7af3863b_o.png) 
+![plot of chunk policyfn_plot](http://farm4.staticflickr.com/3789/12228041343_2834e81016_o.png) 
 
 
 and the value function (at equilibrium):
@@ -178,7 +180,7 @@ geom_vline(xintercept=opt$S)
 q2
 ```
 
-![plot of chunk valuefn_plot](http://farm4.staticflickr.com/3709/12228067316_f6f6f91c8f_o.png) 
+![plot of chunk valuefn_plot](http://farm6.staticflickr.com/5474/12228444096_9fa9c8fdf5_o.png) 
 
 
 
@@ -234,7 +236,7 @@ p0 <- ggplot(subset(dt,reps==1)) +
 p0
 ```
 
-![plot of chunk p0](http://farm6.staticflickr.com/5513/12227664783_5f779809bd_o.png) 
+![plot of chunk p0](http://farm6.staticflickr.com/5476/12228445246_5b1b358778_o.png) 
 
 
 
@@ -248,7 +250,7 @@ p1 <- p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 p1
 ```
 
-![plot of chunk p1](http://farm8.staticflickr.com/7339/12228068596_f04ce2dbcd_o.png) 
+![plot of chunk p1](http://farm3.staticflickr.com/2807/12228044423_893130fff3_o.png) 
 
 
 

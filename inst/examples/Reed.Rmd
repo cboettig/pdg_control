@@ -30,13 +30,15 @@ Chose the state equation / population dynamics function
 #K <- (pars[1]-1)/pars[2]
 
 K <- 100
-pars <- c(1,K)
-f <- function(x,h,p){
-  sapply(x, function(x){
-    S = max(x - h, 0)
-    p[1] * S * (1 - S/p[2]) + S
-  })
-}
+pars <- c(1.1,K)
+f <- Ricker
+
+#f <- function(x,h,p){
+#  sapply(x, function(x){
+#    S = max(x - h, 0)
+#    p[1] * S * (1 - S/p[2]) + S
+#  })
+#}
 
 ````
 
