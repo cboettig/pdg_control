@@ -7,7 +7,7 @@
 
  * Author [Carl Boettiger](http://carlboettiger.info), <cboettig@gmail.com>
  * License: [CC0](http://creativecommons.org/publicdomain/zero/1.0/)
- * Description:  Implements a numerical version of the SDP described in <a href="http://dx.doi.org/10.1016/0095-0696(79)90014-7">Reed (1979)</a>.
+ * Description:  Implements a numerical version of the SDP described in <a href="http://dx.doi.org/10.1016/0095-0696(79)90014-7">Reed (1979)</a> .
 
 
 ```
@@ -32,9 +32,15 @@ Chose the state equation / population dynamics function
 
 
 ```r
-f <- RickerAllee
+# f <- RickerAllee pars <- c(2, K, 5)
 K <- 10
-pars <- c(2, K, 5)
+pars <- c(1, 100)
+f <- function(x, h, p) {
+    sapply(x, function(x) {
+        S = max(x - h, 0)
+        p[1] * S * (1 - S/p[2]) + S
+    })
+}
 ```
 
 
@@ -122,7 +128,7 @@ opt$S
 ```
 
 ```
-## [1] 7.161
+## [1] 3.92
 ```
 
 
@@ -171,7 +177,7 @@ q1 <- ggplot(policies, aes(stock, stock - value, color = variable)) + geom_point
 q1
 ```
 
-![plot of chunk policyfn_plot](http://farm4.staticflickr.com/3829/8856495917_0ee6c01d33_o.png) 
+![plot of chunk policyfn_plot](http://farm6.staticflickr.com/5487/12184301433_ba7dd27a26_o.png) 
 
 
 and the value function (at equilibrium):
@@ -182,7 +188,7 @@ q2 <- qplot(x_grid, opt$V, xlab = "stock size", ylab = "value") + geom_vline(xin
 q2
 ```
 
-![plot of chunk valuefn_plot](http://farm4.staticflickr.com/3752/8857107876_d4a5ea9ed8_o.png) 
+![plot of chunk valuefn_plot](http://farm3.staticflickr.com/2846/12184487584_b59f73142a_o.png) 
 
 
 
@@ -236,7 +242,7 @@ p0 <- ggplot(subset(dt, reps == 1)) + geom_line(aes(time, fishstock)) + geom_abl
 p0
 ```
 
-![plot of chunk p0](http://farm8.staticflickr.com/7429/8856499269_03790ea6f7_o.png) 
+![plot of chunk p0](http://farm3.staticflickr.com/2822/12184303073_38f46df941_o.png) 
 
 
 
@@ -250,7 +256,7 @@ p1 <- p1 + geom_line(aes(time, fishstock, group = reps), alpha = 0.2)
 p1
 ```
 
-![plot of chunk p1](http://farm6.staticflickr.com/5330/8857111518_3f8f63dce1_o.png) 
+![plot of chunk p1](http://farm8.staticflickr.com/7314/12184691746_9d9e3c9ef2_o.png) 
 
 
 
