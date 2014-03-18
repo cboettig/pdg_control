@@ -8,3 +8,8 @@
 *.fff
 *.pdf
 .Rproj.user
+/inst/doc/policycosts/*.eps
+/inst/doc/policycosts/*.dvi
+/inst/doc/policycosts/*.html
+/inst/doc/policycosts/writeup/*
+/inst/examples/policycosts/writeup-*

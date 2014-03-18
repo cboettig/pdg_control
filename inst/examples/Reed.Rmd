@@ -1,7 +1,7 @@
-`ro cache=FALSE, tidy=FALSE, warning=FALSE, comment=NA, message=FALSE, verbose=TRUE or`
 
 ``` {r  echo=FALSE, cache=FALSE}
 opts_knit$set(upload.fun = socialR::flickr.url)
+opts_chunk$set(cache=FALSE, tidy=FALSE, warning=FALSE, comment=NA, message=FALSE, verbose=TRUE)
 ````
 
 # Reed Model
@@ -23,9 +23,17 @@ rm(list=ls())
 Chose the state equation / population dynamics function
 
 ``` {r }
-f <- RickerAllee
-K <- 10
-pars <- c(2, K, 5)
+#f <- RickerAllee
+#pars <- c(2, K, 5)
+K <- 100
+pars <- c(1,100)
+f <- function(x,h,p){
+  sapply(x, function(x){
+    S = max(x - h, 0)
+  	p[1] * S * (1 - S/p[2]) + S
+  })
+}
+
 ````
 
 We consider a profits from fishing to be a function of harvest `h` and stock size `x`,  
