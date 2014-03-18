@@ -1,0 +1,8 @@
+Tasks 
+- write introduction
+- references onto that
+- collate the data and make figure 1 relating stock estimates to quotas set for 2-3 stocks
+- choice of parameters for base case
+- Jake to look back over the text provided on apples to apples and make sure it still holds given the way these are now calculated.
+- tidy up figures to journal quality; explore different ways of presenting them (e.g. size, content, and positioningof panels). Presentable figure captions
+- write results and discussion text around the figures and table
