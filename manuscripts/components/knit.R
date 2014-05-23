@@ -2,6 +2,13 @@
 args <- commandArgs(TRUE)
 file <- args[1]
 
+if(!is.na(args[1])){
+  file <- args[1]
+} else if(!is.character(file)) {
+  file <- 'manuscript.Rmd'
+}
+
+
 ## FIXME add second argument to handle figure types
 
 ## Set the paths for cache and figure
@@ -11,7 +18,7 @@ basename <- gsub(".Rmd", "", file) # knitr:::knit_concord$get('infile'))
 opts_chunk$set(fig.path = paste("components/figure/", basename, "-", sep=""),
                cache.path = paste("components/cache/", basename, "/", sep=""))
 opts_chunk$set(cache = 2)
-opts_chunk$set(tidy=FALSE, warning=FALSE, message=FALSE, comment = NA, verbose = TRUE)
+opts_chunk$set(tidy=FALSE, warning=FALSE, message=FALSE, comment = NA, verbose = TRUE, echo=FALSE)
 
 # PDF-based figures
 opts_chunk$set(dev='pdf')
