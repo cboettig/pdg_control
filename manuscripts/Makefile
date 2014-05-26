@@ -18,7 +18,7 @@ $(MANUSCRIPT).md: $(MANUSCRIPT).Rmd
 
 ## Customize template, latex engine, etc here
 $(MANUSCRIPT).pdf: $(MANUSCRIPT).md
-	pandoc -o $(MANUSCRIPT).pdf --template=$(TEMPLATE) --biblio $(BIBLIO) --csl $(CSL) $(MANUSCRIPT).md
+	pandoc -o $(MANUSCRIPT).pdf --template=$(TEMPLATE) --biblio $(BIBLIO) --csl $(CSL) --latex-engine xelatex $(MANUSCRIPT).md
 
 $(MANUSCRIPT).tex: $(MANUSCRIPT).md
 	pandoc -o $(MANUSCRIPT).tex --template=$(TEMPLATE) --biblio $(BIBLIO) --csl $(CSL) $(MANUSCRIPT).md

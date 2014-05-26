@@ -1,6 +1,6 @@
 #!/usr/bin/R
 setwd("components")
-archive <- "template-manuscript-cache.tar.gz"
+archive <- "pdg_controlcache.tar.gz"
 
 
 library("utils")
