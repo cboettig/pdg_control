@@ -61,7 +61,8 @@ library("ggplot2")
 library("data.table")
 library("pander")
 library("cboettigR")
-theme_set(theme_bw())
+library("ggthemes")
+theme_set(theme_tufte())
 ```
 
 ``` {r profit_model}
@@ -427,7 +428,7 @@ populations and communities adopt this approach and largely ignore the
 challenges that would be involved in implementing such recommendations
 [e.g., @Reed1979; @Neubert2003; @Sethi2005; @Halpern2011]. However, 
 the policy process can often be much more sluggish
-to respond to variations in ecosystem dynamics [@Walters1978; @Armsworth2012]. 
+to respond to variations in ecosystem dynamics [@Walters1978; @Armsworth2010]. 
 Moreover, stakeholders impacted by ecosystem management
 may prefer some stability and not want to deal with continually changing
 management recommendations [@Biais1995; @Armsworth2003;
@@ -674,7 +675,7 @@ than that corresponding to the maximum sustainable yield in biomass
 
 
 ```{r Figure_1, fig.cap="Expected net present value by functional form of penalty. Horizontal axis shows the coefficient $c_i$ governing the magnitude of the policy cost, while vertical axis shows fraction of the maximum expected net present value dissipated by the policy cost.  The horizontal line indicates a value of the stock that is 80% of the maximum expected value in the absence of policy adjustment costs, $NPV_0({\\bf h_0^*})$. Selecting the coefficient $c_i$ corresponding to this value in each functional form allows us to make consistent comparisons across the different functional forms of policy costs.", dependson="quadcosts", fig.width=5, fig.height=3}
-ggplot(fees, aes(c2, (npv0-value)/npv0, col=variable)) + geom_point() + geom_line()
+ggplot(fees, aes(c2, (npv0-value)/npv0, lty=variable)) + geom_line() + theme_tufte()
 
 ```
 
@@ -735,8 +736,8 @@ ggplot(subset(dt, replicate %in% names(reps)[1:5])) +
   geom_line(aes(time, alternate), col="grey20", lwd=1) +
   geom_line(aes(time, fishstock), col=rgb(0,0,1,.8)) + 
   facet_grid(replicate~penalty_fn) + 
-  labs(x="time", y="stock size", title = "Stock Dynamics") +
-  theme_bw()
+  labs(x="time", y="stock size", title = "Stock Dynamics")  + theme_tufte()
+
 
 ```
 
@@ -745,8 +746,7 @@ ggplot(subset(dt, replicate %in% names(reps)[1:5])) +
   geom_line(aes(time, harvest_alt), col="grey20", lwd=1)  +
   geom_line(aes(time, harvest), col=rgb(0,0,1,.8)) + 
   facet_grid(replicate~penalty_fn) + 
-  labs(x="time", y="havest intensity (fish taken)", title = "Harvest Policy Dynamics") + 
-  theme_bw()
+  labs(x="time", y="havest intensity (fish taken)", title = "Harvest Policy Dynamics")  + theme_tufte()
 
 ```
 
@@ -819,13 +819,15 @@ Fig4a <- ggplot(harvest_trends,
   geom_ribbon(aes(fill=penalty, col=NA), lwd=0, alpha=.05) + 
   geom_line() + 
   xlab("Fraction of NPV lost to costs") +
-  scale_x_continuous(limits=c(0, 0.4))
+  scale_x_continuous(limits=c(0, 0.4)) + theme_tufte()
+
 
 Fig4b <- ggplot(harvest_trends, 
                 aes(fraction, Ea, ymin=Ea-SDa, ymax=Ea+SDa, col=penalty)) + 
   geom_ribbon(aes(fill=penalty, col=NA), lwd=0, alpha=.05) + 
   geom_line() + xlab("Fraction of NPV lost to costs")+
-  scale_x_continuous(limits=c(0, 0.4))
+  scale_x_continuous(limits=c(0, 0.4)) + theme_tufte()
+
 
 multiplot(Fig4a, Fig4b, cols=2)
 ```
@@ -836,13 +838,15 @@ Fig5a <- ggplot(fishstock_trends,
                 aes(fraction, Ev, ymin=Ev-SDv, ymax=Ev+SDv, col=penalty)) + 
   geom_ribbon(aes(fill=penalty, col=NA), lwd=0, alpha=.05) + 
   geom_line() + xlab("Fraction of NPV lost to costs")+
-  scale_x_continuous(limits=c(0, 0.4)) 
+  scale_x_continuous(limits=c(0, 0.4))  + theme_tufte()
+
 
 Fig5b <- ggplot(fishstock_trends, 
                 aes(fraction, Ea, ymin=Ea-SDa, ymax=Ea+SDa, col=penalty)) + 
   geom_ribbon(aes(fill=penalty, col=NA), lwd=0, alpha=.05) + 
   geom_line() + xlab("Fraction of NPV lost to costs") +
-  scale_x_continuous(limits=c(0, 0.4)) 
+  scale_x_continuous(limits=c(0, 0.4))  + theme_tufte()
+
 
 multiplot(Fig5a, Fig5b, cols=2)
 
