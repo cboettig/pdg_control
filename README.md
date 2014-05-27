@@ -1,55 +1,23 @@
-Pretty Darn Good Control: Applied Optimal Control Tools & Examples 
-==================================================================
+Pretty Darn Good Control working examples directory
+==================================================
 
-This repository contains a collection of scripts and functions being
-actively used and developing in research in optimal control as 
-part of a NIMBioS working group, PDG Control.  
+This is an actively working research directory.  This readme is primarily for my own reference to keep track of the various examples.  This project is part of my Open Lab Notebook, see [this description](http://www.carlboettiger.info/archives/4325).  
 
 
-Installation for R
-------------------
+* `profile_optimpolicy.md` -- an example of profiling the code to determine rate-limiting routines
+* `model_uncertainty.md` An active adaptive management example
+* `Reed.md` -- A simple example based on the Reed model.
+* `stability_analysis.md` -- Example estimating stability coefficients, variance, etc in exploited and unexploited populations
 
-Install R.  See http://www.r-project.org
-Install required packages:
-Launch R and do:
+policycosts
+-----------
 
-```R 
-> install.packages(c("devtools", "RCurl"))
-> install.packages(c("Hmisc", "cubature", "expm", "ggplot2", "snowfall"))
-> require(devtools)
-> install_github("pdg_control", "cboettig")
-```
+Examples showing the impact of adding costs to changing the policy (i.e. the TAC) based on the annual stock estimate.  
 
-(This second line shouldn't be necessary, but the install_github isn't 
-doing that step automatically for some reason).  
+robustness
+----------
 
-Then you should be able to run the R scripts in the /demo directory by 
-setting it as your "working directory" for R, and then sourcing in the 
-demo name, e.g. :
-
-```R 
-> source("policy_costs.R") 
-```
+Examples of applying the optimal policy under conditions differing slightly from the idealized model under which the optimal policy is computed.  
 
 
-
-Matlab installation
--------------------------------------
-Collaborators work in Matlab, and some scripts here are written in matlab.
-I've tried to ensure that my adapted matlab scripts will run in the open-source
-clone "octave," which can be freely installed on most platforms.  
-
-
-What's here so far?
-------------------
-* R code for a collocation example of Optimal Control by Pontryagin's method
-* R code for a dynamic programming solution (Bellman Equation) of optimal control
-* R code and matlab code for a stochastic dynamic programming solution
-
-
-Progress & what need's doing
-============================
-Information about progress milestones and what's up next can be followed through the [Issues Tracker](https://github.com/cboettig/pdg_control/issues?sort=created&direction=desc&state=open)
-
-More details about the project are avialble in my research [lab notebook](http://www.carlboettiger.info/archives/tag/PDG-Control)
 
