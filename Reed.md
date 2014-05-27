@@ -1,3 +1,7 @@
+---
+layout: page
+---
+
 `ro cache=FALSE, tidy=FALSE, warning=FALSE, comment=NA, message=FALSE, verbose=TRUE or`
 
 

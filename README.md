@@ -1,3 +1,7 @@
+---
+layout: page
+---
+
 Pretty Darn Good Control working examples directory
 ==================================================
 

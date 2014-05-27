@@ -1,3 +1,7 @@
+---
+layout: page
+---
+
 
 ```
 ## Loading required package: socialR

@@ -1,3 +1,7 @@
+---
+layout: page
+---
+
 <!--roptions dev='png', fig.width=7, fig.height=5, tidy=FALSE, warning=FALSE, message=FALSE, comment=NA, cache.path="policycost/", cache=FALSE-->
 
 <!--begin.rcode setup, include=FALSE

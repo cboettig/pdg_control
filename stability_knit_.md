@@ -1,3 +1,7 @@
+---
+layout: page
+---
+
 <!--begin.rcode setup, echo=FALSE 
 render_gfm()  
 opts_knit$set(upload = TRUE)   

@@ -1,3 +1,7 @@
+---
+layout: page
+---
+
 <!--roptions dev="png", fig.width=7, fig.height=5, fig.path='ex-out-', tidy=FALSE, warning=FALSE, comment=NA, message=FALSE, cache=FALSE-->
 
 <!--begin.rcode echo=FALSE 
