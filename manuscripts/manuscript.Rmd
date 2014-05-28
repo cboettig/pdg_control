@@ -3,7 +3,7 @@ title: Optimal management of a stochastically varying population when policy adj
 author: 
   - name: Carl Boettiger
     affiliation: cstar
-    email: cboettig@gmail.com
+    email: 
     footnote: Corresponding author
   - name: Michael Bode
     affiliation: melbourne

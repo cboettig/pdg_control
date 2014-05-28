@@ -5,10 +5,14 @@ CSL=components/ecology.csl
 TEMPLATE=components/elsarticle.latex
 
 all:
+	make render
 #	make install
 #	make restore-cache
-	make $(MANUSCRIPT).pdf
+#	make $(MANUSCRIPT).pdf
 #	make $(MANUSCRIPT).tex
+
+render:
+	Rscript -e 'rmarkdown::render("manuscript.Rmd")'
 
 install: components/install.R
 	Rscript components/install.R
