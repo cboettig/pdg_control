@@ -1,10 +1,8 @@
-.Rhistory
-.Rbuildignore
-*.png
-*.rda
-*.Rproj.user
-*.Rproj
-*.jpg
-*.fff
-*.pdf
+manuscripts/components/cache
+manuscripts/components/figure
+manuscripts/*.pdf
+vignettes/*.pdf
 .Rproj.user
+*.Rproj
+*/*.Rhistory
+.Rhistory
