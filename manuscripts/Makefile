@@ -1,47 +1,30 @@
-# Fill these out
-MANUSCRIPT=manuscript
-BIBLIO=components/references.bib
-CSL=components/ecology.csl
-TEMPLATE=components/elsarticle.latex
-
 all:
+	make install
+	make restore-cache
 	make render
-#	make install
-#	make restore-cache
-#	make $(MANUSCRIPT).pdf
-#	make $(MANUSCRIPT).tex
 
-render:
-	Rscript -e 'rmarkdown::render("manuscript.Rmd")'
 
 install: components/install.R
 	Rscript components/install.R
 
-$(MANUSCRIPT).md: $(MANUSCRIPT).Rmd
-	Rscript components/knit.R $(MANUSCRIPT).Rmd	
-
-## Customize template, latex engine, etc here
-$(MANUSCRIPT).pdf: $(MANUSCRIPT).md
-	pandoc -o $(MANUSCRIPT).pdf --template=$(TEMPLATE) --biblio $(BIBLIO) --csl $(CSL) --latex-engine xelatex $(MANUSCRIPT).md
-
-$(MANUSCRIPT).tex: $(MANUSCRIPT).md
-	pandoc -o $(MANUSCRIPT).tex --template=$(TEMPLATE) --biblio $(BIBLIO) --csl $(CSL) $(MANUSCRIPT).md
-
-
-
-# Only runs if cache has been cleared
-components/cache: components/restore-cache.R
-	Rscript components/restore-cache.R
-
 # just an alias 
 restore-cache: 
 	make components/cache
-	
+
+# combines knitr & pandoc calls
+render:
+	Rscript -e 'rmarkdown::render("manuscript.Rmd")'
+
+# Set target as components/cache, so it only runs if cache has been cleared
+components/cache: components/restore-cache.R
+	Rscript components/restore-cache.R
+
 clear-cache:
 	rm -rf components/cache
 
 clean:
-	rm -f $(MANUSCRIPT).md 
+	rm -f $(MANUSCRIPT).md *.log *.aux  
+
 
 
 # Non portable, just for me to update the source cache

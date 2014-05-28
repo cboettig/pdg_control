@@ -1,5 +1,6 @@
 ---
 title: Optimal management of a stochastically varying population when policy adjustment is costly
+
 author: 
   - name: Carl Boettiger
     affiliation: cstar
@@ -15,6 +16,7 @@ author:
     affiliation: UCD
   - name: Paul Armsworth 
     affiliation: UTK
+
 address: 
   - code: cstar
     address: | 
@@ -27,6 +29,7 @@ address:
     address: University of Melbourne, Australia 
   - code: UTK
     address: University of Tennessee, Knoxville
+
 abstract: |
           Ecological systems are dynamic and policies to manage them need to
           respond to that variation. However, policy adjustments will sometimes
@@ -47,16 +50,16 @@ abstract: |
           policy adjustment costs are present when in fact they are absent is much
           smaller than the impact of managers assuming such costs are absent if
           they are present.
-layout: preprint      # review, 11pt
+
+layout: preprint, 11pt
+
+bibliography: components/references.bib
+csl: components/ecology.csl
+
 output:
   pdf_document:
     keep_tex: true
     template: components/elsarticle.latex
-    pandoc_args: [
-      "--biblio", "components/references.bib",
-      "--csl", "components/ecology.csl",
-      "--metadata", "fontsize[:11]"
-      ]
 ---
 
 <!-- CODE -->
@@ -205,7 +208,7 @@ index <- dt_npv[,closest(reduction, (npv0-value)/npv0), by=variable]
 apples <- c2[index$V1]
 names(apples) = index$variable
 apples })
-write.csv(reduction_table, "reduction_table.csv")
+write.csv(reduction_table, "../data/reduction_table.csv")
 ````
 
 
@@ -1055,4 +1058,4 @@ ggplot(fig1s_df, aes(time, value, col=baseline, lty=replicate)) +
 
 
 
-
+# References
