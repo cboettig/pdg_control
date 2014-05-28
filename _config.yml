@@ -1,5 +1,10 @@
+repo: pdg_control 
 markdown: redcarpet
-analytics: UA-18401403-1
-repo: pdg_control
 redcarpet:
-    extensions: ['no_intra_emphasis', 'autolink', 'fenced_code_blocks', 'footnotes']
+  extensions: 
+    - no_intra_emphasis 
+    - autolink 
+    - fenced_code_blocks 
+    - footnotes
+analytics: UA-18401403-1
+
