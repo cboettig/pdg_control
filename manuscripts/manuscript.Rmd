@@ -576,8 +576,10 @@ equation ([eq:state_equation]) define a stochastic dynamic programming
 problem that we solve using backwards recursion via Bellman's equation.
 We denote the resulting state-dependent, optimal control as $h_0^{\ast}$. 
 
-<!--PRESUMABLY YOU USED A FINITE TERMINAL TIME IN WHICH CASE
-WE NEED TO REVISE TO REFLECT HOW YOU HANDLED THAT.-->
+
+
+<!--NOTE presumably you used a finite terminal time in which case
+we need to revise to reflect how you handled that.-->
 
 Costs of policy adjustment {#costs-of-policy-adjustment .unnumbered}
 --------------------------
@@ -674,15 +676,18 @@ than that corresponding to the maximum sustainable yield in biomass
 
 
 
-```{r Figure_1, fig.cap="Expected net present value by functional form of penalty. Horizontal axis shows the coefficient $c_i$ governing the magnitude of the policy cost, while vertical axis shows fraction of the maximum expected net present value dissipated by the policy cost.  The horizontal line indicates a value of the stock that is 80% of the maximum expected value in the absence of policy adjustment costs, $NPV_0({\\bf h_0^*})$. Selecting the coefficient $c_i$ corresponding to this value in each functional form allows us to make consistent comparisons across the different functional forms of policy costs.", dependson="quadcosts", fig.width=5, fig.height=3}
-ggplot(fees, aes(c2, (npv0-value)/npv0, lty=variable)) + geom_line() + theme_tufte()
+```{r Figure_1, fig.cap="Expected net present value by functional form of penalty. Horizontal axis shows the coefficient $c_i$ governing the magnitude of the policy cost, while vertical axis shows fraction of the maximum expected net present value dissipated by the policy cost, $\\tfrac{NPV_0 - NPV_i}{NPV_0}$.  The horizontal line indicates a value of the stock that is reduced by `r reduction * 100`% from the maximum expected value in the absence of policy adjustment costs, $NPV_0({\\bf h_0^*})$. Selecting the coefficient $c_i$ corresponding to this value in each functional form allows us to make consistent comparisons across the different functional forms of policy costs.", dependson="quadcosts", fig.width=4, fig.height=3}
+
+ggplot(fees, aes(c2, (npv0-value)/npv0, lty=variable)) + 
+  geom_line() + 
+  geom_hline(aes(hintercept=reduction), linetype=4) + 
+  xlab("penalty coefficient") +
+  ylab("Reduction in net present value") + 
+  theme_tufte() 
 
 ```
 
 
-
-<!-- NOTE
-Figure needs tidying up to be submission ready. Resize it - can be smaller, no color needed, bigger TickLabels, no background shading or grid. It also need the relevant horizontal and vertical lines marking to show the calibration. Choose a % reduction that corresponds to that you are choosing for what is currently labeled Figs 2&3 (sample paths) and Fig 8 - histograms. We should then adjust the text to talk to what is shown in the figure consistently - e.g. is is 25% loss or 75% of the value, etc. -->
 
 
 
@@ -693,23 +698,22 @@ Effect of policy adjustment costs on optimal quotas and stock sizes {#effect-of-
 -------------------------------------------------------------------
 
 
-<!-- If, as discussed over email, we are going to go with just one in the main text blown up a bit bigger to make it more visible, I need to have that figure to be able to write this text around it. Note I would still present the full set in the SI. Rather than trying to recover old random seeds if not stored. Just run one anew. -->
-<!-- 
-For the figure in the main text, I would make a single figure with six plates - the three different adjustment costs are the columns. One row is the effect on optimal harvests and one the effect on optimal stock sizes. -->
 
 Figure 2 illustrates how the different forms of adjustment cost can
 impact the optimal policy. Each panel is generated against the same
 sequence of random shocks so that they can be compared directly. Figure
-3 shows the corresponding stock sizes, which are measured here WHEN 
+3 shows the corresponding stock sizes, which are measured here before 
+harvest ($h_t$ being determined after observing stock size $x_t$).
+Because stock sizes are measured before harvests, the effect of the 
+penalty on the stock size is not very pronounced, while the effect
+on the harvest chosen shows a systematic deviations from the penalty
+free optimum, depending on the nature of the cost.  
 
-<!-- At what time relative to the dynamics in equation 1, and I would be setting up a comment why they don't see something similar to the constant escapement policy -- this is just a census time issue, but I would say it explicitly given the attention we shine on the REED result upfront.
--->
 
-. In 
-each case, the optimal solution without any adjustment cost is shown in
-black and the policy induced by optimization under the given adjustment
-penalty (equivalent to a 25% reduction in maximum expected NPV) is
-overlaid in blue.
+In each case, the optimal solution without any adjustment cost is shown in
+against the policy induced by optimization under the given adjustment
+penalty (equivalent to a `r 100*reduction`% reduction in maximum expected NPV) 
+is overlaid in blue.
 
 
 When considering the first formulation of policy adjustment costs
@@ -731,22 +735,24 @@ period shown (time steps $t=47-49$) with a constant quota in between the
 extremes, the fixed fee version takes the opposite approach of one very
 large swing. MORE DETAILING TO COME WHEN WE HAVE THE FIGURES
 
-```{r Figure_2, dependson="tidy", fig.cap="Individual realizations of optimal harvesting strategy under the different functional forms of adjustment costs.", fig.height=3, fig.width=8}
-ggplot(subset(dt, replicate %in% names(reps)[1:5])) +
-  geom_line(aes(time, alternate), col="grey20", lwd=1) +
-  geom_line(aes(time, fishstock), col=rgb(0,0,1,.8)) + 
-  facet_grid(replicate~penalty_fn) + 
-  labs(x="time", y="stock size", title = "Stock Dynamics")  + theme_tufte()
+```{r Figure_2, dependson="tidy", fig.cap="Example realization of optimal harvesting strategy and resulting fish stock sizes under the different functional forms of adjustment costs.", fig.height=3, fig.width=8}
+
+fig2_df <- as.data.frame(subset(dt, replicate=='rep_2'))
+fig2_df <- fig2_df[c("time", "fishstock", "alternate", "harvest", "harvest_alt", "penalty_fn")]
+fig2_df <- melt(fig2_df, id = c("time", "penalty_fn"))
+fig2_df <- data.frame(fig2_df, baseline = fig2_df$variable)
+variable_map <- c(fishstock = "fish_stock", alternate = "fish_stock", harvest = "harvest", harvest_alt = "harvest")
+baseline_map <- c(fishstock = "penalty", alternate = "no_penalty", harvest = "penalty", harvest_alt = "no_penalty")
+fig2_df$variable <- variable_map[fig2_df$variable]
+fig2_df$baseline <- baseline_map[fig2_df$baseline]
 
 
-```
+ggplot(fig2_df, aes(time, value, col=baseline)) +
+  geom_line() +
+  facet_grid(variable~penalty_fn) + 
+  labs(x="time", y="stock size", title = "Example Stock & Harvest Dynamics")  + 
+  theme_tufte()
 
-```{r Figure_3, dependson="tidy", fig.cap="Individual realizations of optimal stock size strategy under the different functional forms of adjustment costs.", fig.height=3, fig.width=8}
-ggplot(subset(dt, replicate %in% names(reps)[1:5])) +
-  geom_line(aes(time, harvest_alt), col="grey20", lwd=1)  +
-  geom_line(aes(time, harvest), col=rgb(0,0,1,.8)) + 
-  facet_grid(replicate~penalty_fn) + 
-  labs(x="time", y="havest intensity (fish taken)", title = "Harvest Policy Dynamics")  + theme_tufte()
 
 ```
 
@@ -755,7 +761,7 @@ ggplot(subset(dt, replicate %in% names(reps)[1:5])) +
 The comparisons shown in Figure 2 are for one realization (i.e. a
 particular sequence of random number draws representing environmental
 variability) and are made for a particular magnitude of policy
-adjustment costs equal to 25% of the maximum expected net present value <!-- Match to that shown in Figure 1. -->
+adjustment costs equal to `r reduction`% of the maximum expected net present value 
 in the base case ($NPV_0({\bf h_0^*})$). Figure 4 generalizes to show
 how optimal harvest levels and corresponding optimal stock sizes are
 affected by the magnitude of the costs of policy adjustment. This time
@@ -763,7 +769,7 @@ we show summary statistics across 50 replicate sets of environmental
 conditions. We show the impact of policy adjustment costs on the
 variance of both harvests and stock sizes through time; on the
 autocorrelation of harvests and stock sizes through time; and on the
-cross-correlation of harvests and stock sizes through time. <!-- Are we showing cross-correlations or not?-->
+cross-correlation of harvests and stock sizes through time. <!-- NOTE Are we showing cross-correlations or not?-->
 
 For example, when small policy adjustment costs cost little but large
 adjustments are expensive ($\Pi_2$), we see the smoothing signal that we
@@ -805,7 +811,7 @@ Moreover, these occurrences increase in frequency as the severity of
 these costs ($c_1$) increases (STATISTIC).
 
 
-<!--
+<!-- NOTE 
 Assuming we aren't showing cross-correlations, I think we can probably fit these into a single four subplot figure. Cross-correlations would be a little harder but just using 5 subplots from what could have been a 6 subplot figure would also work, because a journal could just put the caption into the empty space.
 
 Same comments as before on labeling the curves and detailing in the figure captions. Axis labels and things all also need work.
@@ -926,7 +932,7 @@ policy change being implemented ($\Pi_2$).
 
 
 <!--
-Obviously we have presentation choices to make here. I think there is plenty of scope either to compact this table somehow (rows are penalty functions)  x columns are percent reduction.
+NOTE Obviously we have presentation choices to make here. I think there is plenty of scope either to compact this table somehow (rows are penalty functions)  x columns are percent reduction.
 
 There would also be lots of scope for showing the same info visually as a simple bar chart
 -->
@@ -994,5 +1000,35 @@ TO COME PENDING WHAT THE RESULTS SHOW.
 
 2.  **Lesson for policy makers**: Decreasing adjustment costs not only
     saves direct costs, but permits higher-value solutions.
+
+
+
+Supplementary material
+======================
+
+
+
+```{r Figure_1S, dependson="tidy", fig.cap="Multiple realizations of optimal harvesting strategy and resulting fish stock sizes under the different functional forms of adjustment costs. Note that while fish stock dynamics appear similar in penalty and non-penalty scenarios, the harvest dyanmics show clear patterns depending on the type of penalty.", fig.height=3, fig.width=8}
+
+fig1s_df <- as.data.frame(subset(dt, replicate %in% paste0('rep_', 1:5)))
+fig1s_df <- fig1s_df[c("time", "fishstock", "alternate", "harvest", "harvest_alt", "penalty_fn", "replicate")]
+fig1s_df <- melt(fig1s_df, id = c("time", "penalty_fn", "replicate"))
+fig1s_df <- data.frame(fig1s_df, baseline = fig1s_df$variable)
+variable_map <- c(fishstock = "fish_stock", alternate = "fish_stock", harvest = "harvest", harvest_alt = "harvest")
+baseline_map <- c(fishstock = "penalty", alternate = "no_penalty", harvest = "penalty", harvest_alt = "no_penalty")
+fig1s_df$variable <- variable_map[fig1s_df$variable]
+fig1s_df$baseline <- baseline_map[fig1s_df$baseline]
+
+
+ggplot(fig1s_df, aes(time, value, col=baseline, lty=replicate)) +
+  geom_line() +
+  facet_grid(variable~penalty_fn) + 
+  labs(x="time", y="stock size", title = "Example Stock & Harvest Dynamics")  + 
+  theme_tufte()
+
+
+```
+
+
 
 

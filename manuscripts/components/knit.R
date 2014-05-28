@@ -1,11 +1,10 @@
 #!/usr/bin/Rscript
 args <- commandArgs(TRUE)
-file <- args[1]
 
 if(!is.na(args[1])){
-  file <- args[1]
-} else if(!is.character(file)) {
-  file <- 'manuscript.Rmd'
+  infile <- args[1]
+} else {
+  infile <- 'manuscript.Rmd'
 }
 
 
@@ -14,7 +13,7 @@ if(!is.na(args[1])){
 ## Set the paths for cache and figure
 library("methods")
 library("knitr")
-basename <- gsub(".Rmd", "", file) # knitr:::knit_concord$get('infile')) 
+basename <- gsub(".Rmd", "", infile) # knitr:::knit_concord$get('infile')) 
 opts_chunk$set(fig.path = paste("components/figure/", basename, "-", sep=""),
                cache.path = paste("components/cache/", basename, "/", sep=""))
 opts_chunk$set(cache = 2)
@@ -28,6 +27,6 @@ opts_chunk$set(dev='pdf')
 output <- paste(basename, ".md", sep="")
 
 ## Knit
-knit(file, output)
+knit(infile, output)
 
 
