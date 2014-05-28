@@ -48,9 +48,33 @@ abstract: |
           smaller than the impact of managers assuming such costs are absent if
           they are present.
 layout: preprint      # review, 11pt
+output:
+  pdf_document:
+    keep_tex: true
+    template: components/elsarticle.latex
+    pandoc_args: [
+      "--biblio", "components/references.bib",
+      "--csl", "components/ecology.csl",
+      "--metadata", "fontsize[:11]"
+      ]
 ---
 
 <!-- CODE -->
+
+```{r caching, include=FALSE, output="hide"}
+library("methods")
+library("knitr")
+basename <- "manuscript"
+opts_chunk$set(fig.path = paste("components/figure/", basename, "-", sep=""),
+               cache.path = paste("components/cache/", basename, "/", sep=""))
+opts_chunk$set(cache = 2)
+opts_chunk$set(tidy=FALSE, warning=FALSE, message=FALSE, 
+               comment = NA, verbose = TRUE, echo=FALSE)
+
+# PDF-based figures
+opts_chunk$set(dev='pdf')
+```
+
 
 
 ```{r libraries, output="hide", include=FALSE, cache=FALSE}
