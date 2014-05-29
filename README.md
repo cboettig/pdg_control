@@ -32,4 +32,7 @@ rmarkdown::render("manuscript.Rmd")
 [^2]: Windows users may have to download the zip file manually.
 
 
+Editing
+-------
 
+Use RStudio to edit the file `manuscript.Rmd` in the `pdg_control/manuscripts` directory.
