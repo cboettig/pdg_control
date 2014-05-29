@@ -7,25 +7,30 @@ all:
 install: components/install.R
 	Rscript components/install.R
 
-# just an alias 
-restore-cache: 
-	make components/cache
+components/cache: components/restore-cache.R
+	Rscript components/restore-cache.R
 
 # combines knitr & pandoc calls
 render:
 	Rscript -e 'rmarkdown::render("manuscript.Rmd")'
 
-# Set target as components/cache, so it only runs if cache has been cleared
-components/cache: components/restore-cache.R
-	Rscript components/restore-cache.R
+
+clean:
+	rm -f $(MANUSCRIPT).md *.log *.aux *.pdf  
+	make clear-cache
+	make clear-packrat
+
+
+clear-packrat: 
+	rm -rf .Rprofile .Renviron library/ packrat.sources/ 
 
 clear-cache:
 	rm -rf components/cache
 
-clean:
-	rm -f $(MANUSCRIPT).md *.log *.aux  
 
-
+# just an alias 
+restore-cache: 
+	make components/cache
 
 # Non portable, just for me to update the source cache
 # Must be on same line to use cd. must use cd to get paths right

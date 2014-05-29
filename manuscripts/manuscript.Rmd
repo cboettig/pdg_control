@@ -51,10 +51,11 @@ abstract: |
           smaller than the impact of managers assuming such costs are absent if
           they are present.
 
-layout: preprint, 11pt
+layout: preprint
 
 bibliography: components/references.bib
 csl: components/ecology.csl
+documentclass: components/elsarticle
 
 output:
   pdf_document:
@@ -64,7 +65,11 @@ output:
 
 <!-- CODE -->
 
-```{r caching, include=FALSE, output="hide"}
+```{r dependencies, include=FALSE}
+source("components/install.R")
+```
+
+```{r caching, include=FALSE}
 library("methods")
 library("knitr")
 basename <- "manuscript"
@@ -80,8 +85,9 @@ opts_chunk$set(dev='pdf')
 
 
 
-```{r libraries, output="hide", include=FALSE, cache=FALSE}
+```{r libraries, include=FALSE, cache=FALSE}
 rm(list=ls())
+library("rmarkdown")
 library("pdgControl")
 library("reshape2")
 library("ggplot2")
@@ -89,7 +95,9 @@ library("data.table")
 library("pander")
 library("cboettigR")
 library("ggthemes")
+library("snowfall")
 theme_set(theme_tufte())
+ncpu = 1
 ```
 
 ``` {r profit_model}
@@ -145,8 +153,7 @@ penaltyfns <- list(L2=L2, L1=L1, fixed=fixed)
 ````
 
 ```{r parallel, include=FALSE}
-require(snowfall)
-sfInit(cpu=4, parallel=T)
+sfInit(cpu=ncpu, parallel=T)
 sfLibrary(pdgControl)
 sfExportAll()
 ````

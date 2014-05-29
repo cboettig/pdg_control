@@ -1,4 +1,4 @@
-\documentclass[author-year, $layout$]{components/elsarticle} %review=doublespace preprint=single 5p=2 column
+\documentclass[author-year, $layout$]{$documentclass$} %review=doublespace preprint=single 5p=2 column
 %%% Begin My package additions %%%%%%%%%%%%%%%%%%%
 \usepackage[hyphens]{url}
 \usepackage{lineno} % add 
@@ -44,7 +44,7 @@ $endif$
     \usepackage{xltxtra,xunicode}
   \fi
   \defaultfontfeatures{Mapping=tex-text,Scale=MatchLowercase}
-  \newcommand{\euro}{€}
+  \newcommand{\euro}{???}
 $if(mainfont)$
     \setmainfont{$mainfont$}
 $endif$

@@ -9,7 +9,7 @@ Getting started editing manuscript
 ----------------------------------
 
 - Download and unzip the source file locally
-- Change into the manuscripts directory
+- Change into the manuscripts directory (That is, set `manuscripts/` as your working directory)
 - Run the install script
 - Restore the cache (optional, avoids waiting for R code to re-run locally)
 - Compile the `manuscript.Rmd` document into a pdf (excutes the R code and applies a LaTeX template)[^1].
