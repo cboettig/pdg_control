@@ -17,9 +17,9 @@ Getting started editing manuscript
 These steps can be done from within R by pasting in the following code[^2]:
 
 ```coffee
-download.file("https://github.com/cboettig/pdg_control/archive/master.zip", "pdg_control.zip", "curl")
+download.file("https://github.com/cboettig/pdg_control/archive/master.zip", "pdg_control.zip", "wget")
 unzip("pdg_control.zip")
-setwd("pdg_control/manuscripts")
+setwd("pdg_control-master/manuscripts")
 
 source("components/install.R")
 source("components/restore-cache.R")
