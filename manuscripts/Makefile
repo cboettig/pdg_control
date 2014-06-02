@@ -1,6 +1,5 @@
 all:
 	make install
-	make restore-cache
 	make render
 
 

@@ -230,8 +230,10 @@ print_npv <- data.frame(model=index$variable, "value realized"=values,
 
 ```
 
+
 ```{r npv_table, dependson="print_npv", results='asis'} 
-pandoc.table(print_npv)
+# verify that we have fine enough c_2 sampling to hit about 75% NPV0 on each penalty form
+# pandoc.table(print_npv)
 ```
 
 
@@ -589,31 +591,42 @@ net present value (NPV) of the fishery. We take as a base case the
 situation where there are no costs associated with policy adjustment and
 the managers' objective is
 
-$$\max_{{\bf h}}\mathbf{ E} ( NPV_{0} )=\max_{{\bf h}} \sum_0^\infty \mathbf{E} \left( \displaystyle \frac{\Pi_0(N_t,h_t)}{(1+\delta)^{t+1}} \right) \label{eq:objective}$$
+
+$$
+\begin{equation}
+\max_{{\bf h}}\mathbf{ E} ( NPV_{0} )=\max_{{\bf h}} \sum_0^\infty \mathbf{E} \left( \displaystyle \frac{\Pi_0(N_t,h_t)}{(1+\delta)^{t+1}} \right) \label{eq:objective}
+\end{equation}
+$$
 
 where $\mathbf{E}$ is the expectation operator, $\delta>0$ is the
 discount rate and $\Pi_0$ is the net revenue from operating the fishery
 in a given year. In this base case, we assume the annual net revenue
 from fishing is
 
-$$\Pi_0(N_t,h_t) = p h_t -  c_0 E_t \label{eq:annual_netrevenue}$$
+$$\begin{equation}
+\Pi_0(N_t,h_t) = p h_t -  c_0 E_t \label{eq:annual_netrevenue}
+\end{equation}
+$$
 
 where $E_t$ represents fishing effort. We assume catch is proportional
-to stock size and effort expended fishing that year, $h_t=qE_tN_t$ and
+to stock size and effort expended fishing that year, $h_t = q E_t N_t$ and
 constant $q>0$ is the catchability coefficient. In
-Eqn. [eq:annual_netrevenue], $p$ is the price per unit harvest and
+Eqn. \eqref{eq:annual_netrevenue}, $p$ is the price per unit harvest and
 $c_0$ the cost of fishing and, to simplify the presentation of results,
-we assume that these are constants with $p>0$ and $c_0>0$.
+we assume that these are constants with $p>0$ and $c_0>0$. (Examples 
+shown here use $p$= `r p` and $c_0$ = `r_c0`.) 
+<!-- Mention R code provided to test other values? Do we need to test other values?
+(i.e. the c0 = 0 case?) Word about units?-->
 
-Taken together this objective function ([eq:objective]) and the state
-equation ([eq:state_equation]) define a stochastic dynamic programming
+Taken together this objective function \eqref{eq:objective} and the state
+equation \eqref{eq:state_equation} define a stochastic dynamic programming
 problem that we solve using backwards recursion via Bellman's equation.
 We denote the resulting state-dependent, optimal control as $h_0^{\ast}$. 
 
+We solve this problem on a finite time horizon of $T =$ `r OptTime` using
+value iteration [@Mangel1988; @Clark2000]. 
 
 
-<!--NOTE presumably you used a finite terminal time in which case
-we need to revise to reflect how you handled that.-->
 
 Costs of policy adjustment {#costs-of-policy-adjustment .unnumbered}
 --------------------------
@@ -647,9 +660,9 @@ $$\Pi_{3}(N_t,h_t, h_{t-1}) = \Pi_0 - c_3 (1-\mathbf{I}(h_t, h_{t-1}))  \,,$$
 
 where indicator function $\mathbf{I}(h_t, h_{t-1})$ takes the value 1 if
 $h_t=h_{t-1}$ and zero otherwise. For each $\Pi_i$, we can then define a
-new objective function $NPV_i$ similar to that in Eqn. [eq:objective].
+new objective function $NPV_i$ similar to that in Eqn. \eqref{eq:objective}.
 
-Taken together with the state equation (Eqn. [eq:state_equation]), each
+Taken together with the state equation Eqn. \eqref{eq:state_equation}, each
 of these new objective functions defines a different stochastic dynamic
 programming problem. Again, we solve them numerically using backwards
 recursion. To include costs of policy adjustment, we expand the state
@@ -659,17 +672,16 @@ function $\max NPV_i$, we denote the corresponding optimal control
 policy $h_i^*$.
 
 
-<!-- NOTE Will need to do the runs and generate the figures for that one  -->
-In addition in the Supplementary Material, we compare our results with a
+In addition in the Supplementary Material, we compare our results with 
 more conventional fisheries economic formulation in which additional
 costs are applied to the control variables themselves, as opposed to
-adjustments to the controls: $\Pi_4 (N_t,h_t) = p h_t -  c_0 E_t-c_4E_t^2$. Additional costs of this
-form tend to have a smoothing effect on optimal quotas, but also change
+adjustments to the controls: $\Pi_4 (N_t,h_t) = p h_t -  c_0 E_t-c_4E_t^2$. Additional costs of this form tend to have a smoothing effect on optimal quotas, but also change
 the long-term average stock size or quota size that is optimal.
 
 Choice of parameters {#choice-of-parameters .unnumbered}
 --------------------
 
+<!--NOTE c_i notation is confusing because it does not usually refer to c_0 or c_4 -->
 Each of the policy adjustment cost function is characterized in terms of
 a cost coefficient $c_i$. However, $c_i$ takes different units for each
 functional form. Therefore, if seeking to compare the relative effect of
@@ -686,6 +698,19 @@ parameter is increased. In each case, the figure shows maximum expected
 NPV with policy adjustment costs as a proportion of the maximum expected
 NPV available in the basic problem $NPV_0({\bf h_0^*})$ without policy
 adjustment costs.
+
+
+```{r Figure_1, fig.cap="Expected net present value by functional form of penalty. Horizontal axis shows the coefficient $c_i$ governing the magnitude of the policy cost, while vertical axis shows fraction of the maximum expected net present value dissipated by the policy cost, $\\tfrac{NPV_0 - NPV_i}{NPV_0}$.  The horizontal line indicates a value of the stock that is reduced by `r reduction * 100`% from the maximum expected value in the absence of policy adjustment costs, $NPV_0({\\bf h_0^*})$. Selecting the coefficient $c_i$ corresponding to this value in each functional form allows us to make consistent comparisons across the different functional forms of policy costs.", dependson="quadcosts", fig.width=4, fig.height=3}
+
+ggplot(fees, aes(c2, (npv0-value)/npv0, lty=variable)) + 
+  geom_line() + 
+  geom_hline(aes(hintercept=reduction), linetype=4) + 
+  xlab("penalty coefficient") +
+  ylab("Reduction in net present value") + 
+  theme_tufte() 
+
+```
+
 
 To compare the impact of penalty functions on optimal management across
 the different functional forms, we select penalty cost coefficients that
@@ -709,17 +734,6 @@ than that corresponding to the maximum sustainable yield in biomass
 
 
 
-
-```{r Figure_1, fig.cap="Expected net present value by functional form of penalty. Horizontal axis shows the coefficient $c_i$ governing the magnitude of the policy cost, while vertical axis shows fraction of the maximum expected net present value dissipated by the policy cost, $\\tfrac{NPV_0 - NPV_i}{NPV_0}$.  The horizontal line indicates a value of the stock that is reduced by `r reduction * 100`% from the maximum expected value in the absence of policy adjustment costs, $NPV_0({\\bf h_0^*})$. Selecting the coefficient $c_i$ corresponding to this value in each functional form allows us to make consistent comparisons across the different functional forms of policy costs.", dependson="quadcosts", fig.width=4, fig.height=3}
-
-ggplot(fees, aes(c2, (npv0-value)/npv0, lty=variable)) + 
-  geom_line() + 
-  geom_hline(aes(hintercept=reduction), linetype=4) + 
-  xlab("penalty coefficient") +
-  ylab("Reduction in net present value") + 
-  theme_tufte() 
-
-```
 
 
 
