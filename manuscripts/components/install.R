@@ -11,7 +11,5 @@ if(file.exists("packrat.sources") && file.exists(".Rprofile") && file.exists(".R
   if(!require("devtools")) install.packages("devtools")
   if(!require("packrat")) devtools::install_github("rstudio/packrat")
   packrat::packify()
-  source(".Rprofile"); readRenviron(".Renviron")
   packrat::restore()
-  source(".Rprofile"); readRenviron(".Renviron")
 }
