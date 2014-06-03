@@ -1,7 +1,11 @@
-PackratFormat: 1.1
-PackratVersion: 0.1.0.99
+PackratFormat: 1.2
+PackratVersion: 0.2.0.99
 RVersion: 3.1.0
-Repos: http://cran.rstudio.com/
+Repos: http://cran.rstudio.com/,
+  http://bioconductor.org/packages/2.14/bioc,
+  http://bioconductor.org/packages/2.14/data/annotation,
+  http://bioconductor.org/packages/2.14/data/experiment,
+  http://bioconductor.org/packages/2.14/extra
 
 Package: Formula
 Source: CRAN
@@ -42,10 +46,10 @@ Package: cboettigR
 Source: github
 Version: 0.0-1
 Requires: ggplot2
-GithubRepo: cboettigR
-GithubUsername: cboettig
-GithubRef: master
-GithubSha1: b8f79f44e793354bba4b9275bce341e60a4ff5c1
+GitHubRepo: cboettigR
+GitHubUsername: cboettig
+GitHubRef: master
+GitHubSha1: b8f79f44e793354bba4b9275bce341e60a4ff5c1
 
 Package: cluster
 Source: CRAN
@@ -68,10 +72,10 @@ Package: devtools
 Source: github
 Version: 1.5
 Requires: httr, RCurl, memoise, whisker, evaluate, digest
-GithubRepo: devtools
-GithubUsername: hadley
-GithubRef: master
-GithubSha1: b6fda8144de4b145197c6d38aa6a1bb839678a5c
+GitHubRepo: devtools
+GitHubUsername: hadley
+GitHubRef: master
+GitHubSha1: b6fda8144de4b145197c6d38aa6a1bb839678a5c
 
 Package: dichromat
 Source: CRAN
@@ -104,10 +108,10 @@ Package: ggthemes
 Source: github
 Version: 1.8.0
 Requires: ggplot2, colorspace, proto, scales
-GithubRepo: ggthemes
-GithubUsername: jrnold
-GithubRef: master
-GithubSha1: 1b6701d067aae2686d61edbcb7895f4b1709bde2
+GitHubRepo: ggthemes
+GitHubUsername: jrnold
+GitHubRef: master
+GitHubSha1: 1b6701d067aae2686d61edbcb7895f4b1709bde2
 
 Package: gtable
 Source: CRAN
@@ -121,10 +125,10 @@ Package: httr
 Source: github
 Version: 0.3
 Requires: RCurl, stringr, digest
-GithubRepo: httr
-GithubUsername: hadley
-GithubRef: master
-GithubSha1: 7e897fcd6b9e02756ce1ebd33c7c04ac3273a416
+GitHubRepo: httr
+GitHubUsername: hadley
+GitHubRef: master
+GitHubSha1: 7e897fcd6b9e02756ce1ebd33c7c04ac3273a416
 
 Package: knitr
 Source: CRAN
@@ -165,11 +169,11 @@ Requires: colorspace
 
 Package: packrat
 Source: github
-Version: 0.1.0.99
-GithubRepo: packrat
-GithubUsername: rstudio
-GithubRef: master
-GithubSha1: f9f35fb50ad3e1909e9873eec0bb3c715e16c5ca
+Version: 0.2.0.99
+GitHubRepo: packrat
+GitHubUsername: rstudio
+GitHubRef: master
+GitHubSha1: 0c2951ef15e740bb679de4348dec5a31a3f62e7c
 
 Package: pander
 Source: CRAN
@@ -180,10 +184,10 @@ Package: pdgControl
 Source: github
 Version: 0.0-2
 Requires: Hmisc, cubature, expm, ggplot2, snowfall
-GithubRepo: pdg_control
-GithubUsername: cboettig
-GithubRef: master
-GithubSha1: 656853f932113754d50f86d51472d5dfb8d51030
+GitHubRepo: pdg_control
+GitHubUsername: cboettig
+GitHubRef: master
+GitHubSha1: 656853f932113754d50f86d51472d5dfb8d51030
 
 Package: plyr
 Source: CRAN
@@ -198,19 +202,19 @@ Package: reshape2
 Source: github
 Version: 1.4.0.99
 Requires: plyr, stringr, Rcpp
-GithubRepo: reshape
-GithubUsername: hadley
-GithubRef: master
-GithubSha1: bac94816ffc21ac52458e974de3307f1f3b753d7
+GitHubRepo: reshape
+GitHubUsername: hadley
+GitHubRef: master
+GitHubSha1: bac94816ffc21ac52458e974de3307f1f3b753d7
 
 Package: rmarkdown
 Source: github
 Version: 0.2.15
 Requires: knitr, yaml
-GithubRepo: rmarkdown
-GithubUsername: rstudio
-GithubRef: master
-GithubSha1: 958b78cd70791bfb47782d333f549e1925e8b60b
+GitHubRepo: rmarkdown
+GitHubUsername: rstudio
+GitHubRef: master
+GitHubSha1: 958b78cd70791bfb47782d333f549e1925e8b60b
 
 Package: scales
 Source: CRAN
