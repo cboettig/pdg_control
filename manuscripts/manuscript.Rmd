@@ -230,10 +230,8 @@ print_npv <- data.frame(model=index$variable, "value realized"=values,
 
 ```
 
-
 ```{r npv_table, dependson="print_npv", results='asis'} 
-# verify that we have fine enough c_2 sampling to hit about 75% NPV0 on each penalty form
-# pandoc.table(print_npv)
+#pandoc.table(print_npv)
 ```
 
 
@@ -699,7 +697,6 @@ NPV with policy adjustment costs as a proportion of the maximum expected
 NPV available in the basic problem $NPV_0({\bf h_0^*})$ without policy
 adjustment costs.
 
-
 ```{r Figure_1, fig.cap="Expected net present value by functional form of penalty. Horizontal axis shows the coefficient $c_i$ governing the magnitude of the policy cost, while vertical axis shows fraction of the maximum expected net present value dissipated by the policy cost, $\\tfrac{NPV_0 - NPV_i}{NPV_0}$.  The horizontal line indicates a value of the stock that is reduced by `r reduction * 100`% from the maximum expected value in the absence of policy adjustment costs, $NPV_0({\\bf h_0^*})$. Selecting the coefficient $c_i$ corresponding to this value in each functional form allows us to make consistent comparisons across the different functional forms of policy costs.", dependson="quadcosts", fig.width=4, fig.height=3}
 
 ggplot(fees, aes(c2, (npv0-value)/npv0, lty=variable)) + 
@@ -731,7 +728,6 @@ show cases where $p=1$, $\delta=0.05$ and $c_0$ is chosen such that the
 optimal stock size in the analogous deterministic problem is 5% larger
 than that corresponding to the maximum sustainable yield in biomass
 ($c_0=XXX$).
-
 
 
 
