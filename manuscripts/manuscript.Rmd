@@ -594,21 +594,18 @@ situation where there are no costs associated with policy adjustment and
 the managers' objective is
 
 
-$$
 \begin{equation}
 \max_{{\bf h}}\mathbf{ E} ( NPV_{0} )=\max_{{\bf h}} \sum_0^\infty \mathbf{E} \left( \displaystyle \frac{\Pi_0(N_t,h_t)}{(1+\delta)^{t+1}} \right) \label{eq:objective}
 \end{equation}
-$$
 
 where $\mathbf{E}$ is the expectation operator, $\delta>0$ is the
 discount rate and $\Pi_0$ is the net revenue from operating the fishery
 in a given year. In this base case, we assume the annual net revenue
 from fishing is
 
-$$\begin{equation}
+\begin{equation}
 \Pi_0(N_t,h_t) = p h_t -  c_0 E_t \label{eq:annual_netrevenue}
 \end{equation}
-$$
 
 where $E_t$ represents fishing effort. We assume catch is proportional
 to stock size and effort expended fishing that year, $h_t = q E_t N_t$ and
@@ -616,7 +613,7 @@ constant $q>0$ is the catchability coefficient. In
 Eqn. \eqref{eq:annual_netrevenue}, $p$ is the price per unit harvest and
 $c_0$ the cost of fishing and, to simplify the presentation of results,
 we assume that these are constants with $p>0$ and $c_0>0$. (Examples 
-shown here use $p$= `r p` and $c_0$ = `r_c0`.) 
+shown here use $p$= `r price` and $c_0$ = `r c0`.) 
 <!-- Mention R code provided to test other values? Do we need to test other values?
 (i.e. the c0 = 0 case?) Word about units?-->
 
