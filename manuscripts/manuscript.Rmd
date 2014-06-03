@@ -215,7 +215,7 @@ index <- dt_npv[,closest(reduction, (npv0-value)/npv0), by=variable]
 apples <- c2[index$V1]
 names(apples) = index$variable
 apples })
-write.csv(reduction_table, "../data/reduction_table.csv")
+write.csv(reduction_table, "components/data/reduction_table.csv")
 ````
 
 
@@ -375,62 +375,77 @@ sims <- lapply(1:50, function(reps) list(
 ```
 
 
-```{r helper_fn_2} 
-# Helper functions to extract the summary stats in different variables
-stats_harvest <- function(dt){
-v <- dt[,var(harvest), by=c("penalty_fn", "reps")]
-acor <- dt[,acf(harvest, plot=F)$acf[2], by=c("penalty_fn", "reps")]
-df <- cbind(v, acor$V1)
-setnames(df, c("V1", "V2"), c("var", "acor")) # names are nice
-df
-}
+```{r fig4-stats}
+summary_stats <- function(dt){
+ harvest_var <- dt[,var(harvest), by=c("penalty_fn", "reps")]$V1
+ harvest_acor <- dt[,acf(harvest, plot=F)$acf[2], by=c("penalty_fn", "reps")]$V1
+ stock_var <- dt[,var(fishstock), by=c("penalty_fn", "reps")]$V1
+ stock_acor <- dt[,acf(fishstock, plot=F)$acf[2], by=c("penalty_fn", "reps")]$V1
+ xcor <- dt[, ccf(fishstock, harvest, plot=FALSE)$acf[2], by=c("penalty_fn", "reps")]
+ setnames(xcor, "V1", "cross-correlation")
 
-stats_fishstock <- function(dt){
-v <- dt[,var(fishstock), by=c("penalty_fn", "reps")]
-acor <- dt[,acf(fishstock, plot=F)$acf[2], by=c("penalty_fn", "reps")]
-df <- cbind(v, acor$V1)
-setnames(df, c("V1", "V2"), c("var", "acor")) # names are nice
-df
-}
+ df <- data.frame('stock.variance' = stock_var, 
+                  'stock.autocorrelation' = stock_acor, 
+                  'harvest.variance' = harvest_var, 
+                  'harvest.autocorrelation' = harvest_acor, 
+                  xcor)
+ 
+ # long format
+ melt(df, id=c("penalty_fn", "reps"))
+ }
 ```
 
-```{r cross-correlations}
-#stats_xcor <- dt[, xcor(fishstock, harvest), by=c("penalty_fn", "reps")]
+```{r summary-stat-calc}
+stats_summaries <- lapply(sims_at_each_apple, summary_stats)
+# reformat list of data-frames as data frame with apple coef as a factor
+stats_df <- melt(stats_summaries, id=names(stats_summaries[[1]]))
+stats_df$L1 <- frac_lost[stats_df$L1]
+names(stats_df) <- c("penalty_fn", "reps", "variable", "value", "penalty_fraction")
 ```
 
-
-```{r helper_fn_3}
-#' a simple function for reorganizing the data over the different "faction-lost" levels
-get_trends <- function(tmp2){
-  out <- melt(tmp2, id=c("reps", "var", "acor"))
-  colnames(out) = c("reps", "var", "acor", "nothing", "penalty", "index")
-  out <- cbind(out[c(1,2,3,5)], fraction = frac_lost[out$index])
-  out <- data.table(out)
-  Ev = out[,mean(var),by=c('penalty', 'fraction')]
-  SDv = out[,sd(var),by=c('penalty', 'fraction')]
-  Ea = out[,mean(acor),by=c('penalty', 'fraction')]
-  SDa = out[,sd(acor),by=c('penalty', 'fraction')]
-  harvest_trends <- data.table(penalty = Ev$penalty, 
-                               fraction = Ev$fraction, 
-                               Ev = Ev$V1, Ea = Ea$V1, 
-                               SDv=SDv$V1, SDa = SDa$V1)
-}
-```
+ 
+```{r split-factors}
+# make statistic and timeseries separate factors
+figure4_df <- stats_df
+figure4_df$statistic <- figure4_df$variable
+figure4_df$timeseries <- figure4_df$variable
+stat_map <- c(harvest.variance = 'variance', stock.variance='variance', stock.autocorrelation='autocor',harvest.autocorrelation='autocor', cross.correlation='cross.correlation')
+series_map <- c(harvest.variance = 'harvest', stock.variance='stock', stock.autocorrelation='stock',harvest.autocorrelation='harvest', cross.correlation='both')
 
 
-
-
-```{r Figure4_harvest}
-sims_at_each_apple <- lapply(frac_lost, fig4)
-harvest_stats <- lapply(sims_at_each_apple, stats_harvest)
-harvest_trends <- get_trends(harvest_stats)
+figure4_df$statistic <- stat_map[figure4_df$statistic]
+figure4_df$timeseries <- series_map[figure4_df$timeseries]
 ```
 
 
-```{r fishstock_trends}
-fishstock_stats <- lapply(sims_at_each_apple, stats_fishstock)
-fishstock_trends <- get_trends(fishstock_stats)
+
+```{r table-calc}
+source("componetns/compute_error_table.R")
+sigmas <- c(0.01, 0.1, 0.2)
+reductions <- 1:3
+out <- lapply(sigmas, function(s){
+  lapply(reductions, function(r){
+    compute_error_table(r = r, sigma = s)    
+  })
+})
+       
+who <- names(out[[1]][[1]])
+error_df <- melt(out, id=who)              
 ```
+
+
+```{r clean-table}
+df <- error_df[2:8]
+who <- c("penalty_fn", "ignore_fraction", "assume_fraction", "sigma_g", "reduction")
+df2 <- melt(df, id=who)
+who <- c("penalty_fn", "sigma_g", "reduction", "variable", "value")
+df3 <- melt(df2, id=who)
+names(df3) <- c("penalty_fn", "sigma_g", "reduction", "variable", "value", "fraction_variable", "fraction")
+df3$reduction <- as.factor(df3$reduction)
+
+#ggplot(df3) + geom_line(aes(sigma_g, value, col=reduction, lty=variable)) + facet_wrap(~penalty_fn, scales="free_y") 
+```
+
 
 
 
@@ -814,7 +829,7 @@ we show summary statistics across 50 replicate sets of environmental
 conditions. We show the impact of policy adjustment costs on the
 variance of both harvests and stock sizes through time; on the
 autocorrelation of harvests and stock sizes through time; and on the
-cross-correlation of harvests and stock sizes through time. <!-- NOTE Are we showing cross-correlations or not?-->
+cross-correlation of harvests and stock sizes through time. <!-- NOTE Are we showing cross-correlations or not? --> <!-- See figure 4, probably not-->
 
 For example, when small policy adjustment costs cost little but large
 adjustments are expensive ($\Pi_2$), we see the smoothing signal that we
@@ -830,7 +845,7 @@ harvests taking longer to eliminate the signal of strong recruitment
 events, when compared to a more immediately responsive constant
 escapement policy.
 
-Interestingly, as suggested by the realization in Fig. 3, including a
+Interestingly, as suggested by the realization in Fig. 2, including a
 fixed cost of policy adjustment increases the variation in harvests
 through time. This is the opposite of a smoothing effect. Follow-on
 consequences for the other statistics are not as clear in this case.
@@ -859,49 +874,37 @@ these costs ($c_1$) increases (STATISTIC).
 <!-- NOTE 
 Assuming we aren't showing cross-correlations, I think we can probably fit these into a single four subplot figure. Cross-correlations would be a little harder but just using 5 subplots from what could have been a 6 subplot figure would also work, because a journal could just put the caption into the empty space.
 
-Same comments as before on labeling the curves and detailing in the figure captions. Axis labels and things all also need work.
+Same comments as before on labeling the curves and detailing in the figure captions. Axis labels and things all also need work. - Paul
+-->
+<!--
+Added cross-correlations but shows no pattern.  Also have version with 2x2 as single plot.  feedback on aesthetics welcome.  - CB
 -->
 
 
 
-```{r Figure_4, fig.cap="(a) Variance of optimal harvest rates through time as a function of size of adjustment penalties, the latter being calculated as percentage of the maximum expected NPV in the basic case with no policy adjustment costs. (b) Autocorrelation of optimal harvest rates through time as a function of size of adjustment penalties, the latter being calculated as percentage of the maximum expected NPV in the basic case with no policy adjustment costs.", fig.height=3, fig.width=8}
-Fig4a <- ggplot(harvest_trends, 
-                aes(fraction, Ev, ymin=Ev-SDv, ymax=Ev+SDv, col=penalty)) + 
-  geom_ribbon(aes(fill=penalty, col=NA), lwd=0, alpha=.05) + 
-  geom_line() + 
-  xlab("Fraction of NPV lost to costs") +
-  scale_x_continuous(limits=c(0, 0.4)) + theme_tufte()
+```{r Figure_4, fig.cap="Variance and autocorrelation of stock dynamics and harvest dynamics, as well as cross-correlation between stock and harvest dynamics, as a function of the penalty coefficient.  Adjustment penalty is calculated as percentage of the maximum expected NPV in the basic case with no policy adjustment costs.", fig.height=8, fig.width=8}
 
+with_xcor_plot <- 
+ggplot(figure4_df, aes(penalty_fraction, value, fill=penalty_fn, col=penalty_fn)) + 
+  facet_wrap(~variable, scales = "free_y") +
+  stat_summary(fun.y = mean, 
+               fun.ymin = function(x) mean(x) - sd(x), 
+               fun.ymax = function(x) mean(x) + sd(x), 
+               geom = "ribbon", alpha=0.3, colour=NA) +
+  stat_summary(fun.y = mean, geom = "line")
+with_xcor_plot
 
-Fig4b <- ggplot(harvest_trends, 
-                aes(fraction, Ea, ymin=Ea-SDa, ymax=Ea+SDa, col=penalty)) + 
-  geom_ribbon(aes(fill=penalty, col=NA), lwd=0, alpha=.05) + 
-  geom_line() + xlab("Fraction of NPV lost to costs")+
-  scale_x_continuous(limits=c(0, 0.4)) + theme_tufte()
-
-
-multiplot(Fig4a, Fig4b, cols=2)
-```
-
-
-```{r Figure_5, fig.cap = "(a) Variance of optimal stock sizes through time as a function of size of adjustment penalties, the latter being calculated as percentage of the maximum expected NPV in the basic case with no policy adjustment costs. (b) Autocorrelation of optimal stock sizes through time as a function of size of adjustment penalties, the latter being calculated as percentage of the maximum expected NPV in the basic case with no policy adjustment costs.", fig.height=3, fig.width=8}
-Fig5a <- ggplot(fishstock_trends, 
-                aes(fraction, Ev, ymin=Ev-SDv, ymax=Ev+SDv, col=penalty)) + 
-  geom_ribbon(aes(fill=penalty, col=NA), lwd=0, alpha=.05) + 
-  geom_line() + xlab("Fraction of NPV lost to costs")+
-  scale_x_continuous(limits=c(0, 0.4))  + theme_tufte()
-
-
-Fig5b <- ggplot(fishstock_trends, 
-                aes(fraction, Ea, ymin=Ea-SDa, ymax=Ea+SDa, col=penalty)) + 
-  geom_ribbon(aes(fill=penalty, col=NA), lwd=0, alpha=.05) + 
-  geom_line() + xlab("Fraction of NPV lost to costs") +
-  scale_x_continuous(limits=c(0, 0.4))  + theme_tufte()
-
-
-multiplot(Fig5a, Fig5b, cols=2)
+ggplot(subset(figure4_df, statistic != "cross.correlation"), aes(penalty_fraction, value, fill=penalty_fn, col=penalty_fn))  +
+  stat_summary(fun.y = mean, 
+               fun.ymin = function(x) mean(x) - sd(x), 
+               fun.ymax = function(x) mean(x) + sd(x), 
+               geom = "ribbon", alpha=0.3, colour=NA) +
+  stat_summary(fun.y = mean, geom = "line") + 
+  facet_grid(statistic ~ timeseries, scale="free") + theme_bw()
 
 ```
+
+
 
 Consequences of policy adjustment costs {#consequences-of-policy-adjustment-costs .unnumbered}
 ---------------------------------------
@@ -974,6 +977,15 @@ We also see that the impacts on net present value of the fishery of
 incorrectly assuming or ignoring policy adjustment costs are most severe
 when these costs are assumed to scale quadratically with the size of the
 policy change being implemented ($\Pi_2$).
+
+
+
+```{r Table1, results="asis", echo=FALSE}
+df4 <- error_df[c(1,2,4,6,7)]
+plyr::arrange(df4, penalty_fn)
+pandoc.table(df4)
+```
+
 
 
 <!--

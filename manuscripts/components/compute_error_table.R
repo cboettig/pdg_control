@@ -1,0 +1,103 @@
+compute_error_table <- function(r, sigma){
+  reduction_range = c(.1, .2, .3)
+  reduction <- reduction_range[r]
+  
+  price = 10
+  c0 = 0
+  profit <- profit_harvest(price = price, c0 = c0, c1 = 0)
+  c2 <- seq(0, 50, length.out=100)
+  
+  
+  delta <- 0.05               # economic discounting rate
+  OptTime <- 20               # stopping time
+  gridsize <- 50              # grid size for fish stock and harvest rate (discretized population)
+  sigma_g <- sigma              # Noise in population growth
+  reward <- 0                 # bonus for satisfying the boundary condition
+  z_g <- function() rlnorm(1,  0, sigma_g) # mean 1
+  z_m <- function() 1         # No measurement noise, 
+  z_i <- function() 1         # No implemenation noise
+  f <- BevHolt                # Select the state equation
+  pars <- c(1.5, 0.05)        # parameters for the state equation
+  K <- (pars[1] - 1)/pars[2]  # Carrying capacity (for reference 
+  xT <- 0                     # boundary conditions
+  x0 <- K
+  x_grid <- seq(0.01, 1.2 * K, length = gridsize)  
+  h_grid <- seq(0.01, 0.8 * K, length = gridsize)  
+  
+  
+  SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g )
+  opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, 
+                       profit, delta, reward=reward)
+  
+  L1 <- function(c2) function(h, h_prev)  c2 * abs(h - h_prev) 
+  fixed <-  function(c2) function(h, h_prev) c2 * as.numeric( !(h == h_prev) )
+  L2 <- function(c2) function(h, h_prev)  c2 * (h - h_prev) ^ 2
+  none <- function(h, h_prev)  0
+  
+  
+  reduction_table <- read.csv('reduction_table.csv', row.names=1)
+  apples <-   reduction_table[[r]]
+  names(apples) <- rownames(reduction_table)
+  
+  L2_policy <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
+                            profit, delta, reward, penalty = L2(apples[["L2"]]))
+  L1_policy <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
+                            profit, delta, reward, penalty = L1(apples[["L1"]]))
+  fixed_policy <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
+                               profit, delta, reward, penalty = fixed(apples[["fixed"]]))
+  
+  
+  reps <- 1:100
+  names(reps) = paste("rep", 1:100, sep="_")
+  seeds <- 1:100
+  sims <- list(
+    L1 = lapply(reps, function(x) simulate_optim(f, pars, x_grid, h_grid, x0, 
+                                                 L1_policy$D, z_g, z_m, z_i, 
+                                                 opt$D, profit=profit, penalty=L1(apples[["L1"]]), seed=seeds[x])), 
+    L2 = lapply(reps, function(x) simulate_optim(f, pars, x_grid, h_grid, x0, 
+                                                 L2_policy$D, z_g, z_m, z_i, 
+                                                 opt$D, profit=profit, penalty=L2(apples[["L2"]]), seed=seeds[x])),
+    fixed = lapply(reps, function(x) simulate_optim(f, pars, x_grid, h_grid, x0, 
+                                                    fixed_policy$D, z_g, z_m, z_i, 
+                                                    opt$D, profit=profit, penalty=fixed(apples[["fixed"]]), seed=seeds[x]))
+    
+  )
+  
+  #Make data tidy (melt), fast (data.tables), and nicely labeled.
+  dat <- melt(sims, id=names(sims[[1]][[1]]))  
+  dt <- data.table(dat)
+  setnames(dt, "L2", "replicate") # names are nice
+  setnames(dt, "L1", "penalty_fn") # names are nice
+  
+  dt$profit <- dt$profit_fishing/(1+delta)^dt$time
+  dt$profit_fishing_alt <- dt$profit_fishing_alt/(1+delta)^dt$time
+  dt$policy_cost <- dt$policy_cost/(1+delta)^dt$time
+  dt$policy_cost_alt <- dt$policy_cost_alt/(1+delta)^dt$time
+  
+  # Profit when accounting for penalty when present
+  optimal_cost <- dt[, sum(profit_fishing - policy_cost), by=penalty_fn ] 
+  # Profit when ignoring penalty when present
+  ignore_when_present <- dt[, sum(profit_fishing_alt - policy_cost_alt), by=penalty_fn] 
+  # Profit when assuming penalty when it is absent
+  assume_when_absent <- dt[, sum(profit_fishing), by=penalty_fn]
+  # Profit when ignoring penalty when it is absent
+  optimal_free <- dt[, sum(profit_fishing_alt), by=penalty_fn]
+  
+  # Normalize by the optimal 
+  ignore_fraction <- ignore_when_present$V1/optimal_free$V1 # common normalization
+  assume_fraction <- assume_when_absent$V1/optimal_free$V1
+  assume_when_absent <- cbind(assume_when_absent, assume_fraction = assume_fraction, normalize_optimal_free=optimal_free$V1, normalize_optimal_cost = optimal_cost$V1)
+  ignore_when_present <- cbind(ignore_when_present, ignore_fraction = ignore_fraction)
+  
+  # Name and merge columns
+  setnames(ignore_when_present, "V1", "ignore_cost")
+  setnames(assume_when_absent, "V1", "assume_cost")
+  error_costs = merge(ignore_when_present, assume_when_absent, "penalty_fn")
+  
+  
+  optimal_cost$V1/optimal_free$V1 # actually realized 
+  
+  error_costs <- cbind(error_costs, sigma_g = sigma_g, reduction = reduction)
+  
+  error_costs 
+}
