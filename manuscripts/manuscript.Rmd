@@ -396,6 +396,10 @@ df
 }
 ```
 
+```{r cross-correlations}
+#stats_xcor <- dt[, xcor(fishstock, harvest), by=c("penalty_fn", "reps")]
+```
+
 
 ```{r helper_fn_3}
 #' a simple function for reorganizing the data over the different "faction-lost" levels
