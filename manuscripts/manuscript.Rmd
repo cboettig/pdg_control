@@ -4,7 +4,7 @@ title: Optimal management of a stochastically varying population when policy adj
 author: 
   - name: Carl Boettiger
     affiliation: cstar
-    email: 
+    email: cboettig (at) gmail.com
     footnote: Corresponding author
   - name: Michael Bode
     affiliation: melbourne
@@ -66,7 +66,7 @@ output:
 <!-- CODE -->
 
 ```{r dependencies, include=FALSE}
-source("components/install.R")
+#source("components/install.R")
 ```
 
 ```{r caching, include=FALSE}
@@ -90,6 +90,7 @@ rm(list=ls())
 library("rmarkdown")
 library("pdgControl")
 library("reshape2")
+library("plyr")
 library("ggplot2")
 library("data.table")
 library("pander")
@@ -192,9 +193,6 @@ fees <- subset(fees, variable %in% c("L1", "L2", "fixed"))
 ````
 
 
-```{r apples_plot, dependson="quadcosts"}
-#ggplot(fees, aes(c2, (npv0-value)/npv0, col=variable)) + geom_point() + geom_line()
-````
 
 
 ```{r apples, dependson=c("quadcosts", "reduction")}
@@ -233,6 +231,7 @@ print_npv <- data.frame(model=index$variable, "value realized"=values,
 ```{r npv_table, dependson="print_npv", results='asis'} 
 #pandoc.table(print_npv)
 ```
+
 
 
 
@@ -305,24 +304,6 @@ error_costs <- cbind(error_costs, sigma_g = sigma_g, reduction = reduction)
 ```
 
 
-```{r}
-v <- dt[,var(harvest), by="penalty_fn"]
-var <- v$V1
-names(var) <- v$penalty_fn
-acor <- dt[,acf(harvest, plot=F)$acf[2], by="penalty_fn"]$V1
-names(acor) <- names(var)
-out <- rbind(var=var, a=acor)
-```
-
-
-
-
-
-
-```{r}
-frac_lost <- seq(0,1, length=20)
-```
-
 ```{r helper_fn_1}
 fig4 <- function(fraction_lost){
 closest <- function(x, v){
@@ -374,8 +355,13 @@ sims <- lapply(1:50, function(reps) list(
 }
 ```
 
+```{r sim_at_each_apple}
+frac_lost <- seq(0,1, length=20)
+sims_at_each_apple <- lapply(frac_lost, fig4)
+```
 
-```{r fig4-stats}
+
+```{r stats-defs}
 summary_stats <- function(dt){
  harvest_var <- dt[,var(harvest), by=c("penalty_fn", "reps")]$V1
  harvest_acor <- dt[,acf(harvest, plot=F)$acf[2], by=c("penalty_fn", "reps")]$V1
@@ -395,7 +381,7 @@ summary_stats <- function(dt){
  }
 ```
 
-```{r summary-stat-calc}
+```{r summary-stat-calc, dependson="sim_at_each_apple"}
 stats_summaries <- lapply(sims_at_each_apple, summary_stats)
 # reformat list of data-frames as data frame with apple coef as a factor
 stats_df <- melt(stats_summaries, id=names(stats_summaries[[1]]))
@@ -416,38 +402,6 @@ series_map <- c(harvest.variance = 'harvest', stock.variance='stock', stock.auto
 figure4_df$statistic <- stat_map[figure4_df$statistic]
 figure4_df$timeseries <- series_map[figure4_df$timeseries]
 ```
-
-
-
-```{r table-calc}
-source("componetns/compute_error_table.R")
-sigmas <- c(0.01, 0.1, 0.2)
-reductions <- 1:3
-out <- lapply(sigmas, function(s){
-  lapply(reductions, function(r){
-    compute_error_table(r = r, sigma = s)    
-  })
-})
-       
-who <- names(out[[1]][[1]])
-error_df <- melt(out, id=who)              
-```
-
-
-```{r clean-table}
-df <- error_df[2:8]
-who <- c("penalty_fn", "ignore_fraction", "assume_fraction", "sigma_g", "reduction")
-df2 <- melt(df, id=who)
-who <- c("penalty_fn", "sigma_g", "reduction", "variable", "value")
-df3 <- melt(df2, id=who)
-names(df3) <- c("penalty_fn", "sigma_g", "reduction", "variable", "value", "fraction_variable", "fraction")
-df3$reduction <- as.factor(df3$reduction)
-
-#ggplot(df3) + geom_line(aes(sigma_g, value, col=reduction, lty=variable)) + facet_wrap(~penalty_fn, scales="free_y") 
-```
-
-
-
 
 
 
@@ -979,14 +933,19 @@ when these costs are assumed to scale quadratically with the size of the
 policy change being implemented ($\Pi_2$).
 
 
-
-```{r Table1, results="asis", echo=FALSE}
-df4 <- error_df[c(1,2,4,6,7)]
-plyr::arrange(df4, penalty_fn)
-pandoc.table(df4)
+```{r table-caption}
+caption = "Table 1: Column 'ignoring' shows the results of ignoring a adjustment penalty when it is present, Column 'assuming' shows the results of assuming an adjustment cost when it is absent. Values (ignoring, assuming) are given as the expected net present value (ENPV) as a fraction of that when no penalty is present, ENPV0.  Percent reduction refers to penalty coefficient being calibrated to achieve the given percent reduction relative to ENPV0 when the penalty is optimally accounted for.  Column c2 shows the coefficient chosen to achieve that reduction. Comparing the second and third columns shows that ignoring a real cost is a significantly graver error, particularly in the case of quadratic (L2) costs."
 ```
 
+```{r clean-table}
+who <- c("penalty_fn", "ignore_fraction", "assume_fraction", "reduction")
+table1 <- arrange(subset(error_df, sigma_g == 0.01)[who], penalty_fn) 
+pandoc.table(table1, caption=caption)
 
+table1_long <- melt(table1, id = c('penalty_fn', 'reduction'))
+table1_long$reduction <- as.factor(table1_long$reduction)
+ggplot(table1_long, aes(penalty_fn, value, fill = variable)) + geom_bar(stat="identity", position="dodge") + facet_wrap(~ reduction) + theme_bw()
+```
 
 <!--
 NOTE Obviously we have presentation choices to make here. I think there is plenty of scope either to compact this table somehow (rows are penalty functions)  x columns are percent reduction.
@@ -995,19 +954,8 @@ There would also be lots of scope for showing the same info visually as a simple
 -->
 
 
-      penalty fn     ignoring   assuming   percent reduction      c2
-  --- ------------ ---------- ---------- ------------------- -------
-    1 L1                 0.81       1.00                0.10    0.40
-    2 L1                 0.62       0.99                0.20    0.81
-    3 L1                 0.35       0.97                0.30    2.02
-    4 L2                 0.68       0.95                0.10    0.81
-    5 L2                 0.44       0.89                0.20    1.62
-    6 L2                -0.28       0.81                0.30    2.83
-    7 fixed              0.78       1.00                0.10    3.64
-    8 fixed              0.56       0.99                0.20    8.08
-    9 fixed              0.31       0.97                0.30   12.93
 
-  Table 1: Column 'ignoring' shows the results of ignoring a adjustment penalty when it is present, Column 'assuming' shows the results of assuming an adjustment cost when it is absent. Values (ignoring, assuming) are given as the expected net present value (ENPV) as a fraction of that when no penalty is present, ENPV0.  Percent reduction refers to penalty coefficient being calibrated to achieve the given percent reduction relative to ENPV0 when the penalty is optimally accounted for.  Column c2 shows the coefficient chosen to achieve that reduction. Comparing the second and third columns shows that ignoring a real cost is a significantly graver error, particularly in the case of quadratic (L2) costs.
+
 
 
 
