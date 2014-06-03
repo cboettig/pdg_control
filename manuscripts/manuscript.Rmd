@@ -98,7 +98,7 @@ library("cboettigR")
 library("ggthemes")
 library("snowfall")
 theme_set(theme_tufte())
-ncpu = 1
+ncpu = 24
 ```
 
 ``` {r profit_model}
@@ -202,19 +202,11 @@ closest <- function(x, v){
 dt_npv <- data.table(fees)
 index <- dt_npv[,closest(reduction, (npv0-value)/npv0), by=variable]
 apples_index <- index$V1
-names(apples_index) = index$variable
+names(apples_index) <- index$variable
 apples <- c2[index$V1]
+names(apples) <- index$variable
 ````
 
-
-```{r reductions}
-reduction_table <- sapply(c("0.10" = 0.10, "0.20" = 0.20, "0.30" = 0.30), function(reduction){
-index <- dt_npv[,closest(reduction, (npv0-value)/npv0), by=variable]
-apples <- c2[index$V1]
-names(apples) = index$variable
-apples })
-write.csv(reduction_table, "components/data/reduction_table.csv")
-````
 
 
 
@@ -302,6 +294,8 @@ error_costs <- merge(ignore_when_present, assume_when_absent, "penalty_fn")
 error_costs <- cbind(error_costs, sigma_g = sigma_g, reduction = reduction)
 
 ```
+
+
 
 
 ```{r helper_fn_1}
@@ -403,6 +397,22 @@ figure4_df$statistic <- stat_map[figure4_df$statistic]
 figure4_df$timeseries <- series_map[figure4_df$timeseries]
 ```
 
+
+
+
+
+
+```{r errors-table}
+
+source("components/compute_error_table.R")
+
+reduction_list <- c(.1, .15, .2, .25, .3)
+out <- lapply(reduction_list, function(r)
+    compute_error_table(r = r))   
+who <- names(out[[1]])
+error_df <- melt(out, id=who)       
+
+````
 
 
 <!-- ENDCODE -->
@@ -934,17 +944,20 @@ policy change being implemented ($\Pi_2$).
 
 
 ```{r table-caption}
-caption = "Table 1: Column 'ignoring' shows the results of ignoring a adjustment penalty when it is present, Column 'assuming' shows the results of assuming an adjustment cost when it is absent. Values (ignoring, assuming) are given as the expected net present value (ENPV) as a fraction of that when no penalty is present, ENPV0.  Percent reduction refers to penalty coefficient being calibrated to achieve the given percent reduction relative to ENPV0 when the penalty is optimally accounted for.  Column c2 shows the coefficient chosen to achieve that reduction. Comparing the second and third columns shows that ignoring a real cost is a significantly graver error, particularly in the case of quadratic (L2) costs."
+caption = "Table 1: Column 'ignoring' shows the results of ignoring a adjustment penalty when it is present, Column 'assuming' shows the results of assuming an adjustment cost when it is absent. Values (ignoring, assuming) are given as the expected net present value (ENPV) as a fraction of that when no penalty is present, ENPV0.  Percent reduction refers to penalty coefficient being calibrated to achieve the given percent reduction relative to ENPV0 when the penalty is optimally accounted for.  Comparing the second and third columns shows that ignoring a real cost is a significantly graver error, particularly in the case of quadratic (L2) costs."
 ```
 
-```{r clean-table}
+```{r Table1}
 who <- c("penalty_fn", "ignore_fraction", "assume_fraction", "reduction")
-table1 <- arrange(subset(error_df, sigma_g == 0.01)[who], penalty_fn) 
+table1 <- arrange(error_df[who], reduction) 
+names(table1) = c("penalty.fn", "ignoring", "assuming", "reduction")
 pandoc.table(table1, caption=caption)
+```
 
-table1_long <- melt(table1, id = c('penalty_fn', 'reduction'))
+```{r Table1-Figure, fig.cap="Relative cost of ignoring adjustment costs when they are present ('ignoring', red) vs assuming the adjustment costs when they are absent ('assuming', blue), shown by penalty function over increasing magnitudes of cost.  All values are relative to the cost-free adjustment optimum, NPV0.  In each case, it is less costly to assume adjustment costs are present when they are not than it is to ignore them when they are present. The severity of the latter mistake increases sharply as adjustment costs make a larger fraction of the total costs."}
+table1_long <- melt(table1, id = c('penalty.fn', 'reduction'))
 table1_long$reduction <- as.factor(table1_long$reduction)
-ggplot(table1_long, aes(penalty_fn, value, fill = variable)) + geom_bar(stat="identity", position="dodge") + facet_wrap(~ reduction) + theme_bw()
+ggplot(table1_long, aes(penalty.fn, value, fill = variable)) + geom_bar(stat="identity", position="dodge") + facet_wrap(~ reduction) + theme_bw()
 ```
 
 <!--
