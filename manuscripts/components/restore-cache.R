@@ -10,7 +10,7 @@ target <- paste0("http://two.ucdavis.edu/~cboettig/data/", archive)
 #cache <- GET(target)
 #if(cache$status_code != 404){
 #  writeBin(content(cache, "raw"), archive)
-download.file(target, archive, method=wget)
+download.file(target, archive, method="wget")
 untar(archive)
 unlink(archive)
 #}
