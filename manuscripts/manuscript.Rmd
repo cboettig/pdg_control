@@ -59,7 +59,6 @@ documentclass: components/elsarticle
 
 output:
   pdf_document:
-    keep_tex: true
     template: components/elsarticle.latex
     fig_caption: true
 ---
