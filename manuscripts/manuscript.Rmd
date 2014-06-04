@@ -65,9 +65,21 @@ output:
 ---
 
 
-```{r dependencies, include=FALSE, cache=FALSE}
+```{r configure, include=FALSE, cache=FALSE}
 #source("components/install.R")
+
+library("methods")
+library("knitr")
+basename <- "manuscript"
+opts_chunk$set(fig.path = paste("components/figure/", basename, "-", sep=""),
+               cache.path = paste("components/cache/", basename, "/", sep=""))
+opts_chunk$set(cache = 2)
+opts_chunk$set(tidy=FALSE, warning=FALSE, message=FALSE, 
+               comment = NA, verbose = TRUE, echo=FALSE)
+# PDF-based figures
+opts_chunk$set(dev='pdf')
 ```
+
 ```{r analysis, include=FALSE}
 source("components/analysis.R")
 ```
@@ -319,7 +331,7 @@ NPV with policy adjustment costs as a proportion of the maximum expected
 NPV available in the basic problem $NPV_0({\bf h_0^*})$ without policy
 adjustment costs.
 
-```{r Figure_1, fig.cap="Expected net present value by functional form of penalty. Horizontal axis shows the coefficient $c_i$ governing the magnitude of the policy cost, while vertical axis shows fraction of the maximum expected net present value dissipated by the policy cost, $\\tfrac{NPV_0 - NPV_i}{NPV_0}$.  The horizontal line indicates a value of the stock that is reduced by `r reduction * 100`% from the maximum expected value in the absence of policy adjustment costs, $NPV_0({\\bf h_0^*})$. Selecting the coefficient $c_i$ corresponding to this value in each functional form allows us to make consistent comparisons across the different functional forms of policy costs.", dependson="quadcosts", fig.width=4, fig.height=3, cache=FALSE}
+```{r Figure_1, fig.cap="Expected net present value by functional form of penalty. Horizontal axis shows the coefficient $c_i$ governing the magnitude of the policy cost, while vertical axis shows fraction of the maximum expected net present value dissipated by the policy cost, $\\tfrac{NPV_0 - NPV_i}{NPV_0}$.  The horizontal line indicates a value of the stock that is reduced by `r reduction * 100`% from the maximum expected value in the absence of policy adjustment costs, $NPV_0({\\bf h_0^*})$. Selecting the coefficient $c_i$ corresponding to this value in each functional form allows us to make consistent comparisons across the different functional forms of policy costs.", dependson="quadcosts", fig.width=4, fig.height=3}
 ggplot(fees, aes(c2, (npv0-value)/npv0, lty=variable)) + 
   geom_line() + 
   geom_hline(aes(yintercept=reduction), linetype=4) + 
@@ -497,7 +509,8 @@ ggplot(figure4_df, aes(penalty_fraction, value, fill=penalty_fn, col=penalty_fn)
   stat_summary(fun.y = mean, geom = "line")
 with_xcor_plot
 
-ggplot(subset(figure4_df, statistic != "cross.correlation"), aes(penalty_fraction, value, fill=penalty_fn, col=penalty_fn))  +
+ggplot(subset(figure4_df, statistic != "cross.correlation"), 
+       aes(penalty_fraction, value, fill=penalty_fn, col=penalty_fn))  +
   stat_summary(fun.y = mean, 
                fun.ymin = function(x) mean(x) - sd(x), 
                fun.ymax = function(x) mean(x) + sd(x), 
@@ -549,7 +562,6 @@ more tightly.
 
 **
 
-<!-- ![image](figure/Figure_6) -->
 
 Table 1 compares these different contributions, namely the $NPV$ lost by
 assuming policy adjustment costs when none are present (first entry in
@@ -596,7 +608,8 @@ pandoc.table(table1, caption=caption)
 ```{r Table1-Figure, fig.cap="Relative cost of ignoring adjustment costs when they are present ('ignoring', red) vs assuming the adjustment costs when they are absent ('assuming', blue), shown by penalty function over increasing magnitudes of cost.  All values are relative to the cost-free adjustment optimum, NPV0.  In each case, it is less costly to assume adjustment costs are present when they are not than it is to ignore them when they are present. The severity of the latter mistake increases sharply as adjustment costs make a larger fraction of the total costs."}
 table1_long <- melt(table1, id = c('penalty.fn', 'reduction'))
 table1_long$reduction <- as.factor(table1_long$reduction)
-ggplot(table1_long, aes(penalty.fn, value, fill = variable)) + geom_bar(stat="identity", position="dodge") + facet_wrap(~reduction) 
+ggplot(table1_long, aes(penalty.fn, value, fill = variable)) + 
+  geom_bar(stat="identity", position="dodge") + facet_wrap(~reduction) 
 ```
 
 <!--
