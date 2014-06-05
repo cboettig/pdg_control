@@ -507,7 +507,9 @@ ggplot(figure4_df, aes(penalty_fraction, value, fill=penalty_fn, col=penalty_fn)
                geom = "ribbon", alpha=0.3, colour=NA) +
   stat_summary(fun.y = mean, geom = "line")
 with_xcor_plot
+```
 
+```{r Figure_4_alt, fig.cap="Variance and autocorrelation of stock dynamics and harvest dynamics, as a function of the penalty coefficient.  Adjustment penalty is calculated as percentage of the maximum expected NPV in the basic case with no policy adjustment costs.", fig.height=8, fig.width=8}
 ggplot(subset(figure4_df, statistic != "cross.correlation"), 
        aes(penalty_fraction, value, fill=penalty_fn, col=penalty_fn))  +
   stat_summary(fun.y = mean, 
@@ -515,7 +517,7 @@ ggplot(subset(figure4_df, statistic != "cross.correlation"),
                fun.ymax = function(x) mean(x) + sd(x), 
                geom = "ribbon", alpha=0.3, colour=NA) +
   stat_summary(fun.y = mean, geom = "line") + 
-  facet_grid(statistic ~ timeseries, scale="free_y")
+  facet_wrap(~ timeseries + statistic, scale="free_y")
 
 ```
 
