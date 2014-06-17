@@ -77,6 +77,8 @@ opts_chunk$set(tidy=FALSE, warning=FALSE, message=FALSE,
                comment = NA, verbose = TRUE, echo=FALSE)
 # PDF-based figures
 opts_chunk$set(dev='pdf')
+
+fig.cache <- TRUE
 ```
 
 ```{r analysis, include=FALSE}
@@ -323,14 +325,14 @@ present value of fishery, broadly following the example of Bovenberg,
 Goulder and Gurnery (2005) and Bovenberg, Goulder and Jacobsen (2008).
 <!--NOTE Jake to confirm these are still relevant and needed. We are using a less sophisticated normalization than was once discussed and may or may not need the citations now. -->
 
-Figure 1 shows the calibration graphically. Each curve plots the change
+Figure 2 shows the calibration graphically. Each curve plots the change
 in maximum expected NPV for a given penalty function as the penalty cost
 parameter is increased. In each case, the figure shows maximum expected
 NPV with policy adjustment costs as a proportion of the maximum expected
 NPV available in the basic problem $NPV_0({\bf h_0^*})$ without policy
 adjustment costs.
 
-```{r Figure_1, fig.cap="Expected net present value by functional form of penalty. Horizontal axis shows the coefficient $c_i$ governing the magnitude of the policy cost, while vertical axis shows fraction of the maximum expected net present value dissipated by the policy cost, $\\tfrac{NPV_0 - NPV_i}{NPV_0}$.  The horizontal line indicates a value of the stock that is reduced by `r reduction * 100`% from the maximum expected value in the absence of policy adjustment costs, $NPV_0({\\bf h_0^*})$. Selecting the coefficient $c_i$ corresponding to this value in each functional form allows us to make consistent comparisons across the different functional forms of policy costs.", dependson="quadcosts", fig.width=4, fig.height=3}
+```{r Figure_2, fig.cap="Expected net present value by functional form of penalty. Horizontal axis shows the coefficient $c_i$ governing the magnitude of the policy cost, while vertical axis shows fraction of the maximum expected net present value dissipated by the policy cost, $\\tfrac{NPV_0 - NPV_i}{NPV_0}$.  The horizontal line indicates a value of the stock that is reduced by `r reduction * 100`% from the maximum expected value in the absence of policy adjustment costs, $NPV_0({\\bf h_0^*})$. Selecting the coefficient $c_i$ corresponding to this value in each functional form allows us to make consistent comparisons across the different functional forms of policy costs.", dependson="quadcosts", fig.width=4, fig.height=3, cache = fig.cache}
 ggplot(fees, aes(c2, (npv0-value)/npv0, lty=variable)) + 
   geom_line() + 
   geom_hline(aes(yintercept=reduction), linetype=4) + 
@@ -410,7 +412,7 @@ period shown (time steps $t=47-49$) with a constant quota in between the
 extremes, the fixed fee version takes the opposite approach of one very
 large swing. MORE DETAILING TO COME WHEN WE HAVE THE FIGURES
 
-```{r Figure_2, dependson="tidy", fig.cap="Example realization of optimal harvesting strategy and resulting fish stock sizes under the different functional forms of adjustment costs.", fig.height=3, fig.width=8}
+```{r Figure_3, dependson="tidy", fig.cap="Example realization of optimal harvesting strategy and resulting fish stock sizes under the different functional forms of adjustment costs.", fig.height=3, fig.width=8, cache = fig.cache}
 
 fig2_df <- as.data.frame(subset(dt, replicate=='rep_2'))
 fig2_df <- fig2_df[c("time", "fishstock", "alternate", "harvest", "harvest_alt", "penalty_fn")]
@@ -485,18 +487,10 @@ Moreover, these occurrences increase in frequency as the severity of
 these costs ($c_1$) increases (STATISTIC).
 
 
-<!-- NOTE 
-Assuming we aren't showing cross-correlations, I think we can probably fit these into a single four subplot figure. Cross-correlations would be a little harder but just using 5 subplots from what could have been a 6 subplot figure would also work, because a journal could just put the caption into the empty space.
-
-Same comments as before on labeling the curves and detailing in the figure captions. Axis labels and things all also need work. - Paul
--->
 <!--
 Added cross-correlations but shows no pattern.  Also have version with 2x2 as single plot.  feedback on aesthetics welcome.  - CB
--->
 
-
-
-```{r Figure_4, fig.cap="Variance and autocorrelation of stock dynamics and harvest dynamics, as well as cross-correlation between stock and harvest dynamics, as a function of the penalty coefficient.  Adjustment penalty is calculated as percentage of the maximum expected NPV in the basic case with no policy adjustment costs.", fig.height=8, fig.width=8}
+```{r Figure_4, fig.cap="Variance and autocorrelation of stock dynamics and harvest dynamics, as well as cross-correlation between stock and harvest dynamics, as a function of the penalty coefficient.  Adjustment penalty is calculated as percentage of the maximum expected NPV in the basic case with no policy adjustment costs.", fig.height=8, fig.width=8, cache=fig.cache}
 
 with_xcor_plot <- 
 ggplot(figure4_df, aes(penalty_fraction, value, fill=penalty_fn, col=penalty_fn)) + 
@@ -509,7 +503,13 @@ ggplot(figure4_df, aes(penalty_fraction, value, fill=penalty_fn, col=penalty_fn)
 with_xcor_plot
 ```
 
-```{r Figure_4_alt, fig.cap="Variance and autocorrelation of stock dynamics and harvest dynamics, as a function of the penalty coefficient.  Adjustment penalty is calculated as percentage of the maximum expected NPV in the basic case with no policy adjustment costs.", fig.height=8, fig.width=8}
+-->
+
+
+
+
+
+```{r Figure_4_alt, fig.cap="Variance and autocorrelation of stock dynamics and harvest dynamics, as a function of the penalty coefficient.  Adjustment penalty is calculated as percentage of the maximum expected NPV in the basic case with no policy adjustment costs.", fig.height=8, fig.width=8, cache=fig.cache}
 ggplot(subset(figure4_df, statistic != "cross.correlation"), 
        aes(penalty_fraction, value, fill=penalty_fn, col=penalty_fn))  +
   stat_summary(fun.y = mean, 
@@ -679,7 +679,7 @@ Supplementary material
 
 
 
-```{r Figure_1S, dependson="tidy", fig.cap="Multiple realizations of optimal harvesting strategy and resulting fish stock sizes under the different functional forms of adjustment costs. Note that while fish stock dynamics appear similar in penalty and non-penalty scenarios, the harvest dyanmics show clear patterns depending on the type of penalty.", fig.height=3, fig.width=8}
+```{r Figure_1S, dependson="tidy", fig.cap="Multiple realizations of optimal harvesting strategy and resulting fish stock sizes under the different functional forms of adjustment costs. Note that while fish stock dynamics appear similar in penalty and non-penalty scenarios, the harvest dyanmics show clear patterns depending on the type of penalty.", fig.height=3, fig.width=8, cache=fig.cache}
 
 fig1s_df <- as.data.frame(subset(dt, replicate %in% paste0('rep_', 1:5)))
 fig1s_df <- fig1s_df[c("time", "fishstock", "alternate", "harvest", "harvest_alt", "penalty_fn", "replicate")]
