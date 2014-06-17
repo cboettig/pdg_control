@@ -77,7 +77,7 @@ opts_chunk$set(tidy=FALSE, warning=FALSE, message=FALSE,
                comment = NA, verbose = TRUE, echo=FALSE)
 # PDF-based figures
 opts_chunk$set(dev='pdf')
-fig.cache <- FALSE
+fig.cache <- TRUE
 
 library("rmarkdown")
 library("pdgControl")
@@ -346,6 +346,9 @@ ggplot(fees, aes(c2, (npv0-value)/npv0, lty=variable)) +
   xlab("penalty coefficient") +
   ylab("Reduction in net present value") 
 
+write.csv(dt, "components/data/100reps.csv")
+write.csv(fees, "components/data/figure2.csv")
+
 ```
 
 
@@ -385,21 +388,22 @@ Effect of policy adjustment costs on optimal quotas and stock sizes {#effect-of-
 
 ```{r Figure_3, dependson="tidy", fig.cap="Example realization of optimal harvesting strategy and resulting fish stock sizes under the different functional forms of adjustment costs.", fig.height=3, fig.width=8, cache = fig.cache}
 
-fig2_df <- as.data.frame(subset(dt, replicate=='rep_1'))
-fig2_df <- fig2_df[c("time", "fishstock", "alternate", "harvest", "harvest_alt", "penalty_fn")]
-fig2_df <- melt(fig2_df, id = c("time", "penalty_fn"))
-fig2_df <- data.frame(fig2_df, baseline = fig2_df$variable)
+fig3_df <- as.data.frame(subset(dt, replicate=='rep_1'))
+fig3_df <- fig3_df[c("time", "fishstock", "alternate", "harvest", "harvest_alt", "penalty_fn")]
+fig3_df <- melt(fig3_df, id = c("time", "penalty_fn"))
+fig3_df <- data.frame(fig3_df, baseline = fig3_df$variable)
 variable_map <- c(fishstock = "fish_stock", alternate = "fish_stock", harvest = "harvest", harvest_alt = "harvest")
 baseline_map <- c(fishstock = "penalty", alternate = "no_penalty", harvest = "penalty", harvest_alt = "no_penalty")
-fig2_df$variable <- variable_map[fig2_df$variable]
-fig2_df$baseline <- baseline_map[fig2_df$baseline]
+fig3_df$variable <- variable_map[fig3_df$variable]
+fig3_df$baseline <- baseline_map[fig3_df$baseline]
 
 
-ggplot(fig2_df, aes(time, value, col=baseline)) +
+ggplot(fig3_df, aes(time, value, col=baseline)) +
   geom_line() +
   facet_grid(variable~penalty_fn) + 
   labs(x="time", y="stock size", title = "Example Stock & Harvest Dynamics")  
 
+write.csv(fig3_df, "components/data/figure3.csv")
 ```
 
 
@@ -521,6 +525,7 @@ ggplot(subset(figure4_df, statistic != "cross.correlation"),
   coord_cartesian(xlim = c(0, .3)) + 
   facet_wrap(~ timeseries + statistic, scale="free_y")
 
+write.csv(figure4_df, "components/data/figure4.csv")
 ```
 
 
@@ -542,6 +547,7 @@ hist_dat <- melt(cbind(profits, costs = costs$V1,
 
 ```{r Figure_5}
 ggplot(hist_dat) + geom_density(aes(value, fill=variable), alpha=0.6)+facet_wrap(~penalty_fn)
+write.csv(hist_dat, "components/data/figure5.csv")
 ```
 
 Next we examine the consequences either of ignoring policy adjustment
@@ -585,6 +591,7 @@ table1_long <- melt(table1, id = c('penalty.fn', 'reduction'))
 table1_long$reduction <- as.factor(table1_long$reduction)
 ggplot(table1_long, aes(penalty.fn, value, fill = variable)) + 
   geom_bar(stat="identity", position="dodge") + facet_wrap(~reduction) 
+write.csv(table1_long, "components/data/figure6.csv")
 ```
 
 
@@ -642,6 +649,8 @@ table2_long$reduction <- as.factor(table2_long$reduction)
 ggplot(table2_long, aes(penalty.fn, value, fill = variable)) + 
   geom_bar(stat="identity", position="dodge") + 
   facet_wrap(~reduction, scales="free_y") 
+
+write.csv(table2_long, "components/data/figure7.csv")
 ```
 
 
