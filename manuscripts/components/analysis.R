@@ -1,18 +1,6 @@
 
 
-## ----libraries, include=FALSE, cache=FALSE-------------------------------
-rm(list=ls())
-library("rmarkdown")
-library("pdgControl")
-library("reshape2")
-library("plyr")
-library("ggplot2")
-library("data.table")
-library("pander")
-library("cboettigR")
-library("ggthemes")
-library("snowfall")
-theme_set(theme_tufte())
+
 ncpu = 24
 
 
@@ -285,6 +273,16 @@ figure4_df$statistic <- stat_map[figure4_df$statistic]
 figure4_df$timeseries <- series_map[figure4_df$timeseries]
 
 
+## ----histograms----------------------------------------------------------
+profits <- dt[, sum(profit_fishing), by=c('penalty_fn', 'replicate') ]
+costs <- dt[, sum(policy_cost), by=c('penalty_fn', 'replicate') ]
+reed_profits <- dt[, sum(profit_fishing_alt), by=c('penalty_fn', 'replicate') ]
+reed_costs <- dt[, sum(policy_cost_alt), by=c('penalty_fn', 'replicate') ]
+setnames(profits, "V1", "profits")
+hist_dat <- melt(cbind(profits, costs = costs$V1, 
+                       reed_profits = reed_profits$V1, reed_costs = reed_costs$V1),
+                 id = c("penalty_fn", "replicate"))
+
 ## ----errors-table--------------------------------------------------------
 
 source("components/compute_error_table.R")
@@ -296,4 +294,13 @@ who <- names(out[[1]])
 error_df <- melt(out, id=who)       
 
 
+## ----mismatches--------------------------------------------------------
+
+source("components/compute_mismatches.R")
+
+reduction_list <- c(.1, .15, .2, .25)
+out <- lapply(reduction_list, function(r)
+  compute_mismatches(r = r))   
+who <- names(out[[1]])
+mismatches_df <- melt(out, id=who)       
 

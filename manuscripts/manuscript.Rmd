@@ -77,8 +77,20 @@ opts_chunk$set(tidy=FALSE, warning=FALSE, message=FALSE,
                comment = NA, verbose = TRUE, echo=FALSE)
 # PDF-based figures
 opts_chunk$set(dev='pdf')
+fig.cache <- FALSE
 
-fig.cache <- TRUE
+library("rmarkdown")
+library("pdgControl")
+library("reshape2")
+library("plyr")
+library("ggplot2")
+library("data.table")
+library("pander")
+library("cboettigR")
+library("ggthemes")
+library("snowfall")
+
+theme_set(theme_tufte())
 ```
 
 ```{r analysis, include=FALSE}
@@ -444,8 +456,7 @@ affected by the magnitude of the costs of policy adjustment. This time
 we show summary statistics across 50 replicate sets of environmental
 conditions. We show the impact of policy adjustment costs on the
 variance of both harvests and stock sizes through time; on the
-autocorrelation of harvests and stock sizes through time; and on the
-cross-correlation of harvests and stock sizes through time. <!-- NOTE Are we showing cross-correlations or not? --> <!-- See figure 4, probably not-->
+autocorrelation of harvests and stock sizes through time. <!-- NOTE Are we showing cross-correlations or not? --> <!-- See figure 4, probably not-->
 
 For example, when small policy adjustment costs cost little but large
 adjustments are expensive ($\Pi_2$), we see the smoothing signal that we
@@ -526,6 +537,21 @@ ggplot(subset(figure4_df, statistic != "cross.correlation"),
 Consequences of policy adjustment costs {#consequences-of-policy-adjustment-costs .unnumbered}
 ---------------------------------------
 
+```{r histogram-calc}
+profits <- dt[, sum(profit_fishing), by=c('penalty_fn', 'replicate') ]
+costs <- dt[, sum(policy_cost), by=c('penalty_fn', 'replicate') ]
+reed_profits <- dt[, sum(profit_fishing_alt), by=c('penalty_fn', 'replicate') ]
+reed_costs <- dt[, sum(policy_cost_alt), by=c('penalty_fn', 'replicate') ]
+setnames(profits, "V1", "profits")
+hist_dat <- melt(cbind(profits, costs = costs$V1, 
+                       reed_profits = reed_profits$V1, reed_costs = reed_costs$V1),
+                 id = c("penalty_fn", "replicate"))
+````
+
+
+```{r Figure_5}
+ggplot(hist_dat) + geom_density(aes(value, fill=variable), alpha=0.6)+facet_wrap(~penalty_fn)
+```
 Next we examine the consequences either of ignoring policy adjustment
 costs when they are present or assuming they are present when they are
 not. To do so, it helps to break-down the different contributions to the
@@ -612,6 +638,38 @@ table1_long$reduction <- as.factor(table1_long$reduction)
 ggplot(table1_long, aes(penalty.fn, value, fill = variable)) + 
   geom_bar(stat="identity", position="dodge") + facet_wrap(~reduction) 
 ```
+
+
+
+
+When policy costs are present, assuming the wrong functional form may or may not be worse than ignoring the presence of policy costs all together.  Figure S2 considers several such cases.  The X axis labels indicate first which policy is being used to drive the harvest decisions, and then which penalty is actually being applied.  Thus `L1_L2` indicates a policy calculated under the linear $L_1$ costs, when the reality involves quadratic $L_2$ costs.  Though the coefficients of the $L_2$ costs have been scaled such that the net effect is the same, the inferred policies differ.  As a result, the value is slightly more than half of the optimal free solution when the expected reduction should only be 10% less than optimal free. In this case, ignoring the costs all together is still worse than using L1 costs -- the red bar is lower than the blue.  
+
+For fixed costs, the reverse is true.  Because fixed costs increase the volatility of the optimal solution while L2 costs decrease it, simply ignoring the cost of adjustment all together results in a higher value than either assuming costs are quadratic $L_2$ when they are fixed, or assuming they are fixed when they are quadratic.  
+
+Nevertheless, assuming quadaratic costs is always the most conservative option -- scenarios in which true costs are quadratic (regardless of what cost structure is assumed by the policy) do significantly worse than those that are not (i.e. all cases that assume quadratic but actually have linear or fixed costs).  
+
+These patterns hold across the different size reductions shown (from 10% to 25%), though net present value becomes negative under the quadratic form for the larger penalties as costs paid for adjustments exceed profits derived from harvest.  (Though optimal solutions will always avoid negative net present values, these scenarios in which policies are applied under conditions other than assumed in the optimality calculation have no such guarentee.) For each scenario, results are averaged over 100 replicates.  
+
+
+
+```{r mismatches, fig.cap="Mismatches. X axis labels indicate the model used to derive the policy, followed by the model used to simulate the penalty. Blue bars show the net present value of that scenario.  Compare to red bars, which show the consequence of using a policy that ignores costs all together in the same scenario (i.e. costs as indicated by second code), rather than assuming the policy indicated by the first code in the pair.  All values are scaled to a fraction of the adjustment free net present value.  Successive panels show increasing reduction of the net present value by increasing penalty coefficients: e.g. a policy in the first panel should lose only 10% of its net present value to adjustment costs if it had the correct form of those costs."}
+who <- c("penalty_fn", "ignore_fraction", "mismatched_fraction", "reduction")
+table2 <- arrange(mismatches_df[who], reduction) 
+names(table2) = c("penalty.fn", "ignoring", "mismatched", "reduction")
+table2_long <- melt(table2, id = c('penalty.fn', 'reduction'))
+table2_long$reduction <- as.factor(table2_long$reduction)
+
+
+ggplot(table2_long, aes(penalty.fn, value, fill = variable)) + 
+  geom_bar(stat="identity", position="dodge") + 
+  facet_wrap(~reduction, scales="free_y") 
+```
+
+
+
+
+
+
 
 <!--
 NOTE Obviously we have presentation choices to make here. I think there is plenty of scope either to compact this table somehow (rows are penalty functions)  x columns are percent reduction.
