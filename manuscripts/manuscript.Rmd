@@ -328,8 +328,8 @@ functional form. Therefore, if seeking to compare the relative effect of
 each penalty function on optimal management, it is unclear what
 parameter values should be used. To address this issue, we calibrate
 choices of $c_i$ so that each has a comparable impact on the optimal net
-present value of fishery, broadly following the example of Bovenberg,
-Goulder and Gurnery (2005) and Bovenberg, Goulder and Jacobsen (2008).
+present value of fishery, broadly following the example of  @Bovenberg_2008.
+
 <!--NOTE Jake to confirm these are still relevant and needed. We are using a less sophisticated normalization than was once discussed and may or may not need the citations now. -->
 
 Figure 2 shows the calibration graphically. Each curve plots the change
