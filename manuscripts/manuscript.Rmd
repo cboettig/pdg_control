@@ -490,8 +490,11 @@ costs (Eqn. 3) or when optimizing against $\Pi_2$ or $\Pi_3$.
 
 
 ```{r}
-fraction_no_shift <- function(x)
+fraction_no_shift <- function(x){
+ nonzeros <- which(x > 0)
+ x <- x[nonzeros]
  sum(x[2:length(x)] - x[1:length(x)-1] == 0)/length(x)
+}
 
 shifts <- dt[, fraction_no_shift(harvest), by=c("penalty_fn", "replicate")]
 ave <- shifts[, mean(V1), by=penalty_fn]
@@ -504,9 +507,9 @@ While still not common for the particular parameter combinations we examine,
 we find that positive unaltered quotas through time are much more likely
 to occur when optimizing against $\Pi_1$ where policy adjustment costs
 scale linearly with the size of proposed policy changes: in the 100 replicates
-of data presented above the harvest policy is identical in conecutive intevals
+of data presented above the harvest policy is strictly positive and identical in consecutive intervals
 only `r no_shifts[["L2"]] * 100`% of the time for quadratic costs $\Pi_2$, compared with
-`r no_shifts[["L1"]] * 100`$ with linear costs $Pi_1$ and `r no_shifts[["fixed"]]*100`%
+`r no_shifts[["L1"]] * 100` with linear costs $\Pi_1$ and `r no_shifts[["fixed"]]*100`%
 for fixed costs $\Pi_3$. Moreover, these occurrences increase in frequency as the severity of
 these costs ($c_1$) increases. 
 
@@ -587,6 +590,11 @@ more tightly.
 
 
 ```{r Figure_6, fig.cap="Relative cost of ignoring adjustment costs when they are present ('ignoring', red) vs assuming the adjustment costs when they are absent ('assuming', blue), shown by penalty function over increasing magnitudes of cost.  All values are relative to the cost-free adjustment optimum, NPV0.  In each case, it is less costly to assume adjustment costs are present when they are not than it is to ignore them when they are present. The severity of the latter mistake increases sharply as adjustment costs make a larger fraction of the total costs."}
+
+who <- c("penalty_fn", "ignore_fraction", "assume_fraction", "reduction")
+table1 <- arrange(error_df[who], reduction) 
+names(table1) = c("penalty.fn", "ignoring", "assuming", "reduction")
+
 table1_long <- melt(table1, id = c('penalty.fn', 'reduction'))
 table1_long$reduction <- as.factor(table1_long$reduction)
 ggplot(table1_long, aes(penalty.fn, value, fill = variable)) + 
@@ -770,9 +778,6 @@ caption = "Table 1: Column 'ignoring' shows the results of ignoring a adjustment
 ```
 
 ```{r Table1, results="asis"}
-who <- c("penalty_fn", "ignore_fraction", "assume_fraction", "reduction")
-table1 <- arrange(error_df[who], reduction) 
-names(table1) = c("penalty.fn", "ignoring", "assuming", "reduction")
 pandoc.table(table1, caption=caption)
 ```
 

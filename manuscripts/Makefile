@@ -1,16 +1,11 @@
 all:
-	make install
-	make render
-
-
-install: components/install.R
-	Rscript components/install.R
+	make manuscript.pdf
 
 components/cache: components/restore-cache.R
 	Rscript components/restore-cache.R
 
 # combines knitr & pandoc calls
-render:
+manuscript.pdf: manuscript.Rmd
 	Rscript -e 'rmarkdown::render("manuscript.Rmd")'
 
 
