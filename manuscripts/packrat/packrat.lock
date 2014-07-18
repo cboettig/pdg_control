@@ -11,10 +11,10 @@ Package: cboettigR
 Source: github
 Version: 0.0-1
 Requires: ggplot2
-GitHubRepo: cboettigR
-GitHubUsername: cboettig
-GitHubRef: master
-GitHubSha1: b8f79f44e793354bba4b9275bce341e60a4ff5c1
+GithubRepo: cboettigR
+GithubUsername: cboettig
+GithubRef: master
+GithubSha1: b8f79f44e793354bba4b9275bce341e60a4ff5c1
 
 Package: cluster
 Source: CRAN
@@ -68,10 +68,10 @@ Package: ggplot2
 Source: github
 Version: 0.9.3.1.99
 Requires: plyr, digest, gtable, reshape2, scales, proto, MASS
-GitHubRepo: ggplot2
-GitHubUsername: hadley
-GitHubRef: master
-GitHubSha1: c383670265cd89f8a1bce3709e0b861a781c3f80
+GithubRepo: ggplot2
+GithubUsername: hadley
+GithubRef: master
+GithubSha1: c383670265cd89f8a1bce3709e0b861a781c3f80
 
 Package: ggthemes
 Source: CRAN
@@ -150,10 +150,10 @@ Requires: colorspace
 Package: packrat
 Source: github
 Version: 0.2.0.99
-GitHubRepo: packrat
-GitHubUsername: rstudio
-GitHubRef: master
-GitHubSha1: 70fa2851765f8de594e9925e6f5652fc9b636bee
+GithubRepo: packrat
+GithubUsername: rstudio
+GithubRef: master
+GithubSha1: 70fa2851765f8de594e9925e6f5652fc9b636bee
 
 Package: pander
 Source: CRAN
@@ -164,10 +164,10 @@ Package: pdgControl
 Source: github
 Version: 0.0-2
 Requires: Hmisc, cubature, expm, ggplot2, snowfall
-GitHubRepo: pdg_control
-GitHubUsername: cboettig
-GitHubRef: master
-GitHubSha1: 16b2b153a5d9769f854ea8bf09a6c69013dfdb2b
+GithubRepo: pdg_control
+GithubUsername: cboettig
+GithubRef: master
+GithubSha1: 16b2b153a5d9769f854ea8bf09a6c69013dfdb2b
 
 Package: plyr
 Source: CRAN
@@ -195,19 +195,19 @@ Package: reshape2
 Source: github
 Version: 1.4.0.99
 Requires: plyr, stringr, Rcpp
-GitHubRepo: reshape
-GitHubUsername: hadley
-GitHubRef: master
-GitHubSha1: bac94816ffc21ac52458e974de3307f1f3b753d7
+GithubRepo: reshape
+GithubUsername: hadley
+GithubRef: master
+GithubSha1: bac94816ffc21ac52458e974de3307f1f3b753d7
 
 Package: rmarkdown
 Source: github
 Version: 0.2.41
 Requires: knitr, yaml, htmltools
-GitHubRepo: rmarkdown
-GitHubUsername: rstudio
-GitHubRef: master
-GitHubSha1: 1e43f495c95d3a653b0262d95cd85f7370399076
+GithubRepo: rmarkdown
+GithubUsername: rstudio
+GithubRef: master
+GithubSha1: 1e43f495c95d3a653b0262d95cd85f7370399076
 
 Package: scales
 Source: CRAN
