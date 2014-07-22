@@ -160,6 +160,12 @@ thereby maintaining the optimal escapement level. However, in that
 analysis, Reed did not account for any costs of policy adjustment, which
 for such a responsive management strategy potentially could be large.
 
+
+```{r Figure_1, fig.cap="Quota on Blue Fin Tuna Catch "}
+tuna <- read.csv("components/data/tuna.csv")
+ggplot(tuna, aes(year, quota)) + geom_point()
+```
+
 As the example in Figure 1 makes clear, management policies will rarely be
 as responsive as this constant escapement policy assumes. In this paper,
 we explore conditions under which this lack of responsiveness may be a
@@ -491,9 +497,11 @@ costs (Eqn. 3) or when optimizing against $\Pi_2$ or $\Pi_3$.
 
 ```{r}
 fraction_no_shift <- function(x){
- nonzeros <- which(x > 0)
- x <- x[nonzeros]
- sum(x[2:length(x)] - x[1:length(x)-1] == 0)/length(x)
+
+noshift <- x[2:length(x)] - x[1:length(x)-1] == 0
+strictly_positive <- (x > 0.01 )[-1] # drop first point, 
+who <- noshift & strictly_positive # True whenever consecutive pairs did not shift and the second in the pair was nonzero harvest
+ sum(who)/length(who)
 }
 
 shifts <- dt[, fraction_no_shift(harvest), by=c("penalty_fn", "replicate")]
@@ -720,32 +728,101 @@ TO COME PENDING WHAT THE RESULTS SHOW.
 <!-- Pasted from external word doc, see Boettiger_Discussion_draft.docx for latest version of discussion -->
 
 
-Policy-makers managing ecological systems that vary in space and time must evaluate how much of that variation to reflect in management recommendations in order to achieve a desirable management outcome. Fine-tuning a policy to respond to frequent variations in ecological dynamics may incur increased transaction costs associated with constantly revisiting past policy decisions. A more pragmatic approach might be one that balances benefits from responding to frequent variations in ecological conditions with the increased transactions costs involved. As a first step towards exploring these ideas, we revisited a classic problem from bioeconomics concerning the optimal management of a fish stock subject to stochastically varying recruitment (Reed, Clark). We examined how optimal policy recommendations, here annual catch quotas, changed when accounting for costs associated with policy adjustment and what the implications of following these policy recommendations would be for the exploited population. We also compared how the value of the fishery is affected by managers either under- or over-estimating the importance of policy adjustment costs of this type.
 
-Estimating policy adjustment costs and how they respond to the size of proposed policy changes would be empirically challenging. Recognizing this fact, in our analyses, we compared different plausible forms that these costs might take. We compared two cost structures where we assumed the magnitude of policy adjustment costs increased with the magnitude of the change in policy being proposed with an alternative formulation in which we assumed there was a fixed cost associated with making any change to current policy. While each formulation clearly provides only a very phenomenological representation of the policy setting environment, we believe that each enables us to explore meaningful differences in how policy adjustment costs might operate. That being said, in the real-world we might expect the different types of adjustment cost to operate in combination. Interestingly, there are analogues between how we have represented different types of policy adjustment costs in our models and regularization techniques (e.g. ridge or lasso regression approaches) that are sometimes in model fitting to address concerns about over-specifying models (REFERENCES).
 
-The biggest differences between the different representations of policy adjustment cost that we consider are between those that have a smoothing effect on annual quotas and those that do not. The few past studies that incorporate policy adjustment costs in models of fisheries management (e.g. Ludwig, Feichtinger, Wirl) assumed costs of policy adjustment increased as a quadratic function of the magnitude of the policy change being proposed (our $\Pi_2$ formulation in Eqn.) In effect, this means that small changes to annual quotas incur little extra cost, but large changes to annual quotas become disproportionately expensive to make. Including costs of this form smoothes inter-annual variation in the catch quotas that would be recommended. However, as catches become less variable through time, the variability in the fish population itself increases. In essence, the optimal policy no longer soaks up as much of the natural variability in recruitment that is affecting the population. Also, the catches and remaining stock sizes corresponding to optimal management become more autocorrelated in time, because it takes the fishery longer to fish down peaks in abundance that follow large recruitment pulses. The effects of smoothing here are similar to those predicted when assuming the cost per unit effort is increasing in the amount of effort expended, as is common in many fisheries bioeconomics models (references). Note this assumption is different from associating extra costs with changes to policy per se (see Supporting Information for the relevant results). Moreover, smoothing effects of this type are what one would have expected when including policy adjustment costs. 
+Policy-makers managing ecological systems that vary in space and time must evaluate how much of that variation to reflect in management recommendations. Fine-tuning a policy to respond to frequent variations in ecological dynamics may incur increased transaction costs associated with constantly revisiting past policy decisions. A more pragmatic approach would be one that balances benefits from responding to frequent variations in ecological conditions with the increased transaction costs involved. As a first step towards exploring these ideas, we revisited a classic problem from bioeconomics concerning the optimal management of a fish stock subject to stochastically varying recruitment (Reed 1979, Clark 2010). We examined how optimal policy recommendations, here annual catch quotas, changed when accounting for costs associated with policy adjustment and what the implications of following these policy recommendations would be for the exploited population. We also compared how the value of the fishery is affected by managers either under- or over-estimating the importance of policy adjustment costs of this type.
 
-Therefore, standing in sharp contrast to these smoothing predictions is our finding that including policy adjustment costs can actually increase the variability of quotas through time if there is a fixed cost associated with making any changes to current policy (e.g. costs of running relevant stakeholder meetings and public consultations on proposed policy changes, $\Pi_3$). With this formulation, as stock sizes vary in response to recruitment, the fishery manager must balance the cost of brokering a policy change with the cost in forgone fisheries revenue from not responding to favorable recruitment pulses. The optimal policy involves ignoring small variations in recruitment, but then assigns a larger quota when particularly strong recruitment years arise than would have been the case in the absence of policy adjustment costs. The other functional form we consider, in which the costs of policy adjustment scale linearly with the size of the adjustment ($Pi_1$), has less obvious effects on optimal policies. But interestingly, it is the only formulation for which we observed positive unchanging quotas of the type most commonly encountered in real-world applications.
+Estimating policy adjustment costs and how they respond to the size of proposed policy changes would be empirically challenging. Recognizing this fact, in our analyses, we compared different plausible forms that these costs might take. We compared two cost structures where we assumed the magnitude of policy adjustment costs increased with the magnitude of the change in policy being proposed with an alternative formulation in which we assumed there was a fixed cost associated with making any change to current policy. While each formulation clearly provides only a very phenomenological representation of the policy setting environment, we believe that each enables us to explore meaningful differences in how policy adjustment costs might operate. That being said, in the real-world we might expect the different types of adjustment cost to operate in combination. Interestingly, there are analogues between how we have represented different types of policy adjustment costs in our models and regularization techniques that are sometimes used in model fitting to address concerns about over-specifying models (e.g. ridge or lasso regression (James et al., 2013) or total variation denoising approaches (Rudin et al. 1992)).
 
-That the different representations of policy adjustment costs result in such different dynamics suggests that researchers constructing fisheries economics models should proceed cautiously when choosing how to represent these costs. However, in our own experience, we have found that while modeling studies sometimes mention policy adjustment costs when motivating model assumptions (references), they rarely provide much justification for the choice of functional form used or test the sensitivity of any conclusions drawn to alternative specifications. That we found such clear differences between the functional forms is perhaps also surprising, because one might anticipate that the limiting case of increasing policy adjustment costs within each functional form should be the same, namely a constant annual quota that does not change through time (open-loop control). 
+<!-- NOTE 
+
+Have wondered about cutting this, but does broaden things out a bit from just econ referencing and context. 
+
+Also more people will have heard about ridge and lasso, but I actually think they’re not as relevant as the total variation suggestion, because it applies to the gradient whereas they do not. So really a more accurate statement is that the difference between lasso and ridge and the total variation approach is in some ways analogous to the difference between costs on h or E and costs on dh/dt or dE/dt. But that’s way too many words now
+
+Carl B – when it comes to references, you may have others you would prefer here 
+
+-->
+
+
+The biggest differences between the representations of policy adjustment cost that we consider are between those that have a smoothing effect on annual quotas and those that do not. The few past studies that incorporate policy adjustment costs in models of fisheries management (e.g. Ludwig 1980, Feichtinger et al. 1994, Wirl 1999) assumed costs of policy adjustment increased as a quadratic function of the magnitude of the policy change being proposed (our $\Pi_2$ formulation in Eqn.) In effect, this means that small changes to annual quotas incur little extra cost, but large changes to annual quotas become disproportionately expensive to make. Including costs of this form smoothes inter-annual variation in the catch quotas that would be recommended. However, as catches become less variable through time, the variability in the fish population itself increases. In essence, the optimal policy no longer soaks up as much of the natural variability in recruitment that is affecting the population. Also, the catches and remaining stock sizes corresponding to optimal management become more autocorrelated in time, because it takes the fishery longer to harvest down peaks in abundance that follow large recruitment pulses. The effects of smoothing here are similar to those predicted when assuming the cost per unit effort is increasing in the amount of effort expended (e.g., Lewis 1981, McGough et al. 2009; see Supporting Information for a summary of the relevant results) as opposed to associating extra costs with changes to policy {\em per se}. Smoothing effects of this type are what one mightd have expected when including policy adjustment costs. 
+
+Standing in sharp contrast to these smoothing predictions is our finding that including policy adjustment costs can actually increase the variability of quotas through time if there is a fixed cost associated with making any changes to current policy (e.g. costs of running relevant stakeholder meetings and public consultations on proposed policy changes, $\Pi_3$). With this formulation, as stock sizes vary in response to recruitment, the fishery manager must balance the cost of brokering a policy change with the cost in forgone fisheries revenue from not responding to favorable recruitment pulses. The optimal policy involves ignoring small variations in recruitment, but then assigns a larger quota when particularly strong recruitment years arise than would have been the case in the absence of policy adjustment costs. The other functional form we consider, in which the costs of policy adjustment scale linearly with the size of the adjustment ($Pi_1$), has less obvious effects on optimal policies. But interestingly, it is the only formulation for which we observed positive unchanging quotas of the type most commonly encountered in real-world applications.
+
+
+<!-- NOTE These paragraphs will need revamping if the new results on mismatch are going in. -->
+
+That the different representations of policy adjustment costs result in such different dynamics suggests that researchers constructing fisheries economics models should proceed cautiously when choosing how to represent these costs. However, in our own experience, we have found that while modeling studies sometimes mention policy adjustment costs when motivating model assumptions (references), they rarely provide much justification for the choice of functional form used or test the sensitivity of any conclusions drawn to alternative specifications. Indeed, we were surprised to find such clear differences between the functional forms, because we anticipated that the limiting case of increasing policy adjustment costs within each functional form should be the same, namely a constant annual quota that does not change through time (open-loop control). 
 
 We also compared the efficiency costs that would result from failing to account for policy adjustment cost if they are present with those involved in assuming them when in fact they are absent. The results of this comparison were not sensitive to the particular form of policy adjustment costs assumed. Instead, we always found the efficiency costs of ignoring policy adjustment costs when they were present to be much larger than the efficiency costs of assuming policy adjustment costs applied when they were in fact absent. Policy adjustment costs affect the overall value of the fishery in two ways here. First, there is the direct cost associated with each quota change. Second there is a cost in foregone revenue from missed catches when not following what would be the optimal policy if quotas were free to track recruitment variability. Our finding that it is more costly to ignore policy adjustment costs when they are present arises because the first, more direct, cost contribution here is larger than the second.
 
-As with any modeling analysis, our formulation makes many assumptions. For example, we assume that the fishery in question is being optimally managed by a policy-maker who acts as the 'sole owner' of the stock. This approach is different to models that assume fisheries are not well-managed, e.g. by assuming open access conditions (references), or ones that derive policy recommendations endogenously by modeling interactions between different stakeholders (game theory references). As such, we anticipate that our approach will be more relevant to some fisheries, particularly domestic fisheries in developed countries that are subject to relatively strong regulatory regimes, than to others (e.g., artisanal fisheries that are subject to weaker regulation). A second important assumption we made is that the fishery manager observes the current stock size correctly when setting the annual quota (see Clark and Kirkwood, Williams + more for alternative specifications). However, stock assessments struggle to predict current cohort sizes based as they are on observing past catch history (Ralston et al). We might anticipate that when uncertainty regarding reported recruitment pulses is included, we see the tendency for an optimizing manager to moderate their policy responses to initial reports of particularly good recruitment years increase yet further.
+As with any modeling analysis, our formulation makes many assumptions. For example, we assume that the fishery in question is being optimally managed by a policy-maker who acts as the 'sole owner' of the stock. This approach is different to models that assume fisheries are not well-managed, e.g. by assuming open access conditions (references), 
 
-One obvious research avenue suggested by our models is that of empirically estimating costs of policy adjustment. A direct estimation approach could quantify some sources of policy adjustment costs, e.g. costs to processing plants that arise from having more variable catches. However, other more intangible sources of policy adjustment costs, e.g. preferences of policy-makers or different stakeholders for less variable quotas, might be missed. An alternative, more holistic, approach would be to apply revealed preference methods to fisheries management agencies themselves, in the tradition of McFadden (1975, 1976). Such an analysis would involve comparing quotas that were set relative to stock sizes as they were estimated at the time each management decision was taken to try to infer what objective managers were maximizing. Some stocks are assessed and some quotas revisited more frequently than others, which provides relevant patterns of variation in policy environments that econometric analyses of this type could try to exploit.
-
-A worthwhile modeling extension suggested by our results would be to examine the implications of policy adjustment costs for risks of stock collapse. Examining risks of stock collapse is not possible with the Reed model-formulation that we followed here. But using an alternative approach also would be worthwhile in light of our finding that the variance and autocorrelation in stock sizes through time can be affected when accounting for costs of policy adjustment. Both are properties known in other modeling settings to be associated with changes to the risk of extinction or of transitions between alternative stable states. In such an analysis, it would be interesting to explore more complicated patterns of environmental variability than we have here (e.g., colored environmental noise). Another obvious extension would be to combine the different functional forms that we consider rather than studying them in isolation as we have here. Finally, a third would be to consider how policy adjustment costs affect approach paths to the long-run management outcomes, which provide the focus for this study.
-
-Conclusions
-===========
-
-Lessons for modelers - ignoring reality of policy costs leads to less effective management (decreased value)
-
-Lesons for policy makers - decreasing adjustment costs not only saves direct costs but permits higher value solutions.
+<!-- NOTE Would be good to give an open access model in a fluctuating environment here. From Andersen and Sutinen’s review (Mar Res Econ 1, 117-136) it looks like one basal citation is Andersen 1981 The exploitation of fish resources under stock uncertainty. But it is a “staff paper”. Our library don’t hold it. Has anyone else got it?-->
 
 
+or ones that derive policy recommendations endogenously by modeling interactions between different stakeholders (Kaitala 1993, Laukkanen 2003). As such, we anticipate that our approach will be more relevant to some fisheries, particularly domestic fisheries in developed countries that are subject to relatively strong regulatory regimes, than to others (e.g., artisanal fisheries that are subject to weaker regulation). To focus on the effects of policy adjustment costs, we focused narrowly on the basic model specification of Reed (1979) and examined how the predictions of this classic problem were changed by introducing policy adjustment costs of different forms.
+However, there have been many elaborations on Reed’s basic approach that increase the realism of the optimization models involved by relaxing other assumptions (see for example Sethi et al. 2005; Singh et al. 2006; McGough et al. 2009). For example, in following Reed’s approach closely another important assumption we made is that the fishery manager observes the current stock size correctly when setting the annual quota (see Clark and Kirkwood 1986, Williams 2001 for alternative specifications). However, predictions of current cohort sizes from stock assessments are subject to uncertainty (Ralston et al. 2011). Were uncertainty regarding reported recruitment pulses also included, an optimizing manager might moderate their policy responses to initial reports of particularly good recruitment years increase yet further.
+<!-- NOTE Might be worth saying something like this upfront in the Methods to head off the obvious referee comment from the obvious referees.-->
+
+One obvious research avenue suggested by our models is that of empirically estimating costs of policy adjustment. A direct estimation approach could quantify some sources of policy adjustment costs, e.g. costs to processing plants that arise from having more variable catches. However, other more intangible sources of policy adjustment costs, e.g. preferences of policy-makers or different stakeholders for less variable quotas, might be missed. An alternative, more holistic, approach would be to apply revealed preference methods to fisheries management agencies themselves, in the tradition of McFadden (1975, 1976). Such an analysis would involve comparing quotas that were set relative to stock sizes as they were estimated at the time each management decision was taken to try to infer what objective managers were maximizing.
+
+A worthwhile modeling extension suggested by our results would be to examine the implications of policy adjustment costs for risks of stock collapse. Examining risks of stock collapse is not possible with the Reed model-formulation that we followed here but would be worthwhile in light of our finding that the variance and autocorrelation in stock sizes through time can be affected when accounting for costs of policy adjustment. Both are properties known in other modeling settings to be associated with changes to the risk of extinction or of transitions between alternative stable states (references). 
+
+<!--NOTE: Carl – pick your faves and I suggest you highlight things you’ve written! -->
+
+<!-- 
+In such an analysis, it would be interesting to explore more complicated patterns of environmental variability than we have here (e.g., colored environmental noise). Another obvious extension would be to combine the different functional forms that we consider rather than studying them in isolation as we have here. Finally, a third would be to consider how policy adjustment costs affect approach paths to the long-run management outcomes, which provide the focus for this study.
+-->
+
+
+<!-- Too many extensions being suggested now -->
+
+When facing highly variable ecological systems, how often should natural resource managers respond? A highly interventionist strategy would track ecosystem variation very closely. Alternatively, a manager might choose only to take action or change policy only when conditions look very different to those previously experienced. We took a modeling approach to begin to explore these ideas. Specifically, we focused on a well-known problem from fisheries management and examined how optimal management recommendations changed when we accounted for costs associated with frequently changing management decisions. While we focused on a fisheries context, our findings would be relevant to many other settings where natural resource managers revisit management decisions through time in light of ecological variability, including game management, management of instream flow rates, fire management, habitat restoration, and managing for endangered species. In some ways, the analyses that we present can also be thought of as providing a temporal counter-part to discussions about the optimal spatial scale over which ecosystem management should be conducted.
+
+<!--Paul writes:
+I can provide some references on this paragraph. But would suggest that I wait and let you and others overhaul it first. I am not sure it really adds much of value, but it does give us a dismount. Moreover,  I’m trying to help you hit your desire to broaden out beyond a fisheries context. The key barometer is we should be able to point at a suitable sdp application which we could have used just as easily as the fisheries management context. I think we can probably do that for the list provided here.
+-->
+
+Additional references
+
+Clark, C.W. 2010. Mathematical Bioeconomics: The Mathematics of Conservation. 3rd edition. Wiley, Hoboken, NJ.
+
+Clark, C.W., Kirkwood, G.P. 1986. On uncertain renewable resource stocks: optimal harvest policies and the value of stock surveys. J. Environmental Economics and Manage. 13:235-244.
+
+James, G., Witten, D., Hastie, T., Tibshirani, R. 2013. An Introduction to Statistical Learning with Applications in R. Springer, New York.
+
+Kaitala V. 1993. Equilibria in a stochastic resource management game under imperfect information. European Journal of Operational Research 71, 439-453.
+
+Laukkanen, M. 2003. Cooperative and non-cooperative harvesting in a stochastic sequential fishery. J Environmental Economics and Management 45, 454-473.
+
+Lewis, T.R. 1981. Exploitation of a renewable resource under uncertainty. Canadian Journal of Economics 14, 422-439.
+
+McFadden, D. 1975. The revealed preference of a government bureaucracy: theory. Bell Journal of economics 6, 401-416.
+
+McFadden D. 1976. The revealed preference of a government bureaucracy: empirical evidence. Bell Journal of Economics 7, 55-72.
+
+McGough, B., Plantinga, A.J., Costello, C. 2009. Optimally managing a stochastic renewable resource under general economic conditions. B.E. Journal of Economic Analysis & Policy 9, Iss 1, Article 56.
+
+
+Ralston S., Punt, A.E., Hamel, O.S., DeVore, J.D., Conser, R.J. 2011. A meta-analytic approach to quantifying scientific uncertainty in stock assessments. Fish. Bull. 109: 217-231.
+[NOTE WE CAN CITE STEVE’S PAPER FOR THIS POINT + I LIKE THE PAPER. BUT THE POINT IS PRETTY BEING CLAIMED IS PRETTY ELEMENTARY AND IT’S POSSIBLE WE COULD CITE A STOCK ASSESSMENT TEXTBOOK INSTEAD.]
+
+Rudin, L.I., Osher, S., Fatemi, E. 1992. Nonlinear total variation based noise removal algorithms. Physica D 60, 259-268.
+
+Williams, B.K. 2001. Uncertainty, learning and the optimal management of wildlife> Environmental and Ecological Statistics 8, 269-288.
+
+
+
+ALSO REFERENCE TO ADD TO METHODS SECTION
+
+When introducing fixed fee – conceptual analogues to the set-up cost of Reef (1974) and Spulber (1982) but here the fee is associated with a change in harvesting ($h_t\neq h_{t-1}$) and not with harvesting {\em per se} ($h_t>0$) as in those studies.
+
+Reed, W.J. 1974. A stochastic model for the economic management of a renewable animal resource. Mathematical Biosciences 22, 313-337.
+
+Spulber, D.F. 1982. Adaptive harvesting of a renewable resource and stable equilibrium. In: Essays in the Economics of Renewable Resources. L.J. Mirman and D.F. Spulber (eds.) North-Holland Publishing, Amsterdam. pp. 117-139.
+
+ 
 Supplementary material
 ======================
 
