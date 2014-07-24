@@ -123,7 +123,7 @@ policy prescription to reflect environmental variation more closely
 should be traded off against potential costs associated with the more
 interventionist approach to management this would require.
 
-```{r Figure_1, fig.cap="Quota on Blue Fin Tuna Catch", fig.width=4, fig.height=4}
+```{r Figure_1, fig.cap="Quota on Blue Fin Tuna Catch", fig.width=4, fig.height=4, dev=c("pdf", "svg", "png")}
 tuna <- read.csv("components/data/tuna.csv")
 ggplot(tuna, aes(year, quota)) + geom_point()
 ```
@@ -334,7 +334,7 @@ NPV with policy adjustment costs as a proportion of the maximum expected
 NPV available in the basic problem $NPV_0({\bf h_0^*})$ without policy
 adjustment costs.
 
-```{r Figure_2, fig.cap="Expected net present value by functional form of penalty. Horizontal axis shows the coefficient $c_i$ governing the magnitude of the policy cost, while vertical axis shows fraction of the maximum expected net present value dissipated by the policy cost, $\\tfrac{NPV_0 - NPV_i}{NPV_0}$.  The horizontal line indicates a value of the stock that is reduced by `r reduction * 100`% from the maximum expected value in the absence of policy adjustment costs, $NPV_0({\\bf h_0^*})$. Selecting the coefficient $c_i$ corresponding to this value in each functional form allows us to make consistent comparisons across the different functional forms of policy costs.", dependson="quadcosts", fig.width=4, fig.height=3, cache = fig.cache}
+```{r Figure_2, fig.cap="Expected net present value by functional form of penalty. Horizontal axis shows the coefficient $c_i$ governing the magnitude of the policy cost, while vertical axis shows fraction of the maximum expected net present value dissipated by the policy cost, $\\tfrac{NPV_0 - NPV_i}{NPV_0}$.  The horizontal line indicates a value of the stock that is reduced by `r reduction * 100`% from the maximum expected value in the absence of policy adjustment costs, $NPV_0({\\bf h_0^*})$. Selecting the coefficient $c_i$ corresponding to this value in each functional form allows us to make consistent comparisons across the different functional forms of policy costs.", dependson="quadcosts", fig.width=4, fig.height=3, cache = fig.cache, dev=c("pdf", "svg", "png")}
 
 relabel <- c(L1 = substitute(paste(Pi[1])),
              L2 = substitute(paste(Pi[2])),
@@ -385,7 +385,7 @@ Effect of policy adjustment costs on optimal quotas and stock sizes
 
 
 
-```{r Figure_3, dependson="tidy", fig.cap="Example realization of optimal harvesting strategy and resulting fish stock sizes under the different functional forms of adjustment costs.", fig.height=3, fig.width=5, cache = fig.cache}
+```{r Figure_3, dependson="tidy", fig.cap="Example realization of optimal harvesting strategy and resulting fish stock sizes under the different functional forms of adjustment costs.", fig.height=3, fig.width=5, cache = fig.cache, dev=c("pdf", "svg", "png")}
 
 fig3_df <- as.data.frame(subset(dt, replicate=='rep_17'))
 fig3_df <- fig3_df[c("time", "fishstock", "alternate", "harvest", "harvest_alt", "penalty_fn")]
@@ -517,7 +517,7 @@ these costs ($c_1$) increases.
 
 <!-- to include cross.correlation, drop subset call and facet_wrap by variable. But shows no pattern-->
 
-```{r Figure_4, fig.cap="Variance and autocorrelation of stock dynamics and harvest dynamics, as a function of the penalty coefficient.  Adjustment penalty is calculated as percentage of the maximum expected NPV in the basic case with no policy adjustment costs.", fig.height=8, fig.width=8, cache=fig.cache}
+```{r Figure_4, fig.cap="Variance and autocorrelation of stock dynamics and harvest dynamics, as a function of the penalty coefficient.  Adjustment penalty is calculated as percentage of the maximum expected NPV in the basic case with no policy adjustment costs.", fig.height=8, fig.width=8, cache=fig.cache, dev=c("pdf", "svg", "png")}
 ggplot(subset(figure4_df, statistic != "cross.correlation"), 
        aes(penalty_fraction, value, fill=penalty_fn, col=penalty_fn))  +
   stat_summary(fun.y = mean, 
@@ -553,7 +553,7 @@ hist_dat <- melt(rbind(Adj, Reed), id=c("penalty_fn", "replicate", "Assumption")
 ````
 
 
-```{r Figure_5, fig.cap="Distribution of profits from fishing and costs paid to adjustment.  Distributions are shown when managing a system in which the adjustment costs present are determined by the model indicated, and compared to the same costs and profits of managing the same system using a Reed model, which ignores adjustment costs, and thus tends to pay much higher fees for adjustment.  In contrast, the difference in profit after accounting for costs is only marginally less than the value derived by managing the population to optimize profits when ignoring adjustment costs (Reed model).", fig.width=6, fig.height=5, dependson="histogram-calc"}
+```{r Figure_5, fig.cap="Distribution of profits from fishing and costs paid to adjustment.  Distributions are shown when managing a system in which the adjustment costs present are determined by the model indicated, and compared to the same costs and profits of managing the same system using a Reed model, which ignores adjustment costs, and thus tends to pay much higher fees for adjustment.  In contrast, the difference in profit after accounting for costs is only marginally less than the value derived by managing the population to optimize profits when ignoring adjustment costs (Reed model).", fig.width=6, fig.height=5, dependson="histogram-calc", dev=c("pdf", "svg", "png")}
 
 assume <- levels(as.factor(hist_dat$Assumption))
 labeller <- function(variable,value){
@@ -608,7 +608,7 @@ adjustment that are incurred if managers try to track stock variations
 more tightly.
 
 
-```{r Figure_6, fig.cap="Relative cost of ignoring adjustment costs when they are present ('ignoring', red) vs assuming the adjustment costs when they are absent ('assuming', blue), shown by penalty function over increasing magnitudes of cost.  All values are relative to the cost-free adjustment optimum, NPV0.  In each case, it is less costly to assume adjustment costs are present when they are not than it is to ignore them when they are present. The severity of the latter mistake increases sharply as adjustment costs make a larger fraction of the total costs."}
+```{r Figure_6, fig.cap="Relative cost of ignoring adjustment costs when they are present ('ignoring', red) vs assuming the adjustment costs when they are absent ('assuming', blue), shown by penalty function over increasing magnitudes of cost.  All values are relative to the cost-free adjustment optimum, NPV0.  In each case, it is less costly to assume adjustment costs are present when they are not than it is to ignore them when they are present. The severity of the latter mistake increases sharply as adjustment costs make a larger fraction of the total costs.", dev=c("pdf", "svg", "png")}
 
 who <- c("penalty_fn", "ignore_fraction", "assume_fraction", "reduction")
 table1 <- arrange(error_df[who], reduction) 
@@ -694,7 +694,7 @@ have no such guarantee.) For each scenario, results are averaged over
 
 
 
-```{r Figure_7, fig.cap="Mismatches. X axis labels indicate the model used to derive the policy, followed by the model used to simulate the penalty. Blue bars show the net present value of that scenario.  Compare to red bars, which show the consequence of using a policy that ignores costs all together in the same scenario (i.e. costs as indicated by second code), rather than assuming the policy indicated by the first code in the pair.  All values are scaled to a fraction of the adjustment free net present value.  Successive panels show increasing reduction of the net present value by increasing penalty coefficients: e.g. a policy in the first panel should lose only 10% of its net present value to adjustment costs if it had the correct form of those costs."}
+```{r Figure_7, fig.cap="Mismatches. X axis labels indicate the model used to derive the policy, followed by the model used to simulate the penalty. Blue bars show the net present value of that scenario.  Compare to red bars, which show the consequence of using a policy that ignores costs all together in the same scenario (i.e. costs as indicated by second code), rather than assuming the policy indicated by the first code in the pair.  All values are scaled to a fraction of the adjustment free net present value.  Successive panels show increasing reduction of the net present value by increasing penalty coefficients: e.g. a policy in the first panel should lose only 10% of its net present value to adjustment costs if it had the correct form of those costs.", dev=c("pdf", "svg", "png")}
 who <- c("penalty_fn", "ignore_fraction", "mismatched_fraction", "reduction")
 table2 <- arrange(mismatches_df[who], reduction) 
 names(table2) = c("penalty.fn", "ignoring", "mismatched", "reduction")
@@ -958,7 +958,7 @@ Supplementary material
 
 
 
-```{r Figure_S1, dependson="tidy", fig.cap="Multiple realizations of optimal harvesting strategy and resulting fish stock sizes under the different functional forms of adjustment costs.", fig.height=10, fig.width=8, cache=fig.cache}
+```{r Figure_S1, dependson="tidy", fig.cap="Multiple realizations of optimal harvesting strategy and resulting fish stock sizes under the different functional forms of adjustment costs.", fig.height=10, fig.width=8, cache=fig.cache, dev=c("pdf", "svg", "png")}
 
 fig1s_df <- as.data.frame(subset(dt, replicate %in% paste0('rep_', 11:20)))
 fig1s_df <- fig1s_df[c("time", "fishstock", "alternate", "harvest", "harvest_alt", "penalty_fn", "replicate")]
@@ -989,7 +989,7 @@ write.csv(fig1s_df, "components/data/figure_s1.csv")
 ```
 
 
-```{r Figure_S2, dependson="tidy", fig.cap="Example realization of resulting fish stock sizes under the different functional forms of adjustment costs, corresponding to policies shown in Figure 3.  Because stock sizes are measured before harvests, the effect of the penalty on the stock size is not as pronounced.", fig.height=3, fig.width=8, cache = fig.cache}
+```{r Figure_S2, dependson="tidy", fig.cap="Example realization of resulting fish stock sizes under the different functional forms of adjustment costs, corresponding to policies shown in Figure 3.  Because stock sizes are measured before harvests, the effect of the penalty on the stock size is not as pronounced.", fig.height=3, fig.width=8, cache = fig.cache, dev=c("pdf", "svg", "png")}
 
 labeller <- function(variable,value){
     return(relabel[value])
@@ -1014,7 +1014,7 @@ pandoc.table(table1, caption=caption)
 ```
 
 
-```{r Figure_5_alt, fig.cap="**Alternate Figure 5**.  Distribution of profits from fishing and costs paid to adjustment.  Distributions are shown when managing a system in which the adjustment costs present are determined by the model indicated, and compared to the same costs and profits of managing the same system using a Reed model, which ignores adjustment costs, and thus tends to pay much higher fees for adjustment.  In contrast, the difference in profit after accounting for costs is only marginally less than the value derived by managing the population to optimize profits when ignoring adjustment costs (Reed model).", fig.width=3, fig.height=5, dependson="histogram-calc"}
+```{r Figure_5_alt, fig.cap="**Alternate Figure 5**.  Distribution of profits from fishing and costs paid to adjustment.  Distributions are shown when managing a system in which the adjustment costs present are determined by the model indicated, and compared to the same costs and profits of managing the same system using a Reed model, which ignores adjustment costs, and thus tends to pay much higher fees for adjustment.  In contrast, the difference in profit after accounting for costs is only marginally less than the value derived by managing the population to optimize profits when ignoring adjustment costs (Reed model).", fig.width=3, fig.height=5, dependson="histogram-calc", dev=c("pdf", "svg", "png")}
 
 hist_dat_alt <- melt(cbind(profits, costs = costs$V1, 
                        reed_profits = reed_profits$profits, reed_costs = reed_costs$V1),
