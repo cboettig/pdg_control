@@ -2,7 +2,9 @@
 %%% Begin My package additions %%%%%%%%%%%%%%%%%%%
 \usepackage[hyphens]{url}
 \usepackage{lineno} % add 
-%\linenumbers % turns line numbering on 
+$if(linenumbers)$
+  \linenumbers % turns line numbering on 
+$endif$
 \bibliographystyle{elsarticle-harv}
 \biboptions{sort&compress} % For natbib
 \usepackage{graphicx}
@@ -24,8 +26,6 @@
 \topmargin -0.5in
 %%%%%%%%%%%%%%%% end my additions to header
 
-
-
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 \usepackage{amssymb,amsmath}
@@ -44,7 +44,7 @@ $endif$
     \usepackage{xltxtra,xunicode}
   \fi
   \defaultfontfeatures{Mapping=tex-text,Scale=MatchLowercase}
-  \newcommand{\euro}{???}
+  \newcommand{\euro}{€}
 $if(mainfont)$
     \setmainfont{$mainfont$}
 $endif$
