@@ -1,38 +1,57 @@
 ---
 title: "Fisheries management when quotas are costly to change"
-date: "07/24/2014"
-output: ioslides_presentation
+date: "08/12/2014"
+output: 
+  ioslides_presentation:
+    self_contained: false
+    css: components/style.css
+    incremental: true
 
-author: 
-  - name: Carl Boettiger
-    affiliation: cstar
-    email: cboettig (at) gmail.com
-    footnote: Corresponding author
-  - name: Michael Bode
-    affiliation: melbourne
-  - name: James Sanchirico
-    affiliation: UCD
-  - name: Jacob LaRiviera
-    affiliation: UTK
-  - name: Alan Hastings
-    affiliation: UCD
-  - name: Paul Armsworth 
-    affiliation: UTK
+author: |
+        Carl Boettiger, Michael Bode, James Sanchirico, 
+        Jacob LaRiviera, Alan Hastings, Paul Armsworth
 
-address: 
-  - code: cstar
-    address: | 
-      Center for Stock Assessment Research,
-      110 Shaffer Rd,
-      Santa Cruz, CA 95050, USA 
-  - code: UCD
-    address: Department of Environmental Science and Policy, University of California, Davis
-  - code: melbourne
-    address: University of Melbourne, Australia 
-  - code: UTK
-    address: University of Tennessee, Knoxville
-    
+
 ---
+
+<!-- 
+Time: 30 minutes with questions
+Presenting at: 2014-12-08 15:10:00 PDT
+-->
+
+
+## Our world is changing
+
+<img src="components/images/global-change.jpg" width="500" style="margin:0px auto;display:block">
+
+<small> Overpeck+ (2011) doi: [10.1126/science.1197869](http://doi.org/10.1126/science.1197869) </small>
+
+## Our policies are not
+
+<img src="components/images/nochange.jpg" width="700">
+
+<small> Alex Wong (Getty Images) </small>
+
+
+# Why?
+
+## Postulate: policy intertia
+
+> Policies are costly to change
+
+## We're quite good at accounting for _ecological_ dynamics
+
+## Dynamic optimization - Dynamic policies
+
+<small> Reed (1979) [10.1016/0095-0696(79)90014-7](http://doi.org/10.1016/0095-0696(79)90014-7) </small>
+
+## Not so good at _policy_ dynamics
+
+- We account for ecological dynamics but not political ones
+- We're not political scientists, we don't know the equations of politics (does anyone?)
+- Instead, we can investigate the potential impact that costly adjustments have on optimal policy
+
+
 
 ```{r configure, include=FALSE, cache=FALSE}
 #source("components/install.R")
@@ -62,16 +81,15 @@ library("snowfall")
 
 theme_set(theme_tufte())
 ```
-
 ```{r analysis, include=FALSE}
 source("components/analysis.R")
 ```
 
-
-
+## Bluefin Tuna Quotas, ICCAT 
+ 
 ```{r Figure_1, fig.cap="Quota on Blue Fin Tuna Catch", dev=c("svg", "png")}
 tuna <- read.csv("components/data/tuna.csv")
-ggplot(tuna, aes(year, quota)) + geom_point()
+ggplot(tuna, aes(year, quota)) + geom_point() + theme_bw()
 ```
 
 
@@ -80,17 +98,15 @@ Fish population dynamics (state equation)
 -----------------------------------------
 
 
-$$N_{t+1} = Z_t \frac{A (N_t - h_t)}{1 + B (N_t - h_t)}, \label{eq:state_equation}$$
+$$N_{t+1} = Z_t \frac{A (N_t - h_t)}{1 + B (N_t - h_t)}$$
 
 Optimization
 ------------
 
-$$\max_{{\bf h}}\mathbf{ E} ( NPV_{0} )=\max_{{\bf h}} \sum_0^\infty \mathbf{E} \left( \displaystyle \frac{\Pi_0(N_t,h_t)}{(1+\delta)^{t+1}} \right)$$
+$$\max_{{\bf h}}\mathbf{ E} ( NPV_{0} )=\max_{{\bf h}} \sum_0^\infty \mathbf{E} \left(\frac{\Pi_0(N_t,h_t)}{(1+\delta)^{t+1}} \right)$$
 
 
 $$\Pi_0(N_t,h_t) = p h_t -  c_0 E_t $$
-
-
 
 
 
@@ -107,7 +123,7 @@ $$\Pi_{3}(N_t,h_t, h_{t-1}) = \Pi_0 - c_3 (1-\mathbf{I}(h_t, h_{t-1}))  \,,$$
 
 
 
-Choice of parameters 
+Apples to Apples 
 --------------------
 
 
@@ -117,12 +133,12 @@ relabel <- c(L1 = substitute(paste(Pi[1])),
              L2 = substitute(paste(Pi[2])),
              fixed = substitute(paste(Pi[3])))
 
-ggplot(fees, aes(c2, (npv0-value)/npv0, lty=variable)) + 
-  geom_line() + 
+ggplot(fees, aes(c2, (npv0-value)/npv0, color=variable)) + 
+  geom_line(lwd=1) + 
   geom_hline(aes(yintercept=reduction), linetype=4) + 
   xlab("Penalty coefficient") +
   ylab("Reduction in net present value") + 
-  scale_linetype_discrete(labels=relabel) 
+  scale_color_discrete(labels=relabel) 
 
 
 ```
@@ -154,7 +170,8 @@ labeller <- function(variable,value){
 ggplot(harvest_fig3, aes(time, value, col=baseline)) +
   geom_line(lwd=1) +
   facet_grid(penalty_fn~., labeller = labeller) + 
-  labs(x="time", y="stock size", title = "Example Stock & Harvest Dynamics")  
+  labs(x="time", y="stock size", title = "Example Harvest Dynamics")  +
+  scale_color_discrete(labels=c("Reed solution", "With penalty"), name="")
 ```
 
 
@@ -174,6 +191,7 @@ ggplot(subset(figure4_df, statistic != "cross.correlation"),
   coord_cartesian(xlim = c(0, .3)) + 
   facet_wrap(~ timeseries + statistic, scale="free_y") + 
   scale_color_discrete(labels=relabel, name="Penalty function") + 
+  scale_fill_discrete(labels=relabel, name="Penalty function") + 
   xlab("Penalty size (as fraction of NPV0)")
 
 write.csv(figure4_df, "components/data/figure4.csv")
@@ -220,11 +238,11 @@ write.csv(hist_dat, "components/data/figure5.csv")
 
 ## Penalty
 
-$$NPV_i( \mathbf{h_1^*} ) = \sum_{t=0}^\infty (\overbrace{ p h^*_{1,t}-c_0E^*_{1t}}^{[1]}-\overbrace{c_1 | h^*_{1,t}- h^*_{1,t-1}|}^{[2]} ) \displaystyle \frac{1}{(1+\delta)^t}$$
 
-and
+$$NPV_i( h_1^* ) = \sum_{t=0}^\infty (\overbrace{ p h^*_{1,t}-c_0E^*_{1t}}^{[1]}-\overbrace{c_1 | h^*_{1,t}- h^*_{1,t-1}|}^{[2]} )  \frac{1}{(1+\delta)^t}$$
 
-$$NPV_i( \mathbf{h_0^*} ) = \sum_{t=0}^\infty (\underbrace{ p h^*_{0,t}-c_0E^*_{0t}}_{[3]}-\underbrace{c_1 | h^*_{0,t}- h^*_{0,t-1}|}_{[4]} ) \displaystyle \frac{1}{(1+\delta)^t}$$
+
+$$NPV_i( h_0^* ) = \sum_{t=0}^\infty (\underbrace{ p h^*_{0,t}-c_0E^*_{0t}}_{[3]}-\underbrace{c_1 | h^*_{0,t}- h^*_{0,t-1}|}_{[4]} )  \frac{1}{(1+\delta)^t}$$
 
 
 ## Figure 6

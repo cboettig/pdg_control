@@ -406,7 +406,8 @@ labeller <- function(variable,value){
 ggplot(harvest_fig3, aes(time, value, col=baseline)) +
   geom_line(lwd=1) +
   facet_grid(penalty_fn~., labeller = labeller) + 
-  labs(x="time", y="stock size", title = "Example Stock & Harvest Dynamics")  
+  labs(x="time", y="stock size", title = "Example Harvest Dynamics")  +
+  scale_color_discrete(labels=c("Reed solution", "With penalty"), name="")
 
 write.csv(harvest_fig3, "components/data/figure3.csv")
 ```
@@ -528,6 +529,7 @@ ggplot(subset(figure4_df, statistic != "cross.correlation"),
   coord_cartesian(xlim = c(0, .3)) + 
   facet_wrap(~ timeseries + statistic, scale="free_y") + 
   scale_color_discrete(labels=relabel, name="Penalty function") + 
+  scale_fill_discrete(labels=relabel, name="Penalty function") +
   xlab("Penalty size (as fraction of NPV0)")
 
 write.csv(figure4_df, "components/data/figure4.csv")
