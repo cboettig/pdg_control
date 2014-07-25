@@ -32,5 +32,14 @@ restore-cache:
 deploy-cache:
 	cd components; tar -pczf pdg_controlcache.tar.gz cache; scp pdg_controlcache.tar.gz ten:~/public_html/data/
 
+deploy-presentation:
+	cp -r presentation_files ../../gh-pages/pdg_control
+	cp -r components/images ../../gh-pages/pdg_control/components
+	cp -r components/figure/presentation*.svg ../../gh-pages/pdg_control/components/figure 
+	cp components/style.css ../../gh-pages/pdg_control/components
+	cp presentation.html ../../gh-pages/pdg_control/
 
+
+
+	
 
