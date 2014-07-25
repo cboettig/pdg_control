@@ -6,7 +6,7 @@ output:
     self_contained: false
     css: components/style.css
     incremental: true
-
+transition: none
 author: |
         Carl Boettiger, Michael Bode, James Sanchirico, 
         Jacob LaRiviera, Alan Hastings, Paul Armsworth
@@ -22,7 +22,7 @@ Presenting at: 2014-12-08 15:10:00 PDT
 
 ## Our world is changing
 
-<img src="components/images/global-change.jpg" width="500" style="margin:0px auto;display:block">
+<img src="components/images/global-change.jpg" width="500">
 
 <small> Overpeck+ (2011) doi: [10.1126/science.1197869](http://doi.org/10.1126/science.1197869) </small>
 
@@ -33,23 +33,7 @@ Presenting at: 2014-12-08 15:10:00 PDT
 <small> Alex Wong (Getty Images) </small>
 
 
-# Why?
 
-## Postulate: policy intertia
-
-> Policies are costly to change
-
-## We're quite good at accounting for _ecological_ dynamics
-
-## Dynamic optimization - Dynamic policies
-
-<small> Reed (1979) [10.1016/0095-0696(79)90014-7](http://doi.org/10.1016/0095-0696(79)90014-7) </small>
-
-## Not so good at _policy_ dynamics
-
-- We account for ecological dynamics but not political ones
-- We're not political scientists, we don't know the equations of politics (does anyone?)
-- Instead, we can investigate the potential impact that costly adjustments have on optimal policy
 
 
 
@@ -79,20 +63,84 @@ library("cboettigR")
 library("ggthemes")
 library("snowfall")
 
-theme_set(theme_tufte())
+theme_set(theme_tufte(base_size=18))
 ```
 ```{r analysis, include=FALSE}
 source("components/analysis.R")
 ```
 
-## Bluefin Tuna Quotas, ICCAT 
+
+----
+
+![](components/images/tuna_cc0.jpg)
+
+<small> NOAA </small>
+
+## Bluefin Tuna Stocks vs US Quota, ICCAT 1987 - 2007
  
-```{r Figure_1, fig.cap="Quota on Blue Fin Tuna Catch", dev=c("svg", "png")}
+ 
+```{r Figure_1, fig.cap="Quota on Blue Fin Tuna Catch", dev=c("svg", "png"), cache=FALSE}
 tuna <- read.csv("components/data/tuna.csv")
-ggplot(tuna, aes(year, quota)) + geom_point() + theme_bw()
+tuna<-melt(tuna, id="year")
+ggplot(tuna, aes(year, value)) + geom_point() +
+  facet_wrap(~variable, ncol=1, scale="free_y") + 
+  ylab("Bluefin Tuna harvest (tonnes)") + theme_bw()
+
 ```
 
 
+
+## dynamic optimization, dynamic policies
+
+<img src="components/images/mangel_and_clark.jpg", width="300">
+
+----
+
+<img src="components/images/confusion0.png" width="600">
+
+----
+
+<img src="components/images/confusion1.png" width="600">
+
+----
+
+<img src="components/images/confusion_matrix.png" width="600">
+
+----
+
+<img src="components/images/numbers.png" width="600">
+
+----
+
+<img src="components/images/outcomes_numbers.png" width="600">
+
+----
+
+<img src="components/images/time_grid.png" width="600">
+
+----
+
+<img src="components/images/previous_action.png" width="600">
+
+
+<!--
+## Postulate: policy intertia
+
+> Policies are costly to change
+
+## We're quite good at accounting for _ecological_ dynamics
+
+---- 
+
+<small> Reed (1979) [10.1016/0095-0696(79)90014-7](http://doi.org/10.1016/0095-0696(79)90014-7) </small>
+
+## Not so good at _policy_ dynamics
+
+- We account for ecological dynamics but not political ones
+- We're not political scientists, we don't know the equations of politics (does anyone?)
+- Instead, we can investigate the potential impact that costly adjustments have on optimal policy
+
+-->
 
 Fish population dynamics (state equation)
 -----------------------------------------
@@ -127,7 +175,7 @@ Apples to Apples
 --------------------
 
 
-```{r Figure_2, fig.cap="",  dev=c("svg", "png")}
+```{r Figure_2, fig.cap="",  dev=c("svg", "png"), cache=FALSE}
 
 relabel <- c(L1 = substitute(paste(Pi[1])),
              L2 = substitute(paste(Pi[2])),
@@ -149,7 +197,7 @@ Effect of policy adjustment costs on optimal quotas and stock sizes
 -------------------------------------------------------------------
 
 
-```{r Figure_3, dependson="tidy", fig.cap="", dev=c("svg", "png")}
+```{r Figure_3, dependson="tidy", fig.cap="", dev=c("svg", "png"), cache=FALSE}
 
 fig3_df <- as.data.frame(subset(dt, replicate=='rep_17'))
 fig3_df <- fig3_df[c("time", "fishstock", "alternate", "harvest", "harvest_alt", "penalty_fn")]
@@ -180,7 +228,7 @@ ggplot(harvest_fig3, aes(time, value, col=baseline)) +
 ## Figure 4
 
 
-```{r Figure_4, fig.cap="", dev=c("svg", "png")}
+```{r Figure_4, fig.cap="", dev=c("svg", "png"), cache=FALSE}
 ggplot(subset(figure4_df, statistic != "cross.correlation"), 
        aes(penalty_fraction, value, fill=penalty_fn, col=penalty_fn))  +
   stat_summary(fun.y = mean, 
@@ -217,7 +265,7 @@ hist_dat <- melt(rbind(Adj, Reed), id=c("penalty_fn", "replicate", "Assumption")
 ````
 
 
-```{r Figure_5, fig.cap="",  dependson="histogram-calc", dev=c("svg", "png")}
+```{r Figure_5, fig.cap="",  dependson="histogram-calc", dev=c("svg", "png"), cache=FALSE}
 
 assume <- levels(as.factor(hist_dat$Assumption))
 labeller <- function(variable,value){
@@ -248,7 +296,7 @@ $$NPV_i( h_0^* ) = \sum_{t=0}^\infty (\underbrace{ p h^*_{0,t}-c_0E^*_{0t}}_{[3]
 ## Figure 6
 
 
-```{r Figure_6, fig.cap="", dev=c("svg", "png")}
+```{r Figure_6, fig.cap="", dev=c("svg", "png"), cache=FALSE}
 
 who <- c("penalty_fn", "ignore_fraction", "assume_fraction", "reduction")
 table1 <- arrange(error_df[who], reduction) 
@@ -268,7 +316,7 @@ ggplot(table1_long, aes(penalty.fn, value, fill = variable)) +
 ## Mismatches
 
 
-```{r Figure_7, fig.cap="", dev=c("svg", "png")}
+```{r Figure_7, fig.cap="", dev=c("svg", "png"), cache=FALSE}
 who <- c("penalty_fn", "ignore_fraction", "mismatched_fraction", "reduction")
 table2 <- arrange(mismatches_df[who], reduction) 
 names(table2) = c("penalty.fn", "ignoring", "mismatched", "reduction")
@@ -284,7 +332,7 @@ ggplot(table2_long, aes(penalty.fn, value, fill = variable)) +
                               'fixed_L1' =  substitute(paste(Pi[3],"_", Pi[1])),
                               'fixed_L2' = substitute(paste(Pi[3],"_", Pi[2])), 
                               'L2_fixed' =  substitute(paste(Pi[2],"_", Pi[3])))) + 
-  xlab("Penalty function")
+  xlab("Penalty function") + theme_tufte(base_size=14)
 ```
 
 
@@ -296,6 +344,17 @@ ggplot(table2_long, aes(penalty.fn, value, fill = variable)) +
 
 
 
+```{r bluefin_landings, dev=c("svg", "png"), eval=FALSE}
+landings <- data.table(read.csv("components/data/iccat.csv"))
+bluefin <- landings[Species == "BFT" & PartyName=="UNITED STATES" & YearC %in% 1987:2007,]
+ggplot(bluefin, aes(x=YearC,y= Qty_t)) + 
+  stat_summary(fun.y = "sum", geom="line") + 
+  xlab("Year")+ylab("Catch (tonnes)")
 
+#library("rfisheries")
+#landings <- of_landings(species="BFT")
+#landings <- landings[landings$year %in% 1982:2007,]
+#ggplot(landings, aes(year, catch)) + geom_line() + ylab("Global landings (tonnes)")
+```
 
 
