@@ -2,10 +2,16 @@
 title: "Fisheries management when quotas are costly to change"
 date: "08/12/2014"
 output: 
-  ioslides_presentation:
-    self_contained: false
-    css: components/style.css
+#  ioslides_presentation:
+#    self_contained: false
+#    css: components/style.css
+#    incremental: true
+  revealjs_presentation:
+    theme: serif
+    self_contained: true
     incremental: true
+    transition: none
+    pandoc_args: ["--css", "style.css"]
 transition: none
 author: |
         Carl Boettiger, Michael Bode, James Sanchirico, 
