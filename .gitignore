@@ -1,8 +1,10 @@
 manuscripts/components/cache
 manuscripts/components/figure
 manuscripts/packrat/lib
+manuscripts/packrat/lib-R
 manuscripts/packrat/src
 manuscripts/*.pdf
 vignettes/*.pdf
 .Rproj.user
 *.Rproj
+.Rhistory

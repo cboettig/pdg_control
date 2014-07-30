@@ -1,7 +1,45 @@
 PackratFormat: 1.4
-PackratVersion: 0.3.0.109
+PackratVersion: 0.4.0.1
 RVersion: 3.1.1
 Repos: CRAN=http://cran.rstudio.com
+
+Package: Formula
+Source: CRAN
+Version: 1.1-1
+Hash: 1e8fe2a046280e0e13b877d1d5a8fe8d
+
+Package: Hmisc
+Source: CRAN
+Version: 3.14-4
+Hash: 5f8029a6a25b12ca0cf92924d928a791
+Requires: Formula, cluster, lattice, latticeExtra, survival
+
+Package: MASS
+Source: CRAN
+Version: 7.3-33
+Hash: a39763fb1980843f13616be87e879ac9
+
+Package: Matrix
+Source: CRAN
+Version: 1.1-3
+Hash: 161543842a1cc136dc05efc88843b5cb
+Requires: lattice
+
+Package: RColorBrewer
+Source: CRAN
+Version: 1.0-5
+Hash: 6a849b729bec970204ca88b96906adbc
+
+Package: RCurl
+Source: CRAN
+Version: 1.95-4.1
+Hash: 42aee7966014fa536adf90df9d5c00cc
+Requires: bitops
+
+Package: Rcpp
+Source: CRAN
+Version: 0.11.1
+Hash: ec5f65e8bafc69ad50967a00aa1429a1
 
 Package: bitops
 Source: CRAN
@@ -43,7 +81,7 @@ Package: devtools
 Source: CRAN
 Version: 1.5
 Hash: d8c2ffc3d991d1b1a8625919b8be3f4c
-Requires: digest, evaluate, httr, memoise, RCurl, whisker
+Requires: RCurl, digest, evaluate, httr, memoise, whisker
 
 Package: dichromat
 Source: CRAN
@@ -72,16 +110,11 @@ Source: CRAN
 Version: 0.10
 Hash: 20331f0a1a9c5f31541b34ecd9aed520
 
-Package: Formula
-Source: CRAN
-Version: 1.1-1
-Hash: 1e8fe2a046280e0e13b877d1d5a8fe8d
-
 Package: ggplot2
 Source: github
 Version: 0.9.3.1.99
 Hash: c383670265cd89f8a1bce3709e0b861a781c3f80
-Requires: digest, gtable, MASS, plyr, proto, reshape2, scales
+Requires: MASS, digest, gtable, plyr, proto, reshape2, scales
 GithubRepo: ggplot2
 GithubUsername: hadley
 GithubRef: master
@@ -103,12 +136,6 @@ Source: CRAN
 Version: 0.3
 Hash: 7c85a9b7d07a75e2d8ca74f9467fee21
 
-Package: Hmisc
-Source: CRAN
-Version: 3.14-4
-Hash: 5f8029a6a25b12ca0cf92924d928a791
-Requires: cluster, Formula, lattice, latticeExtra, survival
-
 Package: htmltools
 Source: CRAN
 Version: 0.2.4
@@ -119,7 +146,7 @@ Package: httr
 Source: CRAN
 Version: 0.3
 Hash: 7f02277955c17eccad6436240597d149
-Requires: digest, RCurl, stringr
+Requires: RCurl, digest, stringr
 
 Package: knitr
 Source: CRAN
@@ -141,24 +168,13 @@ Package: latticeExtra
 Source: CRAN
 Version: 0.6-26
 Hash: 2c59a30bb9d9d4651b913b828dca2640
-Requires: lattice, RColorBrewer
+Requires: RColorBrewer, lattice
 
 Package: markdown
 Source: CRAN
 Version: 0.7
 Hash: abb6bfa9a1fc3763de292018a22b7d98
 Requires: mime
-
-Package: MASS
-Source: CRAN
-Version: 7.3-33
-Hash: a39763fb1980843f13616be87e879ac9
-
-Package: Matrix
-Source: CRAN
-Version: 1.1-3
-Hash: 161543842a1cc136dc05efc88843b5cb
-Requires: lattice
 
 Package: memoise
 Source: CRAN
@@ -179,12 +195,12 @@ Requires: colorspace
 
 Package: packrat
 Source: github
-Version: 0.3.0.109
-Hash: fc24c5628128f2acde8e989ddb6d567fc1286d07
+Version: 0.4.0.1
+Hash: 94e9a8a0cb9bdb8cfc63550f000abcc47e846e51
 GithubRepo: packrat
 GithubUsername: rstudio
 GithubRef: master
-GithubSha1: fc24c5628128f2acde8e989ddb6d567fc1286d07
+GithubSha1: 94e9a8a0cb9bdb8cfc63550f000abcc47e846e51
 
 Package: pander
 Source: CRAN
@@ -196,7 +212,7 @@ Package: pdgControl
 Source: github
 Version: 0.0-2
 Hash: 16b2b153a5d9769f854ea8bf09a6c69013dfdb2b
-Requires: cubature, expm, ggplot2, Hmisc, snowfall
+Requires: Hmisc, cubature, expm, ggplot2, snowfall
 GithubRepo: pdg_control
 GithubUsername: cboettig
 GithubRef: master
@@ -205,7 +221,7 @@ GithubSha1: 16b2b153a5d9769f854ea8bf09a6c69013dfdb2b
 Package: plyr
 Source: CRAN
 Version: 1.8.1
-Hash: f556cacc51f3bad8fec2ebc068b5015b
+Hash: be21bad411e628f810a92212e17b5be7
 Requires: Rcpp
 
 Package: proto
@@ -213,27 +229,11 @@ Source: CRAN
 Version: 0.3-10
 Hash: 668a9e87cedbdc5f56c396edf1bd2648
 
-Package: RColorBrewer
-Source: CRAN
-Version: 1.0-5
-Hash: 6a849b729bec970204ca88b96906adbc
-
-Package: Rcpp
-Source: CRAN
-Version: 0.11.1
-Hash: ec5f65e8bafc69ad50967a00aa1429a1
-
-Package: RCurl
-Source: CRAN
-Version: 1.95-4.1
-Hash: 42aee7966014fa536adf90df9d5c00cc
-Requires: bitops
-
 Package: reshape2
 Source: github
 Version: 1.4.0.99
 Hash: bac94816ffc21ac52458e974de3307f1f3b753d7
-Requires: plyr, Rcpp, stringr
+Requires: Rcpp, plyr, stringr
 GithubRepo: reshape
 GithubUsername: hadley
 GithubRef: master
@@ -253,7 +253,7 @@ Package: scales
 Source: CRAN
 Version: 0.2.4
 Hash: b8b1af97bd07818605223060386b00dd
-Requires: dichromat, labeling, munsell, plyr, RColorBrewer
+Requires: RColorBrewer, dichromat, labeling, munsell, plyr
 
 Package: snow
 Source: CRAN

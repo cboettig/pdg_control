@@ -2,21 +2,13 @@
 title: "Fisheries management when quotas are costly to change"
 date: "08/12/2014"
 output: 
-#  ioslides_presentation:
-#    self_contained: false
-#    css: components/style.css
-#    incremental: true
   revealjs_presentation:
     theme: serif
-    self_contained: true
+    self_contained: false
     incremental: true
     transition: none
-    pandoc_args: ["--css", "style.css"]
-transition: none
-author: |
-        Carl Boettiger, Michael Bode, James Sanchirico, 
-        Jacob LaRiviera, Alan Hastings, Paul Armsworth
-
+    pandoc_args: ["--css", "components/style.css"]
+author: Carl Boettiger, Michael Bode, James Sanchirico, Jacob LaRiviera, Alan Hastings, Paul Armsworth
 
 ---
 
@@ -69,7 +61,7 @@ library("cboettigR")
 library("ggthemes")
 library("snowfall")
 
-theme_set(theme_tufte(base_size=18))
+theme_set(theme_bw(base_size=18))
 ```
 ```{r analysis, include=FALSE}
 source("components/analysis.R")
@@ -78,7 +70,7 @@ source("components/analysis.R")
 
 ----
 
-![](components/images/tuna_cc0.jpg)
+![](components/images/tuna_cc0.png)
 
 <small> NOAA </small>
 
