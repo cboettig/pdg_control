@@ -205,7 +205,9 @@ Fish population dynamics (state equation)
 
 We will assume Beverton-Holt dynamics with multiplicative environmental noise
 
-$$N_{t+1} = Z_t \frac{A (N_t - h_t)}{1 + B (N_t - h_t)}, \label{eq:state_equation}$$
+\begin{equation}
+N_{t+1} = Z_t \frac{A (N_t - h_t)}{1 + B (N_t - h_t)}, \label{eq:state_equation}
+\end{equation}
 
 where $N_t$ the stock size, $h_t$ the harvested level, 
 $Z_t$ gives the stochastic shocks, which we
@@ -266,6 +268,8 @@ each reflecting different plausible functional forms that costs of
 policy adjustment could take. In each, we assume managers can adjust the
 quota set in the fishery $h_t$ in a given year and that any policy
 adjustment costs are associated with changes to this control variable.
+In each case, we assume there is no cost in initially setting the harvest
+policy at time 0.  
 
 First we assume that policy adjustment costs are directly proportional
 to the magnitude of the change in policy being proposed, such that
@@ -320,7 +324,7 @@ Choice of parameters
 
 <!--NOTE ci notation is confusing because it does not usually refer to c0 or c4 -->
 
-Each of the policy adjustment cost function is characterized in terms of
+Each policy adjustment cost function is characterized in terms of
 a cost coefficient $c_i$. However, $c_i$ takes different units for each
 functional form. Therefore, if seeking to compare the relative effect of
 each penalty function on optimal management, it is unclear what
@@ -372,7 +376,7 @@ simplify presentation of the results, we will illustrate cases where the
 growth parameters are chosen so that the intrinsic rate of increase of
 the fish population is 1 and the equilibrium biomass for the equivalent
 deterministic model without harvesting is 10; (specifically, $A=$ `r pars[1]` and
-$B=$ `r pars[2]` in Eqn. (1)). To characterize environmental variability, we
+$B=$ `r pars[2]` in Eqn \eqref{eq:state_equation}. To characterize environmental variability, we
 assume multiplicative shock $Z_t$ is distributed log-normally with 
 log standard deviation $\sigma_g$ = `r sigma_g`. In addition, we
 show cases where $p=$ `r price`, $\delta=$ `r delta` and $c_0=$ `r c0`.
@@ -487,7 +491,7 @@ write.csv(stats_df, "components/data/figure4.csv")
 
 
 
-For example, when small policy adjustment costs cost little but large
+For example, when small policy adjustments cost little but large
 adjustments are expensive ($\Pi_2$), we see the smoothing signal that we
 might have expected (see also @Ludwig1980 for this particular case). As
 cost penalties increase in severity (i.e., $c_i$ increases), the
@@ -507,7 +511,7 @@ through time. This is the opposite of a smoothing effect. Follow-on
 consequences for the other statistics are not as clear in this case.
 
 Finally, the case where policy adjustment costs scale linearly with the
-size of the adjustment ($\Pi_1$ in Eqn. 4) appear to be something of a
+size of the adjustment ($\Pi_1$) appear to be something of a
 middle of the road strategy, in that increasing the severity of policy
 adjustment costs (increasing $c_i$ has little effect on the variance or
 autocorrelation of optimal harvest rates or stock sizes. To reveal the
@@ -516,7 +520,7 @@ more targeted summary statistic. Specifically, for each run we
 calculated the frequency with which the optimal policy involved
 maintaining a positive quota across multiple time steps unaltered. This
 type of policy is arguably the most commonly observed behavior in TAC
-management, but is one that is almost never observed to be part of the
+management, but is one that is very rarely observed to be part of the
 optimal management strategy in the basic model without policy adjustment
 costs (Eqn. 3) or when optimizing against $\Pi_2$ or $\Pi_3$. 
 
@@ -603,9 +607,10 @@ and
 $$NPV_i( \mathbf{h_0^*} ) = \sum_{t=0}^\infty (\underbrace{ p h^*_{0,t}-c_0E^*_{0t}}_{[3]}-\underbrace{c_1 | h^*_{0,t}- h^*_{0,t-1}|}_{[4]} ) \displaystyle \frac{1}{(1+\delta)^t}$$
 
 Histograms for the different contributions labelled $[1]-[4]$ here when
-taken across 100 replicate runs are shown are shown in Figure 5.
-<!--(contribution $[1]$ red, $[2]$ green, $[3]$ blue, and $[4]$ mauve).--> The
-cost of assuming policy adjustments are present when in fact they are
+taken across 100 replicate runs are shown in Figure 5. Observe that the red
+distributions (dockside profits) are relatively unchanged between policies based on the adjustment-free assumption (Reed, bottom row) vs when adjustments are properly accounted for (adjustment penalty, top row), while the blue distributions (costs for adjustment) are much larger in the bottom row then
+in the top (when these costs have not been accounted for vs when they have
+been taken into account.)  The cost of assuming policy adjustments are present when in fact they are
 absent is given by subtracting the contribution to the first infinite
 sum from term $[1]$ from the contribution to the second infinite sum of
 term $[3]$. (Note that convergence properties
@@ -683,7 +688,7 @@ a policy calculated under the linear ($\Pi_1$) costs, when the reality
 involves quadratic ($\Pi_2$) costs.  Though the coefficients of the ($\Pi_2$)
 costs have been scaled such that the net effect is the same, the inferred
 policies differ.  As a result, the value is slightly more than half of
-the optimal free solution when the expected reduction should only be 10%
+the optimal free solution when the expected reduction should only be 10% (panel A)
 less than optimal free based on the $c_i$ calibration. In this case, ignoring the costs all together
 is still worse than using $\Pi_1$ costs -- the red bar is lower than the blue.
 
@@ -697,7 +702,7 @@ those that are not (i.e. all cases that assume quadratic but actually
 have linear or fixed costs).
 
 These patterns hold across the different size reductions shown (from 10%
-to 25%), though net present value becomes negative under the quadratic
+to 25%, panels a-d respectively), though net present value becomes negative under the quadratic
 form for the larger penalties as costs paid for adjustments exceed
 profits derived from harvest.  (Though optimal solutions will always
 avoid negative net present values, these scenarios in which policies are
@@ -707,7 +712,7 @@ have no such guarantee.) For each scenario, results are averaged over
 
 
 
-```{r Figure_7, fig.cap="Mismatches. X axis labels indicate the model used to derive the policy, followed by the model used to simulate the penalty. Blue bars show the net present value of that scenario.  Compare to red bars, which show the consequence of using a policy that ignores costs all together in the same scenario (i.e. costs as indicated by second code), rather than assuming the policy indicated by the first code in the pair.  All values are scaled to a fraction of the adjustment free net present value.  Successive panels show increasing reduction of the net present value by increasing penalty coefficients: e.g. a policy in the first panel would lose only 10% of its net present value to adjustment costs if it had the correct form of those costs, as determined by the choice of penalty coefficient.", dev=c("pdf", "svg", "png"), fig.width=7}
+```{r Figure_7, fig.cap="Mismatches. X axis labels indicate the model used to derive the policy, followed by the model used to simulate the penalty. Blue bars show the net present value of that scenario.  Compare to red bars, which show the consequence of using a policy that ignores costs all together in the same scenario (i.e. costs as indicated by second code), rather than assuming the policy indicated by the first code in the pair.  All values are scaled to a fraction of the adjustment free net present value.  Successive panels show increasing reduction of the net present value by increasing penalty coefficients: e.g. a policy in the first panel would lose only 10% (panel A) of its net present value to adjustment costs if it had the correct form of those costs, as determined by the choice of penalty coefficient.", dev=c("pdf", "svg", "png"), fig.width=7}
 who <- c("penalty_fn", "ignore_fraction", "mismatched_fraction", "reduction")
 table2 <- arrange(mismatches_df[who], reduction) 
 names(table2) = c("penalty.fn", "ignoring", "mismatched", "reduction")
@@ -801,15 +806,11 @@ on annual quotas and those that do not. The few past studies that
 incorporate policy adjustment costs in models of fisheries management
 [@Ludwig1980; @Feichtinger1994; @Wirl1999] assumed costs of
 policy adjustment increased as a quadratic function of the magnitude of
-the policy change being proposed (our $\Pi_2$ formulation in Eqn.) In
+the policy change being proposed (our $\Pi_2$ formulation) In
 effect, this means that small changes to annual quotas incur little
 extra cost, but large changes to annual quotas become disproportionately
 expensive to make. Including costs of this form smoothes inter-annual
-variation in the catch quotas that would be recommended. However, as
-catches become less variable through time, the variability in the fish
-population itself increases. In essence, the optimal policy no longer
-soaks up as much of the natural variability in recruitment that is
-affecting the population. Also, the catches and remaining stock sizes
+variation in the catch quotas that would be recommended. Also, the catches and remaining stock sizes
 corresponding to optimal management become more autocorrelated in time,
 because it takes the fishery longer to harvest down peaks in abundance
 that follow large recruitment pulses. The effects of smoothing here are
@@ -834,7 +835,7 @@ when particularly strong recruitment years arise than would have been
 the case in the absence of policy adjustment costs. The other functional
 form we consider, in which the costs of policy adjustment scale linearly
 with the size of the adjustment ($\Pi_1$), has less obvious effects on
-optimal policies. But interestingly, it is the only formulation that
+optimal policies. But interestingly, it is the formulation that
 most frequently produces stretches of strictly positive but unchanging
 quotas of the type most commonly encountered in real-world applications.
 
@@ -883,7 +884,7 @@ by a policy-maker who acts as the 'sole owner' of the stock. This approach
 is different to models that assume fisheries are not well-managed,
 e.g. by assuming open access conditions (references [^1]),
 or ones that derive policy recommendations endogenously by modeling
-interactions between different stakeholders [@Kaitala1993, @Laukkanen2003].
+interactions between different stakeholders [@Kaitala1993; @Laukkanen2003].
 As such, we anticipate that our approach will be more relevant to
 some fisheries, particularly domestic fisheries in developed countries
 that are subject to relatively strong regulatory regimes, than to others
