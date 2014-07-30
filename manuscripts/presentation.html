@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Fisheries management when quotas are costly to change</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="generator" content="pandoc" />
+
+
+
+  <meta name="date" content="2014-08-12" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <link rel="stylesheet" media="all" href="presentation_files/ioslides-13.5.1/fonts/fonts.css">
+
+  <link rel="stylesheet" media="all" href="presentation_files/ioslides-13.5.1/theme/css/default.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="presentation_files/ioslides-13.5.1/theme/css/phone.css">
+
+  <base target="_blank">
+
+  <script type="text/javascript">
+    var SLIDE_CONFIG = {
+      // Slide settings
+      settings: {
+                title: 'Fisheries management when quotas are costly to change',
+                        useBuilds: true,
+        usePrettify: true,
+        enableSlideAreas: true,
+        enableTouch: true,
+              },
+
+      // Author information
+      presenters: [
+            {
+        name: '<p>Carl Boettiger, Michael Bode, James Sanchirico, Jacob LaRiviera, Alan Hastings, Paul Armsworth</p>'
+      },
+            ]
+    };
+  </script>
+
+  <style type="text/css">
+
+    b, strong {
+      font-weight: bold;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    slides > slide {
+      -webkit-transition: all 0.4s ease-in-out;
+      -moz-transition: all 0.4s ease-in-out;
+      -o-transition: all 0.4s ease-in-out;
+      transition: all 0.4s ease-in-out;
+    }
+
+    .auto-fadein {
+      -webkit-transition: opacity 0.6s ease-in;
+      -webkit-transition-delay: 0.4s;
+      -moz-transition: opacity 0.6s ease-in 0.4s;
+      -o-transition: opacity 0.6s ease-in 0.4s;
+      transition: opacity 0.6s ease-in 0.4s;
+      opacity: 0;
+    }
+
+  </style>
+
+  <link rel="stylesheet" href="components/style.css" type="text/css" />
+
+
+</head>
+
+<body style="opacity: 0">
+
+<slides>
+
+  <slide class="title-slide segue nobackground">
+        <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+            <p style="margin-top: 6px; margin-left: -2px;">08/12/2014</p>
+          </hgroup>
+  </slide>
+
+<!-- 
+Time: 30 minutes with questions
+Presenting at: 2014-12-08 15:10:00 PDT
+-->
+
+
+
+<slide class=''><hgroup><h2>Our world is changing</h2></hgroup><article  id="our-world-is-changing">
+
+<p><img src="components/images/global-change.jpg" width="500"></p>
+
+<p><small> Overpeck+ (2011) doi: <a href='http://doi.org/10.1126/science.1197869' title=''>10.1126/science.1197869</a> </small></p>
+
+</article></slide><slide class=''><hgroup><h2>Our policies are not</h2></hgroup><article  id="our-policies-are-not">
+
+<p><img src="components/images/nochange.jpg" width="700"></p>
+
+<p><small> Alex Wong (Getty Images) </small></p>
+
+</article></slide><slide class=''><hgroup><h2></h2></hgroup><article >
+
+<img src='components/images/tuna_cc0.jpg' title=''/>
+
+<p><small> NOAA </small></p>
+
+</article></slide><slide class=''><hgroup><h2>Bluefin Tuna Stocks vs US Quota, ICCAT 1987 - 2007</h2></hgroup><article  id="bluefin-tuna-stocks-vs-us-quota-iccat-1987---2007">
+
+<p><img src="components/figure/presentation-Figure_1.svg" title="Quota on Blue Fin Tuna Catch" alt="Quota on Blue Fin Tuna Catch" width="720" /></p>
+
+</article></slide><slide class=''><hgroup><h2>dynamic optimization, dynamic policies</h2></hgroup><article  id="dynamic-optimization-dynamic-policies">
+
+<p><img src="components/images/mangel_and_clark.jpg", width="300"></p>
+
+</article></slide><slide class=''><hgroup><h2></h2></hgroup><article >
+
+<p><img src="components/images/confusion0.png" width="600"></p>
+
+</article></slide><slide class=''><hgroup><h2></h2></hgroup><article >
+
+<p><img src="components/images/confusion1.png" width="600"></p>
+
+</article></slide><slide class=''><hgroup><h2></h2></hgroup><article >
+
+<p><img src="components/images/confusion_matrix.png" width="600"></p>
+
+</article></slide><slide class=''><hgroup><h2></h2></hgroup><article >
+
+<p><img src="components/images/numbers.png" width="600"></p>
+
+</article></slide><slide class=''><hgroup><h2></h2></hgroup><article >
+
+<p><img src="components/images/outcomes_numbers.png" width="600"></p>
+
+</article></slide><slide class=''><hgroup><h2></h2></hgroup><article >
+
+<p><img src="components/images/time_grid.png" width="600"></p>
+
+</article></slide><slide class=''><hgroup><h2></h2></hgroup><article >
+
+<p><img src="components/images/previous_action.png" width="600"></p>
+
+<!--
+## Postulate: policy intertia
+
+> Policies are costly to change
+
+## We're quite good at accounting for _ecological_ dynamics
+
+---- 
+
+<small> Reed (1979) [10.1016/0095-0696(79)90014-7](http://doi.org/10.1016/0095-0696(79)90014-7) </small>
+
+## Not so good at _policy_ dynamics
+
+- We account for ecological dynamics but not political ones
+- We're not political scientists, we don't know the equations of politics (does anyone?)
+- Instead, we can investigate the potential impact that costly adjustments have on optimal policy
+
+-->
+
+
+</article></slide><slide class=''><hgroup><h2>Fish population dynamics (state equation)</h2></hgroup><article  id="fish-population-dynamics-state-equation">
+
+<p>\[N_{t+1} = Z_t \frac{A (N_t - h_t)}{1 + B (N_t - h_t)}\]</p>
+
+</article></slide><slide class=''><hgroup><h2>Optimization</h2></hgroup><article  id="optimization">
+
+<p>\[\max_{{\bf h}}\mathbf{ E} ( NPV_{0} )=\max_{{\bf h}} \sum_0^\infty \mathbf{E} \left(\frac{\Pi_0(N_t,h_t)}{(1+\delta)^{t+1}} \right)\]</p>
+
+<p>\[\Pi_0(N_t,h_t) = p h_t -  c_0 E_t \]</p>
+
+</article></slide><slide class=''><hgroup><h2>Costs of policy adjustment</h2></hgroup><article  id="costs-of-policy-adjustment">
+
+<p>We replace \(\Pi_0\) in the \(NPV_0\) equation with</p>
+
+<p>\[\Pi_{1}(N_t,h_t, h_{t-1}) = \Pi_0 - c_1  |  h_t - h_{t-1} | \,.\]</p>
+
+<p>\[\Pi_{2}(N_t,h_t, h_{t-1}) = \Pi_0 - c_2 (  h_t - h_{t-1})^2 \,.\]</p>
+
+<p>\[\Pi_{3}(N_t,h_t, h_{t-1}) = \Pi_0 - c_3 (1-\mathbf{I}(h_t, h_{t-1}))  \,,\]</p>
+
+</article></slide><slide class=''><hgroup><h2>Apples to Apples</h2></hgroup><article  id="apples-to-apples">
+
+<p><img src="components/figure/presentation-Figure_2.svg" title="" alt="" width="720" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Effect of policy adjustment costs on optimal quotas and stock sizes</h2></hgroup><article  id="effect-of-policy-adjustment-costs-on-optimal-quotas-and-stock-sizes">
+
+<p><img src="components/figure/presentation-Figure_3.svg" title="" alt="" width="720" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Figure 4</h2></hgroup><article  id="figure-4">
+
+<p><img src="components/figure/presentation-Figure_4.svg" title="" alt="" width="720" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Consequences of policy adjustment costs</h2></hgroup><article  id="consequences-of-policy-adjustment-costs">
+
+<p><img src="components/figure/presentation-Figure_5.svg" title="" alt="" width="720" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Penalty</h2></hgroup><article  id="penalty">
+
+<p>\[NPV_i( h_1^* ) = \sum_{t=0}^\infty (\overbrace{ p h^*_{1,t}-c_0E^*_{1t}}^{[1]}-\overbrace{c_1 | h^*_{1,t}- h^*_{1,t-1}|}^{[2]} )  \frac{1}{(1+\delta)^t}\]</p>
+
+<p>\[NPV_i( h_0^* ) = \sum_{t=0}^\infty (\underbrace{ p h^*_{0,t}-c_0E^*_{0t}}_{[3]}-\underbrace{c_1 | h^*_{0,t}- h^*_{0,t-1}|}_{[4]} )  \frac{1}{(1+\delta)^t}\]</p>
+
+</article></slide><slide class=''><hgroup><h2>Figure 6</h2></hgroup><article  id="figure-6">
+
+<p><img src="components/figure/presentation-Figure_6.svg" title="" alt="" width="720" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Mismatches</h2></hgroup><article  id="mismatches">
+
+<p><img src="components/figure/presentation-Figure_7.svg" title="" alt="" width="720" /></p></article></slide>
+
+
+  <slide class="backdrop"></slide>
+
+</slides>
+
+<script src="presentation_files/ioslides-13.5.1/js/modernizr.custom.45394.js"></script>
+<script src="presentation_files/ioslides-13.5.1/js/prettify/prettify.js"></script>
+<script src="presentation_files/ioslides-13.5.1/js/prettify/lang-r.js"></script>
+<script src="presentation_files/ioslides-13.5.1/js/prettify/lang-yaml.js"></script>
+<script src="presentation_files/ioslides-13.5.1/js/hammer.js"></script>
+<script src="presentation_files/ioslides-13.5.1/js/slide-controller.js"></script>
+<script src="presentation_files/ioslides-13.5.1/js/slide-deck.js"></script>
+
+<!-- dynamically load mathjax for compatibility with --self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<!-- map slide visiblity events into shiny -->
+<script>
+  (function() {
+    if (window.jQuery) {
+       window.jQuery(document).on('slideleave', function(e) {
+         window.jQuery(e.target).trigger('hidden');
+      });
+       window.jQuery(document).on('slideenter', function(e) {
+         window.jQuery(e.target).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>
