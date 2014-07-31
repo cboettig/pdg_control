@@ -1,7 +1,6 @@
 ---
 title: "Fisheries management when quotas are costly to change"
 date: "08/12/2014"
-revealjs-url:  "./presentation_files/reveal.js-2.6.1"
 output: 
   revealjs_presentation:
     theme: serif
@@ -11,12 +10,12 @@ output:
     pandoc_args: ["--css", "components/style.css"]
 author: Carl Boettiger, Michael Bode, James Sanchirico, Jacob LaRiviera, Alan Hastings, Paul Armsworth
 
+notes: |
+  Time: 30 minutes with questions
+  Presenting at: 2014-12-08 15:10:00 PDT
+
 ---
 
-<!-- 
-Time: 30 minutes with questions
-Presenting at: 2014-12-08 15:10:00 PDT
--->
 
 
 ## Our world is changing
