@@ -1,7 +1,7 @@
 ---
 title: "Fisheries management when quotas are costly to change"
 date: "08/12/2014"
-revealjs-url:  "./presentation_files/revealjs-2.6.1"
+revealjs-url:  "./presentation_files/reveal.js-2.6.1"
 output: 
   revealjs_presentation:
     theme: serif
