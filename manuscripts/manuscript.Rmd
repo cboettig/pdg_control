@@ -410,7 +410,7 @@ harvest_fig3 <- subset(fig3_df, variable=="harvest")
 fishstock_fig3 <- subset(fig3_df, variable=="fish_stock")
 
 labeller <- function(variable,value){
-    return(relabel[value])
+    return(relabel[paste(value)])
 }
 
 ggplot(harvest_fig3, aes(time, value, col=baseline)) +
@@ -578,9 +578,9 @@ hist_dat <- melt(rbind(Adj, Reed), id=c("penalty_fn", "replicate", "Assumption")
 assume <- levels(as.factor(hist_dat$Assumption))
 labeller <- function(variable,value){
 if (variable=='penalty_fn') {
-    return(relabel[value])
+    return(relabel[paste(value)])
   } else {
-    return(assume[value])
+    return(assume[paste(value)])
   }
 }
 
@@ -1017,7 +1017,7 @@ write.csv(fig1s_df, "components/data/figure_s1.csv")
 ```{r Figure_S2, dependson="tidy", fig.cap="Example realization of resulting fish stock sizes under the different functional forms of adjustment costs, corresponding to policies shown in Figure 3.  Because stock sizes are measured before harvests, the effect of the penalty on the stock size is not as pronounced.", fig.height=3, fig.width=8, cache = fig.cache, dev=c("pdf", "svg", "png")}
 
 labeller <- function(variable,value){
-    return(relabel[value])
+    return(relabel[paste(value)])
 }
 
 ggplot(fishstock_fig3, aes(time, value, col=baseline)) +
