@@ -88,49 +88,12 @@ ggplot(tuna, aes(year, value)) + geom_point() +
 
 
 
-## dynamic optimization, dynamic policies
-
-<img src="components/images/mangel_and_clark.jpg", width="300">
 
 ----
 
-<img src="components/images/confusion0.png" width="600">
-
-----
-
-<img src="components/images/confusion1.png" width="600">
-
-----
-
-<img src="components/images/confusion_matrix.png" width="600">
-
-----
-
-<img src="components/images/numbers.png" width="600">
-
-----
-
-<img src="components/images/outcomes_numbers.png" width="600">
-
-----
-
-<img src="components/images/time_grid.png" width="600">
-
-----
-
-<img src="components/images/previous_action.png" width="600">
+> ## As ecologists, we've ever focused on accounting for _ecological_ dynamics
 
 
-<!--
-## Postulate: policy intertia
-
-> Policies are costly to change
-
-## We're quite good at accounting for _ecological_ dynamics
-
----- 
-
-<small> Reed (1979) [10.1016/0095-0696(79)90014-7](http://doi.org/10.1016/0095-0696(79)90014-7) </small>
 
 ## Not so good at _policy_ dynamics
 
@@ -138,13 +101,30 @@ ggplot(tuna, aes(year, value)) + geom_point() +
 - We're not political scientists, we don't know the equations of politics (does anyone?)
 - Instead, we can investigate the potential impact that costly adjustments have on optimal policy
 
--->
+
+
+
+
+
+
+Model setup
+------------
+
+- Focus on _stochastic_ dynamics: thus a constant harvest is not optimal.  
+
+- Follow the textbook classic approach: Reed (1979) [10.1016/0095-0696(79)90014-7](http://doi.org/10.1016/0095-0696(79)90014-7)
+
+ 
+
 
 Fish population dynamics (state equation)
 -----------------------------------------
 
+Population grows under a Beverton-Holt stock-recruitment curve, 
 
 $$N_{t+1} = Z_t \frac{A (N_t - h_t)}{1 + B (N_t - h_t)}$$
+
+- subject to multiplicitive log-normal growth shocks $Z_t$
 
 Optimization
 ------------
@@ -188,6 +168,41 @@ ggplot(fees, aes(c2, (npv0-value)/npv0, color=variable)) +
 
 
 ```
+
+
+
+
+## dynamic optimization, dynamic policies
+
+<img src="components/images/mangel_and_clark.jpg", width="300">
+
+----
+
+<img src="components/images/confusion0.png" width="600">
+
+----
+
+<img src="components/images/confusion1.png" width="600">
+
+----
+
+<img src="components/images/confusion_matrix.png" width="600">
+
+----
+
+<img src="components/images/numbers.png" width="600">
+
+----
+
+<img src="components/images/outcomes_numbers.png" width="600">
+
+----
+
+<img src="components/images/time_grid.png" width="600">
+
+----
+
+<img src="components/images/previous_action.png" width="600">
 
 
 
