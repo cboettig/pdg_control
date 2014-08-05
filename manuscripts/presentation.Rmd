@@ -60,15 +60,43 @@ library("pander")
 library("cboettigR")
 library("ggthemes")
 library("snowfall")
+library("tidyr")
+library("dplyr")
+transparent = theme(
+    panel.background = element_rect(fill = "transparent",colour = NA), 
+    plot.background = element_rect(fill = "transparent",colour = NA))
 
-theme_set(theme_bw(base_size=18))
+theme_set(theme_bw(base_size=18) + transparent)
 ```
+
 ```{r analysis, include=FALSE}
 source("components/analysis.R")
 ```
 
 
 ----
+
+
+## Natural populations fluctuate...
+
+```{r ex_fish, fig.cap="", dev=c("svg", "png"), dev.args=list(bg="transparent")}
+ex <- filter(dt, replicate=="rep_17" & penalty_fn == "L1" & time < 20)
+ggplot(ex) + 
+  geom_line(aes(time, fishstock), col="darkblue", lwd=1)
+```
+
+
+
+## So then, do our optimal policies
+
+```{r ex_harvest, fig.cap="", dev=c("svg", "png"), dependson="ex_fish", dev.args=list(bg="transparent")}
+ggplot(ex) + 
+  geom_line(aes(time, harvest_alt), col="darkgreen", lwd=1) +
+  ylab("Optimal quota policy") 
+```
+
+
+## Real policies: not so much
 
 ![](components/images/tuna_cc0.png)
 
@@ -77,12 +105,12 @@ source("components/analysis.R")
 ## Bluefin Tuna Stocks vs US Quota, ICCAT 1987 - 2007
  
  
-```{r Figure_1, fig.cap="Quota on Blue Fin Tuna Catch", dev=c("svg", "png"), cache=FALSE}
+```{r Figure_1, fig.cap="Quota on Blue Fin Tuna Catch", dev=c("svg", "png"), cache=FALSE, dev.args=list(bg="transparent")}
 tuna <- read.csv("components/data/tuna.csv")
 tuna<-melt(tuna, id="year")
 ggplot(tuna, aes(year, value)) + geom_point() +
   facet_wrap(~variable, ncol=1, scale="free_y") + 
-  ylab("Bluefin Tuna harvest (tonnes)") + theme_bw()
+  ylab("Bluefin Tuna (tonnes)") + theme_bw()
 
 ```
 
@@ -97,8 +125,8 @@ ggplot(tuna, aes(year, value)) + geom_point() +
 
 ## Not so good at _policy_ dynamics
 
-- We account for ecological dynamics but not political ones
-- We're not political scientists, we don't know the equations of politics (does anyone?)
+- We account for _ecological_ dynamics but not _political_ ones
+- We don't know the equations of politics (does anyone?)
 - Instead, we can investigate the potential impact that costly adjustments have on optimal policy
 
 
@@ -112,13 +140,24 @@ Model setup
 
 - Focus on _stochastic_ dynamics: thus a constant harvest is not optimal.  
 
-- Follow the textbook classic approach: Reed (1979) [10.1016/0095-0696(79)90014-7](http://doi.org/10.1016/0095-0696(79)90014-7)
+- Follow the textbook classic approach: __Reed (1979)__ [10.1016/0095-0696(79)90014-7](http://doi.org/10.1016/0095-0696(79)90014-7)
 
- 
+```{r, fig.cap="",  dev=c("svg", "png"), cache=FALSE, dev.args=list(bg="transparent"), fig.height=3}
+ex <- dt %>% 
+  filter(replicate=="rep_17" & penalty_fn == "L1" & time < 20) %>%
+  select(time, fishstock, harvest_alt) %>%
+  gather(variable, stock, -time) 
+ggplot(ex) + 
+  geom_line(aes(time, stock, col=variable), lwd=1) + 
+  scale_color_discrete(labels=c(fishstock = "Stock size", harvest_alt = "Harvest policy"), name="") 
+
+```
 
 
-Fish population dynamics (state equation)
------------------------------------------
+Fish population dynamics 
+--------------------------
+
+### (state equation)
 
 Population grows under a Beverton-Holt stock-recruitment curve, 
 
@@ -129,31 +168,63 @@ $$N_{t+1} = Z_t \frac{A (N_t - h_t)}{1 + B (N_t - h_t)}$$
 Optimization
 ------------
 
+Select harvest policy that maximizes the Net Present Value (NPV) of the stock:
+
 $$\max_{{\bf h}}\mathbf{ E} ( NPV_{0} )=\max_{{\bf h}} \sum_0^\infty \mathbf{E} \left(\frac{\Pi_0(N_t,h_t)}{(1+\delta)^{t+1}} \right)$$
 
 
-$$\Pi_0(N_t,h_t) = p h_t -  c_0 E_t $$
+- Profits from harvesting depend on price and costs $\Pi_0(N_t,h_t) = p h_t -  c_0 E_t(N_t, h_t) $
+- Harvest quota $h_t$ in year $t$
+- Stock size $N_t$, measured before harvest
+- discount rate $\delta$
+
+### Costs of policy adjustment 
+
+- We replace $\Pi_0$ in the $NPV_0$ equation with...
+
+"Linear costs"
+-------------
+
+$$\Pi_{1}(N_t,h_t, h_{t-1}) = \Pi_0 - c_1  |  h_t - h_{t-1} | $$
+
+- All previous terms, minus: 
+- The cost to change the harvest policy (quota): proportional to the size of the change
 
 
+ "Quadratic costs"
+-----------------
 
-Costs of policy adjustment 
---------------------------
+$$\Pi_{2}(N_t,h_t, h_{t-1}) = \Pi_0 - c_2 (  h_t - h_{t-1})^2 $$
 
-We replace $\Pi_0$ in the $NPV_0$ equation with
 
-$$\Pi_{1}(N_t,h_t, h_{t-1}) = \Pi_0 - c_1  |  h_t - h_{t-1} | \,.$$
+- Small adjustments are very cheap
+- Large adjustments are very expensive
+- Closest to typical assumptions of quadratic costs on harvest/effort (but hear it is the _change_ in harvest/effort)
 
-$$\Pi_{2}(N_t,h_t, h_{t-1}) = \Pi_0 - c_2 (  h_t - h_{t-1})^2 \,.$$
 
-$$\Pi_{3}(N_t,h_t, h_{t-1}) = \Pi_0 - c_3 (1-\mathbf{I}(h_t, h_{t-1}))  \,,$$
+ "Fixed costs"
+------------
 
+
+$$\Pi_{3}(N_t,h_t, h_{t-1}) = \Pi_0 - c_3 (1-\mathbb{I}(h_t, h_{t-1}))  $$
+
+- A fixed transaction fee for any change to policy, independent of size. 
+
+<br/>
+<br/>
+<small>($\mathbb{I(x,y)}$ is indicator function, equals 1 iff $x=y$, zero otherwise.) </small>
 
 
 Apples to Apples 
---------------------
+------------------
+
+### How do we pick coefficients $c_i$ such that only the functional form and not the overall cost differ? 
 
 
-```{r Figure_2, fig.cap="",  dev=c("svg", "png"), cache=FALSE}
+Apples to Apples
+------------------
+
+```{r Figure_2, fig.cap="",  dev=c("svg", "png"), cache=FALSE, dev.args=list(bg="transparent")}
 
 relabel <- c(L1 = substitute(paste(Pi[1])),
              L2 = substitute(paste(Pi[2])),
@@ -169,10 +240,14 @@ ggplot(fees, aes(c2, (npv0-value)/npv0, color=variable)) +
 
 ```
 
+----
+
+## Problem defined. Time to compute solutions. 
 
 
+## Implementation: 
 
-## dynamic optimization, dynamic policies
+### Stochastic Dynamic Programming 
 
 <img src="components/images/mangel_and_clark.jpg", width="300">
 
@@ -209,8 +284,68 @@ ggplot(fees, aes(c2, (npv0-value)/npv0, color=variable)) +
 Effect of policy adjustment costs on optimal quotas and stock sizes 
 -------------------------------------------------------------------
 
+What would you predict for...
 
-```{r Figure_3, dependson="tidy", fig.cap="", dev=c("svg", "png"), cache=FALSE}
+- Quadratic adjustment costs?
+- Linear adjustment costs?
+- Fixed adjustment costs?
+
+
+```{r reex, fig.cap="", dev=c("svg", "png"), cache=FALSE, dev.args=list(bg="transparent"), fig.height=3}
+ggplot(ex) + 
+  geom_line(aes(time, stock, col=variable), lwd=1) + 
+  scale_color_discrete(labels=c(fishstock = "Stock size", harvest_alt = "Harvest policy"), name="") 
+```
+
+
+Quadratic Costs ($\Pi_2$)
+-------------------------
+
+```{r quadratic, fig.cap="", dev=c("svg", "png"), cache=FALSE, dev.args=list(bg="transparent")}
+ex <- dt %>% 
+  filter(replicate=="rep_17" & penalty_fn == "L2") %>%
+  select(time, harvest, harvest_alt) %>%
+  gather(variable, value, -time) 
+ggplot(ex) + 
+  geom_line(aes(time, value, col=variable), lwd=1) + 
+  ylab("harvest quota") +
+  scale_color_discrete(labels=c(harvest = "adjusted policy", harvest_alt = "baseline policy"), name="") 
+```
+
+Fixed Costs ($\Pi_3$)
+---------------------
+
+```{r fixed, fig.cap="", dev=c("svg", "png"), cache=FALSE, dev.args=list(bg="transparent")}
+ex <- dt %>% 
+  filter(replicate=="rep_17" & penalty_fn == "fixed") %>%
+  select(time, harvest, harvest_alt) %>%
+  gather(variable, value, -time) 
+ggplot(ex) + 
+  geom_line(aes(time, value, col=variable), lwd=1) + 
+  ylab("harvest quota") +
+  scale_color_discrete(labels=c(harvest = "adjusted policy", harvest_alt = "baseline policy"), name="") 
+```
+
+Linear Costs ($\Pi_1$)
+---------------------
+
+```{r linear, fig.cap="", dev=c("svg", "png"), cache=FALSE, dev.args=list(bg="transparent")}
+ex <- dt %>% 
+  filter(replicate=="rep_17" & penalty_fn == "L1") %>%
+  select(time, harvest, harvest_alt) %>%
+  gather(variable, value, -time) 
+ggplot(ex) + 
+  geom_line(aes(time, value, col=variable), lwd=1) + 
+  ylab("harvest quota") +
+  scale_color_discrete(labels=c(harvest = "adjusted policy", harvest_alt = "baseline policy"), name="") 
+```
+
+
+
+(For comparison)
+----------------
+
+```{r Figure_3, dependson="tidy", fig.cap="", dev=c("svg", "png"), cache=FALSE, dev.args=list(bg="transparent")}
 
 fig3_df <- as.data.frame(subset(dt, replicate=='rep_17'))
 fig3_df <- fig3_df[c("time", "fishstock", "alternate", "harvest", "harvest_alt", "penalty_fn")]
@@ -238,10 +373,9 @@ ggplot(harvest_fig3, aes(time, value, col=baseline)) +
 
 
 
-## Figure 4
+## General trends
 
-
-```{r Figure_4, fig.cap="", dev=c("svg", "png"), cache=FALSE}
+```{r Figure_4, fig.cap="", dev=c("svg", "png"), cache=FALSE, dev.args=list(bg="transparent")}
 ggplot(subset(figure4_df, statistic != "cross.correlation"), 
        aes(penalty_fraction, value, fill=penalty_fn, col=penalty_fn))  +
   stat_summary(fun.y = mean, 
@@ -254,11 +388,35 @@ ggplot(subset(figure4_df, statistic != "cross.correlation"),
   scale_color_discrete(labels=relabel, name="Penalty function") + 
   scale_fill_discrete(labels=relabel, name="Penalty function") + 
   xlab("Penalty size (as fraction of NPV0)")
-
-write.csv(figure4_df, "components/data/figure4.csv")
 ```
 
+- Quadratic ($\Pi_2$) smooths, Linear ($\Pi_1$) flattens, Fixed ($\Pi_3$) jumps 
 
+
+## Okay, so the policies "look" different. Does it matter?  
+
+
+## Yes 
+
+
+
+
+## Managing under the wrong assumptions
+
+
+$$NPV_i( h_1^* ) = \sum_{t=0}^\infty (\overbrace{ p h^*_{1,t}-c_0E^*_{1t}}^{[1]}-\overbrace{c_1 | h^*_{1,t}- h^*_{1,t-1}|}^{[2]} )  \frac{1}{(1+\delta)^t}$$
+
+
+$$NPV_i( h_0^* ) = \sum_{t=0}^\infty (\underbrace{ p h^*_{0,t}-c_0E^*_{0t}}_{[3]}-\underbrace{c_1 | h^*_{0,t}- h^*_{0,t-1}|}_{[4]} )  \frac{1}{(1+\delta)^t}$$
+
+<small> 
+
+1. Dockside profits when accounting for adjustment cost 
+2. (Anticipated) Fees paid for adjusting the policy
+3. Theoretical maximum dockside profits 
+4. (Unanticipated) fees for those adjustments
+
+</small>
 
 Consequences of policy adjustment costs 
 ---------------------------------------
@@ -270,22 +428,20 @@ reed_profits <- dt[, sum(profit_fishing_alt), by=c('penalty_fn', 'replicate') ]
 reed_costs <- dt[, sum(policy_cost_alt), by=c('penalty_fn', 'replicate') ]
 setnames(profits, "V1", "profits")
 setnames(reed_profits, "V1", "profits")
-
 Reed <- cbind(reed_profits, costs = reed_costs$V1, Assumption = "Reed") 
 Adj <- cbind(profits, costs = costs$V1, Assumption = "Adjustment penalty")
-
 hist_dat <- melt(rbind(Adj, Reed), id=c("penalty_fn", "replicate", "Assumption"))
 ````
 
 
-```{r Figure_5, fig.cap="",  dependson="histogram-calc", dev=c("svg", "png"), cache=FALSE}
+```{r Figure_5, fig.cap="",  dependson="histogram-calc", dev=c("svg", "png"), cache=FALSE, dev.args=list(bg="transparent")}
 
 assume <- levels(as.factor(hist_dat$Assumption))
 labeller <- function(variable,value){
 if (variable=='penalty_fn') {
     return(relabel[paste(value)])
   } else {
-    return(assume[paste(value)])
+    return(assume[value])
   }
 }
 
@@ -293,23 +449,25 @@ ggplot(hist_dat) +
   geom_density(aes(value, fill=variable, color=variable), alpha=0.8)+
   facet_grid(Assumption~penalty_fn, labeller = labeller)
 
-write.csv(hist_dat, "components/data/figure5.csv")
 ```
 
+Consequences of policy adjustment costs 
+---------------------------------------
 
-## Penalty
+What is the impact of assuming costs are present when they are not?
+
+- _Very little change to your bottom line_ (regardless of cost structure) <br/><br/>
+
+What is the impact of ignoring costs when they are present?
+
+- _Substantially higher costs_ (particularly for quadratic costs).
 
 
-$$NPV_i( h_1^* ) = \sum_{t=0}^\infty (\overbrace{ p h^*_{1,t}-c_0E^*_{1t}}^{[1]}-\overbrace{c_1 | h^*_{1,t}- h^*_{1,t-1}|}^{[2]} )  \frac{1}{(1+\delta)^t}$$
+
+## To say that another way:
 
 
-$$NPV_i( h_0^* ) = \sum_{t=0}^\infty (\underbrace{ p h^*_{0,t}-c_0E^*_{0t}}_{[3]}-\underbrace{c_1 | h^*_{0,t}- h^*_{0,t-1}|}_{[4]} )  \frac{1}{(1+\delta)^t}$$
-
-
-## Figure 6
-
-
-```{r Figure_6, fig.cap="", dev=c("svg", "png"), cache=FALSE}
+```{r Figure_6, fig.cap="", dev=c("svg", "png"), cache=FALSE, dev.args=list(bg="transparent")}
 
 who <- c("penalty_fn", "ignore_fraction", "assume_fraction", "reduction")
 table1 <- arrange(error_df[who], reduction) 
@@ -326,10 +484,16 @@ ggplot(table1_long, aes(penalty.fn, value, fill = variable)) +
   xlab("Penalty function")
 ```
 
-## Mismatches
+
+## What about managing when costs are present...
+
+###  ..but you're using the wrong model??
 
 
-```{r Figure_7, fig.cap="", dev=c("svg", "png"), cache=FALSE}
+## Mismatches are even worse:
+
+
+```{r Figure_7, fig.cap="", dev=c("svg", "png"), cache=FALSE, dev.args=list(bg="transparent")}
 who <- c("penalty_fn", "ignore_fraction", "mismatched_fraction", "reduction")
 table2 <- arrange(mismatches_df[who], reduction) 
 names(table2) = c("penalty.fn", "ignoring", "mismatched", "reduction")
@@ -345,29 +509,58 @@ ggplot(table2_long, aes(penalty.fn, value, fill = variable)) +
                               'fixed_L1' =  substitute(paste(Pi[3],"_", Pi[1])),
                               'fixed_L2' = substitute(paste(Pi[3],"_", Pi[2])), 
                               'L2_fixed' =  substitute(paste(Pi[2],"_", Pi[3])))) + 
-  xlab("Penalty function") + theme_tufte(base_size=14)
+  xlab("Penalty function as: assumed_reality") + theme_tufte(base_size=14)
+```
+
+
+## Mismatched costs are intuitive if we remember the general patterns
+
+
+- Quadratic ($\Pi_2$) smooths
+- Linear ($\Pi_1$) flattens
+- Fixed ($\Pi_3$) jumps 
+
+Predict which is worse: assuming the wrong cost or no assuming no cost at all, when:
+
+- Costs are assumed linear but in reality quadratic?
+- True costs are assumed quadratic but in reality fixed?
+
+## Mismatched costs are intuitive 
+
+```{r Figure_7again, fig.cap="", dev=c("svg", "png"), cache=FALSE, dev.args=list(bg="transparent")}
+ggplot(table2_long, aes(penalty.fn, value, fill = variable)) + 
+  geom_bar(stat="identity", position="dodge") + 
+  facet_wrap(~reduction, scales="free_y") +
+  scale_x_discrete(labels = c('L1_L2' = substitute(paste(Pi[1],"_", Pi[2])), 
+                              'L2_L1' =  substitute(paste(Pi[2],"_", Pi[1])),
+                              'L1_fixed' = substitute(paste(Pi[1],"_", Pi[3])), 
+                              'fixed_L1' =  substitute(paste(Pi[3],"_", Pi[1])),
+                              'fixed_L2' = substitute(paste(Pi[3],"_", Pi[2])), 
+                              'L2_fixed' =  substitute(paste(Pi[2],"_", Pi[3])))) + 
+  xlab("Penalty function as: assumed_reality") + theme_tufte(base_size=14)
 ```
 
 
 
+## Conclusions
 
+- Policies reflecting the best ecology may ultimately be impractical
+- Novel look at introducing costs to changes in policy
+- Details matter: some adjustment costs make policy less smooth, some more smooth
+- Solutions can satisfy the constraints of adjustment costs while performing nearly optimally
+- Ignoring adjustment costs can result in significant penalties
+- There are many benefits to joining a NIMBioS working group
 
+## Acknowledgements
 
+<img src="components/images/nsf.jpg" width="100" height="100"><img src="components/images/noaa.jpg" width="100" height="100"><img src="components/images/sloan.jpg" width="100" height="100">  <br/>
 
+<img src="components/images/nimbios.jpg" width="150" height="75"> 
+<img src="components/images/csgf.png" width="150" height="75"> <br/>
 
+<!-- Paid the bills and folks that have supported or otherwise
+tolerated this and so many other side projects -->
 
-
-```{r bluefin_landings, dev=c("svg", "png"), eval=FALSE}
-landings <- data.table(read.csv("components/data/iccat.csv"))
-bluefin <- landings[Species == "BFT" & PartyName=="UNITED STATES" & YearC %in% 1987:2007,]
-ggplot(bluefin, aes(x=YearC,y= Qty_t)) + 
-  stat_summary(fun.y = "sum", geom="line") + 
-  xlab("Year")+ylab("Catch (tonnes)")
-
-#library("rfisheries")
-#landings <- of_landings(species="BFT")
-#landings <- landings[landings$year %in% 1982:2007,]
-#ggplot(landings, aes(year, catch)) + geom_line() + ylab("Global landings (tonnes)")
-```
+<small>Slides, data, references, code and more at: http://io.carlboettiger.info/pdg_control</small>
 
 

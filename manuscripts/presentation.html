@@ -88,8 +88,16 @@
 <p><img src="components/images/nochange.jpg" width="700"></p>
 <p><small> Alex Wong (Getty Images) </small></p>
 </section>
-<section class="slide level2">
-
+<section id="natural-populations-fluctuate" class="slide level2">
+<h1>Natural populations fluctuate…</h1>
+<p><img src="components/figure/presentation-ex_fish.svg" title="" alt="" width="768" /></p>
+</section>
+<section id="so-then-do-our-optimal-policies" class="slide level2">
+<h1>So then, do our optimal policies</h1>
+<p><img src="components/figure/presentation-ex_harvest.svg" title="" alt="" width="768" /></p>
+</section>
+<section id="real-policies-not-so-much" class="slide level2">
+<h1>Real policies: not so much</h1>
 <p><img src="components/images/tuna_cc0.png" /></p>
 <p><small> NOAA </small></p>
 </section>
@@ -97,8 +105,91 @@
 <h1>Bluefin Tuna Stocks vs US Quota, ICCAT 1987 - 2007</h1>
 <p><img src="components/figure/presentation-Figure_1.svg" title="Quota on Blue Fin Tuna Catch" alt="Quota on Blue Fin Tuna Catch" width="768" /></p>
 </section>
-<section id="dynamic-optimization-dynamic-policies" class="slide level2">
-<h1>dynamic optimization, dynamic policies</h1>
+<section class="slide level2">
+
+<blockquote>
+<h2>As ecologists, we’ve ever focused on accounting for <em>ecological</em> dynamics</h2>
+</blockquote>
+</section>
+<section id="not-so-good-at-policy-dynamics" class="slide level2">
+<h1>Not so good at <em>policy</em> dynamics</h1>
+<ul>
+<li class="fragment">We account for <em>ecological</em> dynamics but not <em>political</em> ones</li>
+<li class="fragment">We don’t know the equations of politics (does anyone?)</li>
+<li class="fragment">Instead, we can investigate the potential impact that costly adjustments have on optimal policy</li>
+</ul>
+</section>
+<section id="model-setup" class="slide level2">
+<h1>Model setup</h1>
+<ul>
+<li class="fragment"><p>Focus on <em>stochastic</em> dynamics: thus a constant harvest is not optimal.</p></li>
+<li class="fragment"><p>Follow the textbook classic approach: <strong>Reed (1979)</strong> <a href="http://doi.org/10.1016/0095-0696(79)90014-7">10.1016/0095-0696(79)90014-7</a></p></li>
+</ul>
+<p><img src="components/figure/presentation-unnamed-chunk-1.svg" title="" alt="" width="768" /></p>
+</section>
+<section id="fish-population-dynamics" class="slide level2">
+<h1>Fish population dynamics</h1>
+<h3 id="state-equation">(state equation)</h3>
+<p>Population grows under a Beverton-Holt stock-recruitment curve,</p>
+<p><span class="math">\[N_{t+1} = Z_t \frac{A (N_t - h_t)}{1 + B (N_t - h_t)}\]</span></p>
+<ul>
+<li class="fragment">subject to multiplicitive log-normal growth shocks <span class="math">\(Z_t\)</span></li>
+</ul>
+</section>
+<section id="optimization" class="slide level2">
+<h1>Optimization</h1>
+<p>Select harvest policy that maximizes the Net Present Value (NPV) of the stock:</p>
+<p><span class="math">\[\max_{{\bf h}}\mathbf{ E} ( NPV_{0} )=\max_{{\bf h}} \sum_0^\infty \mathbf{E} \left(\frac{\Pi_0(N_t,h_t)}{(1+\delta)^{t+1}} \right)\]</span></p>
+<ul>
+<li class="fragment">Profits from harvesting depend on price and costs <span class="math">\(\Pi_0(N_t,h_t) = p h_t -  c_0 E_t(N_t, h_t) \)</span></li>
+<li class="fragment">Harvest quota <span class="math">\(h_t\)</span> in year <span class="math">\(t\)</span></li>
+<li class="fragment">Stock size <span class="math">\(N_t\)</span>, measured before harvest</li>
+<li class="fragment">discount rate <span class="math">\(\delta\)</span></li>
+</ul>
+<h3 id="costs-of-policy-adjustment">Costs of policy adjustment</h3>
+<ul>
+<li class="fragment">We replace <span class="math">\(\Pi_0\)</span> in the <span class="math">\(NPV_0\)</span> equation with…</li>
+</ul>
+</section>
+<section id="linear-costs" class="slide level2">
+<h1>“Linear costs”</h1>
+<p><span class="math">\[\Pi_{1}(N_t,h_t, h_{t-1}) = \Pi_0 - c_1  |  h_t - h_{t-1} | \]</span></p>
+<ul>
+<li class="fragment">All previous terms, minus:</li>
+<li class="fragment">The cost to change the harvest policy (quota): proportional to the size of the change</li>
+</ul>
+</section>
+<section id="quadratic-costs" class="slide level2">
+<h1>“Quadratic costs”</h1>
+<p><span class="math">\[\Pi_{2}(N_t,h_t, h_{t-1}) = \Pi_0 - c_2 (  h_t - h_{t-1})^2 \]</span></p>
+<ul>
+<li class="fragment">Small adjustments are very cheap</li>
+<li class="fragment">Large adjustments are very expensive</li>
+<li class="fragment">Closest to typical assumptions of quadratic costs on harvest/effort (but hear it is the <em>change</em> in harvest/effort)</li>
+</ul>
+</section>
+<section id="fixed-costs" class="slide level2">
+<h1>“Fixed costs”</h1>
+<p><span class="math">\[\Pi_{3}(N_t,h_t, h_{t-1}) = \Pi_0 - c_3 (1-\mathbb{I}(h_t, h_{t-1}))  \]</span></p>
+<ul>
+<li class="fragment">A fixed transaction fee for any change to policy, independent of size.</li>
+</ul>
+<p><br/> <br/> <small>(<span class="math">\(\mathbb{I(x,y)}\)</span> is indicator function, equals 1 iff <span class="math">\(x=y\)</span>, zero otherwise.) </small></p>
+</section>
+<section id="apples-to-apples" class="slide level2">
+<h1>Apples to Apples</h1>
+<h3 id="how-do-we-pick-coefficients-c_i-such-that-only-the-functional-form-and-not-the-overall-cost-differ">How do we pick coefficients <span class="math">\(c_i\)</span> such that only the functional form and not the overall cost differ?</h3>
+</section>
+<section id="apples-to-apples-1" class="slide level2">
+<h1>Apples to Apples</h1>
+<p><img src="components/figure/presentation-Figure_2.svg" title="" alt="" width="768" /></p>
+</section>
+<section id="problem-defined.-time-to-compute-solutions." class="slide level2">
+<h1>Problem defined. Time to compute solutions.</h1>
+</section>
+<section id="implementation" class="slide level2">
+<h1>Implementation:</h1>
+<h3 id="stochastic-dynamic-programming">Stochastic Dynamic Programming</h3>
 <p><img src="components/images/mangel_and_clark.jpg", width="300"></p>
 </section>
 <section class="slide level2">
@@ -128,70 +219,124 @@
 <section class="slide level2">
 
 <p><img src="components/images/previous_action.png" width="600"></p>
-<!--
-## Postulate: policy intertia
-
-> Policies are costly to change
-
-## We're quite good at accounting for _ecological_ dynamics
-
----- 
-
-<small> Reed (1979) [10.1016/0095-0696(79)90014-7](http://doi.org/10.1016/0095-0696(79)90014-7) </small>
-
-## Not so good at _policy_ dynamics
-
-- We account for ecological dynamics but not political ones
-- We're not political scientists, we don't know the equations of politics (does anyone?)
-- Instead, we can investigate the potential impact that costly adjustments have on optimal policy
-
--->
-
-</section>
-<section id="fish-population-dynamics-state-equation" class="slide level2">
-<h1>Fish population dynamics (state equation)</h1>
-<p><span class="math">\[N_{t+1} = Z_t \frac{A (N_t - h_t)}{1 + B (N_t - h_t)}\]</span></p>
-</section>
-<section id="optimization" class="slide level2">
-<h1>Optimization</h1>
-<p><span class="math">\[\max_{{\bf h}}\mathbf{ E} ( NPV_{0} )=\max_{{\bf h}} \sum_0^\infty \mathbf{E} \left(\frac{\Pi_0(N_t,h_t)}{(1+\delta)^{t+1}} \right)\]</span></p>
-<p><span class="math">\[\Pi_0(N_t,h_t) = p h_t -  c_0 E_t \]</span></p>
-</section>
-<section id="costs-of-policy-adjustment" class="slide level2">
-<h1>Costs of policy adjustment</h1>
-<p>We replace <span class="math">\(\Pi_0\)</span> in the <span class="math">\(NPV_0\)</span> equation with</p>
-<p><span class="math">\[\Pi_{1}(N_t,h_t, h_{t-1}) = \Pi_0 - c_1  |  h_t - h_{t-1} | \,.\]</span></p>
-<p><span class="math">\[\Pi_{2}(N_t,h_t, h_{t-1}) = \Pi_0 - c_2 (  h_t - h_{t-1})^2 \,.\]</span></p>
-<p><span class="math">\[\Pi_{3}(N_t,h_t, h_{t-1}) = \Pi_0 - c_3 (1-\mathbf{I}(h_t, h_{t-1}))  \,,\]</span></p>
-</section>
-<section id="apples-to-apples" class="slide level2">
-<h1>Apples to Apples</h1>
-<p><img src="components/figure/presentation-Figure_2.svg" title="" alt="" width="768" /></p>
 </section>
 <section id="effect-of-policy-adjustment-costs-on-optimal-quotas-and-stock-sizes" class="slide level2">
 <h1>Effect of policy adjustment costs on optimal quotas and stock sizes</h1>
+<p>What would you predict for…</p>
+<ul>
+<li class="fragment">Quadratic adjustment costs?</li>
+<li class="fragment">Linear adjustment costs?</li>
+<li class="fragment">Fixed adjustment costs?</li>
+</ul>
+<p><img src="components/figure/presentation-reex.svg" title="" alt="" width="768" /></p>
+</section>
+<section id="quadratic-costs-pi_2" class="slide level2">
+<h1>Quadratic Costs (<span class="math">\(\Pi_2\)</span>)</h1>
+<p><img src="components/figure/presentation-quadratic.svg" title="" alt="" width="768" /></p>
+</section>
+<section id="fixed-costs-pi_3" class="slide level2">
+<h1>Fixed Costs (<span class="math">\(\Pi_3\)</span>)</h1>
+<p><img src="components/figure/presentation-fixed.svg" title="" alt="" width="768" /></p>
+</section>
+<section id="linear-costs-pi_1" class="slide level2">
+<h1>Linear Costs (<span class="math">\(\Pi_1\)</span>)</h1>
+<p><img src="components/figure/presentation-linear.svg" title="" alt="" width="768" /></p>
+</section>
+<section id="for-comparison" class="slide level2">
+<h1>(For comparison)</h1>
 <p><img src="components/figure/presentation-Figure_3.svg" title="" alt="" width="768" /></p>
 </section>
-<section id="figure-4" class="slide level2">
-<h1>Figure 4</h1>
+<section id="general-trends" class="slide level2">
+<h1>General trends</h1>
 <p><img src="components/figure/presentation-Figure_4.svg" title="" alt="" width="768" /></p>
+<ul>
+<li class="fragment">Quadratic (<span class="math">\(\Pi_2\)</span>) smooths, Linear (<span class="math">\(\Pi_1\)</span>) flattens, Fixed (<span class="math">\(\Pi_3\)</span>) jumps</li>
+</ul>
+</section>
+<section id="okay-so-the-policies-look-different.-does-it-matter" class="slide level2">
+<h1>Okay, so the policies “look” different. Does it matter?</h1>
+</section>
+<section id="yes" class="slide level2">
+<h1>Yes</h1>
+</section>
+<section id="managing-under-the-wrong-assumptions" class="slide level2">
+<h1>Managing under the wrong assumptions</h1>
+<p><span class="math">\[NPV_i( h_1^* ) = \sum_{t=0}^\infty (\overbrace{ p h^*_{1,t}-c_0E^*_{1t}}^{[1]}-\overbrace{c_1 | h^*_{1,t}- h^*_{1,t-1}|}^{[2]} )  \frac{1}{(1+\delta)^t}\]</span></p>
+<p><span class="math">\[NPV_i( h_0^* ) = \sum_{t=0}^\infty (\underbrace{ p h^*_{0,t}-c_0E^*_{0t}}_{[3]}-\underbrace{c_1 | h^*_{0,t}- h^*_{0,t-1}|}_{[4]} )  \frac{1}{(1+\delta)^t}\]</span></p>
+<p><small></p>
+<ul>
+<li class="fragment">Dockside profits when accounting for adjustment cost</li>
+<li class="fragment">(Anticipated) Fees paid for adjusting the policy</li>
+<li class="fragment">Theoretical maximum dockside profits</li>
+<li class="fragment">(Unanticipated) fees for those adjustments</li>
+</ul>
+<p></small></p>
 </section>
 <section id="consequences-of-policy-adjustment-costs" class="slide level2">
 <h1>Consequences of policy adjustment costs</h1>
 <p><img src="components/figure/presentation-Figure_5.svg" title="" alt="" width="768" /></p>
 </section>
-<section id="penalty" class="slide level2">
-<h1>Penalty</h1>
-<p><span class="math">\[NPV_i( h_1^* ) = \sum_{t=0}^\infty (\overbrace{ p h^*_{1,t}-c_0E^*_{1t}}^{[1]}-\overbrace{c_1 | h^*_{1,t}- h^*_{1,t-1}|}^{[2]} )  \frac{1}{(1+\delta)^t}\]</span></p>
-<p><span class="math">\[NPV_i( h_0^* ) = \sum_{t=0}^\infty (\underbrace{ p h^*_{0,t}-c_0E^*_{0t}}_{[3]}-\underbrace{c_1 | h^*_{0,t}- h^*_{0,t-1}|}_{[4]} )  \frac{1}{(1+\delta)^t}\]</span></p>
+<section id="consequences-of-policy-adjustment-costs-1" class="slide level2">
+<h1>Consequences of policy adjustment costs</h1>
+<p>What is the impact of assuming costs are present when they are not?</p>
+<ul>
+<li class="fragment"><em>Very little change to your bottom line</em> (regardless of cost structure) <br/><br/></li>
+</ul>
+<p>What is the impact of ignoring costs when they are present?</p>
+<ul>
+<li class="fragment"><em>Substantially higher costs</em> (particularly for quadratic costs).</li>
+</ul>
 </section>
-<section id="figure-6" class="slide level2">
-<h1>Figure 6</h1>
+<section id="to-say-that-another-way" class="slide level2">
+<h1>To say that another way:</h1>
 <p><img src="components/figure/presentation-Figure_6.svg" title="" alt="" width="768" /></p>
 </section>
-<section id="mismatches" class="slide level2">
-<h1>Mismatches</h1>
+<section id="what-about-managing-when-costs-are-present" class="slide level2">
+<h1>What about managing when costs are present…</h1>
+</section>
+<section id="but-youre-using-the-wrong-model" class="slide level2">
+<h1>..but you’re using the wrong model??</h1>
+</section>
+<section id="mismatches-are-even-worse" class="slide level2">
+<h1>Mismatches are even worse:</h1>
 <p><img src="components/figure/presentation-Figure_7.svg" title="" alt="" width="768" /></p>
+</section>
+<section id="mismatched-costs-are-intuitive-if-we-remember-the-general-patterns" class="slide level2">
+<h1>Mismatched costs are intuitive if we remember the general patterns</h1>
+<ul>
+<li class="fragment">Quadratic (<span class="math">\(\Pi_2\)</span>) smooths</li>
+<li class="fragment">Linear (<span class="math">\(\Pi_1\)</span>) flattens</li>
+<li class="fragment">Fixed (<span class="math">\(\Pi_3\)</span>) jumps</li>
+</ul>
+<p>Predict which is worse: assuming the wrong cost or no assuming no cost at all, when:</p>
+<ul>
+<li class="fragment">Costs are assumed linear but in reality quadratic?</li>
+<li class="fragment">True costs are assumed quadratic but in reality fixed?</li>
+</ul>
+</section>
+<section id="mismatched-costs-are-intuitive" class="slide level2">
+<h1>Mismatched costs are intuitive</h1>
+<p><img src="components/figure/presentation-Figure_7again.svg" title="" alt="" width="768" /></p>
+</section>
+<section id="conclusions" class="slide level2">
+<h1>Conclusions</h1>
+<ul>
+<li class="fragment">Policies reflecting the best ecology may ultimately be impractical</li>
+<li class="fragment">Novel look at introducing costs to changes in policy</li>
+<li class="fragment">Details matter: some adjustment costs make policy less smooth, some more smooth</li>
+<li class="fragment">Solutions can satisfy the constraints of adjustment costs while performing nearly optimally</li>
+<li class="fragment">Ignoring adjustment costs can result in significant penalties</li>
+<li class="fragment">There are many benefits to joining a NIMBioS working group</li>
+</ul>
+</section>
+<section id="acknowledgements" class="slide level2">
+<h1>Acknowledgements</h1>
+<p><img src="components/images/nsf.jpg" width="100" height="100"><img src="components/images/noaa.jpg" width="100" height="100"><img src="components/images/sloan.jpg" width="100" height="100"> <br/></p>
+<p><img src="components/images/nimbios.jpg" width="150" height="75"> <img src="components/images/csgf.png" width="150" height="75"> <br/></p>
+<!-- Paid the bills and folks that have supported or otherwise
+tolerated this and so many other side projects -->
+
+<p><small>Slides, data, references, code and more at: <a href="http://io.carlboettiger.info/pdg_control">http://io.carlboettiger.info/pdg_control</a></small></p>
 </section>
     </div>
   </div>
