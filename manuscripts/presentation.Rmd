@@ -4,7 +4,7 @@ date: "08/12/2014"
 output: 
   revealjs_presentation:
     theme: serif
-    self_contained: false
+    self_contained: true
     incremental: true
     transition: none
     pandoc_args: ["--css", "components/style.css"]
@@ -102,7 +102,7 @@ ggplot(ex) +
 
 <small> NOAA </small>
 
-## Bluefin Tuna Stocks vs US Quota, ICCAT 1987 - 2007
+## Bluefin Tuna Stocks vs Quota (base TAC), ICCAT 1987 - 2007
  
  
 ```{r Figure_1, fig.cap="Quota on Blue Fin Tuna Catch", dev=c("svg", "png"), cache=FALSE, dev.args=list(bg="transparent")}
@@ -114,7 +114,7 @@ ggplot(tuna, aes(year, value)) + geom_point() +
 
 ```
 
-
+<small> base TAC for the stock (before any underages or overages are applied or divided by country)</small>
 
 
 ----
