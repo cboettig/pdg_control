@@ -8,7 +8,7 @@ output:
     incremental: true
     transition: none
     pandoc_args: ["--css", "components/style.css"]
-author: Carl Boettiger, Michael Bode, James Sanchirico, Jacob LaRiviera, Alan Hastings, Paul Armsworth
+author: Carl Boettiger, Michael Bode, James Sanchirico, Jacob LaRiviere, Alan Hastings, Paul Armsworth
 
 notes: |
   Time: 30 minutes with questions
@@ -119,7 +119,7 @@ ggplot(tuna, aes(year, value)) + geom_point() +
 
 ----
 
-> ## As ecologists, we've ever focused on accounting for _ecological_ dynamics
+> ## As ecologists, we've always focused on accounting for _ecological_ dynamics
 
 
 
@@ -163,7 +163,7 @@ Population grows under a Beverton-Holt stock-recruitment curve,
 
 $$N_{t+1} = Z_t \frac{A (N_t - h_t)}{1 + B (N_t - h_t)}$$
 
-- subject to multiplicitive log-normal growth shocks $Z_t$
+- subject to multiplicative log-normal growth shocks $Z_t$
 
 Optimization
 ------------
@@ -199,7 +199,7 @@ $$\Pi_{2}(N_t,h_t, h_{t-1}) = \Pi_0 - c_2 (  h_t - h_{t-1})^2 $$
 
 - Small adjustments are very cheap
 - Large adjustments are very expensive
-- Closest to typical assumptions of quadratic costs on harvest/effort (but hear it is the _change_ in harvest/effort)
+- Closest to typical assumptions of quadratic costs on harvest/effort (but here it is the _change_ in harvest/effort)
 
 
  "Fixed costs"
@@ -208,7 +208,7 @@ $$\Pi_{2}(N_t,h_t, h_{t-1}) = \Pi_0 - c_2 (  h_t - h_{t-1})^2 $$
 
 $$\Pi_{3}(N_t,h_t, h_{t-1}) = \Pi_0 - c_3 (1-\mathbb{I}(h_t, h_{t-1}))  $$
 
-- A fixed transaction fee for any change to policy, independent of size. 
+- A fixed transaction fee for any change to policy, independent of size (or sign) of the change. 
 
 <br/>
 <br/>
@@ -219,6 +219,9 @@ Apples to Apples
 ------------------
 
 ### How do we pick coefficients $c_i$ such that only the functional form and not the overall cost differ? 
+
+- All forms will create complete resistance to change if the costs are high enough
+- But how do we compare across forms that have different units and different coefficients?
 
 
 Apples to Apples
@@ -550,6 +553,10 @@ ggplot(table2_long, aes(penalty.fn, value, fill = variable)) +
 - Solutions can satisfy the constraints of adjustment costs while performing nearly optimally
 - Ignoring adjustment costs can result in significant penalties
 - There are many benefits to joining a NIMBioS working group
+
+## A 'Pretty Darn Good' Working Group
+
+![](components/images/pdg-group.jpg)
 
 ## Acknowledgements
 
