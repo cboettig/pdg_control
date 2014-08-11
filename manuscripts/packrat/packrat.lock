@@ -18,12 +18,6 @@ Source: CRAN
 Version: 1.0-6
 Hash: cb26464a8321628636b547518994c931
 
-Package: caTools
-Source: CRAN
-Version: 1.17
-Hash: e350bf43b27772012b530ccdf2e34f4d
-Requires: bitops
-
 Package: cboettigR
 Source: github
 Version: 0.0-1
@@ -141,12 +135,6 @@ Source: CRAN
 Version: 0.2.4
 Hash: 88df1d8bc3728256408aab4d416959d1
 Requires: digest
-
-Package: httpuv
-Source: CRAN
-Version: 1.3.0
-Hash: 53a25baa1030c2ec74d0f3dbd064247c
-Requires: Rcpp
 
 Package: httr
 Source: CRAN
@@ -282,22 +270,6 @@ GithubUsername: hadley
 GithubRef: master
 GithubSha1: bac94816ffc21ac52458e974de3307f1f3b753d7
 
-Package: rfisheries
-Source: CRAN
-Version: 0.1
-Hash: 81747bd236f55f095481da256f50bf26
-Requires: assertthat, data.table, ggplot2, httr, rjson
-
-Package: rjson
-Source: CRAN
-Version: 0.2.14
-Hash: 6dfb12a8996f481bf8000d885b76db2e
-
-Package: RJSONIO
-Source: CRAN
-Version: 1.3-0
-Hash: 8b1341dfd547c90ed4b3365d5aa46a7b
-
 Package: rmarkdown
 Source: github
 Version: 0.2.53
@@ -313,12 +285,6 @@ Source: CRAN
 Version: 0.2.4
 Hash: b8b1af97bd07818605223060386b00dd
 Requires: dichromat, labeling, munsell, plyr, RColorBrewer
-
-Package: shiny
-Source: CRAN
-Version: 0.10.1
-Hash: abf0d95fb716352103ee6d35b51fffa4
-Requires: caTools, digest, htmltools, httpuv, RJSONIO, xtable
 
 Package: snow
 Source: CRAN
@@ -341,12 +307,6 @@ Source: CRAN
 Version: 2.37-7
 Hash: 09a1e94314fb616ea6f454dee9d75cdc
 
-Package: testthat
-Source: CRAN
-Version: 0.8.1
-Hash: f296283e62e2ff299efa01e26cfc3eb1
-Requires: digest
-
 Package: tidyr
 Source: CRAN
 Version: 0.1
@@ -357,11 +317,6 @@ Package: whisker
 Source: CRAN
 Version: 0.3-2
 Hash: 186ab2937fec1694c8a63009a2389c4e
-
-Package: xtable
-Source: CRAN
-Version: 1.7-3
-Hash: af110253b140f3f7199c0cac37536a2f
 
 Package: yaml
 Source: CRAN
