@@ -95,10 +95,11 @@ library("pander")
 library("cboettigR")
 library("ggthemes")
 library("snowfall")
-
+library("dplyr")
+library("tidyr")
 options(digits=2)
 
-theme_set(theme_tufte() + theme(axis.line = element_line())
+theme_set(theme_tufte() + theme(axis.line = element_line()))
 ```
 
 ```{r analysis, include=FALSE}
