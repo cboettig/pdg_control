@@ -95,6 +95,8 @@ library("pander")
 library("cboettigR")
 library("ggthemes")
 library("snowfall")
+library("tidyr")
+library("dplyr")
 
 options(digits=2)
 
@@ -252,8 +254,18 @@ to stock size and effort expended fishing that year, $h_t = q E_t N_t$ and
 constant $q>0$ is the catchability coefficient. In
 Eqn. \eqref{eq:annual_netrevenue}, $p$ is the price per unit harvest and
 $c_0$ the cost of fishing and, to simplify the presentation of results,
-we assume that these are constants with $p>0$ and $c_0>0$. (Examples
-shown here use $p$= `r price` and $c_0$ = `r c0`.  Sensitivity analysis appears
+we assume that these are constants with $p>0$ and $c_0>0$. 
+
+To simplify presentation of the results, we will illustrate cases where the
+growth parameters are chosen so that the intrinsic rate of increase of
+the fish population is 1 and the equilibrium biomass for the equivalent
+deterministic model without harvesting is 10; (specifically, $A=$ `r pars[1]` and
+$B=$ `r pars[2]` in Eqn \eqref{eq:state_equation}. To characterize environmental variability, we
+assume multiplicative shock $Z_t$ is distributed log-normally with 
+log standard deviation $\sigma_g$ = `r sigma_g`. In addition, we
+show cases where $p=$ `r price`, $\delta=$ `r delta` and $c_0=$ `r c0`.  
+
+Sensitivity analysis appears
 in the supplement, along with complete R code to replicate and further 
 vary the setup).
 
@@ -348,7 +360,12 @@ in maximum expected NPV for a given penalty function as the penalty cost
 parameter is increased. In each case, the figure shows maximum expected
 NPV with policy adjustment costs as a proportion of the maximum expected
 NPV available in the basic problem $NPV_0({\bf h_0^*})$ without policy
-adjustment costs.
+adjustment costs. The $c_i$ values are given in Table 1.  
+
+```{r table_1, results="asis"}
+pandoc.table(print_npv)
+```
+
 
 ```{r Figure_2, fig.cap="Expected net present value by functional form of penalty. Horizontal axis shows the coefficient $c_i$ governing the magnitude of the policy cost, while vertical axis shows fraction of the maximum expected net present value dissipated by the policy cost, $\\tfrac{NPV_0 - NPV_i}{NPV_0}$.  The horizontal line indicates a value of the stock that is reduced by 25% from the maximum expected value in the absence of policy adjustment costs, $NPV_0({\\bf h_0^*})$. Selecting the coefficient $c_i$ corresponding to this value in each functional form allows us to make consistent comparisons across the different functional forms of policy costs.", dependson="quadcosts", fig.width=5, fig.height=3, cache = fig.cache, dev=c("pdf", "svg", "png")}
 
@@ -375,18 +392,7 @@ the different functional forms, we select penalty cost coefficients that
 induce the same reduction in maximum expected NPV. For example, the
 dashed vertical lines in Figure 1 map the needed cost coefficient $c_i$,
 for each penalty function, such that the fishery is worth `r 100*(1-reduction)`% of its
-unconstrained value when optimally managed.
-
-We focus our examination of the models on how the type and severity of
-policy adjustment costs affects the optimal management strategy. To
-simplify presentation of the results, we will illustrate cases where the
-growth parameters are chosen so that the intrinsic rate of increase of
-the fish population is 1 and the equilibrium biomass for the equivalent
-deterministic model without harvesting is 10; (specifically, $A=$ `r pars[1]` and
-$B=$ `r pars[2]` in Eqn \eqref{eq:state_equation}. To characterize environmental variability, we
-assume multiplicative shock $Z_t$ is distributed log-normally with 
-log standard deviation $\sigma_g$ = `r sigma_g`. In addition, we
-show cases where $p=$ `r price`, $\delta=$ `r delta` and $c_0=$ `r c0`.
+unconstrained value when optimally managed. We focus our examination of the models on how the type and severity of policy adjustment costs affects the optimal management strategy.  
 
 <!-- is chosen such that the
 optimal stock size in the analogous deterministic problem is 5% larger
@@ -431,9 +437,7 @@ write.csv(harvest_fig3, "components/data/figure3.csv")
 
 
 Figure 3 illustrates how the different forms of adjustment cost can impact
-the optimal harvest policy. Corresponding stock sizes, which are measured
-here before harvest ($h_t$ being determined after observing stock size
-$x_t$) and thus show less influence of the policy cost can be seen in the
+the optimal harvest policy. Corresponding stock sizes can be seen in the
 supplement.  Each panel is generated against the same sequence of random
 shocks so that they can be compared directly.  The harvest policy chosen
 shows a systematic deviations from the penalty free optimum, depending on
@@ -998,14 +1002,17 @@ source("components/quad_costs.R")
 Calibrated in the same way.  
 
 ```{r Figure_S1, dev=c('pdf', 'svg')}
+
+labels <- c(harvest = substitute(paste("Harvest Policy under ", paste(Pi[4]))), 
+                                harvest_alt = substitute(paste("Harvest under ", paste(Pi[0]), " (Reed)")))
+
 ex <- dt_quad %>% 
   filter(replicate=="rep_17" & time < 20) %>%
   select(time, harvest, harvest_alt) %>%
   gather(variable, stock, -time) 
 ggplot(ex) + 
   geom_line(aes(time, stock, col=variable), lwd=1) + 
-  scale_color_discrete(labels=c(harvest = substitute(paste("Harvest Policy under ", paste(Pi[4]))), 
-                                harvest_alt = substitute(paste("Harvest under ", paste(Pi[0]), " (Reed)"))), 
+  scale_color_discrete(labels=labels, 
                        name="") 
 
 
@@ -1019,75 +1026,31 @@ ave <- shifts[, mean(V1)]
 Like the $\Pi_2$ adjustment cost based penalty, this quadratic cost based penalty shows periods of contant, strictly positive policy only `r ave * 100`% of the time, and exhibits the same kind of smoothing of more small adjustments that is seen in $\Pi_2$ scenario.  
 
 
-
+Recall that in our model definition, stock sizes are measured before harvest ($h_t$ being determined after observing stock size
+$x_t$) and thus show less influence of the policy cost than the harvest itself. 
 
 ```{r Figure_S2, dependson="tidy", fig.cap="Multiple realizations of optimal harvesting strategy and resulting fish stock sizes under the different functional forms of adjustment costs.", fig.height=10, fig.width=8, cache=fig.cache, dev=c("pdf", "svg", "png")}
 
-fig1s_df <- as.data.frame(subset(dt, replicate %in% paste0('rep_', 11:20)))
-fig1s_df <- fig1s_df[c("time", "fishstock", "alternate", "harvest", "harvest_alt", "penalty_fn", "replicate")]
-fig1s_df <- melt(fig1s_df, id = c("time", "penalty_fn", "replicate"))
-fig1s_df <- data.frame(fig1s_df, baseline = fig1s_df$variable)
-variable_map <- c(fishstock = "fish_stock", alternate = "fish_stock", harvest = "harvest", harvest_alt = "harvest")
-baseline_map <- c(fishstock = "penalty", alternate = "no_penalty", harvest = "penalty", harvest_alt = "no_penalty")
-fig1s_df$variable <- variable_map[fig1s_df$variable]
-fig1s_df$baseline <- baseline_map[fig1s_df$baseline]
+labels <- c(harvest = substitute(paste("Harvest Policy under ", paste(Pi[1-3]))), 
+            harvest_alt = substitute(paste("Harvest under ", paste(Pi[0]), " (Reed)")))
+            fishstock = substitute(paste("Stock dynamics under under ", paste(Pi[1-3]))), 
+            alternate = substitute(paste("Harvest under ", paste(Pi[0]), " (Reed)")
+ex <- dt %>% 
+  filter(replicate %in% paste0("rep_", 10:20) & penalty_fn == "L1" & time < 20) %>%
+  select(time, fishstock, harvest, alternate, harvest_alt) %>%
+  gather(variable, stock, -time, -replicate)
 
 
 
-fig1s_df <- subset(fig1s_df, variable=="harvest")
-labeller <- function(variable,value){
-if (variable=='penalty_fn') {
-    return(relabel[value])
-  } else {
-    return(value)
-  }
-}
-
-ggplot(fig1s_df, aes(time, value, col=baseline)) +
-  geom_line(lwd=1) +
-  facet_grid(replicate ~ penalty_fn, labeller=labeller) + 
-  labs(x="time", y="stock size", title = "Example Stock & Harvest Dynamics")  
-write.csv(fig1s_df, "components/data/figure_s1.csv")
-
-```
+ggplot(ex) + 
+  geom_line(aes(time, stock, col=variable), lwd=1) + 
+  scale_color_discrete(labels=labels, name="") +  
+  facet_wrap(~replicate) 
 
 
-```{r Figure_S3, dependson="tidy", fig.cap="Example realization of resulting fish stock sizes under the different functional forms of adjustment costs, corresponding to policies shown in Figure 3.  Because stock sizes are measured before harvests, the effect of the penalty on the stock size is not as pronounced.", fig.height=3, fig.width=8, cache = fig.cache, dev=c("pdf", "svg", "png")}
-
-labeller <- function(variable,value){
-    return(relabel[paste(value)])
-}
-
-ggplot(fishstock_fig3, aes(time, value, col=baseline)) +
-  geom_line(lwd=1) +
-  facet_grid(penalty_fn~., labeller = labeller) + 
-  labs(x="time", y="stock size", title = "Example Stock & Harvest Dynamics")  
-
-write.csv(fishstock_fig3, "components/data/figure_s2.csv")
-```
-
-
-<!-- Ingoring this, not useful-->
-```{r Table1, results="asis", eval=FALSE}
-caption = "Table 1: Column 'ignoring' shows the results of ignoring a adjustment penalty when it is present, Column 'assuming' shows the results of assuming an adjustment cost when it is absent. Values (ignoring, assuming) are given as the expected net present value (ENPV) as a fraction of that when no penalty is present, ENPV0.  Percent reduction refers to penalty coefficient being calibrated to achieve the given percent reduction relative to ENPV0 when the penalty is optimally accounted for.  Comparing the second and third columns shows that ignoring a real cost is a significantly graver error, particularly in the case of quadratic costs."
-pandoc.table(table1, caption=caption)
-```
-
-
-```{r Figure_5_alt, fig.cap="**Alternate Figure 5**.  Distribution of profits from fishing and costs paid to adjustment.  Distributions are shown when managing a system in which the adjustment costs present are determined by the model indicated, and compared to the same costs and profits of managing the same system using a Reed model, which ignores adjustment costs, and thus tends to pay much higher fees for adjustment.  In contrast, the difference in profit after accounting for costs is only marginally less than the value derived by managing the population to optimize profits when ignoring adjustment costs (Reed model).", fig.width=3, fig.height=5, dependson="histogram-calc", dev=c("pdf", "svg", "png")}
-
-hist_dat_alt <- melt(cbind(profits, costs = costs$V1, 
-                       reed_profits = reed_profits$profits, reed_costs = reed_costs$V1),
-                 id = c("penalty_fn", "replicate"))
-
-ggplot(hist_dat_alt) + 
-  geom_density(aes(value, fill=variable, color=variable), alpha=0.8)+
-  facet_grid(penalty_fn~., labeller = labeller)
-
-
+write.csv(ex, "components/data/figure_s2.csv")
 ```
 
 
 # References
-
 
