@@ -18,19 +18,6 @@ notes: |
 
 
 
-## Our world is changing
-
-<img src="components/images/global-change.jpg" width="500">
-
-<small> Overpeck+ (2011) doi: [10.1126/science.1197869](http://doi.org/10.1126/science.1197869) </small>
-
-## Our policies are not
-
-<img src="components/images/nochange.jpg" width="700">
-
-<small> Alex Wong (Getty Images) </small>
-
-
 
 
 
@@ -73,8 +60,23 @@ theme_set(theme_bw(base_size=18) + transparent)
 source("components/analysis.R")
 ```
 
+## Progress in modeling ecological complexity:
+
+- Importance of space
+- temporal heterogeneity 
+- individual heterogeneity
+- ecosystem models
+
 
 ----
+
+<blockquote class="twitter-tweet" lang="en"><p>No public policy issue is ultimately about science; it’s about stakeholders, values, economics, ideology. Goldston <a href="https://twitter.com/hashtag/ESA2014?src=hash">#ESA2014</a></p>&mdash; Liza Gross (@lizabio) <a href="https://twitter.com/lizabio/statuses/498971982998687744">August 11, 2014</a></blockquote>
+<script async src="widgets.js" charset="utf-8"></script>
+
+## Hmm... 
+
+## Can we put that in our models too? 
+
 
 
 ## Natural populations fluctuate...
@@ -145,11 +147,11 @@ Model setup
 ```{r, fig.cap="",  dev=c("svg", "png"), cache=FALSE, dev.args=list(bg="transparent"), fig.height=3}
 ex <- dt %>% 
   filter(replicate=="rep_17" & penalty_fn == "L1" & time < 20) %>%
-  select(time, fishstock, harvest_alt) %>%
+  select(time, fishstock, harvest, alternate, harvest_alt) %>%
   gather(variable, stock, -time) 
 ggplot(ex) + 
   geom_line(aes(time, stock, col=variable), lwd=1) + 
-  scale_color_discrete(labels=c(fishstock = "Stock size", harvest_alt = "Harvest policy"), name="") 
+  scale_color_discrete(labels=c(fishstock = "Stock Size", harvest = "Harvest", alternate = "Stock size (Adj)", harvest_alt = "Harvest policy (Adj)"), name="") 
 
 ```
 
@@ -569,5 +571,7 @@ ggplot(table2_long, aes(penalty.fn, value, fill = variable)) +
 tolerated this and so many other side projects -->
 
 <small>Slides, data, references, code and more at: http://io.carlboettiger.info/pdg_control</small>
+
+
 
 

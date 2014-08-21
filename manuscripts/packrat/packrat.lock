@@ -270,6 +270,17 @@ GithubUsername: hadley
 GithubRef: master
 GithubSha1: bac94816ffc21ac52458e974de3307f1f3b753d7
 
+Package: rfisheries
+Source: CRAN
+Version: 0.1
+Hash: 81747bd236f55f095481da256f50bf26
+Requires: assertthat, data.table, ggplot2, httr, rjson
+
+Package: rjson
+Source: CRAN
+Version: 0.2.14
+Hash: 6dfb12a8996f481bf8000d885b76db2e
+
 Package: rmarkdown
 Source: github
 Version: 0.2.53

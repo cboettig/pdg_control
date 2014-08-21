@@ -10,11 +10,11 @@ author:
   - name: James Sanchirico
     affiliation: UCD
   - name: Jacob LaRiviere
-    affiliation: UTK
+    affiliation: UTK_Econ
   - name: Alan Hastings
     affiliation: UCD
   - name: Paul Armsworth 
-    affiliation: UTK
+    affiliation: UTK_EEB
 
 address: 
   - code: cstar
@@ -25,9 +25,11 @@ address:
   - code: UCD
     address: Department of Environmental Science and Policy, University of California, Davis
   - code: melbourne
-    address: University of Melbourne, Australia 
-  - code: UTK
-    address: University of Tennessee, Knoxville
+    address: School of Botany, University of Melbourne, Australia 
+  - code: UTK_EEB
+    address: Department of Ecology and Evolutionary Biology, University of Tennessee, Knoxville
+  - code: UTK_Econ
+    address: Department of Economics, University of Tennessee, Knoxville
 
 abstract: |
           Ecological systems are dynamic and policies to manage them need to
@@ -48,7 +50,9 @@ abstract: |
           that the potential economic impact on the fishery of managers assuming
           policy adjustment costs are present when in fact they are absent is much
           smaller than the impact of managers assuming such costs are absent if
-          they are present.
+          they are present. Further, we demonstrate that the structural form of
+          these costs matters -- assuming one form when costs are are in fact
+          a different form can be even more costly.  
 
 layout: review,12pt
 linenumbers: true
@@ -106,7 +110,7 @@ Introduction
 
 
 Ecosystems are dynamic and exhibit rich patterns of variability in
-both time and space. In designing management policies for ecosystems,
+both time and space [@Durrett1994]. In designing management policies for ecosystems,
 managers need to decide how much of that variation to respond to. Managers
 could try to track variations in ecosystem dynamics very closely by
 setting policies that are extremely responsive to the environment. Many
@@ -125,21 +129,23 @@ policy prescription to reflect environmental variation more closely
 should be traded off against potential costs associated with the more
 interventionist approach to management this would require.
 
-```{r Figure_1, fig.cap="ICCAT Stock assessments and US Quotas for Bluefin Tuna, 1987 - 2007", fig.width=6, fig.height=4, dev=c("pdf", "svg", "png")}
+```{r Figure_1, fig.cap="ICCAT Stock assessments and Total Allowable Catch (TAC, before adjustments for national underages and overages) for Bluefin Tuna, 1987 - 2007", fig.width=6, fig.height=4, dev=c("pdf", "svg", "png")}
 tuna <- read.csv("components/data/tuna.csv")
-tuna<-melt(tuna, id="year")
+tuna <- melt(tuna, id="year")
 ggplot(tuna, aes(year, value)) + geom_point() +
   facet_wrap(~variable, ncol=1, scale="free_y") + 
   ylab("Bluefin Tuna harvest (tonnes)") + theme_bw()
 ```
 
 
-To illustrate these concepts, Figure 1 show an example from fisheries
-management. On the left axis, the figure shows a time series for the
+To illustrate these concepts, we use an example from fisheries
+management. Fig1a shows a time series for the
 estimated population size, represented as spawning stock biomass, of
 west Atlantic bluefin tuna (_Thunnus thynnus_, henceforth bluefin) from
-a recent stock assessment [@ICCAT20XX].  On the right axis the figure
-also shows the catch quota for the stock that was set by the relevant
+a recent stock assessment [@ICCAT20XX].  Fig1b 
+shows the catch quota (Total Allowable Catch or TAC, before being adjusted
+for overages or underages in the catch of each country in the previous year)
+ for the stock as set by the relevant
 management agency [@ICCAT20XX]. Despite the estimated population size
 declining by XX% between YYYY and ZZZZ, the quota was not changed during
 this period. Instead, the quota only changed occasionally and in between
@@ -166,7 +172,7 @@ note that while later work has extended this treatment to deal with
 a variety of other issues (e.g. @Sethi2005; @Singh2006; @McGough2009),
 we start from the classical model for simplicity of presentation and analysis.
 
-With his formulation, Reed showed that a constant escapement policy could be
+With his formulation, @Reed1979 showed that a constant escapement policy could be
 optimal under certain conditions. Such a policy involves choosing annual
 quotas that are perfectly responsive to recruitment variation in a fish
 stock. In poor recruitment years, the quota is set to zero and no fishing
@@ -228,12 +234,12 @@ the managers' objective is
 
 
 \begin{equation}
-\max_{{\bf h}}\mathbf{ E} ( NPV_{0} )=\max_{{\bf h}} \sum_0^\infty \mathbf{E} \left( \displaystyle \frac{\Pi_0(N_t,h_t)}{(1+\delta)^{t+1}} \right) \label{eq:objective}
+\max_{{\bf h}}\mathbf{ E} ( NPV_{0} )=\max_{{\bf h}} \sum_0^{T_{\mathrm{max}}} \mathbf{E} \left( \displaystyle \frac{\Pi_0(N_t,h_t)}{(1+\delta)^{t+1}} \right) \label{eq:objective}
 \end{equation}
 
 where $\mathbf{E}$ is the expectation operator, $\delta>0$ is the
 discount rate and $\Pi_0$ is the net revenue from operating the fishery
-in a given year. In this base case, we assume the annual net revenue
+in a given year. In this base case, we assume the annual dockside (that is, before accounting for any adjustment costs that may be incurred) net revenue
 from fishing is
 
 \begin{equation}
@@ -246,9 +252,9 @@ constant $q>0$ is the catchability coefficient. In
 Eqn. \eqref{eq:annual_netrevenue}, $p$ is the price per unit harvest and
 $c_0$ the cost of fishing and, to simplify the presentation of results,
 we assume that these are constants with $p>0$ and $c_0>0$. (Examples
-shown here use $p$= `r price` and $c_0$ = `r c0`, complete code is
-provided in the supplementary materials to re-run these analyses with
-arbitrarily specified values and replot the figures shown).
+shown here use $p$= `r price` and $c_0$ = `r c0`.  Sensitivity analysis appears
+in the supplement, along with complete R code to replicate and further 
+vary the setup).
 
 Taken together this objective function \eqref{eq:objective} and the state
 equation \eqref{eq:state_equation} define a stochastic dynamic programming
@@ -980,10 +986,40 @@ We also acknowledge the following support: NSF Grant DBI-1306697 (CB), ...
 Supplementary material
 ======================
 
-_Economic penalties promised for the supplement are still to come_
+## Economic penalties using quadratic costs 
 
 
-```{r Figure_S1, dependson="tidy", fig.cap="Multiple realizations of optimal harvesting strategy and resulting fish stock sizes under the different functional forms of adjustment costs.", fig.height=10, fig.width=8, cache=fig.cache, dev=c("pdf", "svg", "png")}
+```{r quadraticcosts}
+source("components/quad_costs.R")
+```
+
+Calibrated in the same way.  
+
+```{r Figure_S1}
+ex <- dt_quad %>% 
+  filter(replicate=="rep_17" & time < 20) %>%
+  select(time, harvest, harvest_alt) %>%
+  gather(variable, stock, -time) 
+ggplot(ex) + 
+  geom_line(aes(time, stock, col=variable), lwd=1) + 
+  scale_color_discrete(labels=c(harvest = substitute(paste("Harvest Policy under ", paste(Pi[4]))), 
+                                harvest_alt = substitute(paste("Harvest under ", paste(Pi[0]), " (Reed)"))), 
+                       name="") 
+
+
+```
+
+```{r}
+shifts <- dt[, fraction_no_shift(harvest), by=c("replicate")]
+ave <- shifts[, mean(V1)]
+```
+
+Like the $\Pi_2$ adjustment cost based penalty, this quadratic cost based penalty shows periods of contant, strictly positive policy only `r ave * 100`% of the time, and exhibits the same kind of smoothing of more small adjustments that is seen in $\Pi_2$ scenario.  
+
+
+
+
+```{r Figure_S2, dependson="tidy", fig.cap="Multiple realizations of optimal harvesting strategy and resulting fish stock sizes under the different functional forms of adjustment costs.", fig.height=10, fig.width=8, cache=fig.cache, dev=c("pdf", "svg", "png")}
 
 fig1s_df <- as.data.frame(subset(dt, replicate %in% paste0('rep_', 11:20)))
 fig1s_df <- fig1s_df[c("time", "fishstock", "alternate", "harvest", "harvest_alt", "penalty_fn", "replicate")]
@@ -1014,7 +1050,7 @@ write.csv(fig1s_df, "components/data/figure_s1.csv")
 ```
 
 
-```{r Figure_S2, dependson="tidy", fig.cap="Example realization of resulting fish stock sizes under the different functional forms of adjustment costs, corresponding to policies shown in Figure 3.  Because stock sizes are measured before harvests, the effect of the penalty on the stock size is not as pronounced.", fig.height=3, fig.width=8, cache = fig.cache, dev=c("pdf", "svg", "png")}
+```{r Figure_S3, dependson="tidy", fig.cap="Example realization of resulting fish stock sizes under the different functional forms of adjustment costs, corresponding to policies shown in Figure 3.  Because stock sizes are measured before harvests, the effect of the penalty on the stock size is not as pronounced.", fig.height=3, fig.width=8, cache = fig.cache, dev=c("pdf", "svg", "png")}
 
 labeller <- function(variable,value){
     return(relabel[paste(value)])
