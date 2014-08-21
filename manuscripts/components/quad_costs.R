@@ -57,8 +57,7 @@ policies <- sfLapply(c2, function(c2){
 })
 
 
-fees <- sapply(policies, function(policy) max(policy$V[i,]))
-
+fee <- sapply(policies, function(policy) max(policy$V[i,]))
 npv0 <- fee[1]
 normalized_fee <- (npv0-fee)/npv0
 

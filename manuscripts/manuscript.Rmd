@@ -10,11 +10,11 @@ author:
   - name: James Sanchirico
     affiliation: UCD
   - name: Jacob LaRiviere
-    affiliation: UTK_Econ
+    affiliation: UTKEcon
   - name: Alan Hastings
     affiliation: UCD
   - name: Paul Armsworth 
-    affiliation: UTK_EEB
+    affiliation: UTKEEB
 
 address: 
   - code: cstar
@@ -26,9 +26,9 @@ address:
     address: Department of Environmental Science and Policy, University of California, Davis
   - code: melbourne
     address: School of Botany, University of Melbourne, Australia 
-  - code: UTK_EEB
+  - code: UTKEEB
     address: Department of Ecology and Evolutionary Biology, University of Tennessee, Knoxville
-  - code: UTK_Econ
+  - code: UTKEcon
     address: Department of Economics, University of Tennessee, Knoxville
 
 abstract: |
@@ -51,7 +51,7 @@ abstract: |
           policy adjustment costs are present when in fact they are absent is much
           smaller than the impact of managers assuming such costs are absent if
           they are present. Further, we demonstrate that the structural form of
-          these costs matters -- assuming one form when costs are are in fact
+          these costs matters: assuming one form when costs are are in fact
           a different form can be even more costly.  
 
 layout: review,12pt
@@ -66,6 +66,7 @@ output:
   pdf_document:
     template: components/elsarticle.latex
     fig_caption: true
+    keep_tex: true
 ---
 
 
@@ -97,7 +98,7 @@ library("snowfall")
 
 options(digits=2)
 
-theme_set(theme_tufte())
+theme_set(theme_tufte() + theme(axis.line = element_line())
 ```
 
 ```{r analysis, include=FALSE}
@@ -360,8 +361,8 @@ ggplot(fees, aes(c2, (npv0-value)/npv0, lty=variable, color=variable)) +
   geom_hline(aes(yintercept=reduction), linetype=4) + 
   xlab("Penalty coefficient") +
   ylab("Reduction in net present value") + 
-  scale_linetype_discrete(labels=relabel) + 
-  scale_color_discrete(labels=relabel) 
+  scale_linetype_discrete(labels=relabel, breaks = c('L1', 'L2', 'fixed')) + 
+  scale_color_discrete(labels=relabel, breaks = c('L1', 'L2', 'fixed')) 
  
 
 write.csv(dt, "components/data/100reps.csv")
@@ -990,12 +991,13 @@ Supplementary material
 
 
 ```{r quadraticcosts}
+
 source("components/quad_costs.R")
 ```
 
 Calibrated in the same way.  
 
-```{r Figure_S1}
+```{r Figure_S1, dev=c('pdf', 'svg')}
 ex <- dt_quad %>% 
   filter(replicate=="rep_17" & time < 20) %>%
   select(time, harvest, harvest_alt) %>%
@@ -1009,7 +1011,7 @@ ggplot(ex) +
 
 ```
 
-```{r}
+```{r quadshiftrate}
 shifts <- dt[, fraction_no_shift(harvest), by=c("replicate")]
 ave <- shifts[, mean(V1)]
 ```

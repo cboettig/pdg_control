@@ -16,7 +16,9 @@ Suggests:
     cboettigR,
     ggthemes,
     knitr,
-    rmarkdown
+    rmarkdown,
+    tidyr,
+    dplyr
 Imports:
     Hmisc,
     cubature,
