@@ -97,10 +97,9 @@ library("ggthemes")
 library("snowfall")
 library("tidyr")
 library("dplyr")
-
 options(digits=2)
 
-theme_set(theme_tufte() + theme(axis.line = element_line())
+theme_set(theme_tufte() + theme(axis.line = element_line()))
 ```
 
 ```{r analysis, include=FALSE}
