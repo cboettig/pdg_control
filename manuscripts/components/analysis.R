@@ -1,4 +1,4 @@
-ncpu = 24
+ncpu = 4
 
 
 ## ----profit_model--------------------------------------------------------
@@ -35,7 +35,7 @@ x_grid <- seq(0.01, 1.2 * K, length = gridsize)
 h_grid <- seq(0.01, 0.8 * K, length = gridsize)  
 
 
-## ----reed, dependson=c("setup", "profit_model")--------------------------
+## ----reed--------------------------
 SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g )
 opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, 
                      profit, delta, reward=reward)
@@ -50,12 +50,12 @@ penaltyfns <- list(L2=L2, L1=L1, fixed=fixed)
 
 
 ## ----parallel, include=FALSE---------------------------------------------
-sfInit(cpu=ncpu, parallel=T)
+sfInit(cpu=ncpu, parallel=TRUE)
 sfLibrary(pdgControl)
 sfExportAll()
 
 
-## ----bigloop, dependson=c("setup", "reed", "fees", "profit_model", "c2_grid")----
+## ----bigloop----
 policies <- lapply(penaltyfns, function(penalty){
   sfLapply(c2, function(c2){
     policy <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
@@ -65,7 +65,7 @@ policies <- lapply(penaltyfns, function(penalty){
 })
 
 
-## ----, dependson="quadcosts"---------------------------------------------
+## -------------------------------------------------
 i <- which(x_grid > K)[1]
 fees <- 
   lapply(policies, function(penalty) 
@@ -75,7 +75,7 @@ fees <-
   )
 
 
-## ----npv-plot, dependson="quadcosts"-------------------------------------
+## ----npv-plot-------------------------------------
 npv0 <- max(fees$L1) # all have same max, at c2=0 
 fees <- data.frame(c2=c2,fees)
 fees <- melt(fees, id="c2")
@@ -84,7 +84,7 @@ fees <- subset(fees, variable %in% c("L1", "L2", "fixed"))
 #ggplot(fees, aes(c2, value, col=variable)) + geom_point() + geom_line()
 
 
-## ----apples, dependson=c("quadcosts", "reduction")-----------------------
+## ----apples-----------------------
 closest <- function(x, v){
   which.min(abs(v-x))
 }
@@ -96,7 +96,7 @@ apples <- c2[index$V1]
 names(apples) <- index$variable
 
 
-## ----print_npv, dependson="apples"---------------------------------------
+## ----print_npv---------------------------------------
 setkey(dt_npv, variable)
 values <- apply(index, 1, function(x) dt_npv[x[1], ][as.integer(x[2]), ]$value)
 percent.error <- (values - ((1-reduction)*npv0)) / ((1-reduction)*npv0)* 100
@@ -106,7 +106,7 @@ print_npv <- data.frame(model=index$variable, "value realized"=values,
 
 
 
-## ----npv_table, dependson="print_npv", results='asis'--------------------
+## ----npv_table--------------------
 #pandoc.table(print_npv)
 
 
@@ -116,7 +116,7 @@ L1_policy <- policies$L1[[apples_index["L1"]]]$D
 fixed_policy <- policies$fixed[[apples_index["fixed"]]]$D
 
 
-## ----simulate_policy, dependson=c("policynames", "apples")---------------
+## ----simulate_policy---------------
 reps <- 1:100
 names(reps) = paste("rep", 1:length(reps), sep="_") # treat as a factor
 seeds <- 1:100

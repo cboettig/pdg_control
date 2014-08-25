@@ -7,15 +7,16 @@ MAINTAINER Carl Boettiger cboettig@ropensci.org
 
 ENV PACKAGE pdg_control
 
-## Remain current & install dependencies
-RUN apt-get update -qq && apt-get dist-upgrade -qy && apt-get install -qy texlive-humanities lmodern texlive-fonts-recommended texlive-latex-extra r-cran-snowfall r-cran-expm
+## Remain current & install binaries for dependencies that don't compile
+RUN apt-get update -qq && apt-get dist-upgrade -qy && apt-get install -qy r-cran-snowfall r-cran-expm 
 
 ## Install package, with dependencies and suggests
-RUN Rscript -e 'devtools::install_github(c("cboettig/cboettigR", "jrnold/ggthemes", "cboettig/pdg_control"))'
+RUN Rscript -e 'devtools::install_github(c("cboettig/cboettigR", "jrnold/ggthemes", "hadley/reshape", "cboettig/pdg_control"))'
 
-RUN apt-get install -y imagemagick
+# Add manuscripts directory onto image 
+ADD . /tmp/pdg_control/manuscripts
 
-ADD . /home/rstudio/pdg_control/manuscripts
-RUN chmod -R 777 /home/rstudio/pdg_control/manuscripts
-WORKDIR /home/rstudio/pdg_control/manuscripts
 
+## Note that cboettig/rstudio's CMD uses supervisord to first run a shell script which will make sure 
+## that the user's whole home directory, including the subdirectories we just added (as root) 
+## have ownership permissions assigned to the user specified in --e USER=<username> (rstudio by default). 
