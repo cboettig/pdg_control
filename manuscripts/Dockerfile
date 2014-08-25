@@ -11,7 +11,7 @@ ENV PACKAGE pdg_control
 RUN apt-get update -qq && apt-get dist-upgrade -qy && apt-get install -qy r-cran-snowfall r-cran-expm 
 
 ## Install package, with dependencies and suggests
-RUN Rscript -e 'devtools::install_github(c("cboettig/cboettigR", "jrnold/ggthemes", "hadley/reshape", "cboettig/pdg_control"))'
+RUN Rscript -e 'devtools::install_github(c("cboettig/cboettigR", "jrnold/ggthemes", "hadley/reshape", "cboettig/pdg_control"), dependencies=TRUE)'
 
 # Add manuscripts directory onto image 
 ADD . /tmp/pdg_control/manuscripts
