@@ -14,7 +14,7 @@ RUN apt-get update -qq && apt-get dist-upgrade -qy && apt-get install -qy r-cran
 RUN Rscript -e 'devtools::install_github(c("cboettig/cboettigR", "jrnold/ggthemes", "hadley/reshape", "cboettig/pdg_control"), dependencies=TRUE)'
 
 # Add manuscripts directory onto image 
-ADD . /tmp/pdg_control/manuscripts
+ADD . /host/pdg_control/manuscripts
 
 
 ## Note that cboettig/rstudio's CMD uses supervisord to first run a shell script which will make sure 
