@@ -16,6 +16,10 @@ RUN Rscript -e 'devtools::install_github(c("cboettig/cboettigR", "jrnold/ggtheme
 # Add manuscripts directory onto image 
 ADD . /host/pdg_control/manuscripts
 
+# Check image
+WORKDIR /host/pdg_control/manuscripts
+RUN rm -rf components/cache/*
+RUN Rscript -e 'rmarkdown::render("manuscript.Rmd")'
 
 ## Note that cboettig/rstudio's CMD uses supervisord to first run a shell script which will make sure 
 ## that the user's whole home directory, including the subdirectories we just added (as root) 
