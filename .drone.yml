@@ -1,10 +1,8 @@
 image: cboettig/ropensci
 
-install:
+script:
   - sudo apt-get install -y r-cran-snowfall r-cran-expm
   - installGithub.r --deps TRUE cboettig/cboettigR jrnold/ggthemes hadley/reshape cboettig/pdg_control
-
-script:
   - Rscript -e 'rmarkdown::render("manuscripts/manuscript.Rmd")'
 
 notify:
