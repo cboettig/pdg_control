@@ -2,7 +2,7 @@
 ## Launch via RStudio: docker run -d -p 8787:8787 cboettig/pdg_control
 ##   and then navigate to http://localhost:8787 
 
-FROM cboettig/ropensci:latest
+FROM rocker/ropensci
 MAINTAINER Carl Boettiger cboettig@ropensci.org
 
 ENV PACKAGE pdg_control
@@ -26,8 +26,8 @@ WORKDIR /host/pdg_control/manuscripts
 
 
 ## Test build but leave image clean
-RUN nice -n 19 Rscript -e 'rmarkdown::render("manuscript.Rmd")' \
-  && rm -rf components/cache/*
+#RUN nice -n 19 Rscript -e 'rmarkdown::render("manuscript.Rmd")' \
+#  && rm -rf components/cache/*
 
 ## Note that cboettig/rstudio's CMD uses supervisord to first run a shell script which will make sure 
 ## that the user's whole home directory, including the subdirectories we just added (as root) 
