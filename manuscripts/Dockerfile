@@ -2,7 +2,7 @@
 ## Launch via RStudio: docker run -d -p 8787:8787 cboettig/pdg_control
 ##   and then navigate to http://localhost:8787 
 
-FROM rocker/ropensci
+FROM rocker/hadleyverse
 MAINTAINER Carl Boettiger cboettig@ropensci.org
 
 ENV PACKAGE pdg_control
