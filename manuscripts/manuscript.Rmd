@@ -134,10 +134,15 @@ interventionist approach to management this would require.
 
 ```{r Figure_1, fig.cap="ICCAT Stock assessments and Total Allowable Catch (TAC, before adjustments for national underages and overages) for Bluefin Tuna, 1987 - 2007", fig.width=6, fig.height=4, dev=c("pdf", "svg", "png")}
 tuna <- read.csv("components/data/tuna.csv")
-tuna <- melt(tuna, id="year")
-ggplot(tuna, aes(year, value)) + geom_point() +
-  facet_wrap(~variable, ncol=1, scale="free_y") + 
-  ylab("Bluefin Tuna harvest (tonnes)") + theme_bw()
+grouper <- read.csv("components/data/grouper.csv")
+
+ex <- rbind(cbind(tuna, species="tuna"), cbind(grouper, species="snowy grouper"))
+ex_long <- gather(ex, variable, value, year, species)
+
+ggplot(ex_long, aes(year,value)) + 
+  geom_line() + geom_point() + 
+  facet_wrap(variable~species, scales="free") + 
+  ylab("value (mt)") + theme_bw()
 ```
 
 
