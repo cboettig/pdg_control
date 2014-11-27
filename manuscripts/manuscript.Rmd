@@ -38,21 +38,17 @@ abstract: |
           the environment very tightly will only sometimes be worthwhile. We use a
           classic fisheries management question -- how to manage a stochastically
           varying population using annually varying quotas in order to maximize
-          profit  - to examine how costs of policy adjustment change optimal
+          profit  -- to examine how costs of policy adjustment change optimal
           management recommendations. Costs of policy adjustment (here changes in
           fishing quotas through time) could take different forms. For example,
           these costs may respond to the size of the change being implemented or
           there could be a fixed cost any time a quota change is made. We show
           how different forms of policy costs have contrasting implications for
-          optimal policies. While some types of cost act to smooth out variation in
-          quotas and stock sizes, as one might have expected, others can actually
-          increase variation in stock sizes and quotas through time. We also show
-          that the potential economic impact on the fishery of managers assuming
-          policy adjustment costs are present when in fact they are absent is much
-          smaller than the impact of managers assuming such costs are absent if
-          they are present. Further, we demonstrate that the structural form of
-          these costs matters: assuming one form when costs are are in fact
-          a different form can be even more costly.  
+          optimal policies. Though it is frequently assumed that costs to adjusting
+          policies will dampen variation in the policy, we show that certain cost
+          structures can actually increase variation through time. We further show
+          that failing to account for adjustment costs has a consistently worse
+          economic impact than would assuming these costs are present when they are not.
 
 layout: review,12pt
 linenumbers: true
@@ -146,14 +142,14 @@ ggplot(ex_long, aes(year,value)) +
 ```
 
 
-To illustrate these concepts, we use an example from fisheries
+To illustrate this tradeoff, we use an example from fisheries
 management. Fig1a shows a time series for the
 estimated population size, represented as spawning stock biomass, of
 west Atlantic bluefin tuna (_Thunnus thynnus_, henceforth bluefin) from
 a recent stock assessment [@ICCAT20XX].  Fig1b 
 shows the catch quota (Total Allowable Catch or TAC, before being adjusted
 for overages or underages in the catch of each country in the previous year)
- for the stock as set by the relevant
+for the stock as set by the relevant
 management agency [@ICCAT20XX]. Despite the estimated population size
 declining by XX% between YYYY and ZZZZ, the quota was not changed during
 this period. Instead, the quota only changed occasionally and in between
