@@ -1,8 +1,6 @@
 all:
 	make manuscript.pdf
 
-components/cache: components/restore-cache.R
-	Rscript components/restore-cache.R
 
 # combines knitr & pandoc calls
 manuscript.pdf: manuscript.Rmd
@@ -12,15 +10,15 @@ manuscript.pdf: manuscript.Rmd
 clean:
 	rm -f $(MANUSCRIPT).md *.log *.aux *.pdf  
 	make clear-cache
-	make clear-packrat
 
 
-clear-packrat: 
-	rm -rf .Rprofile packrat/lib packrat/src packrat/bootstrap.R
+## Stuff for dealing with caching ##  
+
+components/cache: components/restore-cache.R
+	Rscript components/restore-cache.R
 
 clear-cache:
 	rm -rf components/cache
-
 
 # just an alias 
 restore-cache: 

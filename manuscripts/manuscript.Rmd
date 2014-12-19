@@ -67,8 +67,6 @@ output:
 
 
 ```{r configure, include=FALSE, cache=FALSE}
-#source("components/install.R")
-
 library("methods")
 library("knitr")
 basename <- "manuscript"
@@ -264,9 +262,9 @@ growth parameters are chosen so that the intrinsic rate of increase of
 the fish population is 1 and the equilibrium biomass for the equivalent
 deterministic model without harvesting is 10; (specifically, $A=$ `r pars[1]` and
 $B=$ `r pars[2]` in Eqn \eqref{eq:state_equation}. To characterize environmental variability, we
-assume multiplicative shock $Z_t$ is distributed log-normally with 
+assume multiplicative shock $Z_t$ is distributed log-normally with
 log standard deviation $\sigma_g$ = `r sigma_g`. In addition, we
-show cases where $p=$ `r price`, $\delta=$ `r delta` and $c_0=$ `r c0`.  
+show cases where $p=$ `r price`, $\delta=$ `r delta` and $c_0=$ `r c0`.
 In the supplement we illustrate that the qualitative patterns observed
 here are not sensitive to the specific choices for these parameter values.
 
@@ -499,7 +497,7 @@ in Figure 4.  We show the impact of policy adjustment costs on the
 variance & autocorrelation of the harvests through time. 
 
 
-```{r Figure_4, fig.cap="Variance and autocorrelation of harvest dynamics, as a function of the penalty coefficient.  Adjustment penalty is calculated as percentage of the maximum expected $NPV$ in the basic case with no policy adjustment costs.", fig.height=8, fig.width=8, cache=fig.cache, dev=c("pdf", "svg", "png")}
+```{r Figure_4, fig.cap="Variance and autocorrelation of harvest dynamics, as a function of the penalty coefficient.  Adjustment penalty is calculated as percentage of the maximum expected $NPV$ in the basic case with no policy adjustment costs.", fig.height=4, fig.width=8, cache=fig.cache, dev=c("pdf", "svg", "png")}
 
 library("dplyr")
 
@@ -529,7 +527,7 @@ might have expected (see also @Ludwig1980 for this particular case). As
 cost penalties increase in severity (moving right along the horizontal axis,
 larger fractions of the economic value are consumed by adjustment costs), the
 variance in quotas through time decreases and the autocorrelation of
-quotas through time increases. 
+quotas through time increases.
 When adjustment costs are zero, all policies are slightly negatively autocorrelated:
 this reflects the fact that a high harvest year is usually followed by a low harvest year
 that allows the stocks to recover. However, as adjustment costs increase, the quadratic
@@ -600,7 +598,7 @@ hist_dat <- melt(rbind(Adj, Reed), id=c("penalty_fn", "replicate", "Assumption")
 ````
 
 ```{r}
-fig5_caption <- paste("Distribution of profits from fishing and costs paid to adjustment, under linear costs ($\Pi_1$). (Alternate penalties can be found in the supplementary materials)  Distributions are shown when managing a system in which the adjustment costs present compared to the same costs and profits of managing the system using a Reed model, which ignores adjustment costs, and thus tends to pay higher fees for adjustment.  In contrast, the difference in profit after accounting for costs is only marginally less than the value derived by managing the population to optimize profits when ignoring adjustment costs (Reed model).")
+fig5_caption <- paste("Distribution of profits from fishing and costs paid to adjustment, under linear costs ($\\Pi_1$). (Alternate penalties can be found in the supplementary materials)  Distributions are shown when managing a system in which the adjustment costs present compared to the same costs and profits of managing the system using a Reed model, which ignores adjustment costs, and thus tends to pay higher fees for adjustment.  In contrast, the difference in profit after accounting for costs is only marginally less than the value derived by managing the population to optimize profits when ignoring adjustment costs (Reed model).")
 ```
 
 
@@ -714,7 +712,7 @@ of these mismatch errors in the Supplementary Material.
 Discussion
 ==========
 
-  Policy-makers managing ecological systems that vary in space and time
+Policy-makers managing ecological systems that vary in space and time
 must evaluate how much of that variation to reflect in management
 recommendations. Fine-tuning a policy to respond to frequent variations
 in ecological dynamics may incur increased transaction costs associated
@@ -733,7 +731,7 @@ or over-estimating the importance of policy adjustment costs of this type.
 
 Estimating policy adjustment costs and how they respond to the size of
 proposed policy changes would be empirically challenging. Recognizing
-this fact, in our analyses, we compared different plausible forms that
+this fact, we compared different plausible forms that
 these costs might take. We compared two cost structures where we assumed
 the magnitude of policy adjustment costs increased with the magnitude
 of the change in policy being proposed with an alternative formulation
@@ -749,13 +747,12 @@ combination.
 The biggest differences between the representations of policy adjustment
 cost that we consider are between those that have a smoothing effect
 on annual quotas and those that do not. The few past studies that
-incorporate policy adjustment costs in models of fisheries management
-[@Ludwig1980; @Feichtinger1994; @Wirl1999] assumed costs of
+incorporate policy adjustment costs in models of fisheries or other environmental management contexts [@Feichtinger1994; @Wirl1999] have assumed costs of
 policy adjustment increased as a quadratic function of the magnitude of
-the policy change being proposed (our $\Pi_2$ formulation) In
+the policy change being proposed (analogous to $\Pi_2$ formulation). In
 effect, this means that small changes to annual quotas incur little
 extra cost, but large changes to annual quotas become disproportionately
-expensive to make. Including costs of this form smoothes inter-annual
+expensive to make. Including costs of this form smooths inter-annual
 variation in the catch quotas that would be recommended. Also, the catches and remaining stock sizes
 corresponding to optimal management become more autocorrelated in time,
 because it takes the fishery longer to harvest down peaks in abundance
@@ -790,7 +787,7 @@ such different dynamics suggests that researchers constructing fisheries
 economics models should proceed cautiously when choosing how to represent
 these costs. However, in our own experience, we have found that while
 modeling studies sometimes mention policy adjustment costs when motivating
-model assumptions (references), they rarely provide much justification
+model assumptions [e.g. @Feichtinger1994; @Wirl1999; @Lewis1981; @McGough2009], they rarely provide much justification
 for the choice of functional form used or test the sensitivity of any
 conclusions drawn to alternative specifications. Indeed, we were surprised
 to find such clear differences between the functional forms, because
@@ -815,14 +812,12 @@ they are present arises because the first, more direct, cost contribution
 here is larger than the second. 
 
 Assuming an adjustment cost exists when in fact it is absent is not the
-same as using the wrong functional form when it is present.  Here, our
-results showed that choice of the functional form makes a significant
+same as using the wrong functional form when it is present.  In the supplement we show that choice of the functional form makes a significant
 difference.  We show it can be better to ignore policy costs than to derive a 
 policy based on assuming the wrong functional form.  This result further
 underscores the importance of modelers using caution when seeking to account
 for these costs. Assuming an arbitrary form in order to capture the influence
 of adjustment costs is thus unlikely to be instructive. 
-
 
 As with any modeling analysis, our formulation makes many assumptions. For
 example, we assume that the fishery in question is being optimally managed
@@ -864,10 +859,12 @@ in light of our finding that the variance and autocorrelation in stock
 sizes through time can be affected when accounting for costs of policy
 adjustment. Both are properties known in other modeling settings to
 be associated with changes to the risk of extinction or of transitions
-between alternative stable states [@Scheffer2009; @Boettiger2013].
+between alternative stable states [@Scheffer2009]. This highlights the risk
+that changes in management policies can either mimic or mask such possible
+early warning signs of sudden transitions, and points to another way
+in which more context is needed before such approaches can be useful to
+management [@Boettiger2013].
 
-
-<!-- Comment on increasing variance or increasing autocorrelation from changes in policy costs / optimal management-->
 
 When facing highly variable ecological systems, how often should
 natural resource managers respond? A highly interventionist strategy
@@ -894,262 +891,9 @@ Acknowledgements
 This project arose out of a NIMBioS working group, "Pretty Darn Good Control".
 The authors acknowledge helpful discussions and input from working group
 co-organizers Megan Donahue and Carl Toews, and participants Marie-Josee Fortin, 
-Dan Ryan, Frank Doyle, Claire Paris, Iadine Chades and Mandy Karnauskas.   
+Dan Ryan, Frank Doyle, Claire Paris, Iadine Chades and Mandy Karnauskas.
 We also acknowledge the following support: NSF Grant DBI-1306697 (CB), ... 
 
 
 
 # References
-
-
-
-
-# Supplementary material #
-
-##  Impact on the stock dynamics ##
-
-
-
-```{r StockDynamics, dependson="tidy", fig.cap="Example realization of optimal harvesting strategy and resulting fish stock sizes under the different functional forms of adjustment costs.", fig.height=5, fig.width=8, cache = fig.cache, dev=c("pdf", "svg", "png")}
-
-labeller <- function(variable,value){
-    return(relabel[paste(value)])
-}
-
-dt_s <- dt %>% 
-  filter(replicate=="rep_17" & time < 20) %>%
-  select(time, fishstock, alternate, penalty_fn) %>%
-  gather(variable, value, -time, -penalty_fn) 
-
-
-ggplot(dt_s, aes(time, value, col=variable, lty=variable)) +
-  geom_line(lwd=1) +
-  facet_grid(penalty_fn~., labeller = labeller) + 
-  labs(x="time", y="stock size", title = "Example Stock Dynamics")  +
-  scale_color_discrete(labels=c("With Penalty", "Reed Solution"), name="") +
-  scale_linetype_discrete(labels=c("With Penalty", "Reed Solution"), name="")  
-
-```
-
-
-
-
-```{r StockStats, fig.cap="Variance and autocorrelation of stock dynamics, as a function of the penalty coefficient.  Adjustment penalty is calculated as percentage of the maximum expected $NPV$ in the basic case with no policy adjustment costs.", fig.height=8, fig.width=8, cache=fig.cache, dev=c("pdf", "svg", "png")}
-
-stock_stats <- filter(figure4_df, timeseries=='stock')
-ggplot(stock_stats, aes(penalty_fraction, value, fill=penalty_fn, col=penalty_fn)) + 
-  stat_summary(fun.y = mean, 
-               fun.ymin = function(x) mean(x) - sd(x), 
-               fun.ymax = function(x) mean(x) + sd(x), 
-               geom = "ribbon", alpha=0.3, colour=NA) +
-  stat_summary(fun.y = mean, geom = "line") + 
-  coord_cartesian(xlim = c(0, .3)) + 
-  facet_wrap(~ statistic, scale="free_y") + 
-  scale_color_discrete(labels=relabel, name="Penalty function") + 
-  scale_fill_discrete(labels=relabel, name="Penalty function") +
-  xlab("Penalty size (as fraction of NPV0)")
-
-
-```
-
-
-Recall that in our model definition, stock sizes are measured before harvest ($h_t$ being determined after observing stock size
-$x_t$) and thus show less influence of the policy cost than the harvest itself. 
-
-
-## Additional stochastic realizations ## 
-
-Figure 3 of the main text shows a single stochastic realization.  Here we provide a sample of further realizations (including both stock and harvest dynamics).  Full
-
-
-
-```{r Figure_S2, dependson="tidy", fig.cap="Multiple realizations of optimal harvesting strategy and resulting fish stock sizes under the different functional forms of adjustment costs.", fig.height=10, fig.width=8, cache=fig.cache, dev=c("pdf", "svg", "png"), cache=FALSE}
-
-labels <- c(harvest = substitute(paste("Harvest Policy under ", paste(Pi[1-3]))), 
-            harvest_alt = substitute(paste("Harvest under ", paste(Pi[0]), " (Reed)")),
-            fishstock = substitute(paste("Stock dynamics under under ", paste(Pi[1-3]))), 
-            alternate = substitute(paste("Stock under ", paste(Pi[0]), " (Reed)")))
-labeller <- function(variable,value){
-if (variable=='penalty_fn') {
-    return(relabel[paste(value)])
-  } else {
-    return(value)
-  }
-}
-
-
-ex <- dt %>% 
-  filter(replicate %in% paste0("rep_", 16:20) & time < 20) %>%
-  select(time, fishstock, harvest, alternate, harvest_alt, replicate, penalty_fn) %>%
-  gather(variable, stock, -time, -replicate, -penalty_fn)
-
-
-ggplot(ex) + 
-  geom_line(aes(time, stock, col=variable), lwd=1) + 
-  scale_color_discrete(labels=labels, name="") +  
-  facet_grid(replicate ~ penalty_fn, labeller=labeller) 
-
-
-
-write.csv(ex, "components/data/figure_s2.csv")
-```
-
-
-
-
-
-## Economic penalties using quadratic costs ##
-
-
-```{r quadraticcosts}
-
-source("components/quad_costs.R")
-```
-
-
-
-```{r Figure_S1, dev=c('pdf', 'svg'), cache=FALSE}
-
-labels <- c(harvest = substitute(paste("Harvest Policy under ", paste(Pi[4]))), 
-                                harvest_alt = substitute(paste("Harvest under ", paste(Pi[0]), " (Reed)")))
-
-ex <- dt_quad %>% 
-  filter(replicate=="rep_17" & time < 20) %>%
-  select(time, harvest, harvest_alt) %>%
-  gather(variable, stock, -time) 
-ggplot(ex) + 
-  geom_line(aes(time, stock, col=variable), lwd=1) + 
-  scale_color_discrete(labels=labels, 
-                       name="") 
-
-
-```
-
-```{r quadshiftrate}
-shifts <- dt[, fraction_no_shift(harvest), by=c("replicate")]
-ave <- shifts[, mean(V1)]
-```
-
-Like the $\Pi_2$ adjustment cost based penalty, this quadratic cost based penalty shows periods of contant, strictly positive policy only `r ave * 100`% of the time, and exhibits the same kind of smoothing of more small adjustments that is seen in $\Pi_2$ scenario.  
-
-
-
-
-
-<!-- Figure 5 extended across -->
-
-
-```{r Figure_S3, fig.cap="Distribution of profits from fishing and costs paid to adjustment.  Distributions are shown when managing a system in which the adjustment costs present are determined by the model indicated, and compared to the same costs and profits of managing the same system using a Reed model, which ignores adjustment costs, and thus tends to pay much higher fees for adjustment.  In contrast, the difference in profit after accounting for costs is only marginally less than the value derived by managing the population to optimize profits when ignoring adjustment costs (Reed model).", fig.width=8, fig.height=6, dependson="histogram-calc", dev=c("pdf", "svg", "png"), cache=FALSE}
-
-assume <- levels(as.factor(hist_dat$Assumption))
-labeller <- function(variable,value){
-if (variable=='penalty_fn') {
-    return(relabel[paste(value)])
-  } else {
-    return(paste(value))
-    #return(assume[paste(value)])
-  }
-}
-
-ggplot(hist_dat) + 
-  geom_density(aes(value, fill=variable, color=variable), alpha=0.8)+
-  facet_grid(Assumption~penalty_fn, labeller = labeller)
-
-write.csv(hist_dat, "components/data/figure5.csv")
-```
-
-
-
-```{r Figure_S4, fig.cap="Relative cost of ignoring adjustment costs when they are present ('ignoring', red) vs assuming the adjustment costs when they are absent ('assuming', blue), shown by penalty function over increasing magnitudes of cost.  All values are relative to the cost-free adjustment optimum, NPV0.  In each case, it is less costly to assume adjustment costs are present when they are not than it is to ignore them when they are present. The severity of the latter mistake increases sharply as adjustment costs make a larger fraction of the total costs.", dev=c("pdf", "svg", "png"), fig.width=7, cache=FALSE}
-
-ggplot(table1_long, aes(penalty.fn, value, fill = variable)) + 
-  geom_bar(stat="identity", position="dodge") + 
-  facet_wrap(~reduction, ncol=2) + 
-  scale_x_discrete(labels = c('L1' = substitute(paste(Pi[1])),
-                              'L2' = substitute(paste(Pi[2])),
-                              'fixed' = substitute(paste(Pi[3])))) + 
-  xlab("Penalty function")
-write.csv(table1_long, "components/data/figure6.csv")
-```
-
-
-
-
-
-When policy costs are present, assuming the wrong functional form may or
-may not be worse than ignoring the presence of policy costs all together.
-Figure S5 considers several such cases.  The X axis labels indicate
-first which policy is being used to drive the harvest decisions, and
-then which penalty is actually being applied.  Thus $\Pi_1\_\Pi_2$ indicates
-a policy calculated under the linear ($\Pi_1$) costs, when the reality
-involves quadratic ($\Pi_2$) costs.  Though the coefficients of the ($\Pi_2$)
-costs have been scaled such that the net effect is the same, the inferred
-policies differ.  As a result, the value is slightly more than half of
-the optimal free solution when the expected reduction should only be 10% (panel A)
-less than optimal free based on the $c_i$ calibration. In this case, ignoring the costs all together
-is still worse than using $\Pi_1$ costs -- the red bar is lower than the blue.
-
-For fixed costs ($\Pi_3$), the reverse is true.  Because fixed costs increase the
-volatility of the optimal solution while $\Pi_2$ costs decrease it, simply
-ignoring the cost of adjustment all together results in a higher value
-than either assuming costs are quadratic ($\Pi_2$) when they are fixed ($\Pi_3$),
-or assuming they are fixed when they are quadratic.  Scenarios in which true costs are quadratic (regardless of what
-cost structure is assumed by the policy) do significantly worse than
-those that are not (i.e. all cases that assume quadratic but actually
-have linear or fixed costs).
-
-These patterns hold across the different size reductions shown (from 10%
-to 25%, panels a-d respectively), though net present value becomes negative under the quadratic
-form for the larger penalties as costs paid for adjustments exceed
-profits derived from harvest.  (Though optimal solutions will always
-avoid negative net present values, these scenarios in which policies are
-applied under conditions other than assumed in the optimality calculation
-have no such guarantee.) For each scenario, results are averaged over
-100 replicates.
-
-
-
-```{r Figure_S5, fig.cap="Mismatches. X axis labels indicate the model used to derive the policy, followed by the model used to simulate the penalty. Blue bars show the net present value of that scenario.  Compare to red bars, which show the consequence of using a policy that ignores costs all together in the same scenario (i.e. costs as indicated by second code), rather than assuming the policy indicated by the first code in the pair.  All values are scaled to a fraction of the adjustment free net present value.", dev=c("pdf", "svg", "png"), fig.width=7, cache=FALSE}
-who <- c("penalty_fn", "ignore_fraction", "mismatched_fraction", "reduction")
-table2 <- arrange(mismatches_df[who], reduction) 
-names(table2) = c("penalty.fn", "ignoring", "mismatched", "reduction")
-table2_long <- melt(table2, id = c('penalty.fn', 'reduction'))
-table2_long$reduction <- as.factor(table2_long$reduction)
-
-ggplot(filter(table2_long, reduction==0.25), 
-  aes(penalty.fn, value, fill = variable)) + 
-  geom_bar(stat="identity", position="dodge") + 
-  facet_wrap(~reduction, scales="free_y") +
-  scale_x_discrete(labels = c('L1_L2' = substitute(paste(Pi[1],"_", Pi[2])), 
-                              'L2_L1' =  substitute(paste(Pi[2],"_", Pi[1])),
-                              'L1_fixed' = substitute(paste(Pi[1],"_", Pi[3])), 
-                              'fixed_L1' =  substitute(paste(Pi[3],"_", Pi[1])),
-                              'fixed_L2' = substitute(paste(Pi[3],"_", Pi[2])), 
-                              'L2_fixed' =  substitute(paste(Pi[2],"_", Pi[3])))) + 
-  xlab("Penalty function")
-write.csv(table2_long, "components/data/figure7.csv")
-```
-
-
-
-<!-- 
-
-```{r Figure_S5, fig.cap="Effect of varying severity of adjustment costs on mismatches. Successive panels show increasing reduction of the net present value by increasing penalty coefficients: e.g. a policy in the first panel would lose only 10% (panel A) of its net present value to adjustment costs if it had the correct form of those costs, as determined by the choice of penalty coefficient.  Plots structured as in figure 7, which corresponds to the fourth panel", dev=c("pdf", "svg", "png"), fig.width=7, cache=FALSE}
-ggplot(table2_long, aes(penalty.fn, value, fill = variable)) + 
-  geom_bar(stat="identity", position="dodge") + 
-  facet_wrap(~reduction, scales="free_y") +
-  scale_x_discrete(labels = c('L1_L2' = substitute(paste(Pi[1],"_", Pi[2])), 
-                              'L2_L1' =  substitute(paste(Pi[2],"_", Pi[1])),
-                              'L1_fixed' = substitute(paste(Pi[1],"_", Pi[3])), 
-                              'fixed_L1' =  substitute(paste(Pi[3],"_", Pi[1])),
-                              'fixed_L2' = substitute(paste(Pi[3],"_", Pi[2])), 
-                              'L2_fixed' =  substitute(paste(Pi[2],"_", Pi[3])))) + 
-  xlab("Penalty function")
-write.csv(table2_long, "components/data/figure7.csv")
-```
-
--->
-
-
-
-
