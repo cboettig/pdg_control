@@ -888,10 +888,7 @@ management should be conducted.
 Acknowledgements
 ================
 
-This project arose out of a NIMBioS working group, "Pretty Darn Good Control".
-The authors acknowledge helpful discussions and input from working group
-co-organizers Megan Donahue and Carl Toews, and participants Marie-Josee Fortin, 
-Dan Ryan, Frank Doyle, Claire Paris, Iadine Chades and Mandy Karnauskas.
+This work was assisted through participation in "Pretty Darn Good Control" Investigative Workshop at the National Institute for Mathematical and Biological Synthesis, sponsored by the National Science Foundation through NSF Award #DBI-1300426, with additional support from The University of Tennessee, Knoxville.  The authors acknowledge helpful discussions and input from working group co-organizers Megan Donahue and Carl Toews, and participants Marie-Josee Fortin, Dan Ryan, Frank Doyle, Claire Paris, Iadine Chades and Mandy Karnauskas.
 We also acknowledge the following support: NSF Grant DBI-1306697 (CB), ... 
 
 

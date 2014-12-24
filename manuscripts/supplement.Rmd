@@ -199,7 +199,6 @@ $$\Pi_4(N_t,h_t) = p h_t -  c_0 E_t - c_4 E_t^2$$
 Where $c_4$ is calibrated as in the case of the other coefficients to induce the fixed reduction of net present value relative to $NPV_0$.
 
 ```{r quadraticcosts, include=FALSE, message=FALSE}
-
 source("components/quad_costs.R")
 ```
 
