@@ -14,8 +14,6 @@ make
 Or from R:
 
 ```r
-source("components/install.R")
-source("components/restore-cache.R")
 rmarkdown::render("manuscript.Rmd")
 ```
 
