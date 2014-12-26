@@ -1,3 +1,5 @@
+parallel = FALSE
+ncpu = 4
 
 ## ----dependencies, include=FALSE-----------------------------------------
 source("components/install.R")
@@ -29,7 +31,6 @@ library("cboettigR")
 library("ggthemes")
 library("snowfall")
 theme_set(theme_tufte())
-ncpu = 1
 
 
 ## ----profit_model--------------------------------------------------------
@@ -81,7 +82,7 @@ penaltyfns <- list(L2=L2, L1=L1, fixed=fixed)
 
 
 ## ----parallel, include=FALSE---------------------------------------------
-sfInit(cpu=ncpu, parallel=T)
+sfInit(cpu=ncpu, parallel=parallel)
 sfLibrary(pdgControl)
 sfExportAll()
 

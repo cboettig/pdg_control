@@ -1,3 +1,6 @@
+parallel = FALSE
+ncpu <- 4
+
 library("pdgControl")
 library("tidyr")
 library("dplyr")
@@ -16,7 +19,6 @@ profit_quad <- function(c2) profit_harvest(price = price, c0 = c0, c1 = c2)
 ## ----c2_grid-------------------------------------------------------------
 c2 <- exp(seq(0, log(41), length.out = 40))-1
 c2 <- seq(0, 40, length.out=100)
-ncpu <- 4
 reduction <- 0.25 
 
 ## ----setup---------------------------------------------------------------
@@ -48,7 +50,7 @@ opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT,
 none <- function(h, h_prev)  0
 i <- which(x_grid > K)[1]
 
-sfInit(parallel=TRUE, cpus = ncpu)
+sfInit(parallel = parallel, cpus = ncpu)
 sfLibrary(pdgControl)
 sfExportAll()
 policies <- sfLapply(c2, function(c2){

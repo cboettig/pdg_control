@@ -1,3 +1,4 @@
+parallel = FALSE
 ncpu = 4
 
 
@@ -50,7 +51,7 @@ penaltyfns <- list(L2=L2, L1=L1, fixed=fixed)
 
 
 ## ----parallel, include=FALSE---------------------------------------------
-sfInit(cpu=ncpu, parallel=TRUE)
+sfInit(cpu=ncpu, parallel=parallel)
 sfLibrary(pdgControl)
 sfExportAll()
 
