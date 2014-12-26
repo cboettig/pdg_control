@@ -1,1 +1,2 @@
+# Ignore the cache since it's not available for the automated build anyhow 
 components/cache/*

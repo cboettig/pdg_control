@@ -109,6 +109,7 @@ ggplot(dt_s, aes(time, value, col=variable, lty=variable)) +
   scale_color_discrete(labels=c("With Penalty", "Reed Solution"), name="") +
   scale_linetype_discrete(labels=c("With Penalty", "Reed Solution"), name="")  
 
+write.csv(dt_s, "components/data/figureS1.csv")
 ```
 
 
@@ -129,6 +130,7 @@ ggplot(stock_stats, aes(penalty_fraction, value, fill=penalty_fn, col=penalty_fn
   scale_fill_discrete(labels=relabel, name="Penalty function") +
   xlab("Penalty size (as fraction of NPV0)")
 
+write.csv(stock_stats, "components/data/figureS2.csv")
 
 ```
 
@@ -183,7 +185,7 @@ ggplot(ex) +
 
 
 
-write.csv(ex, "components/data/figure_s3.csv")
+write.csv(ex, "components/data/figureS3.csv")
 ```
 
 
