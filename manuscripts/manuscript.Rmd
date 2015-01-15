@@ -421,7 +421,7 @@ Effect of policy adjustment costs on optimal quotas and stock sizes
 
 
 
-```{r Figure_3, dependson="tidy", fig.cap="Example realization of optimal harvesting strategy and resulting fish stock sizes under the different functional forms of adjustment costs.", fig.height=5, fig.width=8, cache = fig.cache, dev=c("pdf", "svg", "png")}
+```{r Figure_3, dependson="tidy", fig.cap="Example realization of optimal harvesting strategy and resulting fish stock sizes under the different functional forms of adjustment costs. When costs vary linearly with the size of the adjustment ($\\Pi_1$), periods with no adjustment are more common than if adjustments were free.  When costs vary quadratically with adjustment size ($\\Pi_2$), small adjustments are relatively cheap and thus the resulting optimal policy always changes, but by a smaller amount than if adjustments were free.  When adjustments incur a fixed fee independent of size ($\\Pi_$), the optimal strategy either remains unchanged or overshoots the cost-free optimum. ", fig.height=5, fig.width=8, cache = fig.cache, dev=c("pdf", "svg", "png")}
 
 labeller <- function(variable,value){
     return(relabel[paste(value)])
@@ -438,7 +438,8 @@ ggplot(dt3, aes(time, value, col=variable, lty=variable)) +
   facet_grid(penalty_fn~., labeller = labeller) + 
   labs(x="time", y="stock size", title = "Example Harvest Dynamics")  +
   scale_color_discrete(labels=c("Adjustment penalty", "No penalty"), name="") +
-  scale_linetype_discrete(labels=c("Adjustment penalty", "No penalty"), name="")  
+  scale_linetype_discrete(labels=c("Adjustment penalty", "No penalty"), name="") + 
+  theme_bw()
 
 write.csv(dt3, "components/data/figure3.csv")
 ```
