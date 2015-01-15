@@ -13,7 +13,7 @@ author:
     affiliation: UTKEcon
   - name: Alan Hastings
     affiliation: UCD
-  - name: Paul Armsworth 
+  - name: Paul R. Armsworth 
     affiliation: UTKEEB
 
 address: 
@@ -136,7 +136,7 @@ write.csv(stock_stats, "components/data/figureS2.csv")
 
 
 Recall that in our model definition, stock sizes are measured before
-harvest ($h_t$ being determined after observing stock size $x_t$) and
+harvest ($h_t$ being determined after observing stock size $N_t$) and
 thus show less influence of the policy cost than the harvest itself.
 
 Figure S2 shows the same summary statistics illustrating the trends
