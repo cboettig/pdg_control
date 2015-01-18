@@ -16,8 +16,7 @@ RUN installGithub.r --deps TRUE \
   cboettig/pdg_control
 
 # Add manuscripts directory onto image & set ownership to default user
-COPY . /home/rstudio
-RUN chown -R docker:docker /home/rstudio
+COPY . /home/rstudio/pdg-control
 ## Set default working dir for any interactive R session/Rstudio/bash
-WORKDIR /home/rstudio
+WORKDIR /home/rstudio/pdg-control
 
