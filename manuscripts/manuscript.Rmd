@@ -126,7 +126,7 @@ policy prescription to more closely reflect environmental variation
 should be traded off against potential costs associated with the more
 responsive approach to management this would require.
 
-```{r Figure_1, fig.cap="Estimated stock abundances (top panels) show much greater variation than the corresponding harvest policies (bottom).  Left panels: ICCAT Stock assessments and Total Allowable Catch (TAC, before adjustments for national underages and overages) for bluefin tuna, 1987 - 2007. Right panels: SEDAR stock assessments and annual quotas for south Atlantic snowy grouper.", fig.width=6, fig.height=4, dev=c("pdf", "svg", "png"), cache=FALSE}
+```{r Figure_1, fig.cap="Estimated stock abundances (top panels) show much greater variation than the corresponding harvest policies (bottom).  Left panels: ICCAT Stock assessments and Total Allowable Catch (TAC, before adjustments for national underages and overages) for bluefin tuna, 1982 - 2007. Right panels: SEDAR stock assessments and annual quotas for south Atlantic snowy grouper.", fig.width=6, fig.height=4, dev=c("pdf", "svg", "png"), cache=FALSE}
 tuna <- read.csv("components/data/tuna.csv")
 grouper <- read.csv("components/data/grouper.csv")
 
@@ -144,12 +144,12 @@ To illustrate this tradeoff, we use an example from fisheries
 management. Figure 1, top-left panel, shows a time series for the
 estimated population size, represented as spawning stock biomass, of
 west Atlantic bluefin tuna (_Thunnus thynnus_, henceforth bluefin) from
-a recent stock assessment [@ICCAT20XX].  The bottom-left panel 
+a recent stock assessment [@ICCAT2009a].  The bottom-left panel 
 shows the catch quota (Total Allowable Catch or TAC, before being adjusted
 for overages or underages in the catch of each country in the previous year)
 for the stock as set by the relevant
-management agency [@ICCAT20XX]. Despite the estimated population size
-declining by XX% between YYYY and ZZZZ, the quota was not changed during
+management agency [@ICCAT2009a]. Despite the estimated population size
+declining by `r 1 - min(tuna$stock)/max(tuna$stock)`% between 1982 and 1991, the quota was not changed during
 this period. Instead, the quota only changed occasionally and in between
 times was left unaltered. Fishery management decisions regarding this
 species can be highly contentious (@Safina1998, @Sissenwine1998,
@@ -421,7 +421,7 @@ Effect of policy adjustment costs on optimal quotas and stock sizes
 
 
 
-```{r Figure_3, dependson="tidy", fig.cap="Example realization of optimal harvesting strategy and resulting fish stock sizes under the different functional forms of adjustment costs. When costs vary linearly with the size of the adjustment ($\\Pi_1$), periods with no adjustment are more common than if adjustments were free.  When costs vary quadratically with adjustment size ($\\Pi_2$), small adjustments are relatively cheap and thus the resulting optimal policy always changes, but by a smaller amount than if adjustments were free.  When adjustments incur a fixed fee independent of size ($\\Pi_$), the optimal strategy either remains unchanged or overshoots the cost-free optimum. ", fig.height=5, fig.width=8, cache = fig.cache, dev=c("pdf", "svg", "png")}
+```{r Figure_3, dependson="tidy", fig.cap="Example realization of optimal harvesting strategy and resulting fish stock sizes under the different functional forms of adjustment costs. When costs vary linearly with the size of the adjustment ($\\Pi_1$), periods with no adjustment are more common than if adjustments were free.  When costs vary quadratically with adjustment size ($\\Pi_2$), small adjustments are relatively cheap and thus the resulting optimal policy always changes, but by a smaller amount than if adjustments were free.  When adjustments incur a fixed fee independent of size ($\\Pi_3$), the optimal strategy either remains unchanged or overshoots the cost-free optimum. ", fig.height=5, fig.width=8, cache = fig.cache, dev=c("pdf", "svg", "png")}
 
 labeller <- function(variable,value){
     return(relabel[paste(value)])
