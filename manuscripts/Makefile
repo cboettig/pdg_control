@@ -1,3 +1,4 @@
+## Making supplement makes both
 all:
 	make supplement.pdf 
 
