@@ -17,7 +17,8 @@
 #'  function at each point along the grid at each point in time.  
 #'  The returned V gives the value matrix at the first (last) time. 
 #' @export
-value_iteration <- function(SDP_Mat, x_grid, h_grid, OptTime=100, xT, profit, 
+value_iteration <- function(SDP_Mat, x_grid, h_grid, 
+                            OptTime=100, xT, profit, 
                             delta, epsilon = 1e-4){
   
   

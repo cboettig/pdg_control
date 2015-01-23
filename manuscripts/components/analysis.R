@@ -1,3 +1,6 @@
+
+#### SETUP #######
+
 parallel = FALSE
 ncpu = 4
 
@@ -6,7 +9,6 @@ ncpu = 4
 price = 10
 c0 = 30
 profit <- profit_harvest(price = price, c0 = c0, c1 = 0)
-
 
 ## ----c2_grid-------------------------------------------------------------
 c2 <- exp(seq(0, log(41), length.out = 40))-1
@@ -50,13 +52,17 @@ none <- function(h, h_prev)  0
 penaltyfns <- list(L2=L2, L1=L1, fixed=fixed)
 
 
+
+
 ## ----parallel, include=FALSE---------------------------------------------
 sfInit(cpu=ncpu, parallel=parallel)
 sfLibrary(pdgControl)
 sfExportAll()
 
+##### ANALYSIS #############
 
-## ----bigloop----
+
+## Apples to Apples comparison (Figure 2)
 policies <- lapply(penaltyfns, function(penalty){
   sfLapply(c2, function(c2){
     policy <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
@@ -65,8 +71,6 @@ policies <- lapply(penaltyfns, function(penalty){
   )
 })
 
-
-## -------------------------------------------------
 i <- which(x_grid > K)[1]
 fees <- 
   lapply(policies, function(penalty) 
@@ -81,9 +85,6 @@ npv0 <- max(fees$L1) # all have same max, at c2=0
 fees <- data.frame(c2=c2,fees)
 fees <- melt(fees, id="c2")
 fees <- subset(fees, variable %in% c("L1", "L2", "fixed"))
-
-#ggplot(fees, aes(c2, value, col=variable)) + geom_point() + geom_line()
-
 
 ## ----apples-----------------------
 closest <- function(x, v){
@@ -106,18 +107,13 @@ print_npv <- data.frame(model=index$variable, "value realized"=values,
 
 
 
-
-## ----npv_table--------------------
-#pandoc.table(print_npv)
-
-
-## ----policynames---------------------------------------------------------
+## ----Apply the apples-to-apples calibration------------------------------------
 L2_policy <- policies$L2[[apples_index["L2"]]]$D
 L1_policy <- policies$L1[[apples_index["L1"]]]$D
 fixed_policy <- policies$fixed[[apples_index["fixed"]]]$D
 
 
-## ----simulate_policy---------------
+## ----Simulations for Figure 3-------------------
 reps <- 1:100
 names(reps) = paste("rep", 1:length(reps), sep="_") # treat as a factor
 seeds <- 1:100
@@ -143,6 +139,9 @@ setnames(dt, "L2", "replicate") # names are nice
 setnames(dt, "L1", "penalty_fn") # names are nice
 
 
+
+
+#####------------------Simulations for Figure 5---------------------------
 ## ----profit_calcs, dependson="tidy"--------------------------------------
 # Profit when accounting for penalty when present
 optimal_cost <- dt[, sum(profit_fishing - policy_cost), by=penalty_fn ] 
@@ -225,6 +224,8 @@ fig4 <- function(fraction_lost){
 }
 
 
+##### Figure 4 #########
+
 ## ----sim_at_each_apple---------------------------------------------------
 frac_lost <- seq(0,1, length=20)
 sims_at_each_apple <- lapply(frac_lost, fig4)
@@ -264,7 +265,7 @@ figure4_df <- stats_df
 figure4_df$statistic <- figure4_df$variable
 figure4_df$timeseries <- figure4_df$variable
 stat_map <- c(harvest.variance = 'variance', stock.variance='variance', stock.autocorrelation='autocor',harvest.autocorrelation='autocor', cross.correlation='cross.correlation')
-series_map <- c(harvest.variance = 'harvest', stock.variance='stock', stock.autocorrelation='stock',harvest.autocorrelation='harvest', cross.correlation='both')
+  series_map <- c(harvest.variance = 'harvest', stock.variance='stock', stock.autocorrelation='stock',harvest.autocorrelation='harvest', cross.correlation='both')
 
 
 figure4_df$statistic <- stat_map[figure4_df$statistic]
