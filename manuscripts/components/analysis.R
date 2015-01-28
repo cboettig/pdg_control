@@ -255,21 +255,18 @@ summary_stats <- function(dt){
 stats_summaries <- lapply(sims_at_each_apple, summary_stats)
 # reformat list of data-frames as data frame with apple coef as a factor
 stats_df <- melt(stats_summaries, id=names(stats_summaries[[1]]))
+stats_df <- as_data_frame(stats_df)
 stats_df$L1 <- frac_lost[stats_df$L1]
-names(stats_df) <- c("penalty_fn", "reps", "variable", "value", "penalty_fraction")
+stats_df %>% 
+  dplyr::rename(penalty_fraction = L1) -> stats_df
 
 
-## ----split-factors-------------------------------------------------------
-# make statistic and timeseries separate factors
-figure4_df <- stats_df
-figure4_df$statistic <- figure4_df$variable
-figure4_df$timeseries <- figure4_df$variable
-stat_map <- c(harvest.variance = 'variance', stock.variance='variance', stock.autocorrelation='autocor',harvest.autocorrelation='autocor', cross.correlation='cross.correlation')
-  series_map <- c(harvest.variance = 'harvest', stock.variance='stock', stock.autocorrelation='stock',harvest.autocorrelation='harvest', cross.correlation='both')
-
-
-figure4_df$statistic <- stat_map[figure4_df$statistic]
-figure4_df$timeseries <- series_map[figure4_df$timeseries]
+stats_df %>% 
+  filter(variable != "cross.correlation") %>%
+  separate(variable, c("measurement", "statistic"), sep="\\.") %>%
+  filter(measurement == 'harvest') %>% 
+  spread(statistic, value) ->
+  f4df
 
 
 ## ----histograms----------------------------------------------------------

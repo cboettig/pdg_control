@@ -115,22 +115,49 @@ write.csv(dt_s, "components/data/figureS1.csv")
 
 
 
-```{r Figure_S2, fig.cap="Variance and autocorrelation of stock dynamics, as a function of the penalty coefficient.  Adjustment penalty is calculated as percentage of the maximum expected $NPV$ in the basic case with no policy adjustment costs.", fig.height=4, fig.width=8, cache=fig.cache, dev=c("pdf", "svg", "png")}
+```{r Figure_S2, fig.cap="Variance and autocorrelation of stock dynamics, as a function of the penalty coefficient.  Adjustment penalty is calculated as percentage of the maximum expected $NPV$ in the basic case with no policy adjustment costs.", fig.height=6, fig.width=4, cache=fig.cache, dev=c("pdf", "svg", "png")}
 
-stock_stats <- filter(figure4_df, timeseries=='stock')
-ggplot(stock_stats, aes(penalty_fraction, value, fill=penalty_fn, col=penalty_fn)) + 
-  stat_summary(fun.y = mean, 
+
+stats_df %>% 
+  filter(variable != "cross.correlation") %>%
+  separate(variable, c("measurement", "statistic"), sep="\\.") %>%
+  filter(measurement == 'stock') %>% 
+  spread(statistic, value) ->
+  s2df
+
+p4 <- ggplot(s2df, aes(x = penalty_fraction, fill=penalty_fn, col=penalty_fn)) + 
+  coord_cartesian(xlim = c(0, .3)) + 
+  scale_color_discrete(labels=relabel, name="Adj. cost model") + 
+  scale_fill_discrete(labels=relabel, name="Adj. cost model") 
+
+p4a <- p4 + 
+  stat_summary(aes(y=autocorrelation),
+               fun.y = mean, 
                fun.ymin = function(x) mean(x) - sd(x), 
                fun.ymax = function(x) mean(x) + sd(x), 
                geom = "ribbon", alpha=0.3, colour=NA) +
-  stat_summary(fun.y = mean, geom = "line") + 
-  coord_cartesian(xlim = c(0, .3)) + 
-  facet_wrap(~ statistic, scale="free_y") + 
-  scale_color_discrete(labels=relabel, name="Penalty function") + 
-  scale_fill_discrete(labels=relabel, name="Penalty function") +
-  xlab("Penalty size (as fraction of NPV0)")
+  stat_summary(aes(y=autocorrelation), fun.y = mean, geom = "line") + 
+  xlab("")
 
-write.csv(stock_stats, "components/data/figureS2.csv")
+p4b <- p4 + 
+  stat_summary(aes(y=variance),
+               fun.y = mean, 
+               fun.ymin = function(x) mean(x) - sd(x), 
+               fun.ymax = function(x) mean(x) + sd(x), 
+               geom = "ribbon", alpha=0.3, colour=NA) +
+  stat_summary(aes(y=variance), fun.y = mean, geom = "line") +
+  xlab(expression(paste("Penalty size (as fraction of ", NPV[0], ")"))) 
+
+
+legend <- gtable_filter(ggplot_gtable(ggplot_build(p4a)), "guide-box") 
+grid.arrange(do.call(arrangeGrob, 
+            lapply(list(p4a, p4b),
+                   function(x) x + theme_bw() + theme(legend.position="none"))),
+    legend,
+    ncol = 2,
+    widths = c(5,1))
+
+write.csv(s2df, "components/data/figureS2.csv")
 
 ```
 
