@@ -500,7 +500,7 @@ Figure 4.  We show the impact of policy adjustment costs on the variance &
 autocorrelation of the harvests through time.
 
 
-```{r Figure_4, fig.cap="Variance and autocorrelation of harvest dynamics, as a function of the penalty coefficient.  Adjustment penalty is calculated as percentage of the maximum expected NPV in the basic case with no policy adjustment costs.", fig.height=6, fig.width=4, cache=fig.cache, dev=c("pdf", "svg", "png")}
+```{r Figure_4, fig.cap="Variance and autocorrelation of harvest dynamics, as a function of the penalty coefficient.  Adjustment penalty is calculated as percentage of the maximum expected NPV in the basic case with no policy adjustment costs.", fig.height=6, fig.width=4.5, cache=fig.cache, dev=c("pdf", "svg", "png")}
 
 stats_df %>% 
   filter(variable != "cross.correlation") %>%
@@ -539,7 +539,7 @@ grid.arrange(do.call(arrangeGrob,
                    function(x) x + theme_bw() + theme(legend.position="none"))),
     legend,
     ncol = 2,
-    widths = c(5,1))
+    widths = c(5,1.5))
 
 
 
