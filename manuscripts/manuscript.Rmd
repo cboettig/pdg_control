@@ -7,7 +7,7 @@ author:
     footnote: Corresponding author
   - name: Michael Bode
     affiliation: melbourne
-  - name: James Sanchirico
+  - name: James N. Sanchirico
     affiliation: UCD
   - name: Jacob LaRiviere
     affiliation: UTKEcon
@@ -151,7 +151,8 @@ shows the catch quota (Total Allowable Catch or TAC, before being adjusted
 for overages or underages in the catch of each country in the previous year)
 for the stock as set by the relevant
 management agency [@ICCAT2009a]. Despite the estimated population size
-declining by `r 1 - min(tuna$stock)/max(tuna$stock)`% between 1982 and 1991, the quota was not changed during
+declining by `r 100 * (1 - min(tuna$stock) / max(tuna$stock))`% between
+1982 and 1991, the quota was not changed during
 this period. Instead, the quota only changed occasionally and in between
 times was left unaltered. Fishery management decisions regarding this
 species can be highly contentious (@Safina1998, @Sissenwine1998,
@@ -198,9 +199,7 @@ analysis, Reed did not account for any costs of policy adjustment, which
 for such a responsive management strategy potentially could be large.
 
 As the examples in Figure 1 make clear, management policies will rarely be
-as responsive as this constant escapement policy assumes. In this paper,
-we explore conditions under which this lack of responsiveness may be a
-rational response on the part of managers. Specifically, we consider a
+as responsive as this constant escapement policy assumes. In this paper, we consider a
 case where managers seek to balance the benefits in terms of increased
 profits from fishing from more finely tracking recruitment variations
 with the growing costs associated with adjusting policies frequently to do
@@ -208,8 +207,8 @@ so. The policy adjustment costs involved could reflect pure administrative
 transaction costs or preferences held by fishermen, fish processing plants
 or other stakeholders, for less variable quotas. In seeking to account
 for these policy adjustment costs, we recognize that we do not know just
-what functional form they should take and that it will require a lot of
-empirical work to estimate that. Therefore, we scope three candidate
+what functional form they should take and that it will require substantial 
+empirical work to estimate that. Therefore, we investigate three candidate
 functional forms that represent qualitatively different assumptions about how these
 costs operate to determine whether the results we obtain are sensitive
 to such differences.
@@ -269,8 +268,7 @@ $c_0$ the cost of fishing per unit effort and, to simplify the presentation of r
 we assume that these are constants with $p>0$ and $c_0>0$. 
 
 To simplify presentation of the results, we will illustrate cases where the
-growth parameters are chosen so that the intrinsic rate of increase of
-the fish population is 1 and the equilibrium biomass for the equivalent
+growth parameters are chosen so that the equilibrium biomass for the equivalent
 deterministic model without harvesting is `r K`; (specifically, $A=$ `r pars[1]` and
 $B=$ `r pars[2]` in Eqn \eqref{eq:state_equation}). To characterize environmental variability, we
 assume multiplicative shock $Z_t$ is distributed log-normally with
@@ -405,8 +403,8 @@ ggplot(fees, aes(c2, (npv0-value)/npv0, lty=variable, color=variable)) +
   geom_hline(aes(yintercept=reduction), linetype=4) + 
   xlab("Penalty coefficient") +
   ylab("Reduction in net present value") + 
-  scale_linetype_discrete(labels=relabel, breaks = c('L1', 'L2', 'fixed')) + 
-  scale_color_discrete(labels=relabel, breaks = c('L1', 'L2', 'fixed')) 
+  scale_linetype_discrete(labels=relabel, breaks = c('L1', 'L2', 'fixed'), name = 'cost model') + 
+  scale_color_discrete(labels=relabel, breaks = c('L1', 'L2', 'fixed'), name = 'cost model') 
  # rename scale from 'variable' to 'adjustment cost for policy:'
 
 write.csv(dt, "components/data/100reps.csv")
@@ -440,6 +438,8 @@ dt3 <- dt %>%
   filter(replicate=="rep_17" & time < 20) %>%
   select(time, harvest, harvest_alt, penalty_fn) %>%
   gather(variable, value, -time, -penalty_fn) 
+
+dt3$penalty_fn <- factor(dt3$penalty_fn, levels=c("L1", "L2", "fixed"))
 
 
 ggplot(dt3, aes(time, value, col=variable, lty=variable)) +
@@ -500,7 +500,7 @@ Figure 4.  We show the impact of policy adjustment costs on the variance &
 autocorrelation of the harvests through time.
 
 
-```{r Figure_4, fig.cap="Variance and autocorrelation of harvest dynamics, as a function of the penalty coefficient.  Adjustment penalty is calculated as percentage of the maximum expected NPV in the basic case with no policy adjustment costs.", fig.height=6, fig.width=4.5, cache=fig.cache, dev=c("pdf", "svg", "png")}
+```{r Figure_4, fig.cap="Variance and autocorrelation of harvest dynamics, as a function of the penalty coefficient.  Adjustment penalty is calculated as percentage of the maximum expected NPV in the basic case with no policy adjustment costs.", fig.height=6, fig.width=5, cache=fig.cache, dev=c("pdf", "svg", "png")}
 
 stats_df %>% 
   filter(variable != "cross.correlation") %>%
@@ -511,8 +511,8 @@ stats_df %>%
 
 p4 <- ggplot(f4df, aes(x = penalty_fraction, fill=penalty_fn, col=penalty_fn)) + 
   coord_cartesian(xlim = c(0, .3)) + 
-  scale_color_discrete(labels=relabel, name="Adj. cost model") + 
-  scale_fill_discrete(labels=relabel, name="Adj. cost model") 
+  scale_color_discrete(labels=relabel, name="cost model") + 
+  scale_fill_discrete(labels=relabel, name="cost model") 
 
 p4a <- p4 + 
   stat_summary(aes(y=autocorrelation),
@@ -539,7 +539,7 @@ grid.arrange(do.call(arrangeGrob,
                    function(x) x + theme_bw() + theme(legend.position="none"))),
     legend,
     ncol = 2,
-    widths = c(5,1.5))
+    widths = c(5,2))
 
 
 
@@ -597,7 +597,7 @@ names(no_shifts) <- ave$penalty_fn
 ```
 
 While still not common for the particular parameter combinations we examine,
-We find that positive unaltered quotas through time are much more likely
+we find that positive unaltered quotas through time are much more likely
 to occur when optimizing against $\Pi_1$ where policy adjustment costs
 scale linearly with the size of proposed policy changes: over the 100 replicates
 time series the harvest policy is strictly positive and identical in consecutive intervals
@@ -638,10 +638,18 @@ fig5_dat <- hist_dat %>%
   filter(penalty_fn=="L1") %>%
   select(-penalty_fn) %>%
   unite(dist, Assumption, variable, sep = " : ")
-
+labels <- c(expression(paste("Costs under ",  Pi[1])), 
+            expression(paste("Revenue under ", Pi[1])),
+            expression(paste("Cost under ", Pi[0])), 
+            expression(paste("Revenue under ", Pi[0])))
 ggplot(fig5_dat) + 
-  geom_density(aes(value, fill=dist, color=dist), alpha=0.8)
+  geom_density(aes(value, fill=dist, color=dist, lty=dist), alpha=0.5, size=1) +
+  scale_fill_discrete(name="", labels=labels) + 
+  scale_color_discrete(labels=labels, name="") + 
+   scale_linetype_discrete(labels=labels, name="") +
+  xlab("Realized NPV")
 
+  
 write.csv(hist_dat, "components/data/figure5.csv")
 ```
 
@@ -690,12 +698,12 @@ table1_long <- subset(table1_long, reduction != "0.3")
 ggplot(filter(table1_long, reduction == 0.25),
   aes(penalty.fn, value, fill = variable)) + 
   geom_bar(stat="identity", position="dodge") + 
-  facet_wrap(~reduction, ncol=2) + 
+  scale_fill_discrete(name="error type") + 
   scale_x_discrete(labels = c('L1' = substitute(paste(Pi[1])),
                               'L2' = substitute(paste(Pi[2])),
                               'fixed' = substitute(paste(Pi[3])))) + 
-  xlab("Penalty function") + 
-  ylab(expression(NPV[0]))
+  xlab("Cost model") + 
+  ylab(expression(NPV[0])) + theme_tufte(base_size=16)
 write.csv(table1_long, "components/data/figure6.csv")
 ```
 
@@ -787,8 +795,8 @@ and remaining stock sizes corresponding to optimal management become more
 autocorrelated in time, because it takes the fishery multiple timesteps to harvest
 down peaks in abundance that follow large recruitment pulses. The effects
 of smoothing here are similar to those predicted when assuming the cost
-per unit effort is increasing in the amount of effort expended (e.g.,
-@Lewis1981, @McGough2009; see Supporting Information for a summary of the
+per unit effort is increasing in the amount of effort expended [@Brown1974;
+@Lewis1981; @McGough2009]; (see Supporting Information for a summary of the
 relevant results) as opposed to associating extra costs with changes to
 policy *per se*. Smoothing effects of this type are what one might have
 expected when including policy adjustment costs.
@@ -816,14 +824,14 @@ such different dynamics suggests that researchers constructing fisheries
 economics models should proceed cautiously when choosing how to represent
 these costs. However, in our own experience, we have found that while
 modeling studies sometimes mention policy adjustment costs when motivating
-model assumptions [@Lewis1981; @Feichtinger1994; @Wirl1999; @McGough2009],
+model assumptions [@Brown1974; @Lewis1981; @Feichtinger1994; @Wirl1999; @McGough2009],
 they rarely provide much justification
 for the choice of functional form used or test the sensitivity of any
 conclusions drawn to alternative specifications. Indeed, we were surprised
 to find such clear differences between the functional forms, because
 we anticipated that the limiting case of increasing policy adjustment
 costs within each functional form should be the same, namely a constant
-annual quota that does not change through time (open loop control).
+annual quota that does not change through time.
 
 We also compared the efficiency costs that would result from failing
 to account for policy adjustment costs, if they are present, with those
@@ -854,8 +862,8 @@ As with any modeling analysis, our formulation makes many assumptions. For
 example, we assume that the fishery in question is being optimally managed
 by a policymaker who acts as the "sole owner" of the stock. This approach
 is different to models that assume fisheries are not well managed,
-e.g. by assuming open access conditions,
-or models that derive policy recommendations endogenously by modeling
+e.g. by assuming regulated open access conditions [@Homans1997],
+or models that derive policy recommendations endogenously by modeling strategic 
 interactions between different stakeholders [@Kaitala1993; @Laukkanen2003].
 As such, we anticipate that our approach will be more relevant to
 some fisheries, particularly domestic fisheries in developed countries
@@ -926,9 +934,9 @@ NSF Award #DBI-1300426, with additional support from The University of
 Tennessee, Knoxville.  The authors acknowledge helpful discussions and
 input from working group co-organizers Megan Donahue and Carl Toews, and
 participants Marie-Josee Fortin, Dan Ryan, Frank Doyle, Claire Paris,
-Iadine Chades and Mandy Karnauskas.  We also acknowledge the following
-support: NSF Grant DBI-1306697 (CB), ARC DECRA (DE130100572) and The
-ARC Centre of Excellence for Environmental Decisions (MB), ...
+Iadine Chades and Mandy Karnauskas.  We also acknowledge the support of
+NSF Grant DBI-1306697 to CB and ARC DECRA (DE130100572) & the
+ARC Centre of Excellence for Environmental Decisions to MB.
 
 
 
