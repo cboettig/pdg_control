@@ -50,13 +50,17 @@ abstract: |
           that failing to account for adjustment costs has a consistently worse
           economic impact than would assuming these costs are present when they are not.
 
-layout: review,12pt
+
+keywords: [optimal control, fisheries, ecological management, adjustment costs]
+
+layout: review,12pt,author-year,titlepage
 linenumbers: true
-
-
 bibliography: components/references.bib
 csl: components/ecology.csl
 documentclass: components/elsarticle
+geometry: [verbose,letterpaper,tmargin=2.54cm,bmargin=2.54cm,l
+margin=2.54cm,rmargin=2.54cm]
+
 
 output:
   pdf_document:
@@ -97,6 +101,35 @@ options(digits=2)
 
 theme_set(theme_tufte(base_size=12) + theme(axis.line = element_line()))
 ```
+
+
+```{r parameters, cache=FALSE}
+parallel = FALSE
+ncpu = 4
+price = 10
+c0 = 30
+profit <- profit_harvest(price = price, c0 = c0, c1 = 0)
+#c2 <- exp(seq(0, log(41), length.out = 40))-1
+c2 <- seq(0, 40, length.out=100)
+reduction <- 0.25 
+seed <- 123                 # Random seed (replicable results)
+delta <- 0.05               # economic discounting rate
+OptTime <- 50               # stopping time
+gridsize <- 50              # grid size for fish stock and harvest rate (discretized population)
+sigma_g <- 0.2              # Noise in population growth
+reward <- 0                 # bonus for satisfying the boundary condition
+z_g <- function() rlnorm(1,  0, sigma_g) # mean 1
+z_m <- function() 1         # No measurement noise, 
+z_i <- function() 1         # No implemenation noise
+f <- BevHolt                # Select the state equation
+pars <- c(1.5, 0.05)        # parameters for the state equation
+K <- (pars[1] - 1)/pars[2]  # Carrying capacity (for reference 
+xT <- 0                     # boundary conditions
+x0 <- K
+x_grid <- seq(0.01, 1.2 * K, length = gridsize)  
+h_grid <- seq(0.01, 0.8 * K, length = gridsize)  
+```
+
 
 
 ```{r analysis, include=FALSE}
@@ -269,7 +302,7 @@ we assume that these are constants with $p>0$ and $c_0>0$.
 
 To simplify presentation of the results, we will illustrate cases where the
 growth parameters are chosen so that the equilibrium biomass for the equivalent
-deterministic model without harvesting is `r K`; (specifically, $A=$ `r pars[1]` and
+deterministic model without harvesting is `r (pars[1]-1)/pars[2]`; (specifically, $A=$ `r pars[1]` and
 $B=$ `r pars[2]` in Eqn \eqref{eq:state_equation}). To characterize environmental variability, we
 assume multiplicative shock $Z_t$ is distributed log-normally with
 log standard deviation $\sigma_g$ = `r sigma_g`. In addition, we
