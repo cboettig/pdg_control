@@ -97,6 +97,7 @@ library("tidyr")
 library("dplyr")
 library("gtable")
 library("gridExtra")
+library("parallel")
 options(digits=2)
 
 theme_set(theme_tufte(base_size=12) + theme(axis.line = element_line()))
@@ -104,8 +105,8 @@ theme_set(theme_tufte(base_size=12) + theme(axis.line = element_line()))
 
 
 ```{r parameters, cache=FALSE}
-parallel = FALSE
-ncpu = 4
+parallel = TRUE
+ncpu = parallel::detectCores()
 price = 10
 c0 = 30
 profit <- profit_harvest(price = price, c0 = c0, c1 = 0)
