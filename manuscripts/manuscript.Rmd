@@ -316,14 +316,13 @@ equation \eqref{eq:state_equation} define a stochastic dynamic programming
 problem that we solve using backwards recursion via Bellman's equation.
 We denote the resulting state-dependent, optimal control as $\mathbf{h}_0^{\ast}$.
 We solve this problem on a finite time horizon of $T =$ `r OptTime` using
-value iteration [@Mangel1988; @Clark2000]. (Longer horizon times have no
-qualitative difference but stretch the plots making it more difficult
-to visualize the fluctuations.)
+value iteration [@Mangel1988; @Clark2000]. 
 
 
 R code for implementing the dynamic programming algorithm in this context is
-provided as a supplementary R package to the paper. Scripts for replicating 
-all of the analysis presented here are also provided in the Supplementary Material.
+provided as a supplementary R package to the paper, along with scripts for replicating 
+the analyses presented here. To address concerns about computational reproducibility [@Boettiger2015],
+a Docker container image of the software environment is also provided.
 
 <!-- Cite & link to Zenodo DOI here(?)-->
 
@@ -438,10 +437,10 @@ ggplot(fees, aes(c2, (npv0-value)/npv0, lty=variable, color=variable)) +
   xlab("Penalty coefficient") +
   ylab("Reduction in net present value") + 
   scale_linetype_discrete(labels=relabel, breaks = c('L1', 'L2', 'fixed'), name = 'cost model') + 
-  scale_color_discrete(labels=relabel, breaks = c('L1', 'L2', 'fixed'), name = 'cost model') 
+  scale_color_discrete(labels=relabel, breaks = c('L1', 'L2', 'fixed'), name = 'cost model') + 
+  annotate("text", mean(c2), reduction+.01, label = "Calibration for 25% reduction in NPV")
  # rename scale from 'variable' to 'adjustment cost for policy:'
 
-write.csv(dt, "components/data/100reps.csv")
 write.csv(fees, "components/data/figure2.csv")
 
 ```
@@ -450,8 +449,8 @@ To compare the impact of penalty functions on optimal management across
 the different functional forms, we select penalty cost coefficients
 that induce the same reduction in maximum expected NPV. For example,
 the dashed vertical line in Figure 2 maps the needed cost coefficient
-$c_i$, for each penalty function, such that the fishery is worth `r
-100*(1-reduction)`% of its unconstrained value when optimally managed.
+$c_i$, for each penalty function, such that the fishery is worth `r 100*(1-reduction)`%
+of its unconstrained value when optimally managed.
 
 
 Results
@@ -681,7 +680,8 @@ ggplot(fig5_dat) +
   scale_fill_discrete(name="", labels=labels) + 
   scale_color_discrete(labels=labels, name="") + 
    scale_linetype_discrete(labels=labels, name="") +
-  xlab("Realized NPV")
+  xlab("Realized NPV") + 
+  ylab("Probability density of revenue/cost")
 
   
 write.csv(hist_dat, "components/data/figure5.csv")

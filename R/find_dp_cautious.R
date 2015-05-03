@@ -5,7 +5,7 @@
 #' @param h_grid the discrete values of harvest levels to optimize over
 #' @param OptTime the stopping time 
 #' @param xT the boundary condition population size at OptTime
-#' @param c the cost/profit function, a function of harvested level
+#' @param profit the cost/profit function, a function of harvested level
 #' @param delta the exponential discounting rate
 #' @param reward  the profit for finishing with >= Xt fish at the end 
 #' (i.e. enforces the boundary condition)
