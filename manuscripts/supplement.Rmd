@@ -97,7 +97,7 @@ labeller <- function(variable,value){
 }
 
 dt_s <- dt %>% 
-  filter(replicate=="rep_17" & time < 20) %>%
+  filter(replicate=="rep_17" & time < OptTime) %>%
   select(time, fishstock, alternate, penalty_fn) %>%
   gather(variable, value, -time, -penalty_fn) 
 
@@ -200,7 +200,7 @@ if (variable=='penalty_fn') {
 
 
 ex <- dt %>% 
-  filter(replicate %in% paste0("rep_", 16:20) & time < 20) %>%
+  filter(replicate %in% paste0("rep_", 16:20) & time < OptTime) %>%
   select(time, fishstock, harvest, alternate, harvest_alt, replicate, penalty_fn) %>%
   gather(variable, stock, -time, -replicate, -penalty_fn)
 
@@ -239,7 +239,7 @@ labels <- c(harvest = substitute(paste("Harvest Policy under ", paste(Pi[4]))),
                                 harvest_alt = substitute(paste("Harvest under ", paste(Pi[0]), " (Reed)")))
 
 ex <- dt_quad %>% 
-  filter(replicate=="rep_17" & time < 20) %>%
+  filter(replicate=="rep_17" & time < OptTime) %>%
   select(time, harvest, harvest_alt) %>%
   gather(variable, stock, -time) 
 ggplot(ex) + 
@@ -334,7 +334,7 @@ names(table2) = c("penalty.fn", "ignoring", "mismatched", "reduction")
 table2_long <- melt(table2, id = c('penalty.fn', 'reduction'))
 table2_long$reduction <- as.factor(table2_long$reduction)
 
-ggplot(filter(table2_long, reduction==0.25), 
+ggplot(filter(table2_long, reduction==reduction), 
   aes(penalty.fn, value, fill = variable)) + 
   geom_bar(stat="identity", position="dodge") + 
   facet_wrap(~reduction, scales="free_y") +

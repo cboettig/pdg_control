@@ -469,7 +469,7 @@ labeller <- function(variable,value){
 }
 
 dt3 <- dt %>% 
-  filter(replicate=="rep_17" & time < 20) %>%
+  filter(replicate=="rep_17" & time < OptTime) %>%
   select(time, harvest, harvest_alt, penalty_fn) %>%
   gather(variable, value, -time, -penalty_fn) 
 
@@ -729,7 +729,7 @@ table1_long <- melt(table1, id = c('penalty.fn', 'reduction'))
 table1_long$reduction <- as.factor(table1_long$reduction)
 table1_long <- subset(table1_long, reduction != "0.3")
 
-ggplot(filter(table1_long, reduction == 0.25),
+ggplot(filter(table1_long, reduction == reduction),
   aes(penalty.fn, value, fill = variable)) + 
   geom_bar(stat="identity", position="dodge") + 
   scale_fill_discrete(name="error type") + 
