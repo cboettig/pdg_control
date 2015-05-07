@@ -83,29 +83,6 @@ theme_set(theme_tufte(base_size=12) + theme(axis.line = element_line()))
 
 # Supplementary material #
 
-## Code and data for methods and analysis ## 
-
-All code and data used in this analysis can be found under the project's GitHub repository: [https://github.com/cboettig/pdg_control](https://github.com/cboettig/pdg_control). A snapshot of this repository representing the precise versions of the code used in this analysis has been permanently archived in the scientific software and data repository Zenodo, managed by CERN; and should be referenced or cited using its assigned digital object identifer, doi:xxx.  (This DOI is also clearly linked from the GitHub repository).  
-
-### Organization of code
-
-The project repository is organized as an R package.  The intent is not to provide a general-purpose software tool for this kind of analysis, but rather to rely on a standardized directory structure for representing complex projects. It is our hope that this facilates understanding, reproducibility, and further exploration of these results sensu [Gentleman & Temple Lang 2007](http://biostats.bepress.com/bioconductor/paper2/), but caution that additional software engineering would be required before any of this could be applied in a different context.  The functions provided are largely specific to the analyses presented here and may undocumented or incompletely documented.
-
-The source documents for both the manuscript and supplement are also found in the code repository using the dynamic document `.Rmd` format which embeds all of the code required for the analysis; see [http://rmarkdown.rstudio.com/](http://rmarkdown.rstudio.com/).
-
-Within the `.Rmd` files themselves are found only the blocks of code required to generate each of the figures shown in the manuscript.  The analysis is sourced in from an external R script, `analysis.R` by a code block at the beginning of the `.Rmd` file.  This script in turn relies on more modular functions defined in the `R/` directory that define the stochastic dynamic programming optimization algorithms, simulation routines, and so forth.  
-
-
-### Data 
-
-All empirical or simulated data shown in the figures can also be found as tabular .csv files in this repository.  
-
-
-### Dependencies and machine images
-
-
-
-
 ##  Impact on the stock dynamics ##
 
 Figure S1 shows the corresponding stock dynamics for the replicates illustrated in Figure 3 of the main text.  The impact of the adjustment cost on the stock dynamics is less dramatic than it is on the harvest dynamics, due to the stochastic growth in stock sizes and the sequence in which the steps are applied: stock values are assessed without error, then an optimal harvest is determined (using the pre-computed optimal policy based on both the stock assessment and the previous harvest, to account for possible adjustment costs), and then the stock that escapes harvesting recruits stochastically to set the population size for the next year.  
@@ -120,7 +97,7 @@ labeller <- function(variable,value){
 }
 
 dt_s <- dt %>% 
-  filter(replicate=="rep_17" & time < OptTime) %>%
+  filter(replicate=="rep_17" & time < 20) %>%
   select(time, fishstock, alternate, penalty_fn) %>%
   gather(variable, value, -time, -penalty_fn) 
 
@@ -150,8 +127,8 @@ stats_df %>%
 
 p4 <- ggplot(s2df, aes(x = penalty_fraction, fill=penalty_fn, col=penalty_fn)) + 
   coord_cartesian(xlim = c(0, .3)) + 
-  scale_color_discrete(labels=relabel, name="cost model") + 
-  scale_fill_discrete(labels=relabel, name="cost model") 
+  scale_color_discrete(labels=relabel, name="Adj. cost model") + 
+  scale_fill_discrete(labels=relabel, name="Adj. cost model") 
 
 p4a <- p4 + 
   stat_summary(aes(y=autocorrelation),
@@ -223,7 +200,7 @@ if (variable=='penalty_fn') {
 
 
 ex <- dt %>% 
-  filter(replicate %in% paste0("rep_", 16:20) & time < OptTime) %>%
+  filter(replicate %in% paste0("rep_", 16:20) & time < 20) %>%
   select(time, fishstock, harvest, alternate, harvest_alt, replicate, penalty_fn) %>%
   gather(variable, stock, -time, -replicate, -penalty_fn)
 
@@ -262,7 +239,7 @@ labels <- c(harvest = substitute(paste("Harvest Policy under ", paste(Pi[4]))),
                                 harvest_alt = substitute(paste("Harvest under ", paste(Pi[0]), " (Reed)")))
 
 ex <- dt_quad %>% 
-  filter(replicate=="rep_17" & time < OptTime) %>%
+  filter(replicate=="rep_17" & time < 20) %>%
   select(time, harvest, harvest_alt) %>%
   gather(variable, stock, -time) 
 ggplot(ex) + 
@@ -357,7 +334,7 @@ names(table2) = c("penalty.fn", "ignoring", "mismatched", "reduction")
 table2_long <- melt(table2, id = c('penalty.fn', 'reduction'))
 table2_long$reduction <- as.factor(table2_long$reduction)
 
-ggplot(filter(table2_long, reduction==reduction), 
+ggplot(filter(table2_long, reduction==0.25), 
   aes(penalty.fn, value, fill = variable)) + 
   geom_bar(stat="identity", position="dodge") + 
   facet_wrap(~reduction, scales="free_y") +

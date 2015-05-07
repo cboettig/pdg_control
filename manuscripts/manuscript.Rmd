@@ -50,17 +50,13 @@ abstract: |
           that failing to account for adjustment costs has a consistently worse
           economic impact than would assuming these costs are present when they are not.
 
-
-keywords: [optimal control, fisheries, ecological management, adjustment costs]
-
-layout: review,12pt,author-year,titlepage
+layout: review,12pt
 linenumbers: true
+
+
 bibliography: components/references.bib
 csl: components/ecology.csl
 documentclass: components/elsarticle
-geometry: [verbose,letterpaper,tmargin=2.54cm,bmargin=2.54cm,l
-margin=2.54cm,rmargin=2.54cm]
-
 
 output:
   pdf_document:
@@ -97,40 +93,10 @@ library("tidyr")
 library("dplyr")
 library("gtable")
 library("gridExtra")
-library("parallel")
 options(digits=2)
 
 theme_set(theme_tufte(base_size=12) + theme(axis.line = element_line()))
 ```
-
-
-```{r parameters, cache=FALSE}
-parallel = TRUE
-ncpu = parallel::detectCores()
-price = 10
-c0 = 30
-profit <- profit_harvest(price = price, c0 = c0, c1 = 0)
-#c2 <- exp(seq(0, log(41), length.out = 40))-1
-c2 <- seq(0, 40, length.out=100)
-reduction <- 0.25 
-seed <- 123                 # Random seed (replicable results)
-delta <- 0.05               # economic discounting rate
-OptTime <- 50               # stopping time
-gridsize <- 50              # grid size for fish stock and harvest rate (discretized population)
-sigma_g <- 0.2              # Noise in population growth
-reward <- 0                 # bonus for satisfying the boundary condition
-z_g <- function() rlnorm(1,  0, sigma_g) # mean 1
-z_m <- function() 1         # No measurement noise, 
-z_i <- function() 1         # No implemenation noise
-f <- BevHolt                # Select the state equation
-pars <- c(1.5, 0.05)        # parameters for the state equation
-K <- (pars[1] - 1)/pars[2]  # Carrying capacity (for reference 
-xT <- 0                     # boundary conditions
-x0 <- K
-x_grid <- seq(0.01, 1.2 * K, length = gridsize)  
-h_grid <- seq(0.01, 0.8 * K, length = gridsize)  
-```
-
 
 
 ```{r analysis, include=FALSE}
@@ -303,7 +269,7 @@ we assume that these are constants with $p>0$ and $c_0>0$.
 
 To simplify presentation of the results, we will illustrate cases where the
 growth parameters are chosen so that the equilibrium biomass for the equivalent
-deterministic model without harvesting is `r (pars[1]-1)/pars[2]`; (specifically, $A=$ `r pars[1]` and
+deterministic model without harvesting is `r K`; (specifically, $A=$ `r pars[1]` and
 $B=$ `r pars[2]` in Eqn \eqref{eq:state_equation}). To characterize environmental variability, we
 assume multiplicative shock $Z_t$ is distributed log-normally with
 log standard deviation $\sigma_g$ = `r sigma_g`. In addition, we
@@ -316,13 +282,14 @@ equation \eqref{eq:state_equation} define a stochastic dynamic programming
 problem that we solve using backwards recursion via Bellman's equation.
 We denote the resulting state-dependent, optimal control as $\mathbf{h}_0^{\ast}$.
 We solve this problem on a finite time horizon of $T =$ `r OptTime` using
-value iteration [@Mangel1988; @Clark2000]. 
+value iteration [@Mangel1988; @Clark2000]. (Longer horizon times have no
+qualitative difference but stretch the plots making it more difficult
+to visualize the fluctuations.)
 
 
 R code for implementing the dynamic programming algorithm in this context is
-provided as a supplementary R package to the paper, along with scripts for replicating 
-the analyses presented here. To address concerns about computational reproducibility [@Boettiger2015],
-a Docker container image of the software environment is also provided.
+provided as a supplementary R package to the paper. Scripts for replicating 
+all of the analysis presented here are also provided in the Supplementary Material.
 
 <!-- Cite & link to Zenodo DOI here(?)-->
 
@@ -437,10 +404,10 @@ ggplot(fees, aes(c2, (npv0-value)/npv0, lty=variable, color=variable)) +
   xlab("Penalty coefficient") +
   ylab("Reduction in net present value") + 
   scale_linetype_discrete(labels=relabel, breaks = c('L1', 'L2', 'fixed'), name = 'cost model') + 
-  scale_color_discrete(labels=relabel, breaks = c('L1', 'L2', 'fixed'), name = 'cost model') + 
-  annotate("text", mean(c2), reduction+.01, label = "Calibration for 25% reduction in NPV")
+  scale_color_discrete(labels=relabel, breaks = c('L1', 'L2', 'fixed'), name = 'cost model') 
  # rename scale from 'variable' to 'adjustment cost for policy:'
 
+write.csv(dt, "components/data/100reps.csv")
 write.csv(fees, "components/data/figure2.csv")
 
 ```
@@ -449,8 +416,8 @@ To compare the impact of penalty functions on optimal management across
 the different functional forms, we select penalty cost coefficients
 that induce the same reduction in maximum expected NPV. For example,
 the dashed vertical line in Figure 2 maps the needed cost coefficient
-$c_i$, for each penalty function, such that the fishery is worth `r 100*(1-reduction)`%
-of its unconstrained value when optimally managed.
+$c_i$, for each penalty function, such that the fishery is worth `r
+100*(1-reduction)`% of its unconstrained value when optimally managed.
 
 
 Results
@@ -468,7 +435,7 @@ labeller <- function(variable,value){
 }
 
 dt3 <- dt %>% 
-  filter(replicate=="rep_17" & time < OptTime) %>%
+  filter(replicate=="rep_17" & time < 20) %>%
   select(time, harvest, harvest_alt, penalty_fn) %>%
   gather(variable, value, -time, -penalty_fn) 
 
@@ -680,8 +647,7 @@ ggplot(fig5_dat) +
   scale_fill_discrete(name="", labels=labels) + 
   scale_color_discrete(labels=labels, name="") + 
    scale_linetype_discrete(labels=labels, name="") +
-  xlab("Realized NPV") + 
-  ylab("Probability density of revenue/cost")
+  xlab("Realized NPV")
 
   
 write.csv(hist_dat, "components/data/figure5.csv")
@@ -729,7 +695,7 @@ table1_long <- melt(table1, id = c('penalty.fn', 'reduction'))
 table1_long$reduction <- as.factor(table1_long$reduction)
 table1_long <- subset(table1_long, reduction != "0.3")
 
-ggplot(filter(table1_long, reduction == reduction),
+ggplot(filter(table1_long, reduction == 0.25),
   aes(penalty.fn, value, fill = variable)) + 
   geom_bar(stat="identity", position="dodge") + 
   scale_fill_discrete(name="error type") + 

@@ -5,9 +5,10 @@
 #' @param h_grid the discrete values of harvest levels to optimize over
 #' @param OptTime the stopping time 
 #' @param xT the boundary condition population size at OptTime
+#' @param c the cost/profit function, a function of harvested level
 #' @param delta the discounting rate (1-delta)
 #' @param epsilon value iteration tolerance
-#' @param profit the profit function
+
 #' (i.e. enforces the boundary condition)
 #' @return list containing the matrices D and V.  D is an x_grid by OptTime
 #'  matrix with the indices of h_grid giving the optimal h at each value x

@@ -2,13 +2,15 @@ Package: pdgControl
 Description: Research in optimal control. Examples focus on fisheries
     management.
 Title: Pretty Darn Good Control
-Version: 0.0-3
+Version: 0.0-2
 License: CC0
 Author: Carl Boettiger
 Maintainer: Carl Boettiger, <cboettig@gmail.com>
 URL: https://github.com/cboettig/pdg_control
 BugReports: https://github.com/cboettig/pdg_control/issues
 Suggests:
+    reshape2,
+    ggplot2,
     data.table,
     pander,
     cboettigR,
@@ -16,13 +18,8 @@ Suggests:
     knitr,
     rmarkdown,
     tidyr,
-    dplyr,
-    plyr,
-    gtable,
-    gridExtra,
-    parallel
+    dplyr
 Imports:
-    reshape2,
     Hmisc,
     cubature,
     expm,

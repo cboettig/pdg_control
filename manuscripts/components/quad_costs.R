@@ -1,5 +1,5 @@
-parallel = TRUE
-ncpu <- parallel::detectCores()
+parallel = FALSE
+ncpu <- 4
 
 library("pdgControl")
 library("tidyr")
