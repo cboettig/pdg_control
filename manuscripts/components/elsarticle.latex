@@ -1,4 +1,4 @@
-\documentclass[author-year, $layout$]{$documentclass$} %review=doublespace preprint=single 5p=2 column
+\documentclass[$layout$]{$documentclass$} %review=doublespace preprint=single 5p=2 column
 %%% Begin My package additions %%%%%%%%%%%%%%%%%%%
 \usepackage[hyphens]{url}
 \usepackage{lineno} % add 
@@ -158,6 +158,7 @@ $header-includes$
 $endfor$
 
 
+\usepackage[nomarkers]{endfloat}
 
 \begin{document}
 \begin{frontmatter}
@@ -178,8 +179,9 @@ $endfor$
   $if(keywords)$ \begin{keyword} $for(keywords)$$keywords$ \sep $endfor$\end{keyword}$endif$
  \end{frontmatter}
 
-
+\begin{flushleft}
 $body$
+\end{flushleft}
 
 $if(natbib)$
 $if(biblio-files)$
