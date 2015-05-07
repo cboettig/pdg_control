@@ -1,8 +1,8 @@
 
 #### SETUP #######
 
-parallel = FALSE
-ncpu = 4
+parallel = TRUE
+ncpu = 16
 
 
 ## ----profit_model--------------------------------------------------------
@@ -22,7 +22,7 @@ reduction <- 0.25
 ## ----setup---------------------------------------------------------------
 seed <- 123                 # Random seed (replicable results)
 delta <- 0.05               # economic discounting rate
-OptTime <- 20               # stopping time
+OptTime <- 50               # stopping time
 gridsize <- 50              # grid size for fish stock and harvest rate (discretized population)
 sigma_g <- 0.2              # Noise in population growth
 reward <- 0                 # bonus for satisfying the boundary condition
@@ -114,9 +114,9 @@ fixed_policy <- policies$fixed[[apples_index["fixed"]]]$D
 
 
 ## ----Simulations for Figure 3-------------------
-reps <- 1:100
+reps <- 1:500
 names(reps) = paste("rep", 1:length(reps), sep="_") # treat as a factor
-seeds <- 1:100
+seeds <- 1:500
 sims <- list(
   L1 = lapply(reps, function(x) simulate_optim(f, pars, x_grid, h_grid, x0, 
                                                L1_policy, z_g, z_m, z_i, 
@@ -193,7 +193,7 @@ fig4 <- function(fraction_lost){
   quad_policy <- policies$quad[[apples_index["quad"]]]$D
   
   quad_profit <- profit_harvest(price = price, c0 = c0, c1 = apples["quad"]) 
-  sims <- lapply(1:50, function(reps) list(
+  sims <- lapply(1:500, function(reps) list(
     L1 = simulate_optim(f, pars, x_grid, h_grid, x0, 
                         L1_policy, z_g, z_m, z_i, 
                         opt$D, profit=profit, penalty=L1(apples["L1"])), 

@@ -8,9 +8,9 @@ compute_error_table <- function(r){
   L1_policy <- policies$L1[[apples_index["L1"]]]$D
   fixed_policy <- policies$fixed[[apples_index["fixed"]]]$D
 
-  reps <- 1:100
+  reps <- 1:500
   names(reps) = paste("rep", 1:length(reps), sep="_") # treat as a factor
-  seeds <- 1:100
+  seeds <- 1:length(reps)
   sims <- list(
     L1 = lapply(reps, function(x) simulate_optim(f, pars, x_grid, h_grid, x0, 
                                                  L1_policy, z_g, z_m, z_i, 
