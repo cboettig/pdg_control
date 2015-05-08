@@ -251,6 +251,7 @@ $$\Pi_4(N_t,h_t) = p h_t -  c_0 E_t - c_4 E_t^2$$
 Where $c_4$ is calibrated as in the case of the other coefficients to induce the fixed reduction of net present value relative to $NPV_0$.
 
 ```{r quadraticcosts, include=FALSE, message=FALSE}
+
 source("components/quad_costs.R")
 ```
 
@@ -260,7 +261,6 @@ source("components/quad_costs.R")
 
 labels <- c(harvest = substitute(paste("Harvest Policy under ", paste(Pi[4]))), 
                                 harvest_alt = substitute(paste("Harvest under ", paste(Pi[0]), " (Reed)")))
-
 ex <- dt_quad %>% 
   filter(replicate=="rep_17" & time < OptTime) %>%
   select(time, harvest, harvest_alt) %>%
