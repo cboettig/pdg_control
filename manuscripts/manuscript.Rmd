@@ -438,8 +438,8 @@ ggplot(fees, aes(c2, (npv0-value)/npv0, lty=variable, color=variable)) +
   ylab("Reduction in net present value") + 
   scale_linetype_discrete(labels=relabel, breaks = c('L1', 'L2', 'fixed'), name = 'cost model') + 
   scale_color_discrete(labels=relabel, breaks = c('L1', 'L2', 'fixed'), name = 'cost model') + 
-  annotate("text", mean(c2), reduction+.01, label = "Calibration for 25% reduction in NPV")
- # rename scale from 'variable' to 'adjustment cost for policy:'
+  annotate("text", mean(c2), reduction+.02, label = "25% reduction in NPV")
+ 
 
 write.csv(fees, "components/data/figure2.csv")
 
@@ -541,6 +541,8 @@ stats_df %>%
   filter(measurement == 'harvest') %>% 
   spread(statistic, value) ->
   f4df
+
+f4df$penalty_fn <- factor(f4df$penalty_fn, levels = c("L1", "L2", "fixed"))
 
 p4 <- ggplot(f4df, aes(x = penalty_fraction, fill=penalty_fn, col=penalty_fn)) + 
   coord_cartesian(xlim = c(0, .3)) + 
@@ -729,6 +731,8 @@ table1_long <- melt(table1, id = c('penalty.fn', 'reduction'))
 table1_long$reduction <- as.factor(table1_long$reduction)
 table1_long <- subset(table1_long, reduction != "0.3")
 
+table1_long$penalty.fn <- factor(table1_long$penalty.fn, levels = c("L1", "L2", "fixed"))
+
 ggplot(filter(table1_long, reduction == 0.25),
   aes(penalty.fn, value, fill = variable)) + 
   geom_bar(stat="identity", position="dodge") + 
@@ -737,7 +741,7 @@ ggplot(filter(table1_long, reduction == 0.25),
                               'L2' = substitute(paste(Pi[2])),
                               'fixed' = substitute(paste(Pi[3])))) + 
   xlab("Cost model") + 
-  ylab(expression(NPV[0])) + theme_tufte(base_size=16)
+  ylab(expression(NPV[0])) 
 write.csv(table1_long, "components/data/figure6.csv")
 ```
 
