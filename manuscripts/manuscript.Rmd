@@ -450,7 +450,12 @@ the different functional forms, we select penalty cost coefficients
 that induce the same reduction in maximum expected NPV. For example,
 the dashed vertical line in Figure 2 maps the needed cost coefficient
 $c_i$, for each penalty function, such that the fishery is worth `r 100*(1-reduction)`%
-of its unconstrained value when optimally managed.
+of its unconstrained value when optimally managed. To demonstrate that the results
+shown here are independent of this choice of calibrating to a `r 100*(1-reduction)`%
+reduction, we conduct the same analysis with a 10% and 30% reduction rate as well.
+The corresponding figures can be found in the Supplemental Materials.
+
+
 
 
 Results
@@ -523,7 +528,7 @@ magnitude of policy adjustment costs, which have been calibrated to equal
 to `r reduction *100`% of $NPV_0({\bf h_0^*})$.  To demonstrate this,
 we solved for the optimal policy under each of the three adjustment
 cost scenarios for `r length(c2)` different $c_i$ coefficients. For each
-resulting policy, we then simulated 50 stochastic replicates of the stock
+resulting policy, we then simulated `r length(reps)` stochastic replicates of the stock
 dynamics managed under that policy.  To summarize the patterns shown
 in Figure 3 and characterize the impact of increasingly large fraction
 of the economic value (NPV) being consumed by policy adjustment costs,
@@ -614,6 +619,11 @@ management, but is one that is very rarely observed to be part of the
 optimal management strategy in the basic model without policy adjustment
 costs (Eqn. 3) or when optimizing against $\Pi_2$ or $\Pi_3$. 
 
+In the supplemental material, Figures S9-S12 illustrate that the 
+these qualitative patterns still hold at when the models are calibrated 
+to a reduction in NPV of 10% or 30%, though naturally the magnitude
+of the pattern is greater when the penalty is larger (e.g. 30% vs 10%).
+
 
 ```{r}
 fraction_no_shift <- function(x){
@@ -697,7 +707,7 @@ costs when they are present or assuming they are present when they are
 not.
 
 To do so, we will simulate managing a fish stock when adjustments are costly.
-We will perform 100 replicate simulations of this for each of the three
+We will perform `r length(reps)` replicate simulations of this for each of the three
 cost structures, $\Pi_1$, $\Pi_2$, & $\Pi_3$.  For each replicate, we will
 use two different management policies: one which ignores the adjustment costs,
 (that is, the Reed optimum policy, $\Pi_0$), and a second which accounts for the

@@ -78,8 +78,8 @@ theme_set(theme_tufte(base_size=12) + theme(axis.line = element_line()))
 ```
 
 
-\appendix
 \renewcommand{\thefigure}{S\arabic{figure}}
+\appendix
 
 # Supplementary material #
 
@@ -123,6 +123,7 @@ dt_s <- dt %>%
   filter(replicate=="rep_17" & time < OptTime) %>%
   select(time, fishstock, alternate, penalty_fn) %>%
   gather(variable, value, -time, -penalty_fn) 
+dt_s$penalty_fn <- factor(dt3$penalty_fn, levels=c("L1", "L2", "fixed"))
 
 
 ggplot(dt_s, aes(time, value, col=variable, lty=variable)) +
@@ -147,6 +148,8 @@ stats_df %>%
   filter(measurement == 'stock') %>% 
   spread(statistic, value) ->
   s2df
+
+s2df$penalty_fn <- factor(f4df$penalty_fn, levels = c("L1", "L2", "fixed"))
 
 p4 <- ggplot(s2df, aes(x = penalty_fraction, fill=penalty_fn, col=penalty_fn)) + 
   coord_cartesian(xlim = c(0, .3)) + 
@@ -220,6 +223,8 @@ if (variable=='penalty_fn') {
     return(value)
   }
 }
+
+dt$penalty_fn <- factor(dt$penalty_fn, levels = c("L1", "L2", "fixed"))
 
 
 ex <- dt %>% 
@@ -311,6 +316,8 @@ Figure S6 extends the results shown in Figure 6 across different severities of a
 
 ```{r Figure_S6, fig.cap="Relative cost of ignoring adjustment costs when they are present ('ignoring', red) vs assuming the adjustment costs when they are absent ('assuming', blue), shown by penalty function over increasing magnitudes of cost.  All values are relative to the cost-free adjustment optimum, NPV0.  In each case, it is less costly to assume adjustment costs are present when they are not than it is to ignore them when they are present. The severity of the latter mistake increases sharply as adjustment costs make a larger fraction of the total costs.", dev=c("pdf", "svg", "png"), fig.width=7, cache=FALSE}
 
+table1_long$penalty.fn <- factor(table1_long$penalty.fn, levels = c("L1", "L2", "fixed"))
+
 ggplot(table1_long, aes(penalty.fn, value, fill = variable)) + 
   geom_bar(stat="identity", position="dodge") + 
   facet_wrap(~reduction, ncol=2) + 
@@ -397,7 +404,117 @@ ggplot(table2_long, aes(penalty.fn, value, fill = variable)) +
 ```
 
 
+## Robustness to reduction level
+
+```{r}
+source("components/vary_reduction.R")
+```
+
+Figures S9-S12 illustrate that the 
+these qualitative patterns still hold at when the models are calibrated 
+to a reduction in NPV of 10% or 30%, though naturally the magnitude
+of the pattern is greater when the penalty is larger (e.g. 30% vs 10%).
+
+```{r Figure_S9, dev=c("pdf", "svg", "png"), fig.width=7, cache=FALSE, fig.cap="Identical analysis to Figure 3 of the main text, but using a calibration corresponding to a 10% reduction in NPV.  This results in a less pronounced version of the same qualitative pattern."}
+p3 <- ggplot(low$dt3, aes(time, value, col=variable, lty=variable)) +
+  geom_line(lwd=1) +
+  facet_grid(penalty_fn~., labeller = labeller) + 
+  labs(x="time", y="stock size", title = "Example Harvest Dynamics")  +
+  scale_color_discrete(labels=c("Adjustment penalty", "No penalty"), name="") +
+  scale_linetype_discrete(labels=c("Adjustment penalty", "No penalty"), name="") + 
+  theme_bw() + labs(title="example trajectories at 10% reduction in NPV")
+
+p3
+```
 
 
+```{r Figure_S10, dev=c("pdf", "svg", "png"), fig.width=7, cache=FALSE, fig.cap="Identical analysis to Figure 3 of the main text, but using a calibration corresponding to a 30% reduction in NPV.  This results in a more pronounced version of the same qualitative pattern."}
+p3 <- ggplot(high$dt3, aes(time, value, col=variable, lty=variable)) +
+  geom_line(lwd=1) +
+  facet_grid(penalty_fn~., labeller = labeller) + 
+  labs(x="time", y="stock size", title = "Example Harvest Dynamics")  +
+  scale_color_discrete(labels=c("Adjustment penalty", "No penalty"), name="") +
+  scale_linetype_discrete(labels=c("Adjustment penalty", "No penalty"), name="") + 
+  theme_bw() + labs(title="example trajectories at 30% reduction in NPV")
+p3
+```
+
+
+
+```{r Figure_S11, dev=c("pdf", "svg", "png"), fig.width=5, fig.height=6, cache=FALSE, fig.cap="Identical analysis as in Figure 4 of the main text, but using a calibration to 10% reduction in NPV rather than 25%.  The qualitatively similar pattern helps illustrate that these results are not specific to the value of the reduction chosen in the main text."}
+p4 <- ggplot(low$f4df, aes(x = penalty_fraction, fill=penalty_fn, col=penalty_fn)) + 
+  coord_cartesian(xlim = c(0, .3)) + 
+  scale_color_discrete(labels=relabel, name="cost model") + 
+  scale_fill_discrete(labels=relabel, name="cost model") 
+
+p4a <- p4 + 
+  stat_summary(aes(y=autocorrelation),
+               fun.y = mean, 
+               fun.ymin = function(x) mean(x) - sd(x), 
+               fun.ymax = function(x) mean(x) + sd(x), 
+               geom = "ribbon", alpha=0.3, colour=NA) +
+  stat_summary(aes(y=autocorrelation), fun.y = mean, geom = "line") + 
+  xlab("") + 
+  labs(title="Summary statistics under a 10% reduction in NPV")
+
+
+p4b <- p4 + 
+  stat_summary(aes(y=variance),
+               fun.y = mean, 
+               fun.ymin = function(x) mean(x) - sd(x), 
+               fun.ymax = function(x) mean(x) + sd(x), 
+               geom = "ribbon", alpha=0.3, colour=NA) +
+  stat_summary(aes(y=variance), fun.y = mean, geom = "line") +
+  xlab(expression(paste("Penalty size (as fraction of ", NPV[0], ")"))) 
+
+
+legend <- gtable_filter(ggplot_gtable(ggplot_build(p4a)), "guide-box") 
+
+
+grid.arrange(do.call(arrangeGrob, 
+            lapply(list(p4a, p4b),
+                   function(x) x + theme_bw() + theme(legend.position="none"))),
+    legend,
+    ncol = 2,
+    widths = c(5,2))
+```
+
+
+```{r Figure_S12, dev=c("pdf", "svg", "png"), fig.width=5, fig.height=6, cache=FALSE, fig.cap="Identical analysis as in Figure 4 of the main text, but using a calibration to 30% reduction in NPV rather than 25%.  The qualitatively similar pattern helps illustrate that these results are not specific to the value of the reduction chosen in the main text."}
+p4 <- ggplot(high$f4df, aes(x = penalty_fraction, fill=penalty_fn, col=penalty_fn)) + 
+  coord_cartesian(xlim = c(0, .3)) + 
+  scale_color_discrete(labels=relabel, name="cost model") + 
+  scale_fill_discrete(labels=relabel, name="cost model") 
+
+p4a <- p4 + 
+  stat_summary(aes(y=autocorrelation),
+               fun.y = mean, 
+               fun.ymin = function(x) mean(x) - sd(x), 
+               fun.ymax = function(x) mean(x) + sd(x), 
+               geom = "ribbon", alpha=0.3, colour=NA) +
+  stat_summary(aes(y=autocorrelation), fun.y = mean, geom = "line") + 
+  xlab("") + 
+  labs(title="Summary statistics under a 30% reduction in NPV")
+
+p4b <- p4 + 
+  stat_summary(aes(y=variance),
+               fun.y = mean, 
+               fun.ymin = function(x) mean(x) - sd(x), 
+               fun.ymax = function(x) mean(x) + sd(x), 
+               geom = "ribbon", alpha=0.3, colour=NA) +
+  stat_summary(aes(y=variance), fun.y = mean, geom = "line") +
+  xlab(expression(paste("Penalty size (as fraction of ", NPV[0], ")"))) 
+
+
+legend <- gtable_filter(ggplot_gtable(ggplot_build(p4a)), "guide-box") 
+
+
+grid.arrange(do.call(arrangeGrob, 
+            lapply(list(p4a, p4b),
+                   function(x) x + theme_bw() + theme(legend.position="none"))),
+    legend,
+    ncol = 2,
+    widths = c(5,2))
+```
 
 
