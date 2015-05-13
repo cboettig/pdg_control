@@ -7,7 +7,7 @@ MAINTAINER Carl Boettiger cboettig@ropensci.org
 
 ## Remain current & install binaries for dependencies that don't compile
 RUN apt-get update \ 
-  && apt-get install -y r-cran-snowfall r-cran-expm
+  && apt-get install -y r-cran-snowfall r-cran-expm latexdiff
 
 ## Install package, with dependencies and suggests
 RUN installGithub.r --deps TRUE \ 
