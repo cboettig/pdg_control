@@ -199,8 +199,8 @@ with which the those changes could occur.  Either could contribute to
 the observed quota stability. 
 
 Such patterns of variable stocks managed
-under far less variable quotas are extremely common; for instance, 
-in the management of south Atlantic snowy grouper (_Epinephelus niveatus_) 
+under far less variable quotas are extremely common, as in the instance of 
+the management of south Atlantic snowy grouper (_Epinephelus niveatus_) 
 shown in the righthand panels [@SEDAR2013]. Though the stock assessment
 shows similarly frequent variation between 1994 and 2012, the quota has
 only been adjusted twice during this period. In contrast to the adjustment
