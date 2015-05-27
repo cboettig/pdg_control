@@ -940,8 +940,11 @@ try to infer what objective managers were maximizing.
 
 A worthwhile modeling extension suggested by our results would be to
 examine the implications of policy adjustment costs for risks of stock
-collapse. Examining risks of stock collapse is not possible with the
-Reed model formulation that we followed here but would be worthwhile
+collapse. This includes models with larger stochasticity as well as model
+formulations that can permit alternative stable states.
+Examining risks of stock collapse is not possible with the
+Reed model formulation that we followed here (both cases are inconsistent
+with the assumptions of @Reed1974) but would be worthwhile
 in light of our finding that the variance and autocorrelation in stock
 sizes through time can be affected when accounting for costs of policy
 adjustment. Both are properties known in other modeling settings to
@@ -982,7 +985,8 @@ NSF Award #DBI-1300426, with additional support from The University of
 Tennessee, Knoxville.  The authors acknowledge helpful discussions and
 input from working group co-organizers Megan Donahue and Carl Toews, and
 participants Marie-Josee Fortin, Dan Ryan, Frank Doyle, Claire Paris,
-Iadine Chades and Mandy Karnauskas.  We also acknowledge the support of
+Iadine Chades and Mandy Karnauskas, as well as the two anonymous reviewers
+whose feedback strengthened this paper.  We also acknowledge the support of
 NSF Grant DBI-1306697 to CB and ARC DECRA (DE130100572) & the
 ARC Centre of Excellence for Environmental Decisions to MB.
 
