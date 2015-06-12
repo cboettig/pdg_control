@@ -1,0 +1,29 @@
+{
+  "title": "Optimal management of a stochastically varying population when policy adjustment is costly",
+  "creators": [{
+      "name": "Boettiger, Carl",
+      "affiliation": "Center for Stock Assessment Research, Department of Applied Math and Statistics, University of California, Santa Cruz, USA"
+  }, {
+      "name": "Bode, Michael",
+      "affiliation": "School of Botany, University of Melbourne, Australia "
+  }, {
+      "name": "Sanchirico, James N.",
+      "affiliation": "Department of Environmental Science and Policy, University of California, Davis"
+  }, {
+      "name": "LaRiviere, Jacob",
+      "affiliation": "Department of Economics, University of Tennessee, Knoxville"
+  }, {
+      "name": "Hastings, Alan",
+      "affiliation": "Department of Environmental Science and Policy, University of California, Davis"
+  }, {
+      "name": "Armsworth, Paul R.",
+      "affiliation": "Department of Ecology and Evolutionary Biology, University of Tennessee, Knoxville"
+  }],
+  "description": "This compendium includes the code, data, documentation, metadata and manuscript source files that accompany this research, organized in the R package format.",
+  "access_right": "open",
+  "license": "cc-by",
+  "related_identifiers": [{
+    "identifier": "http://github.com/cboettig/pdg_control",
+    "relation": "isVariantFormOf"
+  }]
+}
