@@ -320,7 +320,7 @@ value iteration [@Mangel1988; @Clark2000].
 
 
 R code for implementing the dynamic programming algorithm in this context is
-provided as a supplementary R package to the paper, along with scripts for replicating 
+provided as a supplementary R package to the paper, [@zenodo], along with scripts for replicating 
 the analyses presented here. To address concerns about computational reproducibility [@Boettiger2015],
 a Docker container image of the software environment is also provided.
 

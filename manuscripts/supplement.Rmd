@@ -85,11 +85,11 @@ theme_set(theme_tufte(base_size=12) + theme(axis.line = element_line()))
 
 ## Code and data for methods and analysis ## 
 
-All code and data used in this analysis can be found under the project's GitHub repository: [https://github.com/cboettig/pdg_control](https://github.com/cboettig/pdg_control). A snapshot of this repository representing the precise versions of the code used in this analysis has been permanently archived in the scientific software and data repository Zenodo, managed by CERN; and should be referenced or cited using its assigned digital object identifer, doi:xxx.  (This DOI is also clearly linked from the GitHub repository).  
+All code and data used in this analysis can be found under the project's GitHub repository: [https://github.com/cboettig/pdg_control](https://github.com/cboettig/pdg_control). A snapshot of this repository representing the precise versions of the code used in this analysis has been permanently archived in the scientific software and data repository Zenodo, managed by CERN; and should be referenced or cited using its assigned digital object identifier, doi:xxx.  (This DOI is also clearly linked from the GitHub repository).  
 
 ### Organization of code
 
-The project repository is organized as an R package.  The intent is not to provide a general-purpose software tool for this kind of analysis, but rather to rely on a standardized directory structure for representing complex projects. It is our hope that this facilates understanding, reproducibility, and further exploration of these results sensu [Gentleman & Temple Lang 2007](http://biostats.bepress.com/bioconductor/paper2/), but caution that additional software engineering would be required before any of this could be applied in a different context.  The functions provided are largely specific to the analyses presented here and may undocumented or incompletely documented.
+The project repository is organized as an R package.  The intent is not to provide a general-purpose software tool for this kind of analysis, but rather to rely on a standardized directory structure for representing complex projects. It is our hope that this facilities understanding, reproducibility, and further exploration of these results sensu [Gentleman & Temple Lang 2004](http://biostats.bepress.com/bioconductor/paper2/), but caution that additional software engineering would be required before any of this could be applied in a different context.  The functions provided are largely specific to the analyses presented here and may undocumented or incompletely documented.
 
 The source documents for both the manuscript and supplement are also found in the code repository using the dynamic document `.Rmd` format which embeds all of the code required for the analysis; see [http://rmarkdown.rstudio.com/](http://rmarkdown.rstudio.com/).
 
@@ -98,12 +98,12 @@ Within the `.Rmd` files themselves are found only the blocks of code required to
 
 ### Data 
 
-All empirical or simulated data shown in the figures can also be found as tabular .csv files in this repository.  
+All empirical or simulated data shown in the figures can also be found as tabular `.csv` files in this repository. 
 
 
 ### Dependencies and machine images
 
-
+The package DESCRIPTION file lists the software dependencies required to run the included scripts. To facilitate portability and preservation of these dependencies, we also provide a machine image with all the necessary dependencies already installed which can be run on most common computer platforms using [Docker](http://docker.com). Our Docker image, `cboettig/pdg-control` can be freely downloaded from the Docker Hub, or built using the Dockerfile included in the package repository.
 
 
 ##  Impact on the stock dynamics ##
