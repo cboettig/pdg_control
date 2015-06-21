@@ -165,14 +165,15 @@ responsive approach to management this would require.
 ```{r Figure_1, fig.cap="Estimated stock abundances (top panels) show much greater variation than the corresponding harvest policies (bottom).  Left panels: ICCAT Stock assessments and Total Allowable Catch (TAC, before adjustments for national underages and overages) for bluefin tuna, 1982 - 2007. Right panels: SEDAR stock assessments and annual quotas for south Atlantic snowy grouper, 1994-2012.", fig.width=6, fig.height=4, dev=c("pdf", "svg", "png"), cache=FALSE}
 tuna <- read.csv("components/data/tuna.csv")
 grouper <- read.csv("components/data/grouper.csv")
-
+library("scales")
 ex <- rbind(cbind(tuna, species="tuna"), cbind(grouper, species="snowy grouper"))
 ex_long <- gather(ex, variable, value, stock, quota)
 
 ggplot(ex_long, aes(year,value)) + 
   geom_line() + geom_point() + 
   facet_wrap(variable~species, scales="free") + 
-  ylab("value (mt)") + theme_bw()
+  ylab("value (mt)") + theme_bw() + 
+  scale_x_continuous(breaks = pretty_breaks(n = 5))
 ```
 
 
@@ -320,7 +321,7 @@ value iteration [@Mangel1988; @Clark2000].
 
 
 R code for implementing the dynamic programming algorithm in this context is
-provided as a supplementary R package to the paper, [@zenodo], along with scripts for replicating 
+provided as a supplementary R package to the paper, ([github.com/cboettig/pdg_control](https://github.com/cboettig/pdg_control)), along with scripts for replicating 
 the analyses presented here. To address concerns about computational reproducibility [@Boettiger2015],
 a Docker container image of the software environment is also provided.
 
