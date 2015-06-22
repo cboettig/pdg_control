@@ -43,6 +43,7 @@ output:
   pdf_document:
     template: components/elsarticle.latex
     fig_caption: true
+    keep_tex: true
 ---
 
 
@@ -77,9 +78,8 @@ options(digits=2)
 theme_set(theme_tufte(base_size=12) + theme(axis.line = element_line()))
 ```
 
-
-\renewcommand{\thefigure}{S\arabic{figure}}
 \appendix
+\renewcommand\thefigure{S\arabic{figure}}
 
 # Supplementary material #
 
@@ -113,7 +113,7 @@ Figure S1 shows the corresponding stock dynamics for the replicates illustrated 
 Though this results in an effect that is less pronounced, the stock dynamics of Figure S1 reflect the same general trends observed in Main text Figure 3; e.g. the fixed fee $\Pi_3$ results in the most exaggerated fluctuations in the stock sizes.  It is worth noting how changes in policy costs alone, such as introducing or rising fixed costs, can have important knock-on effects to population dynamics such as increased variance, a recent phenomenon observed in important fisheries that has received much attention elsewhere [@Anderson2008].
 
 
-```{r Figure_S1, dependson="tidy", fig.cap="Example realization of optimal harvesting strategy and resulting fish stock sizes under the different functional forms of adjustment costs.", fig.height=5, fig.width=8, cache = fig.cache, dev=c("pdf", "svg", "png")}
+```{r Figure_S1, dependson="tidy", fig.cap="Example realization of optimal fish stock sizes under the different functional forms of adjustment costs, under the harvest policy dynamics shown in Figure 3 of the main text.", fig.height=5, fig.width=8, cache = fig.cache, dev=c("pdf", "svg", "png")}
 
 labeller <- function(variable,value){
     return(relabel[paste(value)])
@@ -407,9 +407,35 @@ ggplot(table2_long, aes(penalty.fn, value, fill = variable)) +
 ## Robustness to reduction level
 
 ```{r}
-rmarkdown::render('manuscript.Rmd')
+parallel = TRUE
+ncpu = parallel::detectCores()
+price = 10
+c0 = 30
+profit <- profit_harvest(price = price, c0 = c0, c1 = 0)
+#c2 <- exp(seq(0, log(41), length.out = 40))-1
+c2 <- seq(0, 40, length.out=100)
+reduction <- 0.25 
+seed <- 123                 # Random seed (replicable results)
+delta <- 0.05               # economic discounting rate
+OptTime <- 50               # stopping time
+gridsize <- 50              # grid size for fish stock and harvest rate (discretized population)
+sigma_g <- 0.2              # Noise in population growth
+reward <- 0                 # bonus for satisfying the boundary condition
+z_g <- function() rlnorm(1,  0, sigma_g) # mean 1
+z_m <- function() 1         # No measurement noise, 
+z_i <- function() 1         # No implemenation noise
+f <- BevHolt                # Select the state equation
+pars <- c(1.5, 0.05)        # parameters for the state equation
+K <- (pars[1] - 1)/pars[2]  # Carrying capacity (for reference 
+xT <- 0                     # boundary conditions
+x0 <- K
+x_grid <- seq(0.01, 1.2 * K, length = gridsize)  
+h_grid <- seq(0.01, 0.8 * K, length = gridsize)
+
 source("components/vary_reduction.R")
 ```
+
+<!--
 
 Figures S9-S12 illustrate that the 
 these qualitative patterns still hold at when the models are calibrated 
@@ -439,7 +465,6 @@ p3 <- ggplot(high$dt3, aes(time, value, col=variable, lty=variable)) +
   theme_bw() + labs(title="example trajectories at 30% reduction in NPV")
 p3
 ```
-
 
 
 ```{r Figure_S11, dev=c("pdf", "svg", "png"), fig.width=5, fig.height=6, cache=FALSE, fig.cap="Identical analysis as in Figure 4 of the main text, but using a calibration to 10% reduction in NPV rather than 25%.  The qualitatively similar pattern helps illustrate that these results are not specific to the value of the reduction chosen in the main text."}
@@ -518,4 +543,4 @@ grid.arrange(do.call(arrangeGrob,
     widths = c(5,2))
 ```
 
-
+-->

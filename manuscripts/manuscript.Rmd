@@ -467,7 +467,7 @@ Effect of policy adjustment costs on optimal quotas and stock sizes
 
 
 
-```{r Figure_3, dependson="tidy", fig.cap="Example realization of optimal harvesting strategy and resulting fish stock sizes under the different functional forms of adjustment costs. When costs vary linearly with the size of the adjustment ($\\Pi_1$), periods with no adjustment are more common than if adjustments were free.  When costs vary quadratically with adjustment size ($\\Pi_2$), small adjustments are relatively cheap and thus the resulting optimal policy always changes, but by a smaller amount than if adjustments were free.  When adjustments incur a fixed fee independent of size ($\\Pi_3$), the optimal strategy either remains unchanged or overshoots the cost-free optimum. ", fig.height=5, fig.width=8, cache = fig.cache, dev=c("pdf", "svg", "png")}
+```{r Figure_3, dependson="tidy", fig.cap="Example realization of optimal harvesting strategy under the different functional forms of adjustment costs. When costs vary linearly with the size of the adjustment ($\\Pi_1$), periods with no adjustment are more common than if adjustments were free.  When costs vary quadratically with adjustment size ($\\Pi_2$), small adjustments are relatively cheap and thus the resulting optimal policy always changes, but by a smaller amount than if adjustments were free.  When adjustments incur a fixed fee independent of size ($\\Pi_3$), the optimal strategy either remains unchanged or overshoots the cost-free optimum. ", fig.height=5, fig.width=8, cache = fig.cache, dev=c("pdf", "svg", "png")}
 
 labeller <- function(variable,value){
     return(relabel[paste(value)])
@@ -484,7 +484,7 @@ dt3$penalty_fn <- factor(dt3$penalty_fn, levels=c("L1", "L2", "fixed"))
 ggplot(dt3, aes(time, value, col=variable, lty=variable)) +
   geom_line(lwd=1) +
   facet_grid(penalty_fn~., labeller = labeller) + 
-  labs(x="time", y="stock size", title = "Example Harvest Dynamics")  +
+  labs(x="time", y="harvest", title = "Example Harvest Dynamics")  +
   scale_color_discrete(labels=c("Adjustment penalty", "No penalty"), name="") +
   scale_linetype_discrete(labels=c("Adjustment penalty", "No penalty"), name="") + 
   theme_bw()
@@ -620,10 +620,9 @@ management, but is one that is very rarely observed to be part of the
 optimal management strategy in the basic model without policy adjustment
 costs (Eqn. 3) or when optimizing against $\Pi_2$ or $\Pi_3$. 
 
-In the supplemental material, Figures S9-S12 illustrate that the 
-these qualitative patterns still hold at when the models are calibrated 
-to a reduction in NPV of 10% or 30%, though naturally the magnitude
-of the pattern is greater when the penalty is larger (e.g. 30% vs 10%).
+Figure 4 shows these qualitative patterns still hold at when the models are calibrated 
+to a range of different reductions in NPV, from 0% to 30%, though naturally the magnitude
+of the differences is greatest when the penalty is larger. 
 
 
 ```{r}
@@ -733,7 +732,7 @@ costs when they are present -- is more severe.
 
 
 
-```{r Figure_6, fig.cap="Relative cost of ignoring adjustment costs when they are present ('ignoring', red) vs assuming the adjustment costs when they are absent ('assuming', blue), shown by penalty function over increasing magnitudes of cost.  All values are relative to the cost free adjustment optimum, $NPV_0$.  In each case, it is less costly to assume adjustment costs are present when they are not than it is to ignore them when they are present. The severity of the latter mistake increases sharply as adjustment costs make a larger fraction of the total costs.", dev=c("pdf", "svg", "png"), fig.width=7, cache=FALSE}
+```{r Figure_6, fig.cap="Relative cost of ignoring adjustment costs when they are present ('ignoring', red) vs assuming the adjustment costs when they are absent ('assuming', blue).  All values are relative to the cost free adjustment optimum, $NPV_0$.  In each case, it is less costly to assume adjustment costs are present when they are not than it is to ignore them when they are present.Supplementary Figure S6 shows how the magnitude of this effect changes with the size of the reduction to $NPV$.", dev=c("pdf", "svg", "png"), fig.width=7, cache=FALSE}
 
 who <- c("penalty_fn", "ignore_fraction", "assume_fraction", "reduction")
 table1 <- arrange(error_df[who], reduction) 
