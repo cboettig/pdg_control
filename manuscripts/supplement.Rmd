@@ -407,6 +407,7 @@ ggplot(table2_long, aes(penalty.fn, value, fill = variable)) +
 ## Robustness to reduction level
 
 ```{r}
+rmarkdown::render('manuscript.Rmd')
 source("components/vary_reduction.R")
 ```
 
