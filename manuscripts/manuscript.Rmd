@@ -622,7 +622,9 @@ costs (Eqn. 3) or when optimizing against $\Pi_2$ or $\Pi_3$.
 
 Figure 4 shows these qualitative patterns still hold at when the models are calibrated 
 to a range of different reductions in NPV, from 0% to 30%, though naturally the magnitude
-of the differences is greatest when the penalty is larger. 
+of the differences is greatest when the penalty is larger. Note that the supplementary material provide
+further evidence that these patterns are independent of the exact reduction shown by providing
+results analogous to Figure 3 (S8, S9) and Figure 5 (S10, S11), and Figure 6 (S6).
 
 
 ```{r}

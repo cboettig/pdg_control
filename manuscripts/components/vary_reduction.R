@@ -121,18 +121,19 @@ dt3 <- dt %>%
 
 dt3$penalty_fn <- factor(dt3$penalty_fn, levels=c("L1", "L2", "fixed"))
 
+profits <- dt[, sum(profit_fishing), by=c('penalty_fn', 'replicate') ]
+costs <- dt[, sum(policy_cost), by=c('penalty_fn', 'replicate') ]
+reed_profits <- dt[, sum(profit_fishing_alt), by=c('penalty_fn', 'replicate') ]
+reed_costs <- dt[, sum(policy_cost_alt), by=c('penalty_fn', 'replicate') ]
+setnames(profits, "V1", "profits")
+setnames(reed_profits, "V1", "profits")
 
-## Figure 4
-stats_df %>% 
-  filter(variable != "cross.correlation") %>%
-  separate(variable, c("measurement", "statistic"), sep="\\.") %>%
-  filter(measurement == 'harvest') %>% 
-  spread(statistic, value) ->
-  f4df
+Reed <- cbind(reed_profits, costs = reed_costs$V1, Assumption = "No adjustment penalty") 
+Adj <- cbind(profits, costs = costs$V1, Assumption = "Adjustment penalty")
 
-f4df$penalty_fn <- factor(f4df$penalty_fn, levels = c("L1", "L2", "fixed"))
+hist_dat <- melt(rbind(Adj, Reed), id=c("penalty_fn", "replicate", "Assumption"))
 
-list(dt3 = dt3, f4df = f4df) 
+list(dt3 = dt3, dt5 = hist_dat) 
 
 }
 
