@@ -2,12 +2,12 @@
 title: "Supplement to: Optimal management of a stochastically varying population when policy adjustment is costly"
 author: 
   - name: Carl Boettiger
-    affiliation: cstar
-    email: cboettig (at) gmail.com
+    affiliation: UCB 
+    email: cboettig (at) berkeley.edu 
     footnote: Corresponding author
   - name: Michael Bode
     affiliation: melbourne
-  - name: James Sanchirico
+  - name: James N. Sanchirico
     affiliation: UCD
   - name: Jacob LaRiviere
     affiliation: UTKEcon
@@ -17,11 +17,12 @@ author:
     affiliation: UTKEEB
 
 address: 
-  - code: cstar
+  - code: UCB
     address: | 
-      Center for Stock Assessment Research,
-      110 Shaffer Rd,
-      Santa Cruz, CA 95050, USA 
+      Department of Environmental Science, Policy and Management,
+      University of California, Berkeley,
+      130 Mulford Hall \#3114,
+      Berkeley, CA 94720-3114, USA
   - code: UCD
     address: Department of Environmental Science and Policy, University of California, Davis
   - code: melbourne
@@ -31,9 +32,9 @@ address:
   - code: UTKEcon
     address: Department of Economics, University of Tennessee, Knoxville
 
-layout: review,12pt
-linenumbers: true
-
+layout: preprint,12pt
+linenumbers: false
+endfloat: false
 
 bibliography: components/references.bib
 csl: components/ecology.csl
@@ -85,9 +86,9 @@ theme_set(theme_tufte(base_size=12) + theme(axis.line = element_line()))
   \setcounter{equation}{0}%
   \setcounter{table}{0}%------------ << add
   \setcounter{figure}{0}%----------- << add
-  \gdef\theequation{S\arabic{equation}}%
-  \gdef\thefigure{S\arabic{figure}}%
-  \gdef\thesection{S@section}%
+  \gdef\theequation{A\arabic{equation}}%
+  \gdef\thefigure{A\arabic{figure}}%
+  \gdef\thesection{A@section}%
   \@addtoreset{equation}{section}%
   \@addtoreset{table}{section}%----- << add
   \@addtoreset{figure}{section}%---- << add
@@ -100,7 +101,7 @@ theme_set(theme_tufte(base_size=12) + theme(axis.line = element_line()))
 
 ## Code and data for methods and analysis ## 
 
-All code and data used in this analysis can be found under the project's GitHub repository: [https://github.com/cboettig/pdg_control](https://github.com/cboettig/pdg_control). A snapshot of this repository representing the precise versions of the code used in this analysis has been permanently archived in the scientific software and data repository Zenodo, managed by CERN; and should be referenced or cited using its assigned digital object identifier, doi:xxx.  (This DOI is also clearly linked from the GitHub repository).  
+All code and data used in this analysis can be found under the project's GitHub repository: [https://github.com/cboettig/pdg_control](https://github.com/cboettig/pdg_control). A snapshot of this repository representing the precise versions of the code used in this analysis has been permanently archived in the scientific software and data repository Zenodo, managed by CERN; and should be referenced or cited using its assigned digital object identifier, doi:10.5281/zenodo.21416  (This DOI is also clearly linked from the GitHub repository). 
 
 ### Organization of code
 
@@ -508,3 +509,8 @@ ggplot(fig5_dat) +
 write.csv(hist_dat, "components/data/figure5.csv")
 ```
 
+
+\newpage
+
+
+# References

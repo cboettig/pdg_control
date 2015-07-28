@@ -1,5 +1,11 @@
 \documentclass[$layout$]{$documentclass$} %review=doublespace preprint=single 5p=2 column
 %%% Begin My package additions %%%%%%%%%%%%%%%%%%%
+%\usepackage{setspace}
+%\doublespacing
+%\setstretch{2.5}
+$if(doublespacing)$
+\linespread{2.5}
+$endif$
 \usepackage[hyphens]{url}
 \usepackage{lineno} % add 
 $if(linenumbers)$
@@ -111,9 +117,9 @@ $endif$
             bookmarks=true,
             pdfauthor={$author-meta$},
             pdftitle={$title-meta$},
-            colorlinks=true,
-            urlcolor=$if(urlcolor)$$urlcolor$$else$blue$endif$,
-            linkcolor=$if(linkcolor)$$linkcolor$$else$magenta$endif$,
+            colorlinks=false,
+            urlcolor=$if(urlcolor)$$urlcolor$$else$black$endif$,
+            linkcolor=$if(linkcolor)$$linkcolor$$else$black$endif$,
             pdfborder={0 0 0}}
 \urlstyle{same}  % don't use monospace font for urls
 $if(links-as-notes)$
@@ -157,8 +163,16 @@ $for(header-includes)$
 $header-includes$
 $endfor$
 
-
+$if(endfloat)$
 \usepackage[nomarkers]{endfloat}
+
+\makeatletter
+\let\orig@makecaption\@makecaption
+\AtBeginTables{\let\@makecaption\orig@makecaption}
+\AtBeginFigures{\renewcommand{\@makecaption}[2]{#1}}
+\AtBeginDelayedFloats{\linespread{2.5}}
+\makeatother
+$endif$
 
 \begin{document}
 \begin{frontmatter}

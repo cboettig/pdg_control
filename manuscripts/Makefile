@@ -1,13 +1,13 @@
 ## Making supplement makes both, since it needs manuscript.Rmd env vars
 all:
-	make supplement.pdf 
+	make supplement 
 
 # combines knitr & pandoc calls
-manuscript.pdf: manuscript.Rmd
+manuscript: manuscript.Rmd
 	Rscript -e 'library("rmarkdown"); render("manuscript.Rmd")'
 
 # supplement needs manuscript in cache
-supplement.pdf: supplement.Rmd
+supplement: supplement.Rmd
 	Rscript -e 'library("rmarkdown"); render("manuscript.Rmd"); render("supplement.Rmd")'
 
 clean:

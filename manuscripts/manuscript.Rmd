@@ -2,8 +2,8 @@
 title: Optimal management of a stochastically varying population when policy adjustment is costly
 author: 
   - name: Carl Boettiger
-    affiliation: cstar
-    email: cboettig (at) gmail.com
+    affiliation: UCB 
+    email: cboettig (at) berkeley.edu 
     footnote: Corresponding author
   - name: Michael Bode
     affiliation: melbourne
@@ -17,11 +17,12 @@ author:
     affiliation: UTKEEB
 
 address: 
-  - code: cstar
+  - code: UCB
     address: | 
-      Center for Stock Assessment Research,
-      110 Shaffer Rd,
-      Santa Cruz, CA 95050, USA 
+      Department of Environmental Science, Policy and Management,
+      University of California, Berkeley,
+      130 Mulford Hall \#3114,
+      Berkeley, CA 94720-3114, USA
   - code: UCD
     address: Department of Environmental Science and Policy, University of California, Davis
   - code: melbourne
@@ -60,7 +61,8 @@ csl: components/ecology.csl
 documentclass: components/elsarticle
 geometry: [verbose,letterpaper,tmargin=2.54cm,bmargin=2.54cm,l
 margin=2.54cm,rmargin=2.54cm]
-
+endfloat: true
+doublespacing: true
 
 output:
   pdf_document:
@@ -321,7 +323,7 @@ value iteration [@Mangel1988; @Clark2000].
 
 
 R code for implementing the dynamic programming algorithm in this context is
-provided as a supplementary R package to the paper, ([github.com/cboettig/pdg_control](https://github.com/cboettig/pdg_control)), along with scripts for replicating 
+provided as a supplementary R package to the paper, ([github.com/cboettig/pdg_control](https://github.com/cboettig/pdg_control), @zenodo_copy), along with scripts for replicating 
 the analyses presented here. To address concerns about computational reproducibility [@Boettiger2015],
 a Docker container image of the software environment is also provided.
 
@@ -624,7 +626,7 @@ Figure 4 shows these qualitative patterns still hold at when the models are cali
 to a range of different reductions in NPV, from 0% to 30%, though naturally the magnitude
 of the differences is greatest when the penalty is larger. Note that the supplementary material provide
 further evidence that these patterns are independent of the exact reduction shown by providing
-results analogous to Figure 3 (S8, S9) and Figure 5 (S10, S11), and Figure 6 (S6).
+results analogous to Figure 3 (A8, A9) and Figure 5 (A10, A11), and Figure 6 (A6).
 
 
 ```{r}
@@ -734,7 +736,7 @@ costs when they are present -- is more severe.
 
 
 
-```{r Figure_6, fig.cap="Relative cost of ignoring adjustment costs when they are present ('ignoring', red) vs assuming the adjustment costs when they are absent ('assuming', blue).  All values are relative to the cost free adjustment optimum, $NPV_0$.  In each case, it is less costly to assume adjustment costs are present when they are not than it is to ignore them when they are present.Supplementary Figure S6 shows how the magnitude of this effect changes with the size of the reduction to $NPV$.", dev=c("pdf", "svg", "png"), fig.width=7, cache=FALSE}
+```{r Figure_6, fig.cap="Relative cost of ignoring adjustment costs when they are present ('ignoring', red) vs assuming the adjustment costs when they are absent ('assuming', blue).  All values are relative to the cost free adjustment optimum, $NPV_0$.  In each case, it is less costly to assume adjustment costs are present when they are not than it is to ignore them when they are present.Supplementary Figure A6 shows how the magnitude of this effect changes with the size of the reduction to $NPV$.", dev=c("pdf", "svg", "png"), fig.width=7, cache=FALSE}
 
 who <- c("penalty_fn", "ignore_fraction", "assume_fraction", "reduction")
 table1 <- arrange(error_df[who], reduction) 
