@@ -69,6 +69,9 @@ output:
     template: components/elsarticle.latex
     fig_caption: true
     keep_tex: true
+    includes:
+      after_body: appendix_description.tex 
+
 ---
 
 
@@ -311,7 +314,7 @@ $B=$ `r pars[2]` in Eqn \eqref{eq:state_equation}). To characterize environmenta
 assume multiplicative shock $Z_t$ is distributed log-normally with
 log standard deviation $\sigma_g$ = `r sigma_g`. In addition, we
 show cases where $p=$ `r price`, $\delta=$ `r delta` and $c_0=$ `r c0`.
-In the supplement we illustrate that the qualitative patterns observed
+In Appendix A we illustrate that the qualitative patterns observed
 here are not sensitive to the specific choices of these parameter values.
 
 Taken together this objective function \eqref{eq:objective} and the state
@@ -397,7 +400,7 @@ in the _previous_ time step: since the costs that will follow depend on whether
 and by how much the harvest policy will change. This creates a total of
 $S \times Q \times Q$ configurations.
 
-In the Supplementary Material, we compare our results with more
+In Appendix A, we compare our results with more
 conventional fisheries economic formulation in which additional costs are
 applied to the control variables themselves, as opposed to adjustments to
 the controls: $\Pi_4 (N_t,h_t) = p h_t -  c_0 E_t-c_4E_t^2$.  Additional
@@ -456,7 +459,7 @@ $c_i$, for each penalty function, such that the fishery is worth `r 100*(1-reduc
 of its unconstrained value when optimally managed. To demonstrate that the results
 shown here are independent of this choice of calibrating to a `r 100*(1-reduction)`%
 reduction, we conduct the same analysis with a 10% and 30% reduction rate as well.
-The corresponding figures can be found in the Supplemental Materials.
+The corresponding figures can be found in Appendix A.
 
 
 
@@ -497,7 +500,7 @@ write.csv(dt3, "components/data/figure3.csv")
 
 Figure 3 illustrates how the different forms of adjustment cost can
 impact the dynamics of the optimal harvest policy. Corresponding stock
-sizes can be seen in the supplement.  Each panel is generated against the
+sizes can be seen in Appendix A.  Each panel is generated against the
 same sequence of environmental variability so that they can be compared
 directly.  The harvest policy chosen shows a systematic deviations from
 the adjustment cost free optimum, depending on the structure of the cost function.  
@@ -624,7 +627,7 @@ costs (Eqn. 3) or when optimizing against $\Pi_2$ or $\Pi_3$.
 
 Figure 4 shows these qualitative patterns still hold at when the models are calibrated 
 to a range of different reductions in NPV, from 0% to 30%, though naturally the magnitude
-of the differences is greatest when the penalty is larger. Note that the supplementary material provide
+of the differences is greatest when the penalty is larger. Note that results shown in Appendix A provide
 further evidence that these patterns are independent of the exact reduction shown by providing
 results analogous to Figure 3 (A8, A9) and Figure 5 (A10, A11), and Figure 6 (A6).
 
@@ -677,7 +680,7 @@ hist_dat <- melt(rbind(Adj, Reed), id=c("penalty_fn", "replicate", "Assumption")
 ````
 
 ```{r}
-fig5_caption <- paste("Distribution of revenues from fishing and costs paid to adjustment. Plot shows distributions for the linear costs structure ($\\Pi_1$) only, alternate penalties can be found in the supplementary materials. Dockside revenues are always higher than adjustment costs.  When those costs are not accounted for in the policy ('no adjustment costs'), it is possible to obtain only marginally higher revenues, but pay higher adjustment costs.")
+fig5_caption <- paste("Distribution of revenues from fishing and costs paid to adjustment. Plot shows distributions for the linear costs structure ($\\Pi_1$) only, alternate penalties can be found in the Appendix A. Dockside revenues are always higher than adjustment costs.  When those costs are not accounted for in the policy ('no adjustment costs'), it is possible to obtain only marginally higher revenues, but pay higher adjustment costs.")
 ```
 
 
@@ -736,7 +739,7 @@ costs when they are present -- is more severe.
 
 
 
-```{r Figure_6, fig.cap="Relative cost of ignoring adjustment costs when they are present ('ignoring', red) vs assuming the adjustment costs when they are absent ('assuming', blue).  All values are relative to the cost free adjustment optimum, $NPV_0$.  In each case, it is less costly to assume adjustment costs are present when they are not than it is to ignore them when they are present.Supplementary Figure A6 shows how the magnitude of this effect changes with the size of the reduction to $NPV$.", dev=c("pdf", "svg", "png"), fig.width=7, cache=FALSE}
+```{r Figure_6, fig.cap="Relative cost of ignoring adjustment costs when they are present ('ignoring', red) vs assuming the adjustment costs when they are absent ('assuming', blue).  All values are relative to the cost free adjustment optimum, $NPV_0$.  In each case, it is less costly to assume adjustment costs are present when they are not than it is to ignore them when they are present. Appendix A, Figure A6 shows how the magnitude of this effect changes with the size of the reduction to $NPV$.", dev=c("pdf", "svg", "png"), fig.width=7, cache=FALSE}
 
 who <- c("penalty_fn", "ignore_fraction", "assume_fraction", "reduction")
 table1 <- arrange(error_df[who], reduction) 
@@ -784,7 +787,7 @@ are barely below $NPV_0$ (a value of 1 on the vertical axis).  We also
 see that the impacts on net present value of the fishery of incorrectly
 assuming or ignoring policy adjustment costs are most severe when these
 costs are assumed to scale quadratically with the size of the policy
-change being implemented ($\Pi_2$).  In the Supplementary Materials we
+change being implemented ($\Pi_2$).  In Appendix A we
 show that pattern holds across different severity of adjustment costs
 (robust to choice of $c_i$), though the larger the adjustment cost,
 the greater the difference between these two errors.
@@ -794,7 +797,7 @@ adjustment cost is present, but of a different functional form than the
 policy assumes.  The consequences of managing under the wrong functional
 form can be as or more severe than simply ignoring adjustment costs in
 the optimization altogether.  We illustrate several of these mismatch
-errors in the Supplementary Material.
+errors in Appendix A.
 
 
 Discussion
@@ -848,7 +851,7 @@ autocorrelated in time, because it takes the fishery multiple timesteps to harve
 down peaks in abundance that follow large recruitment pulses. The effects
 of smoothing here are similar to those predicted when assuming the cost
 per unit effort is increasing in the amount of effort expended [@Brown1974;
-@Lewis1981; @McGough2009]; (see Supporting Information for a summary of the
+@Lewis1981; @McGough2009]; (see Appendix A for a summary of the
 relevant results) as opposed to associating extra costs with changes to
 policy *per se*. Smoothing effects of this type are what one might have
 expected when including policy adjustment costs.
@@ -902,7 +905,7 @@ they are present arises because the first, more direct, cost contribution
 here is the larger. 
 
 Assuming an adjustment cost exists when in fact it is absent is not the
-same as using the wrong functional form when it is present.  In the supplement
+same as using the wrong functional form when it is present.  In Appendix A
 we show that choice of the functional form makes a significant
 difference.  We show it can be better to ignore policy costs than to derive a 
 policy based on assuming the wrong functional form.  This result further

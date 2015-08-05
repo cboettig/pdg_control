@@ -45,6 +45,10 @@ output:
     template: components/elsarticle.latex
     fig_caption: true
     keep_tex: true
+  html_document: 
+    toc: true
+    toc_depth: 2
+    number_sections: true
 ---
 
 
@@ -97,7 +101,7 @@ theme_set(theme_tufte(base_size=12) + theme(axis.line = element_line()))
 
 \appendix
 
-# Supplementary material #
+# Appendix A #
 
 ## Code and data for methods and analysis ## 
 
@@ -124,9 +128,9 @@ The package DESCRIPTION file lists the software dependencies required to run the
 
 ##  Impact on the stock dynamics ##
 
-Figure S1 shows the corresponding stock dynamics for the replicates illustrated in Figure 3 of the main text.  The impact of the adjustment cost on the stock dynamics is less dramatic than it is on the harvest dynamics, due to the stochastic growth in stock sizes and the sequence in which the steps are applied: stock values are assessed without error, then an optimal harvest is determined (using the pre-computed optimal policy based on both the stock assessment and the previous harvest, to account for possible adjustment costs), and then the stock that escapes harvesting recruits stochastically to set the population size for the next year.  
+Figure A1 shows the corresponding stock dynamics for the replicates illustrated in Figure 3 of the main text.  The impact of the adjustment cost on the stock dynamics is less dramatic than it is on the harvest dynamics, due to the stochastic growth in stock sizes and the sequence in which the steps are applied: stock values are assessed without error, then an optimal harvest is determined (using the pre-computed optimal policy based on both the stock assessment and the previous harvest, to account for possible adjustment costs), and then the stock that escapes harvesting recruits stochastically to set the population size for the next year.  
 
-Though this results in an effect that is less pronounced, the stock dynamics of Figure S1 reflect the same general trends observed in Main text Figure 3; e.g. the fixed fee $\Pi_3$ results in the most exaggerated fluctuations in the stock sizes.  It is worth noting how changes in policy costs alone, such as introducing or rising fixed costs, can have important knock-on effects to population dynamics such as increased variance, a recent phenomenon observed in important fisheries that has received much attention elsewhere [@Anderson2008].
+Though this results in an effect that is less pronounced, the stock dynamics of Figure A1 reflect the same general trends observed in Main text Figure 3; e.g. the fixed fee $\Pi_3$ results in the most exaggerated fluctuations in the stock sizes.  It is worth noting how changes in policy costs alone, such as introducing or rising fixed costs, can have important knock-on effects to population dynamics such as increased variance, a recent phenomenon observed in important fisheries that has received much attention elsewhere [@Anderson2008].
 
 
 ```{r Figure_S1, dependson="tidy", fig.cap="Example realization of optimal fish stock sizes under the different functional forms of adjustment costs, under the harvest policy dynamics shown in Figure 3 of the main text.", fig.height=5, fig.width=8, cache = fig.cache, dev=c("pdf", "svg", "png")}
@@ -208,7 +212,7 @@ Recall that in our model definition, stock sizes are measured before
 harvest ($h_t$ being determined after observing stock size $N_t$) and
 thus show less influence of the policy cost than the harvest itself.
 
-Figure S2 shows the same summary statistics illustrating the trends
+Figure A2 shows the same summary statistics illustrating the trends
 of increasing adjustment costs on the _stock_ dynamics, instead of the
 _harvest_ dynamics shown in Figure 4 of the main text.  Note that 
 the variance in stock sizes under the quadratic penalty ($\Pi_2$) increases,
@@ -221,7 +225,7 @@ fluctuation, resulting in increased variation in the stock sizes.
 ## Additional stochastic realizations ## 
 
 Figure 3 of the main text shows only a single stochastic realization.  Here in
-Figure S3 we provide a sample of further realizations (including both
+Figure A3 we provide a sample of further realizations (including both
 stock and harvest dynamics).
 
 
@@ -265,7 +269,7 @@ write.csv(ex, "components/data/figureS3.csv")
 
 ## Economic penalties using quadratic costs ##
 
-Figure S4 shows that adding quadratic terms to the cost of fishing effort directly, as in @Lewis1981 or @McGough2009, results in a similar smoothing effect as we observe in quadratic adjustment costs ($\Pi_2$), which contrasts sharply with the patterns we observe in other functional forms.  This case corresponds to a profit function defined as:
+Figure A4 shows that adding quadratic terms to the cost of fishing effort directly, as in @Lewis1981 or @McGough2009, results in a similar smoothing effect as we observe in quadratic adjustment costs ($\Pi_2$), which contrasts sharply with the patterns we observe in other functional forms.  This case corresponds to a profit function defined as:
 
 $$\Pi_4(N_t,h_t) = p h_t -  c_0 E_t - c_4 E_t^2$$
 
@@ -305,7 +309,7 @@ Like the $\Pi_2$ adjustment cost based penalty, this quadratic cost based penalt
 Ignoring adjustment costs is worst than wrongly assuming adjustment costs
 --------------------------------------------------------------------------
 
-Figure S5 extends Figure 5 of the main text across all three functional forms of adjustment costs, $\Pi_{1-3}$. To reduce over-plotting of Figure 5 we have also separated the distributions of dockside revenue and adjustment fees by scenario, such that the top row shows the distributions when the policy accounts for adjustment costs, and the bottom shows the policy when it does not (that is, the original @Reed1979 model applied to the scenario of costly adjustment).  
+Figure A5 extends Figure 5 of the main text across all three functional forms of adjustment costs, $\Pi_{1-3}$. To reduce over-plotting of Figure 5 we have also separated the distributions of dockside revenue and adjustment fees by scenario, such that the top row shows the distributions when the policy accounts for adjustment costs, and the bottom shows the policy when it does not (that is, the original @Reed1979 model applied to the scenario of costly adjustment).  
 
 
 ```{r Figure_S5, fig.cap="Distribution of profits from fishing and costs paid to adjustment.  Distributions are shown when managing a system in which the adjustment costs present are determined by the model indicated, and compared to the same costs and profits of managing the same system using a Reed model, which ignores adjustment costs, and thus tends to pay much higher fees for adjustment.  In contrast, the difference in profit after accounting for costs is only marginally less than the value derived by managing the population to optimize profits when ignoring adjustment costs (Reed model).", fig.width=8, fig.height=6, dependson="histogram-calc", dev=c("pdf", "svg", "png"), cache=FALSE}
@@ -328,7 +332,7 @@ write.csv(hist_dat, "components/data/figureS5.csv")
 ```
 
 
-Figure S6 extends the results shown in Figure 6 across different severities of adjustment cost, totaling from 10% up to 25% of the $NPV$ of the stock. While the same qualitative pattern is observed in all cases, it is strongest in the higher penalties.
+Figure A6 extends the results shown in Figure 6 across different severities of adjustment cost, totaling from 10% up to 25% of the $NPV$ of the stock. While the same qualitative pattern is observed in all cases, it is strongest in the higher penalties.
 
 ```{r Figure_S6, fig.cap="Relative cost of ignoring adjustment costs when they are present ('ignoring', red) vs assuming the adjustment costs when they are absent ('assuming', blue), shown by penalty function over increasing magnitudes of cost.  All values are relative to the cost-free adjustment optimum, NPV0.  In each case, it is less costly to assume adjustment costs are present when they are not than it is to ignore them when they are present. The severity of the latter mistake increases sharply as adjustment costs make a larger fraction of the total costs.", dev=c("pdf", "svg", "png"), fig.width=7, cache=FALSE}
 
@@ -351,7 +355,7 @@ Mismatched penalty functions
 
 When policy costs are present, assuming the wrong functional form may or
 may not be worse than ignoring the presence of policy costs all together.
-Figure S7 considers several such cases.  The X axis labels indicate
+Figure A7 considers several such cases.  The X axis labels indicate
 first which policy is being used to drive the harvest decisions, and
 then which penalty is actually being applied.  Thus $\Pi_1\_\Pi_2$ indicates
 a policy calculated under the linear ($\Pi_1$) costs, when the reality
@@ -396,7 +400,7 @@ write.csv(table2_long, "components/data/figureS7.csv")
 
 
 These patterns hold across the different size reductions shown (from 10%
-to 25%, Figure S8 panels a-d respectively), though net present value becomes negative under the quadratic
+to 25%, Figure A8 panels a-d respectively), though net present value becomes negative under the quadratic
 form for the larger penalties as costs paid for adjustments exceed
 profits derived from harvest.  (Though optimal solutions will always
 avoid negative net present values, these scenarios in which policies are
@@ -440,7 +444,7 @@ source("components/vary_reduction.R")
 ```
 
 
-Figures S8-S11 illustrate that the 
+Figures A8-A11 illustrate that the 
 these qualitative patterns still hold at when the models are calibrated 
 to a reduction in NPV of 10% or 30%, though naturally the magnitude
 of the pattern is greater when the penalty is larger (e.g. 30% vs 10%).

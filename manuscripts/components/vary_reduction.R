@@ -1,3 +1,36 @@
+## ----reed--------------------------
+SDP_Mat <- determine_SDP_matrix(f, pars, x_grid, h_grid, sigma_g )
+opt <- find_dp_optim(SDP_Mat, x_grid, h_grid, OptTime, xT, 
+                     profit, delta, reward=reward)
+
+
+## ----fees----------------------------------------------------------------
+L1 <- function(c2) function(h, h_prev)  c2 * abs(h - h_prev) 
+fixed <-  function(c2) function(h, h_prev) c2 * as.numeric( !(h == h_prev) )
+L2 <- function(c2) function(h, h_prev)  c2 * (h - h_prev) ^ 2
+none <- function(h, h_prev)  0
+penaltyfns <- list(L2=L2, L1=L1, fixed=fixed)
+
+
+
+
+## ----parallel, include=FALSE---------------------------------------------
+sfInit(cpu=ncpu, parallel=parallel)
+sfLibrary(pdgControl)
+sfExportAll()
+
+##### ANALYSIS #############
+
+
+## Apples to Apples comparison (Figure 2)
+policies <- lapply(penaltyfns, function(penalty){
+  sfLapply(c2, function(c2){
+    policy <- optim_policy(SDP_Mat, x_grid, h_grid, OptTime, xT, 
+                           profit, delta, reward, penalty = penalty(c2))
+  }
+  )
+})
+
 
 
 robust_reduction <- function(reduction){
