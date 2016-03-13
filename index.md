@@ -5,8 +5,8 @@ layout: page
 ESA2014 Slides
 --------------
 
-- [HTML5 Slides](http://io.carlboettiger.info/pdg_control/presentation.html)
-- [As pdf](http://io.carlboettiger.info/pdg_control/presentation.pdf)
+- [HTML5 Slides](http://www.carlboettiger.info/pdg_control/presentation.html)
+- [As pdf](http://www.carlboettiger.info/pdg_control/presentation.pdf)
 
 Abstract
 --------
