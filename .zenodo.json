@@ -23,5 +23,5 @@
   "description": "This compendium includes the code, data, documentation, metadata and manuscript source files that accompany this research, organized in the R package format.",
   "access_right": "open",
   "license": "cc-by",
-  keywords: ["optimal control", "fisheries", "ecology", "stochastic dynamic programming", "R"]
+  "keywords": ["optimal control", "fisheries", "ecology", "stochastic dynamic programming", "R"]
 }
