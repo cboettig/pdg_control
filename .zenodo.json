@@ -2,10 +2,11 @@
   "title": "Optimal management of a stochastically varying population when policy adjustment is costly",
   "creators": [{
       "name": "Boettiger, Carl",
+      "ORCID": "https://orcid.org/0000-0002-1642-628X",
       "affiliation": "Center for Stock Assessment Research, Department of Applied Math and Statistics, University of California, Santa Cruz, USA"
   }, {
       "name": "Bode, Michael",
-      "affiliation": "School of Botany, University of Melbourne, Australia "
+      "affiliation": "School of Botany, University of Melbourne, Australia"
   }, {
       "name": "Sanchirico, James N.",
       "affiliation": "Department of Environmental Science and Policy, University of California, Davis"
@@ -22,8 +23,5 @@
   "description": "This compendium includes the code, data, documentation, metadata and manuscript source files that accompany this research, organized in the R package format.",
   "access_right": "open",
   "license": "cc-by",
-  "related_identifiers": [{
-    "identifier": "http://github.com/cboettig/pdg_control",
-    "relation": "isVariantFormOf"
-  }]
+  keywords: ["optimal control", "fisheries", "ecology", "stochastic dynamic programming", "R"]
 }
